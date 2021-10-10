@@ -1,0 +1,112 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Bounce
+#pragma kernel InitRays
+
+RWTexture2D<float4> Result;
+
+float w;
+float h;
+
+struct Ray
+{
+	float3 rayPos;
+	float3 rayDir;
+};
+RWStructuredBuffer<Ray> rays;
+
+[numthreads(8, 8, 1)]
+void InitRays(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	float maxTraceDis = 10.0f;
+	float traceThre = 0.01f;
+
+	float3 screenPos = float3(0, 0, 0);
+	float3 eyeOffset = float3(0, 0, 1);
+	float dx = 2.0f / w;
+	float ylen = dx * h;
+	float3 screenLeftDownPos = float3(-1, -ylen / 2, 0) + 0.5f*float3(dx, dx, 0);
+
+	Ray ray = rays[i + w * j];
+
+	//######################## 
+	ray.rayPos = screenPos + screenLeftDownPos + float3(i*dx, j*dx, 0);
+	ray.rayDir = ray.rayPos - screenPos - eyeOffset; //默认eyePos在屏幕后一单位，z轴向屏幕外为(0,0,1)
+	//######################## 
+	//end
+	rays[i + w * j] = ray;
+
+	Result[id.xy] = float4(ray.rayDir, 0);
+}
+
+[numthreads(8, 8, 1)]
+void Bounce(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	float maxTraceDis = 10.0f;
+	float traceThre = 0.01f;
+
+	Ray ray = rays[i + w * j];
+	//######################## 
+	float traceDis = -1.0f;
+	while (true)
+	{
+		float sdf1 = length(ray.rayPos - float3(0, 0, -5)) - 1;
+
+		float3 q = abs(ray.rayPos - float3(0, -1.2, -5)) - float3(5, 0.1, 5);
+		float sdf2 = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+
+		float sdf = min(sdf1, sdf2);
+		if (sdf > maxTraceDis)
+		{
+			break;
+		}
+		else if (sdf <= traceThre)
+		{
+			traceDis = sdf;
+			break;
+		}
+		ray.rayPos += ray.rayDir*sdf;
+	}
+	//######################## 
+	//end
+	rays[i + w * j] = ray;
+
+	float3 re = float3(0, 0, 0);
+	if (traceDis > 0)
+	{
+		re = float3(1, 0, 0);
+	}
+	Result[id.xy] = float4(re, 0);
+}
+
+[numthreads(8, 8, 1)]
+void Render(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	float maxTraceDis = 10.0f;
+	float traceThre = 0.01f;
+
+	Ray ray = rays[i + w * j];
+	//######################## 
+	float3 re = float3(0, 0, 0);
+
+	//??? PointLight(P(2.0, 2.0, -3.0), P(1, 1, 1),1.5);
+	float3 p = ray.rayPos;
+	float3 lightPos = float3(2, 2, -3);
+	float3 L = lightPos - p;
+	//float3 N = info.hitN;
+	//re = saturate(dot(N, L));
+	//___
+	//######################## 
+	//end
+	rays[i + w * j] = ray;
+
+	Result[id.xy] = float4(re, 0);
+}

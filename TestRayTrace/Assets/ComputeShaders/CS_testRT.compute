@@ -1,0 +1,182 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Bounce
+#pragma kernel InitRays
+#pragma kernel Render
+
+RWTexture2D<float4> Result;
+
+float w;
+float h;
+
+struct Ray
+{
+	float3 pos;
+	float3 dir;
+};
+RWStructuredBuffer<Ray> rays;
+
+struct HitInfo
+{
+	int bHit;
+	float3 hitN;
+};
+RWStructuredBuffer<HitInfo> hitInfos;
+
+[numthreads(8, 8, 1)]
+void InitRays(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	float maxTraceDis = 10.0f;
+	float traceThre = 0.01f;
+
+	float3 screenPos = float3(0, 0, 0);
+	float3 eyeOffset = float3(0, 0, 1);
+	float dx = 2.0f / w;
+	float ylen = dx * h;
+	float3 screenLeftDownPos = float3(-1, -ylen / 2, 0) + 0.5f*float3(dx, dx, 0);
+
+	Ray ray = rays[i + w * j];
+
+	//######################## 
+	ray.pos = screenPos + screenLeftDownPos + float3(i*dx, j*dx, 0);
+	ray.dir = ray.pos - screenPos - eyeOffset; //默认eyePos在屏幕后一单位，z轴向屏幕外为(0,0,1)
+	//######################## 
+	//end
+	rays[i + w * j] = ray;
+
+	Result[id.xy] = float4(ray.dir, 0);
+}
+
+float GetObjSDF(int inx, float3 p)
+{
+	if (inx == 0)
+	{
+		//sphere center(0, 0, -5), radius 1
+		return length(p - float3(0, 0, -5)) - 1;
+	}
+	else if (inx == 1)
+	{
+		//box center(0, -1.2, -5), bound(5, 0.1, 5)
+		float3 q = abs(p - float3(0, -1.2, -5)) - float3(5, 0.1, 5);
+		return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+float3 GetObjSDFNormal(int inx, float3 p)
+{
+	float epsilon = 0.0001f;
+	return normalize(float3(
+		GetObjSDF(inx, float3(p.x + epsilon, p.y, p.z)) - GetObjSDF(inx, float3(p.x - epsilon, p.y, p.z)),
+		GetObjSDF(inx, float3(p.x, p.y + epsilon, p.z)) - GetObjSDF(inx, float3(p.x, p.y - epsilon, p.z)),
+		GetObjSDF(inx, float3(p.x, p.y, p.z + epsilon)) - GetObjSDF(inx, float3(p.x, p.y, p.z - epsilon))
+		));
+}
+
+float3 GetObjNormal(int inx, float3 p)
+{
+	if (inx == 0)
+	{
+		//sphere center(0, 0, -5), radius 1
+		return normalize(p - float3(0, 0, -5));
+	}
+	else if (inx == 1)
+	{
+		//box center(0, -1.2, -5), bound(5, 0.1, 5)
+		return GetObjSDFNormal(inx, p);
+	}
+	else
+	{
+		return float3(0,0,0);
+	}
+}
+
+[numthreads(8, 8, 1)]
+void Bounce(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	Ray ray = rays[i + w * j];
+	HitInfo info = hitInfos[i + w * j];
+	//######################## 
+	float maxTraceDis = 10.0f;
+	float traceThre = 0.01f;
+
+	float traceDis = -1.0f;
+	int objInx = -1;
+	while (true)
+	{
+		float objSDF[2];
+		float sdf = 1000; //a very large,can be larger than maxTraceDis
+		for (int inx = 0; inx < 2; inx++)
+		{
+			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			if (objSDF[inx] < sdf)
+			{
+				sdf = objSDF[inx];
+				objInx = inx;
+			}
+		}
+
+		if (sdf > maxTraceDis)
+		{
+			break;
+		}
+		else if (sdf <= traceThre)
+		{
+			traceDis = sdf;
+			info.bHit = 1;
+			info.hitN = GetObjNormal(objInx, ray.pos);
+			break;
+		}
+		ray.pos += ray.dir*sdf;
+		//??? debug
+		//break;
+	}
+	//######################## 
+	//end
+	rays[i + w * j] = ray;
+	hitInfos[i + w * j] = info;
+
+	float3 re = float3(0, 0, 0);
+	if (info.bHit)
+	{
+		re = float3(1, 0, 0);
+	}
+	Result[id.xy] = float4(re, 0);
+}
+
+[numthreads(8, 8, 1)]
+void Render(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	HitInfo info = hitInfos[i + w * j];
+	if (!info.bHit)
+	{
+		return;
+	}
+	Ray ray = rays[i + w * j];
+	//######################## 
+	float3 re = float3(0, 0, 0);
+
+	//??? PointLight(float3(2.0, 2.0, -3.0), float3(1, 1, 1),1.5);
+	float3 p = ray.pos;
+	float3 lightPos = float3(2, 2, -3);
+	float3 L = lightPos - p;
+	float3 N = info.hitN;
+	re = saturate(dot(N, L));
+	//___
+	//######################## 
+	//end
+	rays[i + w * j] = ray;
+
+	Result[id.xy] = float4(re, 0);
+}
