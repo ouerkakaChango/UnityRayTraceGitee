@@ -11,7 +11,9 @@ public struct Ray
 public struct HitInfo
 {
     public int bHit;
+    public int obj;
     public Vector3 hitN;
+    public Vector3 hitP;
 }
 
 public class testRT : MonoBehaviour
@@ -80,22 +82,24 @@ public class testRT : MonoBehaviour
     {
         HitInfo hitInfo = new HitInfo();
         hitInfo.bHit = 0;
+        hitInfo.obj = -1;
         hitInfo.hitN = new Vector3(0, 0, 0);
+        hitInfo.hitP = new Vector3(0, 0, 0);
         hitInfos[i + w * j] = hitInfo;
     }
 
     int GetRayStride()
-    {
+    {//Ray
         //int colorSize = sizeof(float) * 4;
         int vector3Size = sizeof(float) * 3;
         return 2 * vector3Size;
     }
 
     int GetHitInfoStride()
-    {
+    {//HitInfo
         int intSize = sizeof(int);
         int vector3Size = sizeof(float) * 3;
-        return intSize + vector3Size;
+        return intSize*2 + vector3Size*2;
     }
 
     void Bounce()
