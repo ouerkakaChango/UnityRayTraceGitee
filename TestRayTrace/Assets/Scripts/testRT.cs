@@ -29,7 +29,6 @@ public struct ShadeTask
 public class testRT : MonoBehaviour
 {
     public int TraceTime = 2; //第一次Trace只看见自发光物体（光源），第二次看见光源照出的直接光，第三次包含间接光(2bounce)
-    private int nowTraceTime = 0;
     public const int SSP = 64;
 
     public ComputeShader cs;
