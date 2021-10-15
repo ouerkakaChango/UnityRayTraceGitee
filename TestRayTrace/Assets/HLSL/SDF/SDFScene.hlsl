@@ -1,4 +1,8 @@
 ﻿#define OBJNUM 7
+
+#define TraceThre 0.01
+#define StartLen 0.1
+
 float SDFBox(float3 p, float3 center, float3 bound)
 {
 	float3 q = abs(p - center) - bound;
@@ -70,12 +74,12 @@ float3 GetObjNormal(int inx, float3 p)
 
 void SDFScene(inout Ray ray,out HitInfo info)
 {
-	float maxTraceDis = 10.0f;
-	float traceThre = 0.01f;
+	float maxTraceDis = 20.0f;
 
 	float traceDis = -1.0f;
 	int objInx = -1;
 
+	ray.pos += ray.dir*StartLen;
 	while (true)
 	{
 		float objSDF[OBJNUM];
@@ -94,7 +98,7 @@ void SDFScene(inout Ray ray,out HitInfo info)
 		{
 			break;
 		}
-		else if (sdf <= traceThre)
+		else if (sdf <= TraceThre)
 		{
 			traceDis = sdf;
 			info.bHit = 1;
@@ -104,5 +108,17 @@ void SDFScene(inout Ray ray,out HitInfo info)
 			break;
 		}
 		ray.pos += ray.dir*sdf;
+	}
+}
+
+float3 GetObjEmissive(int obj)
+{
+	if (obj == 6)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
 	}
 }

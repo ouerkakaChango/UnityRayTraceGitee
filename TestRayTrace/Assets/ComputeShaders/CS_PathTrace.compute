@@ -2,13 +2,15 @@
 #pragma kernel InitRays
 #pragma kernel Trace
 #pragma kernel Bounce
-#pragma kernel Render
-#pragma kernel Render_MonteCarlo
+#pragma kernel GatherSublight
 
 #define PI 3.14159f
 
+int BI;
+
 RWTexture2D<float4> Result;
 
+int SPP;
 float w;
 float h;
 
@@ -29,8 +31,16 @@ struct HitInfo
 };
 RWStructuredBuffer<HitInfo> hitInfos;
 RWStructuredBuffer<HitInfo> mainHits;
+RWStructuredBuffer<HitInfo> subHits;
 
-#include "CS_SDFScene.hlsl"
+struct Light
+{
+	float3 color;
+};
+RWStructuredBuffer<Light> subLights;
+
+#include "../HLSL/SDF/SDFScene.hlsl"
+#include  "../HLSL/Random/RandUtility.hlsl"
 
 [numthreads(8, 8, 1)]
 void InitRays(uint3 id : SV_DispatchThreadID)
@@ -47,8 +57,8 @@ void InitRays(uint3 id : SV_DispatchThreadID)
 	float ylen = dx * h;
 	float3 screenLeftDownPos = float3(-1, -ylen / 2, 0) + 0.5f*float3(dx, dx, 0);
 
-	Ray ray = mainRays[i + w * j];
-	HitInfo hit = mainHits[i + w * j];
+	Ray ray;
+	HitInfo hit;
 	//初始化
 	hit.bHit = 0;
 	//######################## 
@@ -56,118 +66,69 @@ void InitRays(uint3 id : SV_DispatchThreadID)
 	ray.dir = ray.pos - screenPos - eyeOffset; //默认eyePos在屏幕后一单位，z轴向屏幕外为(0,0,1)
 
 	SDFScene(ray,hit);
+
 	//在hit上初始化SPP个subRay
-	//???
+	for (int k = 0; k < SPP; k++)
+	{
+		Ray subRay;
+		float3 seed = hit.P + float3(i, j, k);
+		subRay.dir = normalize(randP_round(seed) + hit.N);
+		subRay.pos = hit.P;
+		subRays[i + w * j + w * h * k] = subRay;
+	}
 	//######################## 
 	//end
 	mainRays[i + w * j] = ray;
+	mainHits[i + w * j] = hit;
 
+	float3 re = 0;
+	re = GetObjEmissive(hit.obj);
+	//Result[id.xy] = float4(mainRays[i + w * j].pos, 0);
+	//Result[id.xy] = float4(subRays[i + w * j].dir, 0);
 	Result[id.xy] = float4(hit.N, 0);
+	//Result[id.xy] = float4(hit.P, 0);
+	//Result[id.xy] = float4(re, 0);
 }
 //#########################################################################################################
-
 [numthreads(8, 8, 1)]
 void Trace(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
 
-	Ray ray = mainRays[i + w * j];
-	HitInfo info = hitInfos[i + w * j];
+	HitInfo hit = subHits[i + w * j + w * h * 0 + w * h* SPP * BI];
 	//######################## 
-	float maxTraceDis = 10.0f;
-	float traceThre = 0.01f;
-
-	float traceDis = -1.0f;
-	int objInx = -1;
-	while (true)
+	for (int k = 0; k < SPP; k++)
 	{
-		float objSDF[OBJNUM];
-		float sdf = 1000; //a very large,can be larger than maxTraceDis
-		for (int inx = 0; inx < OBJNUM; inx++)
-		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos);
-			if (objSDF[inx] < sdf)
-			{
-				sdf = objSDF[inx];
-				objInx = inx;
-			}
-		}
-
-		if (sdf > maxTraceDis)
-		{
-			break;
-		}
-		else if (sdf <= traceThre)
-		{
-			traceDis = sdf;
-			info.bHit = 1;
-			info.obj = objInx;
-			info.N = GetObjNormal(objInx, ray.pos);
-			info.P = ray.pos;
-			break;
-		}
-		ray.pos += ray.dir*sdf;
-		//??? debug
-		//break;
+		Ray ray = subRays[i + w * j + w * h * k];
+		//初始化
+		hit.bHit = 0;
+		SDFScene(ray, hit);
+		subHits[i + w * j + w * h * k + w * h* SPP * BI] = hit;
 	}
 	//######################## 
-	//end
-	mainRays[i + w * j] = ray;
-	hitInfos[i + w * j] = info;
 
 	float3 re = float3(0, 0, 0);
-	if (info.bHit)
-	{
-		//re = float3(1, 0, 0);
-		re = info.N;
-		//re = normalize(info.P);
-	}
+	re = subHits[i + w * j + w * h * 0 + w * h* SPP * BI].bHit;
 	Result[id.xy] = float4(re, 0);
 }
 //############################################################################
-#define SSP 64
-//struct ShadeTask_Surfuls
-//{
-//	int obj;
-//	float3 N;
-//	float3 V;
-//
-//	float3 Li[SSP];
-//	float3 L[SSP];
-//};
-//RWStructuredBuffer<ShadeTask_Surfuls> shadeTask_Surfuels;
-
-//struct ShadeTask_Lights
-//{
-//	float3 Li;
-//	float3 L;
-//};
-//RWStructuredBuffer<ShadeTask_Lights> shadeTask_Lights;
 [numthreads(8, 8, 1)]
 void Bounce(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
-
-	Ray ray = mainRays[i + w * j];
-	HitInfo info = hitInfos[i + w * j];
 	//######################## 
-	//1.reflect ray.dir based on info.N
-	//---2.save the ShadeTask to outShadeTask
-	//3.clear the hitInfo
-	ray.dir = reflect(ray.dir, info.N);
-	info.bHit = -1;
+	for (int k = 0; k < SPP; k++)
+	{
+		Ray ray = subRays[i + w * j + w * h * k];
+		HitInfo hit = subHits[i + w * j + w * h * k + w * h* SPP * BI];
+		ray.dir = reflect(ray.dir, hit.N);
+	}
 	//######################## 
 	//end
-	mainRays[i + w * j] = ray;
-	hitInfos[i + w * j] = info;
-
 	float3 re = float3(0, 0, 0);
-	if (info.bHit)
-	{
-		re = ray.dir;
-	}
+	re = subRays[i + w * j + w * h * 0].dir;
 	Result[id.xy] = float4(re, 0);
 }
 //############################################################################
@@ -239,7 +200,6 @@ struct Material_PBR
 	float3 albedo;
 	float metallic;
 	float roughness;
-	float3 emissive;
 };
 
 float3 PBR_GGX(Material_PBR param, float3 n, float3 v, float3 l, float3 Li)
@@ -274,7 +234,6 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	Material_PBR re;
 	if (obj == 0)
 	{
-		re.emissive = 0;
 		re.albedo = float3(1, 1, 1);
 		re.metallic = 0.01;
 		re.roughness = 0.98;
@@ -283,7 +242,6 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	}
 	else if (obj >= 1 && obj<=5)
 	{
-		re.emissive = 0;
 		re.albedo = float3(1, 1, 1);
 		if (obj == 3)
 		{
@@ -298,7 +256,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	}
 	else if (obj == 6)
 	{
-		re.emissive = 1;
+		//re.emissive = 1;
 	}
 	else
 	{//错误材质色，类似unity中的麦金塔色
@@ -311,80 +269,40 @@ Material_PBR GetObjMaterial_PBR(int obj)
 }
 
 [numthreads(8, 8, 1)]
-void Render(uint3 id : SV_DispatchThreadID)
+void GatherSublight(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
 
-	HitInfo info = hitInfos[i + w * j];
-	if (!info.bHit)
-	{
-		return;
-	}
-	Ray ray = mainRays[i + w * j];
 	//######################## 
-	float3 re = float3(0, 0, 0);
-
-	//??? PointLight(float3(2.0, 2.0, -3.0), float3(1, 1, 1),1.5);
-	float3 p = info.P;
-	float3 lightPos = float3(0, 2, -3);
-	float3 N = info.N;
-	float3 V = -ray.dir;
-	float3 L = lightPos - p;
-	float3 lightColor = float3(1, 1, 1) * 2.0;
-
-	//re = saturate(dot(N, L));
+	for (int k = 0; k < SPP; k++)
 	{
-		float3 Li = GetAttenuationed(lightColor, p, lightPos);
-		//re = Li;
-		re = PBR_GGX(GetObjMaterial_PBR(info.obj), N, V, L, Li);
+		Light light = subLights[i + w * j + w * h * k];
+		light.color = 0;
+		for (int inx = BI; inx >= 0; inx--)
+		{
+			HitInfo hit = subHits[i + w * j + w * h * k + w*h*SPP*inx];
+			if (inx == BI)
+			{
+				light.color = GetObjEmissive(hit.obj);
+			}
+			else
+			{
+				//???
+				//light[inx] = ObjEmissive(hit[inx]) + PBR(light[inx+1],hit[inx])
+			}
+		}
+		subLights[i + w * j + w * h * k] = light;
 	}
-	//___
 	//######################## 
 	//end
-	mainRays[i + w * j] = ray;
-
-	Result[id.xy] = float4(re, 0);
-}
-
-//##################################################################
-[numthreads(8, 8, 1)]
-void Render_MonteCarlo(uint3 id : SV_DispatchThreadID)
-{
-	int i = id.x;
-	int j = id.y;
-
-	HitInfo info = hitInfos[i + w * j];
-	if (!info.bHit)
+	float3 re = 0; 
+	float3 tt = 0;
+	for (int k = 0; k < SPP; k++)
 	{
-		return;
+		Light light = subLights[i + w * j + w * h * k];
+		tt += light.color;
 	}
-	Ray ray = mainRays[i + w * j];
-	//######################## 
-	float3 re = float3(0, 0, 0);
-
-	//---1.sample SSP个反射方向，如果hit到emissive东西，就计算光照
-
-	//??? PointLight(float3(2.0, 2.0, -3.0), float3(1, 1, 1),1.5);
-	float3 p = info.P;
-	float3 lightPos = float3(0, 2, -3);
-	float3 N = info.N;
-	float3 V = -ray.dir;
-	float3 L = lightPos - p;
-	float3 lightColor = float3(1, 1, 1) * 2.0;
-
-	//re = saturate(dot(N, L));
-	{
-		float3 Li = GetAttenuationed(lightColor, p, lightPos);
-		//re = Li;
-		Material_PBR param = GetObjMaterial_PBR(info.obj);
-		re = PBR_GGX(param, N, V, L, Li);
-		re += param.emissive;
-	}
-	//___
-	//######################## 
-	//end
-	mainRays[i + w * j] = ray;
-
+	re = tt;
 	Result[id.xy] = float4(re, 0);
 }

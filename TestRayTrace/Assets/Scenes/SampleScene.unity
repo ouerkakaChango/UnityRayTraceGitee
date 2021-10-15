@@ -334,6 +334,7 @@ MonoBehaviour:
   rt: {fileID: 0}
   w: 1024
   h: 720
+  SPP: 16
 --- !u!850595691 &1105758469
 LightingSettings:
   m_ObjectHideFlags: 0
