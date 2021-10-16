@@ -11,8 +11,8 @@ int BI;
 RWTexture2D<float4> Result;
 
 int SPP;
-float w;
-float h;
+int w;
+int h;
 
 struct Ray
 {
@@ -41,6 +41,16 @@ RWStructuredBuffer<Light> subLights;
 
 #include "../HLSL/SDF/SDFScene.hlsl"
 #include  "../HLSL/Random/RandUtility.hlsl"
+
+int Inx_PerSubRay(int i, int j, int k)
+{
+	return i+w*j+w*h*k;
+}
+
+int Inx_PerBounce(int i, int j, int k, int bounceInx)
+{
+	return i + w * j + w * h*k + w*h*SPP * bounceInx;
+}
 
 [numthreads(8, 8, 1)]
 void InitRays(uint3 id : SV_DispatchThreadID)
@@ -90,6 +100,8 @@ void InitRays(uint3 id : SV_DispatchThreadID)
 	//Result[id.xy] = float4(re, 0);
 }
 //#########################################################################################################
+int traceInx;
+int SPP_cell;
 [numthreads(8, 8, 1)]
 void Trace(uint3 id : SV_DispatchThreadID)
 {
@@ -98,18 +110,20 @@ void Trace(uint3 id : SV_DispatchThreadID)
 
 	HitInfo hit = subHits[i + w * j + w * h * 0 + w * h* SPP * BI];
 	//######################## 
-	for (int k = 0; k < SPP; k++)
+	for (int k = traceInx*SPP_cell; k < (traceInx+1)*SPP_cell; k++)
 	{
 		Ray ray = subRays[i + w * j + w * h * k];
 		//初始化
 		hit.bHit = 0;
 		SDFScene(ray, hit);
-		subHits[i + w * j + w * h * k + w * h* SPP * BI] = hit;
+		subHits[Inx_PerBounce(i, j, k, BI)] = hit;
 	}
 	//######################## 
 
 	float3 re = float3(0, 0, 0);
-	re = subHits[i + w * j + w * h * 0 + w * h* SPP * BI].bHit;
+	//re = subHits[i + w * j + w * h * 0 + w * h* SPP * BI].bHit;
+	//re = subRays[i + w * j + w * h * (SPP-1) + w * h* SPP * BI].dir;
+	re = subHits[Inx_PerBounce(i, j, 0, BI)].P;
 	Result[id.xy] = float4(re, 0);
 }
 //############################################################################
@@ -121,113 +135,20 @@ void Bounce(uint3 id : SV_DispatchThreadID)
 	//######################## 
 	for (int k = 0; k < SPP; k++)
 	{
-		Ray ray = subRays[i + w * j + w * h * k];
-		HitInfo hit = subHits[i + w * j + w * h * k + w * h* SPP * BI];
+		Ray ray = subRays[Inx_PerSubRay(i, j, k)];
+		HitInfo hit = subHits[Inx_PerBounce(i, j, k, BI)];
 		ray.dir = reflect(ray.dir, hit.N);
+		subRays[Inx_PerSubRay(i, j, k)] = ray;
 	}
 	//######################## 
 	//end
 	float3 re = float3(0, 0, 0);
-	re = subRays[i + w * j + w * h * 0].dir;
+	re = subRays[Inx_PerSubRay(i, j, 0)].dir;
 	Result[id.xy] = float4(re, 0);
 }
 //############################################################################
-float dis2(float3 p1, float3 p2)
-{
-	float3 d = p1 - p2;
-	return dot(d, d);
-}
-
-float3 GetAttenuationed(float3 lightColor, float3 pos, float3 lightPos)
-{
-	float ldis2 = dis2(pos, lightPos);
-	float attenuation = 1.0;
-	//按光学原理， atten 正比 1/dis2
-	//防止距离太近的时候除爆了，衰减亮度需要一个最小值
-	float d2min = 0.01;
-	float d2max = 20;
-	if (ldis2 > d2min)
-	{
-		attenuation = (d2max - ldis2) / (d2max - d2min);
-	}
-	attenuation = saturate(attenuation);
-
-	return attenuation * lightColor;
-}
-
-float3 fresnelSchlick(float cosTheta, float3 F0)
-{
-	return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-}
-
-float GeometrySchlickGGX(float NdotV, float roughness)
-{
-	float r = (roughness + 1.0);
-	float k = (r*r) / 8.0;
-
-	float nom = NdotV;
-	float denom = NdotV * (1.0 - k) + k;
-
-	return nom / denom;
-}
-
-float GeometrySmith(float3 N, float3 V, float3 L, float roughness)
-{
-	float NdotV = max(dot(N, V), 0.0);
-	float NdotL = max(dot(N, L), 0.0);
-	float ggx2 = GeometrySchlickGGX(NdotV, roughness);
-	float ggx1 = GeometrySchlickGGX(NdotL, roughness);
-
-	return ggx1 * ggx2;
-}
-
-float DistributionGGX(float3 N, float3 H, float roughness)
-{
-	float a = roughness * roughness;
-	float a2 = a * a;
-	float NdotH = max(dot(N, H), 0.0);
-	float NdotH2 = NdotH * NdotH;
-
-	float nom = a2;
-	float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-	denom = PI * denom * denom;
-
-	return nom / denom;
-}
-
-struct Material_PBR
-{
-	float3 albedo;
-	float metallic;
-	float roughness;
-};
-
-float3 PBR_GGX(Material_PBR param, float3 n, float3 v, float3 l, float3 Li)
-{
-	float3 h = normalize(l + v);
-
-	//Calculate F
-	float3 F0 = 0.04;
-	F0 = lerp(F0, param.albedo, param.metallic);
-	float3 F = fresnelSchlick(max(dot(h, v), 0.0), F0);
-
-	//Calculate diffuse
-	float3 kD = 1.0 - F;
-	float3 diffuse = (1.0 - param.metallic) * kD * param.albedo / PI;
-
-	//Calculate specular
-	float G = GeometrySmith(n, v, l, param.roughness);
-	float3 nominator;
-	float NDF = DistributionGGX(n, h, param.roughness);
-	nominator = NDF * G * F;
-	float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.001;
-	float3 specular = nominator / denominator;
-
-	float3 Lo = diffuse + specular;
-	Lo *= Li * max(dot(n, l), 0);
-
-	return Lo;
-}
+#include "../HLSL/Render/Light.hlsl"
+#include "../HLSL/Render/PBR.hlsl"
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -268,28 +189,59 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	return re;
 }
 
+//#################################################################
+Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
+{
+	float3 Li = GetAttenuationed(light.color, hit.P, nextHit.P);
+	Material_PBR param = GetObjMaterial_PBR(hit.obj);
+	float3 V = normalize(preHit.P - hit.P);
+	float3 L = normalize(nextHit.P - hit.P);
+	float3 c = PBR_GGX(param, hit.N, V, L, Li);
+	//!!! 是否根据材质的吸收系数再乘一个值
+	//或者PBR中的G已经够用
+	Light re;
+	re.color = GetObjEmissive(hit.obj) + c;
+	//??? debug
+	//Material_PBR param2 = GetObjMaterial_PBR(3);
+	////re.color = PBR_GGX(param2, hit.N, V, L, Li);
+	////float3 N = float3(0, 1, 0);
+	//V = normalize(float3(1, 1, 0));
+	//L = normalize(float3(-1, 1, 0));
+	//Li = float3(1, 1, 1);
+	//re.color = length(L);//PBR_GGX(param2, hit.N, V, L, Li);
+	return re;
+}
+
 [numthreads(8, 8, 1)]
 void GatherSublight(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
 
+	int k = 0;
 	//######################## 
-	for (int k = 0; k < SPP; k++)
+	for (k = 0; k < SPP; k++)
 	{
 		Light light = subLights[i + w * j + w * h * k];
 		light.color = 0;
 		for (int inx = BI; inx >= 0; inx--)
 		{
-			HitInfo hit = subHits[i + w * j + w * h * k + w*h*SPP*inx];
+			HitInfo hit = subHits[Inx_PerBounce(i,j,k,inx)];
 			if (inx == BI)
 			{
 				light.color = GetObjEmissive(hit.obj);
 			}
+			else if (inx == 0)
+			{
+				HitInfo preHit = mainHits[i+w*j];
+				HitInfo nextHit = subHits[Inx_PerBounce(i, j, k, inx + 1)];
+				light = ShadeSublight(light, preHit, hit, nextHit);
+			}
 			else
 			{
-				//???
-				//light[inx] = ObjEmissive(hit[inx]) + PBR(light[inx+1],hit[inx])
+				HitInfo preHit = subHits[Inx_PerBounce(i, j, k, inx - 1)];
+				HitInfo nextHit = subHits[Inx_PerBounce(i, j, k, inx + 1)];
+				light = ShadeSublight(light, preHit, hit, nextHit);
 			}
 		}
 		subLights[i + w * j + w * h * k] = light;
@@ -298,11 +250,12 @@ void GatherSublight(uint3 id : SV_DispatchThreadID)
 	//end
 	float3 re = 0; 
 	float3 tt = 0;
-	for (int k = 0; k < SPP; k++)
+	for (k = 0; k < SPP; k++)
 	{
 		Light light = subLights[i + w * j + w * h * k];
 		tt += light.color;
 	}
+	tt = tt/SPP * PI;
 	re = tt;
 	Result[id.xy] = float4(re, 0);
 }

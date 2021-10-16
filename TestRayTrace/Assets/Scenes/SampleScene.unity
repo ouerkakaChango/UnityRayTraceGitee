@@ -330,11 +330,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1feeffcad3a1eee49956cebdc30c6a0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BN: 2
   cs: {fileID: 7200000, guid: 767e133b056254a41ad0792dbd34d890, type: 3}
   rt: {fileID: 0}
-  w: 1024
-  h: 720
+  w: 512
+  h: 360
   SPP: 16
+  SPP_cell: 16
 --- !u!850595691 &1105758469
 LightingSettings:
   m_ObjectHideFlags: 0

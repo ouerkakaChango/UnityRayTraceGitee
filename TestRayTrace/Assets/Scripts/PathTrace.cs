@@ -17,7 +17,7 @@ using UnityEngine;
 
 public class PathTrace : MonoBehaviour
 {
-    public const int  BN = 1; //BounceNum >=1。为1时，从光源Bounce到surful反射进眼睛，是直接光。
+    public int  BN = 1; //BounceNum >=1。为1时，从光源Bounce到surful反射进眼睛，是直接光。
     int BI = 0; //now BounceInx
 
     public struct HitInfo
@@ -44,7 +44,9 @@ public class PathTrace : MonoBehaviour
 
     public int w = 1024;
     public int h = 720;
-    public int SPP = 16;
+    public int SPP = 32;
+    public int SPP_cell = 16;
+    int taskNum = 2;
 
     Ray[] mainRays; //1pp
     Ray[] subRays; //64pp
@@ -153,8 +155,8 @@ public class PathTrace : MonoBehaviour
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "mainHits", buffer_mainHits);
         cs.SetTexture(kInx, "Result", rt);
-        cs.SetFloat("w", w);
-        cs.SetFloat("h", h);
+        cs.SetInt("w", w);
+        cs.SetInt("h", h);
         cs.SetInt("SPP", SPP);
 
         cs.Dispatch(kInx, w / 8, h / 8, 1);
@@ -169,6 +171,15 @@ public class PathTrace : MonoBehaviour
     //之后尝试分16为一组，分块顺序ComputeTrace。
     void Trace()
     {
+        Debug.Log("Trace BI: " + BI);
+        for(int i=0;i<taskNum;i++)
+        {
+            Trace_cell(i);
+        }
+    }
+
+    void Trace_cell(int traceInx)
+    {
         //??? make sure has inited
 
         PreComputeRayBuffer(ref buffer_subRays, w * h * SPP, subRays);
@@ -180,10 +191,12 @@ public class PathTrace : MonoBehaviour
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "subHits", buffer_subHits);
         cs.SetTexture(kInx, "Result", rt);
-        cs.SetFloat("w", w);
-        cs.SetFloat("h", h);
-        cs.SetFloat("BI", BI);
+        cs.SetInt("w", w);
+        cs.SetInt("h", h);
         cs.SetInt("SPP", SPP);
+        cs.SetInt("BI", BI);
+        cs.SetInt("traceInx", traceInx);
+        cs.SetInt("SPP_cell", SPP_cell);
 
         cs.Dispatch(kInx, w / 8, h / 8, 1);
         //### compute
@@ -204,9 +217,9 @@ public class PathTrace : MonoBehaviour
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "subHits", buffer_subHits);
         cs.SetTexture(kInx, "Result", rt);
-        cs.SetFloat("w", w);
-        cs.SetFloat("h", h);
-        cs.SetFloat("BI", BI);
+        cs.SetInt("w", w);
+        cs.SetInt("h", h);
+        cs.SetInt("BI", BI);
         cs.SetInt("SPP", SPP);
 
         cs.Dispatch(kInx, w / 8, h / 8, 1);
@@ -224,6 +237,7 @@ public class PathTrace : MonoBehaviour
         PreComputeRayBuffer(ref buffer_subRays, w * h * SPP, subRays);
         PreComputeHitinfoBuffer(ref buffer_subHits, w * h * SPP * BN, subHits);
         PreComputeLightBuffer(ref buffer_subLights, w * h * SPP, subLights);
+        PreComputeHitinfoBuffer(ref buffer_mainHits, w * h, mainHits);
         //##################################
         //### compute
         int kInx = cs.FindKernel("GatherSublight");
@@ -231,10 +245,11 @@ public class PathTrace : MonoBehaviour
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "subHits", buffer_subHits);
         cs.SetBuffer(kInx, "subLights", buffer_subLights);
+        cs.SetBuffer(kInx, "mainHits", buffer_mainHits);
         cs.SetTexture(kInx, "Result", rt);
-        cs.SetFloat("w", w);
-        cs.SetFloat("h", h);
-        cs.SetFloat("BI", BI);
+        cs.SetInt("w", w);
+        cs.SetInt("h", h);
+        cs.SetInt("BI", BI);
         cs.SetInt("SPP", SPP);
 
         cs.Dispatch(kInx, w / 8, h / 8, 1);
@@ -243,6 +258,7 @@ public class PathTrace : MonoBehaviour
         PostComputeBuffer(ref buffer_subRays, subRays);
         PostComputeBuffer(ref buffer_subHits, subHits);
         PostComputeBuffer(ref buffer_subLights, subLights);
+        PostComputeBuffer(ref buffer_mainHits, mainHits);
     }
 
     void Render()
@@ -253,11 +269,13 @@ public class PathTrace : MonoBehaviour
     //@@@
     private void OnGUI()
     {
-        GUI.Label(new Rect(0, 0, 200, 50), "Total BounceNum: " + BN);
+        GUI.Label(new Rect(0, 0, 200, 25), "NeedBounce: " + (BN - 1));
+        GUI.Label(new Rect(0, 25, 200, 25), "NowBounce: " + BI);
         if (GUI.Button(new Rect(0, 50, 100, 50), "Init"))
         {
             CreateRays();
             InitRays();
+            taskNum = SPP / SPP_cell;
         } 
         if (GUI.Button(new Rect(0, 100, 100, 50), "Trace"))
         {
