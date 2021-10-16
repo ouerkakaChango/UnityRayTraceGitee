@@ -108,13 +108,18 @@ public class PathTrace : MonoBehaviour
         subRays = new Ray[w * h * SPP];
         mainHits = new HitInfo[w * h];
         subHits = new HitInfo[w * h * SPP * BN];
-        subLights = new Light[w * h * SPP];
+        //subLights = new Light[w * h * SPP];
+
+        //buffer_mainRays = new ComputeBuffer(w * h, GetRayStride());
+        //buffer_subHits = new ComputeBuffer(w * h * SPP * BN, GetHitInfoStride());
+        //buffer_mainHits = new ComputeBuffer(w * h, GetHitInfoStride());
+        //buffer_subRays = new ComputeBuffer(w * h * SPP, GetRayStride());
     }
 
     static public void PreComputeRayBuffer(ref ComputeBuffer buffer, int count, Ray[] rays)
     {
         buffer = new ComputeBuffer(count, GetRayStride());
-        buffer.SetData(rays);
+        buffer.SetData(rays); 
     }
 
     static public void PreComputeHitinfoBuffer(ref ComputeBuffer buffer, int count, HitInfo[] hits)
@@ -231,21 +236,24 @@ public class PathTrace : MonoBehaviour
         BI += 1;
     }
 
-    void Compute_GatherSublight()
+    void Compute_Render()
     {
         //??? make sure has inited
+
+        PreComputeRayBuffer(ref buffer_mainRays, w * h, mainRays);
         PreComputeRayBuffer(ref buffer_subRays, w * h * SPP, subRays);
-        PreComputeHitinfoBuffer(ref buffer_subHits, w * h * SPP * BN, subHits);
-        PreComputeLightBuffer(ref buffer_subLights, w * h * SPP, subLights);
         PreComputeHitinfoBuffer(ref buffer_mainHits, w * h, mainHits);
+        PreComputeHitinfoBuffer(ref buffer_subHits, w * h * SPP * BN, subHits);
+        //PreComputeLightBuffer(ref buffer_subLights, w * h * SPP, subLights);
         //##################################
         //### compute
-        int kInx = cs.FindKernel("GatherSublight");
+        int kInx = cs.FindKernel("Render");
 
+        cs.SetBuffer(kInx, "mainRays", buffer_mainRays);
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
-        cs.SetBuffer(kInx, "subHits", buffer_subHits);
-        cs.SetBuffer(kInx, "subLights", buffer_subLights);
         cs.SetBuffer(kInx, "mainHits", buffer_mainHits);
+        cs.SetBuffer(kInx, "subHits", buffer_subHits);
+        //cs.SetBuffer(kInx, "subLights", buffer_subLights);
         cs.SetTexture(kInx, "Result", rt);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
@@ -255,15 +263,16 @@ public class PathTrace : MonoBehaviour
         cs.Dispatch(kInx, w / 8, h / 8, 1);
         //### compute
         //#####################################
+        PostComputeBuffer(ref buffer_mainRays, mainRays);
         PostComputeBuffer(ref buffer_subRays, subRays);
-        PostComputeBuffer(ref buffer_subHits, subHits);
-        PostComputeBuffer(ref buffer_subLights, subLights);
         PostComputeBuffer(ref buffer_mainHits, mainHits);
+        PostComputeBuffer(ref buffer_subHits, subHits);
+        //PostComputeBuffer(ref buffer_subLights, subLights);
     }
 
     void Render()
     {
-        Compute_GatherSublight();
+        Compute_Render();
     }
 
     //@@@

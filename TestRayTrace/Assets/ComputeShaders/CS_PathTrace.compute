@@ -2,7 +2,7 @@
 #pragma kernel InitRays
 #pragma kernel Trace
 #pragma kernel Bounce
-#pragma kernel GatherSublight
+#pragma kernel Render
 
 #define PI 3.14159f
 
@@ -201,28 +201,23 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
 	//或者PBR中的G已经够用
 	Light re;
 	re.color = GetObjEmissive(hit.obj) + c;
-	//??? debug
-	//Material_PBR param2 = GetObjMaterial_PBR(3);
-	////re.color = PBR_GGX(param2, hit.N, V, L, Li);
-	////float3 N = float3(0, 1, 0);
-	//V = normalize(float3(1, 1, 0));
-	//L = normalize(float3(-1, 1, 0));
-	//Li = float3(1, 1, 1);
-	//re.color = length(L);//PBR_GGX(param2, hit.N, V, L, Li);
 	return re;
 }
 
 [numthreads(8, 8, 1)]
-void GatherSublight(uint3 id : SV_DispatchThreadID)
+void Render(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
 
 	int k = 0;
+	float3 finalColor = 0;
+	HitInfo mainHit = mainHits[i + w * j];
+	Ray mainRay = mainRays[i + w * j];
 	//######################## 
 	for (k = 0; k < SPP; k++)
 	{
-		Light light = subLights[i + w * j + w * h * k];
+		Light light;// = subLights[i + w * j + w * h * k];
 		light.color = 0;
 		for (int inx = BI; inx >= 0; inx--)
 		{
@@ -244,18 +239,21 @@ void GatherSublight(uint3 id : SV_DispatchThreadID)
 				light = ShadeSublight(light, preHit, hit, nextHit);
 			}
 		}
-		subLights[i + w * j + w * h * k] = light;
+		//subLights[i + w * j + w * h * k] = light;
+		//2.
+		HitInfo firstHit = subHits[Inx_PerBounce(i, j, k, 0)];
+		float3 N = mainHit.N;
+		float3 V = -mainRay.dir;
+		float3 L = normalize(firstHit.P - mainHit.P);
+		float3 Li = GetAttenuationed(light.color, mainHit.P, firstHit.P);
+		Material_PBR param = GetObjMaterial_PBR(mainHit.obj);
+		finalColor += PBR_GGX(param, N, V, L, Li);
 	}
+	finalColor = finalColor/SPP*2*PI;
+	finalColor += GetObjEmissive(mainHit.obj);
 	//######################## 
 	//end
 	float3 re = 0; 
-	float3 tt = 0;
-	for (k = 0; k < SPP; k++)
-	{
-		Light light = subLights[i + w * j + w * h * k];
-		tt += light.color;
-	}
-	tt = tt/SPP * PI;
-	re = tt;
+	re = finalColor;
 	Result[id.xy] = float4(re, 0);
 }

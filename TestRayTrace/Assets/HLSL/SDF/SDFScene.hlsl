@@ -115,7 +115,7 @@ float3 GetObjEmissive(int obj)
 {
 	if (obj == 6)
 	{
-		return 1;
+		return 10;
 	}
 	else
 	{
