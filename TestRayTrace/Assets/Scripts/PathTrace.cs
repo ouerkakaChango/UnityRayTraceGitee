@@ -67,7 +67,6 @@ public class PathTrace : MonoBehaviour
     ComputeBuffer buffer_subRays;
     ComputeBuffer buffer_mainHits;
     ComputeBuffer buffer_subHits;
-    ComputeBuffer buffer_subLights;
 
     // Start is called before the first frame update
     void Start()
@@ -120,6 +119,14 @@ public class PathTrace : MonoBehaviour
         subHits = new HitInfo[w * h * SPP * BN];
     }
 
+    void DisposeRays()
+    {
+        buffer_mainRays .Dispose();
+        buffer_subRays  .Dispose();
+        buffer_mainHits .Dispose();
+        buffer_subHits  .Dispose();
+    }
+
     void CreateRaysBlock(int i,int j)
     {
         //if (i == 0 && j == 0)
@@ -153,24 +160,37 @@ public class PathTrace : MonoBehaviour
 
     static public void PreComputeRayBuffer(ref ComputeBuffer buffer, int count, Ray[] rays)
     {
+        if (buffer != null)
+        {
+            return;
+        }
         buffer = new ComputeBuffer(count, GetRayStride());
         buffer.SetData(rays); 
     }
 
     static public void PreComputeHitinfoBuffer(ref ComputeBuffer buffer, int count, HitInfo[] hits)
     {
+        if (buffer != null)
+        {
+            return;
+        }
         buffer = new ComputeBuffer(count, GetHitInfoStride());
         buffer.SetData(hits);
     }
 
     static public void PreComputeLightBuffer(ref ComputeBuffer buffer, int count, Light[] lights)
     {
+        if (buffer != null)
+        {
+            return;
+        }
         buffer = new ComputeBuffer(count, GetLightStride());
         buffer.SetData(lights);
     }
 
     static public void PostComputeBuffer(ref ComputeBuffer buffer,System.Array arr)
     {
+        return;
         buffer.GetData(arr);
         buffer.Dispose();
     }
@@ -340,6 +360,7 @@ public class PathTrace : MonoBehaviour
                 PathTraceBlock(i, j);
             }
         }
+        DisposeRays();
     }
 
     //@@@

@@ -266,6 +266,8 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 	}
 	finalColor = finalColor/SPP*2*PI;
 	finalColor += GetObjEmissive(mainHit.obj);
+	//???
+	finalColor = pow(finalColor, 1.0f / 2.2f);
 	//######################## 
 	//end
 	float3 re = 0; 
