@@ -151,7 +151,8 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 	{
 		Ray ray = subRays[Inx3D(i, j, k)];
 		HitInfo hit = subHits[Inx4D(i, j, k, BI)];
-		ray.dir = reflect(ray.dir, hit.N);
+		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
+		ray.dir = normalize(randP_round(seed) + hit.N);
 		subRays[Inx3D(i, j, k)] = ray;
 	}
 	//######################## 
@@ -244,46 +245,71 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 	float3 finalColor = 0;
 	HitInfo mainHit = mainHits[Inx2D(i,j)];
 	Ray mainRay = mainRays[Inx2D(i, j)];
+	int validCount = 0;
+	int subRayValid = 0;
 	//######################## 
 	for (k = 0; k < SPP; k++)
 	{
 		Light light;
 		light.color = 0;
+		subRayValid = 0;
 		for (int inx = BI; inx >= 0; inx--)
 		{
 			HitInfo hit = subHits[Inx4D(i,j,k,inx)];
 			if (inx == BI)
 			{
 				light.color = GetObjEmissive(hit.obj);
+				if (rgbSum(GetObjEmissive(hit.obj)) > 0)
+				{
+					Result[Inx_img(i, j)] = float4(light.color, 0);
+					subRayValid = 1;
+				}
 			}
 			else if (inx == 0)
 			{
 				HitInfo preHit = mainHits[Inx2D(i, j)];
 				HitInfo nextHit = subHits[Inx4D(i, j, k, inx + 1)];
 				light = ShadeSublight(light, preHit, hit, nextHit);
+				if (rgbSum(GetObjEmissive(hit.obj)) > 0)
+				{
+					Result[Inx_img(i, j)] = float4(light.color, 0);
+					subRayValid = 1;
+				}
 			}
 			else
 			{
 				HitInfo preHit = subHits[Inx4D(i, j, k, inx - 1)];
 				HitInfo nextHit = subHits[Inx4D(i, j, k, inx + 1)];
 				light = ShadeSublight(light, preHit, hit, nextHit);
+				if (rgbSum(GetObjEmissive(hit.obj)) > 0)
+				{
+					Result[Inx_img(i, j)] = float4(light.color, 0);
+					subRayValid = 1;
+				}
 			}
 		}
 
+		//Result[Inx_img(i, j)] = float4(light.color, 0);
+		//return;
+
 		//2.
-		HitInfo firstHit = subHits[Inx4D(i, j, k, 0)];
-		float3 N = mainHit.N;
-		float3 V = -mainRay.dir;
-		float3 L = normalize(firstHit.P - mainHit.P);
-		float3 Li = GetAttenuationed(light.color, mainHit.P, firstHit.P);
-		Material_PBR param = GetObjMaterial_PBR(mainHit.obj);
-		finalColor += PBR_GGX(param, N, V, L, Li);
-		finalColor += GetObjEmissive(mainHit.obj);
+		if (subRayValid == 1)
+		{
+			validCount += 1;
+
+			HitInfo firstHit = subHits[Inx4D(i, j, k, 0)];
+			float3 N = mainHit.N;
+			float3 V = -mainRay.dir;
+			float3 L = normalize(firstHit.P - mainHit.P);
+			float3 Li = GetAttenuationed(light.color, mainHit.P, firstHit.P);
+			Material_PBR param = GetObjMaterial_PBR(mainHit.obj);
+			finalColor += PBR_GGX(param, N, V, L, Li);
+		}
 	}
-	finalColor = finalColor/SPP*2*PI;
+	finalColor = finalColor/ validCount *2*PI;
 	finalColor += GetObjEmissive(mainHit.obj);
 	//???
-	finalColor = pow(finalColor, 1.0f / 2.2f);
+	finalColor = pow(abs(finalColor), 1.0f / 2.2f);
 	//######################## 
 	//end
 	float3 re = 0; 

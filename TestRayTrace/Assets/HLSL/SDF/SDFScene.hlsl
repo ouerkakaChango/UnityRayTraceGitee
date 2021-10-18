@@ -1,7 +1,7 @@
 ﻿#define OBJNUM 8
 
 #define TraceThre 0.001
-#define StartLen 0.005
+#define TraceStart 0.005
 
 float SDFBox(float3 p, float3 center, float3 bound)
 {
@@ -12,7 +12,7 @@ float SDFBox(float3 p, float3 center, float3 bound)
 float GetObjSDF(int inx, float3 p)
 {
 	float xDis = 2.0;
-
+	float height = 4.0;
 	if (inx == 0)
 	{//球
 		//sphere center(0, 0, -5), radius 1
@@ -25,7 +25,7 @@ float GetObjSDF(int inx, float3 p)
 	}
 	else if (inx == 2)
 	{//上
-		return SDFBox(p, float3(0.0, 4.00, -5.0), float3(8.0, 0.1, 8.0));
+		return SDFBox(p, float3(0.0, height, -5.0), float3(8.0, 0.1, 8.0));
 	}
 	else if (inx == 3)
 	{//左
@@ -41,7 +41,7 @@ float GetObjSDF(int inx, float3 p)
 	}
 	else if (inx == 6)
 	{//lightBox
-		return SDFBox(p, float3(0.0, 3.9, -5.0), float3(0.8, 0.08, 0.8));
+		return SDFBox(p, float3(0.0, height-0.1, -5.0), float3(0.8, 0.08, 0.8));
 		//return SDFBox(p, float3(0.0, 3.9, -5.0), float3(1.5, 0.08, 1.5));
 		//return length(p - float3(0, 3.5, -5)) - 0.2;
 	}
@@ -80,16 +80,38 @@ float3 GetObjNormal(int inx, float3 p)
 
 void SDFScene(inout Ray ray,out HitInfo info)
 {
-	float maxTraceDis = 20.0f;
+	float maxTraceDis = 100.0f;
 
 	float traceDis = -1.0f;
 	int objInx = -1;
+	float objSDF[OBJNUM];
+	float sdf = 1000; //a very large,can be larger than maxTraceDis
 
-	ray.pos += ray.dir*StartLen;
+	//old错误方法：ray.pos += ray.dir*TraceStart;
+	//new方法：向N方向走出去
 	while (true)
 	{
-		float objSDF[OBJNUM];
-		float sdf = 1000; //a very large,can be larger than maxTraceDis
+		sdf = 1000;
+		for (int inx = 0; inx < OBJNUM; inx++)
+		{
+			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			if (objSDF[inx] < sdf)
+			{
+				sdf = objSDF[inx];
+				objInx = inx;
+			}
+		}
+		if (sdf >= TraceStart)
+		{
+			break;
+		}
+
+		ray.pos += GetObjNormal(objInx, ray.pos)*TraceStart;
+	}
+	
+	while (true)
+	{
+		sdf = 1000; //a very large,can be larger than maxTraceDis
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
 			objSDF[inx] = GetObjSDF(inx, ray.pos);
