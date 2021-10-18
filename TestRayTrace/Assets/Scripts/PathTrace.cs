@@ -46,10 +46,13 @@ public class PathTrace : MonoBehaviour
     public int h = 720;
     public int SPP = 32;
     public int SPP_cell = 16;
-    int taskNum = 2;
+
+    public int wDivide = 2;
+    public int hDivide = 2;
+    int cw, ch;
 
     Ray[] mainRays; //1pp
-    Ray[] subRays; //64pp
+    Ray[] subRays; //SPP pp
     HitInfo[] mainHits; //1pp
     HitInfo[] subHits;//BN per subRay == BN*SPP pp
     Light[] subLights;
@@ -63,6 +66,7 @@ public class PathTrace : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
     }
 
     // Update is called once per frame
@@ -108,12 +112,37 @@ public class PathTrace : MonoBehaviour
         subRays = new Ray[w * h * SPP];
         mainHits = new HitInfo[w * h];
         subHits = new HitInfo[w * h * SPP * BN];
-        //subLights = new Light[w * h * SPP];
+    }
 
-        //buffer_mainRays = new ComputeBuffer(w * h, GetRayStride());
-        //buffer_subHits = new ComputeBuffer(w * h * SPP * BN, GetHitInfoStride());
-        //buffer_mainHits = new ComputeBuffer(w * h, GetHitInfoStride());
-        //buffer_subRays = new ComputeBuffer(w * h * SPP, GetRayStride());
+    void CreateRaysBlock(int i,int j)
+    {
+        //if (i == 0 && j == 0)
+        if(mainRays == null)
+        {
+            cw = w / wDivide;
+            ch = h / hDivide;
+            mainRays = new Ray[cw * ch];
+            subRays = new Ray[cw * ch * SPP];
+            mainHits = new HitInfo[cw * ch];
+            subHits = new HitInfo[cw * ch * SPP * BN];
+        }
+    }
+
+    void InitBlock(int i,int j)
+    {
+        BI = 0;
+        CreateRaysBlock(i,j);
+        Compute_InitRaysBlock(i, j);
+    }
+
+    void DoTraceBounceBlock(int i, int j)
+    {
+        TraceBlock(i, j);
+        for(int inx=1;inx < BN;inx++)
+        {
+            BounceBlock(i,j);
+            TraceBlock(i, j);
+        }
     }
 
     static public void PreComputeRayBuffer(ref ComputeBuffer buffer, int count, Ray[] rays)
@@ -140,7 +169,7 @@ public class PathTrace : MonoBehaviour
         buffer.Dispose();
     }
 
-    void InitRays()
+    void Compute_InitRaysBlock(int i,int j)
     {
         if (rt == null)
         {
@@ -149,12 +178,12 @@ public class PathTrace : MonoBehaviour
             rt.Create();
         }
 
-        PreComputeRayBuffer(ref buffer_mainRays, w * h, mainRays);
-        PreComputeRayBuffer(ref buffer_subRays, w * h * SPP, subRays);
-        PreComputeHitinfoBuffer(ref buffer_mainHits, w * h, mainHits);
+        PreComputeRayBuffer(ref buffer_mainRays, cw * ch, mainRays);
+        PreComputeRayBuffer(ref buffer_subRays, cw * ch * SPP, subRays);
+        PreComputeHitinfoBuffer(ref buffer_mainHits, cw * ch, mainHits);
         //##################################
         //### compute
-        int kInx = cs.FindKernel("InitRays");
+        int kInx = cs.FindKernel("InitRaysBlock");
 
         cs.SetBuffer(kInx, "mainRays", buffer_mainRays);
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
@@ -162,72 +191,85 @@ public class PathTrace : MonoBehaviour
         cs.SetTexture(kInx, "Result", rt);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
+        cs.SetInt("cw", cw);
+        cs.SetInt("ch", ch);
+        cs.SetInt("blockX", i);
+        cs.SetInt("blockY", j);
         cs.SetInt("SPP", SPP);
 
-        cs.Dispatch(kInx, w / 8, h / 8, 1);
+        cs.Dispatch(kInx, cw / 8, ch / 8, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_mainRays, mainRays);
         PostComputeBuffer(ref buffer_subRays, subRays);
         PostComputeBuffer(ref buffer_mainHits, mainHits);
     }
-
-    //??? 现在spp为16， 32就不行了，像是Unity的显存支持不够
-    //之后尝试分16为一组，分块顺序ComputeTrace。
-    void Trace()
+    //#######################################################################################################################
+    void TraceBlock(int i, int j)
     {
-        Debug.Log("Trace BI: " + BI);
-        for(int i=0;i<taskNum;i++)
+        for (int traceInx = 0; traceInx < SPP / SPP_cell; traceInx++)
         {
-            Trace_cell(i);
+            Compute_TraceBlock(traceInx, i, j);
         }
     }
 
-    void Trace_cell(int traceInx)
+    void Compute_TraceBlock(int traceInx, int i, int j)
     {
         //??? make sure has inited
 
-        PreComputeRayBuffer(ref buffer_subRays, w * h * SPP, subRays);
-        PreComputeHitinfoBuffer(ref buffer_subHits, w * h * SPP * BN, subHits);
+        PreComputeRayBuffer(ref buffer_subRays, cw * ch * SPP, subRays);
+        PreComputeHitinfoBuffer(ref buffer_subHits, cw * ch * SPP * BN, subHits);
         //##################################
         //### compute
-        int kInx = cs.FindKernel("Trace");
+        int kInx = cs.FindKernel("TraceBlock");
 
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "subHits", buffer_subHits);
         cs.SetTexture(kInx, "Result", rt);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
+        cs.SetInt("cw", cw);
+        cs.SetInt("ch", ch);
+        cs.SetInt("blockX", i);
+        cs.SetInt("blockY", j);
         cs.SetInt("SPP", SPP);
         cs.SetInt("BI", BI);
         cs.SetInt("traceInx", traceInx);
         cs.SetInt("SPP_cell", SPP_cell);
 
-        cs.Dispatch(kInx, w / 8, h / 8, 1);
+        cs.Dispatch(kInx, cw / 8, ch / 8, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_subRays, subRays);
         PostComputeBuffer(ref buffer_subHits, subHits);
     }
-
-    void Bounce()
+    //#######################################################################################################################
+    void BounceBlock(int i,int j)
+    {
+        Compute_BounceBlock(i,j);
+    }
+    void Compute_BounceBlock(int i, int j)
     {
         //??? make sure has inited
-        PreComputeRayBuffer(ref buffer_subRays, w * h * SPP, subRays);
-        PreComputeHitinfoBuffer(ref buffer_subHits, w * h * SPP * BN, subHits);
+        PreComputeRayBuffer(ref buffer_subRays, cw * ch * SPP, subRays);
+        PreComputeHitinfoBuffer(ref buffer_subHits, cw * ch * SPP * BN, subHits);
         //##################################
         //### compute
-        int kInx = cs.FindKernel("Bounce");
+        int kInx = cs.FindKernel("BounceBlock");
 
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "subHits", buffer_subHits);
         cs.SetTexture(kInx, "Result", rt);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
+        cs.SetInt("cw", cw);
+        cs.SetInt("ch", ch);
+        cs.SetInt("blockX", i);
+        cs.SetInt("blockY", j);
         cs.SetInt("BI", BI);
         cs.SetInt("SPP", SPP);
 
-        cs.Dispatch(kInx, w / 8, h / 8, 1);
+        cs.Dispatch(kInx, cw / 8, ch / 8, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_subRays, subRays);
@@ -236,67 +278,88 @@ public class PathTrace : MonoBehaviour
         BI += 1;
     }
 
-    void Compute_Render()
+    void Compute_RenderBlock(int i, int j)
     {
         //??? make sure has inited
 
-        PreComputeRayBuffer(ref buffer_mainRays, w * h, mainRays);
-        PreComputeRayBuffer(ref buffer_subRays, w * h * SPP, subRays);
-        PreComputeHitinfoBuffer(ref buffer_mainHits, w * h, mainHits);
-        PreComputeHitinfoBuffer(ref buffer_subHits, w * h * SPP * BN, subHits);
-        //PreComputeLightBuffer(ref buffer_subLights, w * h * SPP, subLights);
+        PreComputeRayBuffer(ref buffer_mainRays, cw * ch, mainRays);
+        PreComputeRayBuffer(ref buffer_subRays, cw * ch * SPP, subRays);
+        PreComputeHitinfoBuffer(ref buffer_mainHits, cw * ch, mainHits);
+        PreComputeHitinfoBuffer(ref buffer_subHits, cw * ch * SPP * BN, subHits);
         //##################################
         //### compute
-        int kInx = cs.FindKernel("Render");
+        int kInx = cs.FindKernel("RenderBlock");
 
         cs.SetBuffer(kInx, "mainRays", buffer_mainRays);
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "mainHits", buffer_mainHits);
         cs.SetBuffer(kInx, "subHits", buffer_subHits);
-        //cs.SetBuffer(kInx, "subLights", buffer_subLights);
         cs.SetTexture(kInx, "Result", rt);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
+        cs.SetInt("cw", cw);
+        cs.SetInt("ch", ch);
+        cs.SetInt("blockX", i);
+        cs.SetInt("blockY", j);
         cs.SetInt("BI", BI);
         cs.SetInt("SPP", SPP);
 
-        cs.Dispatch(kInx, w / 8, h / 8, 1);
+        cs.Dispatch(kInx, cw / 8, ch / 8, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_mainRays, mainRays);
         PostComputeBuffer(ref buffer_subRays, subRays);
         PostComputeBuffer(ref buffer_mainHits, mainHits);
         PostComputeBuffer(ref buffer_subHits, subHits);
-        //PostComputeBuffer(ref buffer_subLights, subLights);
     }
 
-    void Render()
+    void RenderBlock(int i, int j)
     {
-        Compute_Render();
+        Compute_RenderBlock(i,j);
+    }
+
+    void PathTraceBlock(int i, int j)
+    {
+        InitBlock(i, j);
+        DoTraceBounceBlock(i, j);
+        RenderBlock(i, j);
+    }
+
+    void DoPathTrace()
+    {
+        for(int j=0;j<hDivide;j++)
+        {
+            for(int i=0;i<wDivide;i++)
+            {
+                PathTraceBlock(i, j);
+            }
+        }
     }
 
     //@@@
     private void OnGUI()
     {
-        GUI.Label(new Rect(0, 0, 200, 25), "NeedBounce: " + (BN - 1));
-        GUI.Label(new Rect(0, 25, 200, 25), "NowBounce: " + BI);
-        if (GUI.Button(new Rect(0, 50, 100, 50), "Init"))
+        //GUI.Label(new Rect(0, 0, 200, 25), "NeedBounce: " + (BN - 1));
+        //GUI.Label(new Rect(0, 25, 200, 25), "NowBounce: " + BI);
+        //if (GUI.Button(new Rect(0, 50, 100, 50), "Init"))
+        //{
+
+        //} 
+        //if (GUI.Button(new Rect(0, 100, 100, 50), "Trace"))
+        //{
+
+        //}
+        //if (GUI.Button(new Rect(100, 100, 100, 50), "Bounce"))
+        //{
+        //    Bounce();
+        //}
+        //if (GUI.Button(new Rect(0, 150, 100, 50), "Render"))
+        //{
+        //    Render();
+        //}
+        if (GUI.Button(new Rect(0, 50, 100, 50), "Do"))
         {
-            CreateRays();
-            InitRays();
-            taskNum = SPP / SPP_cell;
+            DoPathTrace();
         } 
-        if (GUI.Button(new Rect(0, 100, 100, 50), "Trace"))
-        {
-            Trace();
-        }
-        if (GUI.Button(new Rect(100, 100, 100, 50), "Bounce"))
-        {
-            Bounce();
-        }
-        if (GUI.Button(new Rect(0, 150, 100, 50), "Render"))
-        {
-            Render();
-        }
     }
 }

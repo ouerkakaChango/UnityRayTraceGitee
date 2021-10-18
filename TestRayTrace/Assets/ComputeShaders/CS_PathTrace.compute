@@ -1,8 +1,8 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
-#pragma kernel InitRays
-#pragma kernel Trace
-#pragma kernel Bounce
-#pragma kernel Render
+#pragma kernel InitRaysBlock
+#pragma kernel TraceBlock
+#pragma kernel BounceBlock
+#pragma kernel RenderBlock
 
 #define PI 3.14159f
 
@@ -13,6 +13,10 @@ RWTexture2D<float4> Result;
 int SPP;
 int w;
 int h;
+int cw;
+int ch;
+int blockX;
+int blockY;
 
 struct Ray
 {
@@ -42,37 +46,46 @@ RWStructuredBuffer<Light> subLights;
 #include "../HLSL/SDF/SDFScene.hlsl"
 #include  "../HLSL/Random/RandUtility.hlsl"
 
-int Inx_PerSubRay(int i, int j, int k)
+int Inx2D(int i, int j)
 {
-	return i+w*j+w*h*k;
+	return i + cw * j;
 }
 
-int Inx_PerBounce(int i, int j, int k, int bounceInx)
+int Inx3D(int i, int j, int k)
 {
-	return i + w * j + w * h*k + w*h*SPP * bounceInx;
+	return i + cw * j + cw * ch*k;
 }
 
+int Inx4D(int i, int j, int k, int bounceInx)
+{
+	return i + cw * j + cw * ch*k + cw*ch*SPP * bounceInx;
+}
+
+float2 Inx_img(int i, int j)
+{
+	return float2(i+ blockX * cw,j+ blockY * ch);
+}
+
+//#########################################################################################################
 [numthreads(8, 8, 1)]
-void InitRays(uint3 id : SV_DispatchThreadID)
+void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
-
-	float maxTraceDis = 10.0f;
-	float traceThre = 0.01f;
 
 	float3 screenPos = float3(0, 0, 0);
 	float3 eyeOffset = float3(0, 0, 1);
 	float dx = 2.0f / w;
 	float ylen = dx * h;
 	float3 screenLeftDownPos = float3(-1, -ylen / 2, 0) + 0.5f*float3(dx, dx, 0);
+	float3 blockOffset = float3(blockX*cw*dx, blockY*ch*dx, 0);
 
 	Ray ray;
 	HitInfo hit;
 	//初始化
 	hit.bHit = 0;
 	//######################## 
-	ray.pos = screenPos + screenLeftDownPos + float3(i*dx, j*dx, 0);
+	ray.pos = screenPos + screenLeftDownPos + float3(i*dx, j*dx, 0) + blockOffset;
 	ray.dir = ray.pos - screenPos - eyeOffset; //默认eyePos在屏幕后一单位，z轴向屏幕外为(0,0,1)
 
 	SDFScene(ray,hit);
@@ -84,67 +97,63 @@ void InitRays(uint3 id : SV_DispatchThreadID)
 		float3 seed = hit.P + float3(i, j, k);
 		subRay.dir = normalize(randP_round(seed) + hit.N);
 		subRay.pos = hit.P;
-		subRays[i + w * j + w * h * k] = subRay;
+		subRays[Inx3D(i,j,k)] = subRay;
 	}
 	//######################## 
 	//end
-	mainRays[i + w * j] = ray;
-	mainHits[i + w * j] = hit;
+	mainRays[Inx2D(i,j)] = ray;
+	mainHits[Inx2D(i, j)] = hit;
 
 	float3 re = 0;
-	re = GetObjEmissive(hit.obj);
-	//Result[id.xy] = float4(mainRays[i + w * j].pos, 0);
-	//Result[id.xy] = float4(subRays[i + w * j].dir, 0);
-	Result[id.xy] = float4(hit.N, 0);
-	//Result[id.xy] = float4(hit.P, 0);
-	//Result[id.xy] = float4(re, 0);
+	re = hit.N;
+	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //#########################################################################################################
 int traceInx;
 int SPP_cell;
 [numthreads(8, 8, 1)]
-void Trace(uint3 id : SV_DispatchThreadID)
+void TraceBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
 
-	HitInfo hit = subHits[i + w * j + w * h * 0 + w * h* SPP * BI];
+	HitInfo hit;// = subHits[Inx4D(i, j, 0, BI)];
 	//######################## 
 	for (int k = traceInx*SPP_cell; k < (traceInx+1)*SPP_cell; k++)
 	{
-		Ray ray = subRays[i + w * j + w * h * k];
+		Ray ray = subRays[Inx3D(i,j,k)];
 		//初始化
 		hit.bHit = 0;
 		SDFScene(ray, hit);
-		subHits[Inx_PerBounce(i, j, k, BI)] = hit;
+		subHits[Inx4D(i, j, k, BI)] = hit;
 	}
 	//######################## 
 
 	float3 re = float3(0, 0, 0);
-	//re = subHits[i + w * j + w * h * 0 + w * h* SPP * BI].bHit;
-	//re = subRays[i + w * j + w * h * (SPP-1) + w * h* SPP * BI].dir;
-	re = subHits[Inx_PerBounce(i, j, 0, BI)].P;
-	Result[id.xy] = float4(re, 0);
+
+	re = subHits[Inx4D(i, j, 0, BI)].P;
+	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //############################################################################
 [numthreads(8, 8, 1)]
-void Bounce(uint3 id : SV_DispatchThreadID)
+void BounceBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
 	//######################## 
 	for (int k = 0; k < SPP; k++)
 	{
-		Ray ray = subRays[Inx_PerSubRay(i, j, k)];
-		HitInfo hit = subHits[Inx_PerBounce(i, j, k, BI)];
+		Ray ray = subRays[Inx3D(i, j, k)];
+		HitInfo hit = subHits[Inx4D(i, j, k, BI)];
 		ray.dir = reflect(ray.dir, hit.N);
-		subRays[Inx_PerSubRay(i, j, k)] = ray;
+		subRays[Inx3D(i, j, k)] = ray;
 	}
 	//######################## 
 	//end
 	float3 re = float3(0, 0, 0);
-	re = subRays[Inx_PerSubRay(i, j, 0)].dir;
-	Result[id.xy] = float4(re, 0);
+	re = subRays[Inx3D(i, j, 0)].dir;
+	//re = abs(subRays[Inx3D(i, j, 0)].pos);
+	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //############################################################################
 #include "../HLSL/Render/Light.hlsl"
@@ -177,7 +186,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	}
 	else if (obj == 6)
 	{
-		//re.emissive = 1;
+		//lightbox
 	}
 	else
 	{//错误材质色，类似unity中的麦金塔色
@@ -205,43 +214,43 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
 }
 
 [numthreads(8, 8, 1)]
-void Render(uint3 id : SV_DispatchThreadID)
+void RenderBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
 
 	int k = 0;
 	float3 finalColor = 0;
-	HitInfo mainHit = mainHits[i + w * j];
-	Ray mainRay = mainRays[i + w * j];
+	HitInfo mainHit = mainHits[Inx2D(i,j)];
+	Ray mainRay = mainRays[Inx2D(i, j)];
 	//######################## 
 	for (k = 0; k < SPP; k++)
 	{
-		Light light;// = subLights[i + w * j + w * h * k];
+		Light light;
 		light.color = 0;
 		for (int inx = BI; inx >= 0; inx--)
 		{
-			HitInfo hit = subHits[Inx_PerBounce(i,j,k,inx)];
+			HitInfo hit = subHits[Inx4D(i,j,k,inx)];
 			if (inx == BI)
 			{
 				light.color = GetObjEmissive(hit.obj);
 			}
 			else if (inx == 0)
 			{
-				HitInfo preHit = mainHits[i+w*j];
-				HitInfo nextHit = subHits[Inx_PerBounce(i, j, k, inx + 1)];
+				HitInfo preHit = mainHits[Inx2D(i, j)];
+				HitInfo nextHit = subHits[Inx4D(i, j, k, inx + 1)];
 				light = ShadeSublight(light, preHit, hit, nextHit);
 			}
 			else
 			{
-				HitInfo preHit = subHits[Inx_PerBounce(i, j, k, inx - 1)];
-				HitInfo nextHit = subHits[Inx_PerBounce(i, j, k, inx + 1)];
+				HitInfo preHit = subHits[Inx4D(i, j, k, inx - 1)];
+				HitInfo nextHit = subHits[Inx4D(i, j, k, inx + 1)];
 				light = ShadeSublight(light, preHit, hit, nextHit);
 			}
 		}
-		//subLights[i + w * j + w * h * k] = light;
+
 		//2.
-		HitInfo firstHit = subHits[Inx_PerBounce(i, j, k, 0)];
+		HitInfo firstHit = subHits[Inx4D(i, j, k, 0)];
 		float3 N = mainHit.N;
 		float3 V = -mainRay.dir;
 		float3 L = normalize(firstHit.P - mainHit.P);
@@ -255,5 +264,5 @@ void Render(uint3 id : SV_DispatchThreadID)
 	//end
 	float3 re = 0; 
 	re = finalColor;
-	Result[id.xy] = float4(re, 0);
+	Result[Inx_img(i, j)] = float4(re, 0);
 }
