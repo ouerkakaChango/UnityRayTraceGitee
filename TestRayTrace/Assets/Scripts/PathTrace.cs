@@ -17,8 +17,11 @@ using UnityEngine;
 
 public class PathTrace : MonoBehaviour
 {
-    public int  BN = 1; //BounceNum >=1。为1时，从光源Bounce到surful反射进眼睛，是直接光。
-    int BI = 0; //now BounceInx
+    //根据网上资料，N卡最小也有32threads，A卡64
+    //所以 Use 64 threads (e.g. (64, 1, 1), (8, 8, 1), (16, 2, 2) etc.)
+    //threads数量过低会慢很多
+    const int CoreX = 8;
+    const int CoreY = 8;
 
     public struct HitInfo
     {
@@ -41,6 +44,9 @@ public class PathTrace : MonoBehaviour
 
     public ComputeShader cs;
     public RenderTexture rt;
+
+    public int BN = 1; //BounceNum >=1。为1时，从光源Bounce到surful反射进眼睛，是直接光。
+    int BI = 0; //now BounceInx
 
     public int w = 1024;
     public int h = 720;
@@ -197,7 +203,7 @@ public class PathTrace : MonoBehaviour
         cs.SetInt("blockY", j);
         cs.SetInt("SPP", SPP);
 
-        cs.Dispatch(kInx, cw / 1, ch / 1, 1);
+        cs.Dispatch(kInx, cw / CoreX, ch / CoreY, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_mainRays, mainRays);
@@ -237,7 +243,7 @@ public class PathTrace : MonoBehaviour
         cs.SetInt("traceInx", traceInx);
         cs.SetInt("SPP_cell", SPP_cell);
 
-        cs.Dispatch(kInx, cw / 1, ch / 1, 1);
+        cs.Dispatch(kInx, cw / CoreX, ch / CoreY, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_subRays, subRays);
@@ -269,7 +275,7 @@ public class PathTrace : MonoBehaviour
         cs.SetInt("BI", BI);
         cs.SetInt("SPP", SPP);
 
-        cs.Dispatch(kInx, cw / 1, ch / 1, 1);
+        cs.Dispatch(kInx, cw / CoreX, ch / CoreY, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_subRays, subRays);
@@ -304,7 +310,7 @@ public class PathTrace : MonoBehaviour
         cs.SetInt("BI", BI);
         cs.SetInt("SPP", SPP);
 
-        cs.Dispatch(kInx, cw / 1, ch / 1, 1);
+        cs.Dispatch(kInx, cw / CoreX, ch / CoreY, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_mainRays, mainRays);

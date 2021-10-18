@@ -4,6 +4,12 @@
 #pragma kernel BounceBlock
 #pragma kernel RenderBlock
 
+//根据网上资料，N卡最小也有32threads，A卡64
+//所以 Use 64 threads (e.g. (64, 1, 1), (8, 8, 1), (16, 2, 2) etc.)
+//threads数量过低会慢很多
+#define CoreX 8
+#define CoreY 8
+
 #define PI 3.14159f
 
 int BI;
@@ -67,7 +73,7 @@ float2 Inx_img(int i, int j)
 }
 
 //#########################################################################################################
-[numthreads(1, 1, 1)]
+[numthreads(CoreX, CoreY, 1)]
 void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
@@ -111,7 +117,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 //#########################################################################################################
 int traceInx;
 int SPP_cell;
-[numthreads(1, 1, 1)]
+[numthreads(CoreX, CoreY, 1)]
 void TraceBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
@@ -135,7 +141,7 @@ void TraceBlock(uint3 id : SV_DispatchThreadID)
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //############################################################################
-[numthreads(1, 1, 1)]
+[numthreads(CoreX, CoreY, 1)]
 void BounceBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
@@ -213,7 +219,7 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
 	return re;
 }
 
-[numthreads(1, 1, 1)]
+[numthreads(CoreX, CoreY, 1)]
 void RenderBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
