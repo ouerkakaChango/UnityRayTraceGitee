@@ -278,6 +278,7 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 		float3 Li = GetAttenuationed(light.color, mainHit.P, firstHit.P);
 		Material_PBR param = GetObjMaterial_PBR(mainHit.obj);
 		finalColor += PBR_GGX(param, N, V, L, Li);
+		finalColor += GetObjEmissive(mainHit.obj);
 	}
 	finalColor = finalColor/SPP*2*PI;
 	finalColor += GetObjEmissive(mainHit.obj);

@@ -314,10 +314,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cs: {fileID: 7200000, guid: 767e133b056254a41ad0792dbd34d890, type: 3}
   rt: {fileID: 0}
-  BN: 8
+  BN: 4
   w: 1024
   h: 1024
-  SPP: 256
+  SPP: 16
   SPP_cell: 16
   wDivide: 8
   hDivide: 8
