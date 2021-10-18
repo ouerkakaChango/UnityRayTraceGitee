@@ -197,7 +197,7 @@ public class PathTrace : MonoBehaviour
         cs.SetInt("blockY", j);
         cs.SetInt("SPP", SPP);
 
-        cs.Dispatch(kInx, cw / 8, ch / 8, 1);
+        cs.Dispatch(kInx, cw / 1, ch / 1, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_mainRays, mainRays);
@@ -237,7 +237,7 @@ public class PathTrace : MonoBehaviour
         cs.SetInt("traceInx", traceInx);
         cs.SetInt("SPP_cell", SPP_cell);
 
-        cs.Dispatch(kInx, cw / 8, ch / 8, 1);
+        cs.Dispatch(kInx, cw / 1, ch / 1, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_subRays, subRays);
@@ -269,7 +269,7 @@ public class PathTrace : MonoBehaviour
         cs.SetInt("BI", BI);
         cs.SetInt("SPP", SPP);
 
-        cs.Dispatch(kInx, cw / 8, ch / 8, 1);
+        cs.Dispatch(kInx, cw / 1, ch / 1, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_subRays, subRays);
@@ -304,7 +304,7 @@ public class PathTrace : MonoBehaviour
         cs.SetInt("BI", BI);
         cs.SetInt("SPP", SPP);
 
-        cs.Dispatch(kInx, cw / 8, ch / 8, 1);
+        cs.Dispatch(kInx, cw / 1, ch / 1, 1);
         //### compute
         //#####################################
         PostComputeBuffer(ref buffer_mainRays, mainRays);

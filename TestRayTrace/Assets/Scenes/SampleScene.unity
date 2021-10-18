@@ -317,9 +317,9 @@ MonoBehaviour:
   rt: {fileID: 0}
   w: 1024
   h: 720
-  SPP: 16
+  SPP: 512
   SPP_cell: 16
-  wDivide: 8
+  wDivide: 16
   hDivide: 8
 --- !u!850595691 &1105758469
 LightingSettings:

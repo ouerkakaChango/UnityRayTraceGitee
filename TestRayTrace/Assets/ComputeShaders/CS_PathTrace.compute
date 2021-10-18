@@ -67,7 +67,7 @@ float2 Inx_img(int i, int j)
 }
 
 //#########################################################################################################
-[numthreads(8, 8, 1)]
+[numthreads(1, 1, 1)]
 void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
@@ -111,7 +111,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 //#########################################################################################################
 int traceInx;
 int SPP_cell;
-[numthreads(8, 8, 1)]
+[numthreads(1, 1, 1)]
 void TraceBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
@@ -135,7 +135,7 @@ void TraceBlock(uint3 id : SV_DispatchThreadID)
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //############################################################################
-[numthreads(8, 8, 1)]
+[numthreads(1, 1, 1)]
 void BounceBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
@@ -213,7 +213,7 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
 	return re;
 }
 
-[numthreads(8, 8, 1)]
+[numthreads(1, 1, 1)]
 void RenderBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
