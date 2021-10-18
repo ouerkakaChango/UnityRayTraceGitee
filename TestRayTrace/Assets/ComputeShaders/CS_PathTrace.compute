@@ -100,7 +100,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 	for (int k = 0; k < SPP; k++)
 	{
 		Ray subRay;
-		float3 seed = hit.P + float3(i, j, k);
+		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY,0);
 		subRay.dir = normalize(randP_round(seed) + hit.N);
 		subRay.pos = hit.P;
 		subRays[Inx3D(i,j,k)] = subRay;
@@ -168,13 +168,20 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
+	int type = 0;
 	if (obj == 0)
 	{
 		re.albedo = float3(1, 1, 1);
-		re.metallic = 0.01;
-		re.roughness = 0.98;
-		//re.metallic = 0.7;
-		//re.roughness = 0.3;
+		if (type == 0)
+		{
+			re.metallic = 0.01;
+			re.roughness = 0.98;
+		}
+		else
+		{
+			re.metallic = 0.7;
+			re.roughness = 0.3;
+		}
 	}
 	else if (obj >= 1 && obj<=5)
 	{
@@ -187,8 +194,16 @@ Material_PBR GetObjMaterial_PBR(int obj)
 		{
 			re.albedo = float3(0, 1, 0);
 		}
-		re.metallic = 0.01;
-		re.roughness = 0.98;
+		if (type == 0)
+		{
+			re.metallic = 0.01;
+			re.roughness = 0.98;
+		}
+		else
+		{
+			re.metallic = 0.7;
+			re.roughness = 0.3;
+		}
 	}
 	else if (obj == 6)
 	{

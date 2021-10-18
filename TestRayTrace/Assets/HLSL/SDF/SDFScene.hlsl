@@ -1,7 +1,7 @@
-﻿#define OBJNUM 7
+﻿#define OBJNUM 8
 
-#define TraceThre 0.01
-#define StartLen 0.1
+#define TraceThre 0.001
+#define StartLen 0.005
 
 float SDFBox(float3 p, float3 center, float3 bound)
 {
@@ -25,7 +25,7 @@ float GetObjSDF(int inx, float3 p)
 	}
 	else if (inx == 2)
 	{//上
-		return SDFBox(p, float3(0.0, 4.05, -5.0), float3(8.0, 0.1, 8.0));
+		return SDFBox(p, float3(0.0, 4.00, -5.0), float3(8.0, 0.1, 8.0));
 	}
 	else if (inx == 3)
 	{//左
@@ -42,6 +42,12 @@ float GetObjSDF(int inx, float3 p)
 	else if (inx == 6)
 	{//lightBox
 		return SDFBox(p, float3(0.0, 3.9, -5.0), float3(0.8, 0.08, 0.8));
+		//return SDFBox(p, float3(0.0, 3.9, -5.0), float3(1.5, 0.08, 1.5));
+		//return length(p - float3(0, 3.5, -5)) - 0.2;
+	}
+	else if (inx == 7)
+	{//前（封光）
+		return SDFBox(p, float3(0.0, 0.0, 1.1), float3(8.0, 8.0, 0.1));
 	}
 	else
 	{
