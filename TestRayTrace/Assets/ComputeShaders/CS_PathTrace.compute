@@ -51,6 +51,8 @@ RWStructuredBuffer<Light> subLights;
 
 #include "../HLSL/SDF/SDFScene.hlsl"
 #include  "../HLSL/Random/RandUtility.hlsl"
+#include "../HLSL/Render/Light.hlsl"
+#include "../HLSL/Render/PBR.hlsl"
 
 int Inx2D(int i, int j)
 {
@@ -102,6 +104,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 		Ray subRay;
 		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY,0);
 		subRay.dir = normalize(randP_round(seed) + hit.N);
+		//subRay.dir = randP_halfRound(seed, hit.N);
 		subRay.pos = hit.P;
 		subRays[Inx3D(i,j,k)] = subRay;
 	}
@@ -152,7 +155,10 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 		Ray ray = subRays[Inx3D(i, j, k)];
 		HitInfo hit = subHits[Inx4D(i, j, k, BI)];
 		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
-		ray.dir = normalize(randP_round(seed) + hit.N);
+		Material_PBR param = GetObjMaterial_PBR(hit.obj);
+		float3 ref = reflect(ray.dir, hit.N);
+		ray.dir = normalize(randP_round(seed)*param.roughness + ref);
+		//subRay.dir = randP_halfRound(seed, hit.N);
 		subRays[Inx3D(i, j, k)] = ray;
 	}
 	//######################## 
@@ -163,62 +169,6 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //############################################################################
-#include "../HLSL/Render/Light.hlsl"
-#include "../HLSL/Render/PBR.hlsl"
-
-Material_PBR GetObjMaterial_PBR(int obj)
-{
-	Material_PBR re;
-	int type = 0;
-	if (obj == 0)
-	{
-		re.albedo = float3(1, 1, 1);
-		if (type == 0)
-		{
-			re.metallic = 0.01;
-			re.roughness = 0.98;
-		}
-		else
-		{
-			re.metallic = 0.7;
-			re.roughness = 0.3;
-		}
-	}
-	else if (obj >= 1 && obj<=5)
-	{
-		re.albedo = float3(1, 1, 1);
-		if (obj == 3)
-		{
-			re.albedo = float3(1, 0, 0);
-		}
-		if (obj == 4)
-		{
-			re.albedo = float3(0, 1, 0);
-		}
-		if (type == 0)
-		{
-			re.metallic = 0.01;
-			re.roughness = 0.98;
-		}
-		else
-		{
-			re.metallic = 0.7;
-			re.roughness = 0.3;
-		}
-	}
-	else if (obj == 6)
-	{
-		//lightbox
-	}
-	else
-	{//错误材质色，类似unity中的麦金塔色
-		re.albedo = float3(1, 1, 0);
-		re.metallic = 0;
-		re.roughness = 1;
-	}
-
-	return re;
-}
 
 //#################################################################
 Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)

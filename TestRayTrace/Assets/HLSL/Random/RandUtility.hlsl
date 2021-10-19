@@ -1,9 +1,10 @@
+#include "../Transform/Transform.hlsl"
 float fracNoise(float3 seed ,float3 seedWeight)
 {
 	return frac(sin(dot(seed, seedWeight)) * 143758.5453);
 }
 
-float3 randP(float3 seed) {
+float3 fracRandP(float3 seed) {
 	return float3(
 		fracNoise(seed, float3(12.989, 78.233, 37.719)),
 		fracNoise(seed, float3(39.346, 11.135, 83.155)),
@@ -11,14 +12,43 @@ float3 randP(float3 seed) {
 		);
 }
 
-//round表明是单位球的面上，而不是体内
+//https://www.cnblogs.com/gearslogy/p/11717470.html
+//https://github.com/diharaw/GPUPathTracer/blob/master/src/shader/path_tracer_cs.glsl
+//################################
+uint g_state = 0;
+//###############################
+
+uint rand(inout uint state)
+{
+	uint x = state;
+	x ^= x << 13;
+	x ^= x >> 17;
+	x ^= x << 15;
+	state = x;
+	return x;
+}
+
+float random_float_01(inout uint state)
+{
+	return (rand(state) & 0xFFFFFF) / 16777216.0f;
+}
+
+float3 random_in_unit_sphere(inout uint state)
+{
+	float z = random_float_01(state) * 2.0f - 1.0f;
+	float t = random_float_01(state) * 2.0f * 3.1415926f;
+	float r = sqrt(max(0.0, 1.0f - z * z));
+	float x = r * cos(t);
+	float y = r * sin(t);
+	float3 res = float3(x, y, z);
+	res *= pow(random_float_01(state), 1.0 / 3.0);
+	return res;
+}
+
 float3 randP_round(float3 seed)
 {
-	float3 d=0;
-	do
-	{
-		//!!! randP 随机粗糙，不如std::mt1993
-		d = 2.0f * randP(seed) - 1;
-	} while (dot(d, d) > 1);
-	return normalize(d);
+	int stat = (int)dot(seed, float3(1973, 9277, 2699));
+	
+	return random_in_unit_sphere(stat);
+	//return normalize(2*fracRandP(seed)-1);
 }

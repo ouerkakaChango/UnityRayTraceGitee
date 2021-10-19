@@ -71,3 +71,57 @@ float3 PBR_GGX(Material_PBR param, float3 n, float3 v, float3 l, float3 Li)
 
 	return Lo;
 }
+
+Material_PBR GetObjMaterial_PBR(int obj)
+{
+	Material_PBR re;
+	int type = 0;
+	if (obj == 0)
+	{
+		re.albedo = float3(1, 1, 1);
+		if (type == 0)
+		{
+			re.metallic = 0.01;
+			re.roughness = 0.98;
+		}
+		else
+		{
+			re.metallic = 0.7;
+			re.roughness = 0.3;
+		}
+	}
+	else if (obj >= 1 && obj <= 5)
+	{
+		re.albedo = float3(1, 1, 1);
+		if (obj == 3)
+		{
+			re.albedo = float3(1, 0, 0);
+		}
+		if (obj == 4)
+		{
+			re.albedo = float3(0, 1, 0);
+		}
+		if (type == 0)
+		{
+			re.metallic = 0.01;
+			re.roughness = 0.98;
+		}
+		else
+		{
+			re.metallic = 0.7;
+			re.roughness = 0.3;
+		}
+	}
+	else if (obj == 6)
+	{
+		//lightbox
+	}
+	else
+	{//错误材质色，类似unity中的麦金塔色
+		re.albedo = float3(1, 1, 0);
+		re.metallic = 0;
+		re.roughness = 1;
+	}
+
+	return re;
+}
