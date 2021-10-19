@@ -245,7 +245,6 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 	float3 finalColor = 0;
 	HitInfo mainHit = mainHits[Inx2D(i,j)];
 	Ray mainRay = mainRays[Inx2D(i, j)];
-	int validCount = 0;
 	int subRayValid = 0;
 	//######################## 
 	for (k = 0; k < SPP; k++)
@@ -289,14 +288,9 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			}
 		}
 
-		//Result[Inx_img(i, j)] = float4(light.color, 0);
-		//return;
-
 		//2.
 		if (subRayValid == 1)
-		{
-			validCount += 1;
-
+		{			
 			HitInfo firstHit = subHits[Inx4D(i, j, k, 0)];
 			float3 N = mainHit.N;
 			float3 V = -mainRay.dir;
@@ -306,7 +300,7 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			finalColor += PBR_GGX(param, N, V, L, Li);
 		}
 	}
-	finalColor = finalColor/ validCount *2*PI;
+	finalColor = finalColor/ SPP *2*PI;
 	finalColor += GetObjEmissive(mainHit.obj);
 	//???
 	finalColor = pow(abs(finalColor), 1.0f / 2.2f);
