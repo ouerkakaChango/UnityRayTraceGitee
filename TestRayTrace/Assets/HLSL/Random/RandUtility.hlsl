@@ -15,7 +15,7 @@ float3 fracRandP(float3 seed) {
 //https://www.cnblogs.com/gearslogy/p/11717470.html
 //https://github.com/diharaw/GPUPathTracer/blob/master/src/shader/path_tracer_cs.glsl
 //################################
-uint g_state = 0;
+uint g_state = 1973;
 //###############################
 
 uint rand(inout uint state)
@@ -51,4 +51,11 @@ float3 randP_round(float3 seed)
 	
 	return random_in_unit_sphere(stat);
 	//return normalize(2*fracRandP(seed)-1);
+}
+
+float rand01(float3 seed)
+{
+	int stat = (int)dot(seed, float3(1973, 9277, 2699));
+
+	return random_float_01(stat);
 }

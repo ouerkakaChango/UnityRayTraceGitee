@@ -138,15 +138,3 @@ void SDFScene(inout Ray ray,out HitInfo info)
 		ray.pos += ray.dir*sdf;
 	}
 }
-
-float3 GetObjEmissive(int obj)
-{
-	if (obj == 6)
-	{
-		return 10;
-	}
-	else
-	{
-		return 0;
-	}
-}

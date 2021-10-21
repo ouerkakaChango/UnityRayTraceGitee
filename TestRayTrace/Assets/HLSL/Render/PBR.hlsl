@@ -125,3 +125,15 @@ Material_PBR GetObjMaterial_PBR(int obj)
 
 	return re;
 }
+
+float3 GetObjEmissive(int obj)
+{
+	if (obj == 6)
+	{
+		return 50;
+	}
+	else
+	{
+		return 0;
+	}
+}

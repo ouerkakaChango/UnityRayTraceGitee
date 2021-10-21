@@ -16,7 +16,7 @@ float3 GetAttenuationed(float3 lightColor, float3 pos, float3 lightPos)
 	//1.防止距离太近的时候除爆了，衰减亮度需要一个最小值
 	//2.可以调整衰减速度，并且保证[0,1]
 	float d2min = 0.001;
-	float d2max = 20000;
+	float d2max = 50;
 	if (ldis2 > d2min)
 	{
 		attenuation = (d2max - ldis2) / (d2max - d2min);
