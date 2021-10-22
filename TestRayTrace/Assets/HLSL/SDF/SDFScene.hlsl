@@ -1,7 +1,7 @@
 ﻿#define OBJNUM 8
 
-#define TraceThre 0.001
-#define TraceStart 0.005
+#define TraceThre 0.01
+#define TraceStart 0.05
 
 float SDFBox(float3 p, float3 center, float3 bound)
 {

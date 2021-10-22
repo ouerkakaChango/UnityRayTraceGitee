@@ -317,7 +317,7 @@ MonoBehaviour:
   BN: 8
   w: 1024
   h: 1024
-  SPP: 128
+  SPP: 64
   SPP_cell: 16
   wDivide: 8
   hDivide: 8

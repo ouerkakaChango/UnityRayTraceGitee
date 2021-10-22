@@ -94,22 +94,20 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	else if (obj >= 1 && obj <= OBJNUM-1)
 	{
 		re.albedo = float3(1, 1, 1);
-		if (obj == 3)
+		if (obj == 3 )
 		{
 			re.albedo = float3(1, 0, 0);
-			if (type == 1)
-			{
-				re.metallic = 0.1;
-				re.roughness = 0.1;
-			}
 		}
-		if (obj == 4)
+		else if (obj == 4)
 		{
 			re.albedo = float3(0, 1, 0);
+		}
+		if (obj==1 || (obj >= 3 && obj <= 5))
+		{
 			if (type == 1)
 			{
-				re.metallic = 0.7;
-				re.roughness = 0.3;
+				re.metallic = 0.8;
+				re.roughness = 0.1;
 			}
 		}
 		
