@@ -144,21 +144,6 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 				//H = toNormalHemisphere(H, hit.N);
 				//subRay.dir = reflect(ray.dir, H);
 			}
-			{//type3 Importance Sample(GGX NDF1)
-				//1.prepare a
-				//Material_PBR param = GetObjMaterial_PBR(hit.obj);
-				//float a = param.roughness;
-				//a = max(0.001f, a*a);
-				////2.sample h 
-				//float x1 = rand01(seed);
-				//float x2 = rand01(seed.zxy*seed.z);
-				//float phi = 2 * PI*x1;
-				//float theta = atan(a*sqrt(x2 / (1 - x2)));
-				//float3 H = PFromSpherical(theta, phi,1);
-				////???
-				//H = toNormalHemisphere(H, hit.N);
-				//subRay.dir = reflect(ray.dir, H);
-			}
 		}
 		subRay.pos = hit.P;
 		subRays[Inx3D(i,j,k)] = subRay;
@@ -235,8 +220,8 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
 	float3 c = PBR_GGX(param, hit.N, V, L, Li);
 
 	Light re;
-	//??? 吸收系数
-	re.color = GetObjEmissive(hit.obj) + c;
+	//??? 反射系数
+	re.color = GetObjEmissive(hit.obj) + c*0.98f;
 	return re;
 }
 
@@ -323,17 +308,6 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 				{//type4 Importance Sample(Diffuse)
 					//float3 H = normalize(V + L);
 					//pdf = dot(N, H) / PI;
-				}
-				{//type3 Importance Sample(NDF1)					
-					//float3 H = normalize(V + L);
-					//float theta = acos(dot(N, H));
-					//theta = lerp(0.00001, PI / 2, theta / (PI / 2));
-					//float c = cos(theta);
-					//float s = sin(theta);
-					//
-					//float nomi = 2*a * a * c*s;
-					//float deno = c * c * (a*a - 1) + 1;
-					//pdf = nomi / deno;
 				}
 			}
 			finalColor += PBR_GGX(param, N, V, L, Li)/pdf;

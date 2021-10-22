@@ -71,7 +71,7 @@ public class PathTrace : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        DoPathTrace();
     }
 
     // Update is called once per frame
@@ -384,9 +384,9 @@ public class PathTrace : MonoBehaviour
         //{
         //    Render();
         //}
-        if (GUI.Button(new Rect(0, 50, 100, 50), "Do"))
-        {
-            DoPathTrace();
-        } 
+        //if (GUI.Button(new Rect(0, 50, 100, 50), "Do"))
+        //{
+        //    DoPathTrace();
+        //} 
     }
 }
