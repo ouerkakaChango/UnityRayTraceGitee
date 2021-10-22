@@ -102,7 +102,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 		{
 			re.albedo = float3(0, 1, 0);
 		}
-		if (obj==1 || (obj >= 3 && obj <= 5))
+		if (obj==1 || (obj >= 3 && obj <= OBJNUM - 1 && obj!=5))
 		{
 			if (type == 1)
 			{
