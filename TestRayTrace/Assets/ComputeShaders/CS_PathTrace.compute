@@ -109,26 +109,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 			//type2 uni 
 			//subRay.dir = randP_halfRound(seed, hit.N);
 			{
-				////type3 Importance Sample (GGX NDF)
-				////1.prepare a
-				//Material_PBR param = GetObjMaterial_PBR(hit.obj);
-				//float a = param.roughness;
-				//a = max(0.001f, a*a);
-				////2.sample h 
-				//float x1 = rand01(seed);
-				//float x2 = rand01(seed.zxy);
-				//float phi = 2 * PI*x1;
-				//float costheta = sqrt((1 - x2) / (1 + (a*a - 1)*x2));
-				//float sintheta = sqrt(1 - costheta * costheta);
-				//float3 H = float3(
-				//	sintheta*cos(phi),
-				//	sintheta*sin(phi),
-				//	costheta);
-				//H = toNormalHemisphere(H, hit.N);
-				//subRay.dir = reflect(-ray.dir, H);
-			}
-			{
-				//type4 Importance Sample (Diffuse)
+				//type3 Importance Sample (GGX NDF)
 				//1.prepare a
 				Material_PBR param = GetObjMaterial_PBR(hit.obj);
 				float a = param.roughness;
@@ -136,14 +117,33 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 				//2.sample h 
 				float x1 = rand01(seed);
 				float x2 = rand01(seed.zxy);
-				float r = sqrt(x1);
-				float theta = x2 * 2 * PI;
-				float x = r * cos(theta);
-				float y = r * sin(theta);
-				float z = sqrt(1 - x * x - y * y);
-				float3 H = float3(x, y, z);
+				float phi = 2 * PI*x1;
+				float costheta = sqrt((1 - x2) / (1 + (a*a - 1)*x2));
+				float sintheta = sqrt(1 - costheta * costheta);
+				float3 H = float3(
+					sintheta*cos(phi),
+					sintheta*sin(phi),
+					costheta);
 				H = toNormalHemisphere(H, hit.N);
 				subRay.dir = reflect(-ray.dir, H);
+			}
+			{
+				////type4 Importance Sample (Diffuse)
+				////1.prepare a
+				//Material_PBR param = GetObjMaterial_PBR(hit.obj);
+				//float a = param.roughness;
+				//a = max(0.001f, a*a);
+				////2.sample h 
+				//float x1 = rand01(seed);
+				//float x2 = rand01(seed.zxy);
+				//float r = sqrt(x1);
+				//float theta = x2 * 2 * PI;
+				//float x = r * cos(theta);
+				//float y = r * sin(theta);
+				//float z = sqrt(1 - x * x - y * y);
+				//float3 H = float3(x, y, z);
+				//H = toNormalHemisphere(H, hit.N);
+				//subRay.dir = reflect(-ray.dir, H);
 			}
 		}
 		subRay.pos = hit.P;
@@ -219,9 +219,9 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
 	float3 V = normalize(preHit.P - hit.P);
 	float3 L = normalize(nextHit.P - hit.P);
 	float3 c = PBR_GGX(param, hit.N, V, L, Li);
-	//!!! 是否根据材质的吸收系数再乘一个值
-	//或者PBR中的G已经够用
+
 	Light re;
+	//??? 吸收系数
 	re.color = GetObjEmissive(hit.obj) + c;
 	return re;
 }
@@ -297,22 +297,31 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 				//type1
 				//pdf = 1/(2*PI);
 				{
-					////type3 Importance Sample(NDF)
-					//float3 H = normalize(V + L);
-					//float theta = acos(dot(N, H));
-					////theta = lerp(0.00001, PI / 2, theta / (PI / 2));
-					//float c = cos(theta);
-					//float s = sin(theta);
-					//
-					//float nomi = a * a * c;
-					//float deno = c * c * (a*a - 1) + 1;
-					//pdf = nomi / deno;
-					//pdf /= 4 * dot(L, H);
+					//type3 Importance Sample(NDF)
+					float3 H = normalize(V + L);
+					float theta = acos(dot(N, H));
+					//theta = lerp(0.00001, PI / 2, theta / (PI / 2));
+					float c = cos(theta);
+					float s = sin(theta);
+					
+					if (false)
+					{
+						float nomi = a * a * c;
+						float deno = c * c * (a*a - 1) + 1;
+						pdf = nomi / deno;
+						pdf /= 4 * dot(L, H);
+					}
+					else
+					{
+						float nomi = 2*a * a * c*s;
+						float deno = c * c * (a*a - 1) + 1;
+						pdf = nomi / deno;
+					}
 				}
 				{
 					//type3 Importance Sample(Diffuse)
-					float3 H = normalize(V + L);
-					pdf = dot(N, H) / PI;
+					//float3 H = normalize(V + L);
+					//pdf = dot(N, H) / PI;
 				}
 			}
 			finalColor += PBR_GGX(param, N, V, L, Li)/pdf;
