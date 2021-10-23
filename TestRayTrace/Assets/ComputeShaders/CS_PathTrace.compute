@@ -104,8 +104,9 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 		Ray subRay;
 		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY,0);
 		{
-			//type1
-			subRay.dir = normalize(randP_round(seed) + hit.N);
+			{//type1
+			//subRay.dir = normalize(randP_round(seed) + hit.N);
+			}
 			//type2 uni 
 			//subRay.dir = randP_halfRound(seed, hit.N);
 			{//type3 Importance Sample (GGX NDF2)
@@ -196,9 +197,13 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 		HitInfo hit = subHits[Inx4D(i, j, k, BI)];
 		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
 		Material_PBR param = GetObjMaterial_PBR(hit.obj);
-		float3 ref = reflect(ray.dir, hit.N);
-		ray.dir = normalize(randP_round(seed) + ref);
-		//subRay.dir = randP_halfRound(seed, hit.N);
+		{
+			float3 ref = reflect(ray.dir, hit.N);
+			ray.dir = normalize(randP_round(seed) + ref);
+		}
+		{
+			//ray.dir = toNormalHemisphere(randP_hemiRound(seed), hit.N);
+		}
 		subRays[Inx3D(i, j, k)] = ray;
 	}
 	//######################## 
@@ -316,12 +321,13 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 	finalColor = finalColor / SPP;
 	finalColor += GetObjEmissive(mainHit.obj);
 	//???
-	//finalColor = pow(abs(finalColor), 1.0f / 2.2f);
+	finalColor = pow(abs(finalColor), 1.0f / 2.2f);
 	//######################## 
 	//end
 	float3 re = 0; 
 	re = finalColor;
 	//re = -cross(float3(0, 1, 0), float3(1, 0, 0));
-	//re = toNormalHemisphere(float3(1, 1, 1), float3(0, 0, 1));
+	//re = toNormalHemisphere(float3(1, 1, 1), float3(0, 1, 0));
+	//re = toNormalHemisphere(float3(0, 0, 1), float3(1,0,0));
 	Result[Inx_img(i, j)] = float4(re, 0);
 }

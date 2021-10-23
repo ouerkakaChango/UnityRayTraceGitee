@@ -67,23 +67,24 @@ float3 Rotate(Q rot, float3 v)
 	return QAxis(re) * len;
 }
 
-float3 toNormalHemisphere(float3 v_local, float3 N)
+float3 errortoNormalHemisphere(float3 v_local, float3 N)
 {
-	if (length(N - float3(0, 0, 1)) < 0.001)
+	if (length(N - float3(0, 1, 0)) < 0.001)
 	{
 		return v_local;
 	}
-	Q rot = QFrom(float3(0, 0, 1), N);
+	Q rot = QFrom(float3(0, 1, 0), N);
 	return Rotate(rot, v_local);
 }
 
-float3 toNormalHemisphere2(float3 v, float3 N)
+// v must be in z-up coord
+float3 toNormalHemisphere(float3 v, float3 N)
 {
 	float3 helper = float3(1, 0, 0);
 	if (abs(N.x) > 0.999) helper = float3(0, 0, 1);
-	float3 tangent = normalize(cross(N, helper));
+	float3 tangent = normalize(cross(helper, N));
 	float3 bitangent = normalize((cross(N, tangent)));
-	return -v.x*bitangent + v.y*N - v.z * tangent;
+	return v.x*tangent + v.y*bitangent + v.z * N;
 }
 
 float3 PFromSpherical(float theta, float phi, float r)

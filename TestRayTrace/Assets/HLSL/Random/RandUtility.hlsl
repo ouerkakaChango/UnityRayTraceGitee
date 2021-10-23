@@ -53,6 +53,15 @@ float3 randP_round(float3 seed)
 	//return normalize(2*fracRandP(seed)-1);
 }
 
+float3 randP_hemiRound(float3 seed)
+{
+	int stat = (int)dot(seed, float3(1973, 9277, 2699));
+
+	float3 re =  random_in_unit_sphere(stat);
+	re.z = abs(re.z);
+	return re;
+}
+
 float rand01(float3 seed)
 {
 	int stat = (int)dot(seed, float3(1973, 9277, 2699));
