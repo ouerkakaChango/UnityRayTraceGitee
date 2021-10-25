@@ -71,7 +71,7 @@ public class PathTrace : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        DoPathTrace();
+        //DoPathTrace();
     }
 
     // Update is called once per frame
@@ -157,6 +157,13 @@ public class PathTrace : MonoBehaviour
             TraceBlock(i, j);
         }
     }
+
+    void RenderBlock(int i, int j)
+    {
+        Compute_RenderBlock(i, j);
+    }
+
+    //#######################################
 
     static public void PreComputeRayBuffer(ref ComputeBuffer buffer, int count, Ray[] rays)
     {
@@ -339,16 +346,16 @@ public class PathTrace : MonoBehaviour
         PostComputeBuffer(ref buffer_subHits, subHits);
     }
 
-    void RenderBlock(int i, int j)
-    {
-        Compute_RenderBlock(i,j);
-    }
-
     void PathTraceBlock(int i, int j)
     {
         InitBlock(i, j);
         DoTraceBounceBlock(i, j);
         RenderBlock(i, j);
+
+        //InitBlock(0, 0);
+        //TraceBlock(0, 0);
+        //BounceBlock(0, 0);
+        //TraceBlock(0, 0);
     }
 
     void DoPathTrace()
@@ -363,30 +370,34 @@ public class PathTrace : MonoBehaviour
         DisposeRays();
     }
 
+    void Filter()
+    {
+        Compute_Filter();
+    }
+
+    void Compute_Filter()
+    {
+        //##################################
+        //### compute
+        int kInx = cs.FindKernel("Filter");
+
+        cs.SetTexture(kInx, "Result", rt);
+
+        cs.Dispatch(kInx, w / CoreX, h / CoreY, 1);
+        //### compute
+        //#####################################
+    }
+
     //@@@
     private void OnGUI()
     {
-        //GUI.Label(new Rect(0, 0, 200, 25), "NeedBounce: " + (BN - 1));
-        //GUI.Label(new Rect(0, 25, 200, 25), "NowBounce: " + BI);
-        //if (GUI.Button(new Rect(0, 50, 100, 50), "Init"))
-        //{
-
-        //} 
-        //if (GUI.Button(new Rect(0, 100, 100, 50), "Trace"))
-        //{
-
-        //}
-        //if (GUI.Button(new Rect(100, 100, 100, 50), "Bounce"))
-        //{
-        //    Bounce();
-        //}
-        //if (GUI.Button(new Rect(0, 150, 100, 50), "Render"))
-        //{
-        //    Render();
-        //}
-        //if (GUI.Button(new Rect(0, 50, 100, 50), "Do"))
-        //{
-        //    DoPathTrace();
-        //} 
+        if (GUI.Button(new Rect(0, 50, 100, 50), "Do"))
+        {
+            DoPathTrace();
+        }
+        if (GUI.Button(new Rect(0, 50*2, 100, 50), "Filter"))
+        {
+            Filter();
+        }
     }
 }

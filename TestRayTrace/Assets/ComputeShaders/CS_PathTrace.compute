@@ -3,6 +3,7 @@
 #pragma kernel TraceBlock
 #pragma kernel BounceBlock
 #pragma kernel RenderBlock
+#pragma kernel Filter
 
 //根据网上资料，N卡最小也有32threads，A卡64
 //所以 Use 64 threads (e.g. (64, 1, 1), (8, 8, 1), (16, 2, 2) etc.)
@@ -103,48 +104,46 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 	{
 		Ray subRay;
 		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY,0);
+		{//type1
+		//subRay.dir = normalize(randP_round(seed) + hit.N);
+		}
+		//type2 uni 
+		//subRay.dir = randP_halfRound(seed, hit.N);
+		{//type3 Importance Sample (GGX NDF2)
+			//1.prepare a
+			Material_PBR param = GetObjMaterial_PBR(hit.obj);
+			float a = param.roughness;
+			a = max(0.001f, a*a);
+			//2.sample h 
+			float x1 = rand01(seed);
+			float x2 = rand01(seed.zxy);
+			float phi = 2 * PI*x1;
+			float costheta = sqrt((1 - x2) / (1 + (a*a - 1)*x2));
+			float sintheta = sqrt(max(0.0, 1.0 - costheta * costheta)); //防止极限误差 -0.00000x
+			float3 H = float3( 
+				sintheta*cos(phi),
+				sintheta*sin(phi),
+				costheta);
+			H = toNormalHemisphere(H, hit.N);
+			subRay.dir = reflect(ray.dir, H);
+		}
 		{
-			{//type1
-			//subRay.dir = normalize(randP_round(seed) + hit.N);
-			}
-			//type2 uni 
-			//subRay.dir = randP_halfRound(seed, hit.N);
-			{//type3 Importance Sample (GGX NDF2)
-				//1.prepare a
-				Material_PBR param = GetObjMaterial_PBR(hit.obj);
-				float a = param.roughness;
-				a = max(0.001f, a*a);
-				//2.sample h 
-				float x1 = rand01(seed);
-				float x2 = rand01(seed.zxy);
-				float phi = 2 * PI*x1;
-				float costheta = sqrt((1 - x2) / (1 + (a*a - 1)*x2));
-				float sintheta = sqrt(1 - costheta * costheta);
-				float3 H = float3(
-					sintheta*cos(phi),
-					sintheta*sin(phi),
-					costheta);
-				H = toNormalHemisphere(H, hit.N);
-				subRay.dir = reflect(ray.dir, H);
-			}
-			{
-				////type4 Importance Sample (Diffuse)
-				////1.prepare a
-				//Material_PBR param = GetObjMaterial_PBR(hit.obj);
-				//float a = param.roughness;
-				//a = max(0.001f, a*a);
-				////2.sample h 
-				//float x1 = rand01(seed);
-				//float x2 = rand01(seed.zxy);
-				//float r = sqrt(x1);
-				//float theta = x2 * 2 * PI;
-				//float x = r * cos(theta);
-				//float y = r * sin(theta);
-				//float z = sqrt(1 - x * x - y * y);
-				//float3 H = float3(x, y, z);
-				//H = toNormalHemisphere(H, hit.N);
-				//subRay.dir = reflect(ray.dir, H);
-			}
+			////type4 Importance Sample (Diffuse)
+			////1.prepare a
+			//Material_PBR param = GetObjMaterial_PBR(hit.obj);
+			//float a = param.roughness;
+			//a = max(0.001f, a*a);
+			////2.sample h 
+			//float x1 = rand01(seed);
+			//float x2 = rand01(seed.zxy);
+			//float r = sqrt(x1);
+			//float theta = x2 * 2 * PI;
+			//float x = r * cos(theta);
+			//float y = r * sin(theta);
+			//float z = sqrt(1 - x * x - y * y);
+			//float3 H = float3(x, y, z);
+			//H = toNormalHemisphere(H, hit.N);
+			//subRay.dir = reflect(ray.dir, H);
 		}
 		subRay.pos = hit.P;
 		subRays[Inx3D(i,j,k)] = subRay;
@@ -175,13 +174,18 @@ void TraceBlock(uint3 id : SV_DispatchThreadID)
 		//初始化
 		hit.bHit = 0;
 		SDFScene(ray, hit);
+		if (hit.bHit == -1)
+		{
+			Result[Inx_img(i, j)] = float4(0,0,1,0);
+			return;
+		}
 		subHits[Inx4D(i, j, k, BI)] = hit;
 	}
 	//######################## 
 
 	float3 re = float3(0, 0, 0);
 
-	re = subHits[Inx4D(i, j, 0, BI)].P;
+	re = float3(subHits[Inx4D(i, j, 0, BI)].P.xy,0);
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //############################################################################
@@ -210,7 +214,7 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 	//end
 	float3 re = float3(0, 0, 0);
 	re = subRays[Inx3D(i, j, 0)].dir;
-	//re = abs(subRays[Inx3D(i, j, 0)].pos);
+	//re = subHits[Inx4D(i, j, 0, BI)].P;
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //############################################################################
@@ -326,8 +330,71 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 	//end
 	float3 re = 0; 
 	re = finalColor;
+
 	//re = -cross(float3(0, 1, 0), float3(1, 0, 0));
 	//re = toNormalHemisphere(float3(1, 1, 1), float3(0, 1, 0));
-	//re = toNormalHemisphere(float3(0, 0, 1), float3(1,0,0));
+	//float3 seed = mainHit.P + float3(i, j, 0) + float3(blockX, blockY, 0);
+	//re = toNormalHemisphere(randP_hemiRound(seed), float3(0,1,0)).y>0;
 	Result[Inx_img(i, j)] = float4(re, 0);
+}
+
+float GetGrey(float3 c)
+{
+	return c.r*0.3 + c.g*0.6 + c.b*0.1;
+}
+
+void swap(inout float a, inout float b)
+{
+	float tt = a;
+	a = b;
+	b = tt;
+}
+
+void swap(inout float3 a, inout float3 b)
+{
+	float3 tt = a;
+	a = b;
+	b = tt;
+}
+
+[numthreads(CoreX, CoreY, 1)]
+void Filter(uint3 id : SV_DispatchThreadID)
+{
+	int x = id.x;
+	int y = id.y;
+	float4 oriColor = Result[id.xy];
+	
+	float grey[9];
+	float3 colors[9];
+	int count = 0;
+	for (int j = -1; j <= 1; j++)
+	{
+		for (int i = -1; i <= 1; i++)
+		{
+			colors[count] = Result[float2(x + i, y + j)].xyz;
+			float tt = GetGrey(colors[count]);
+			grey[count] = tt;
+			count += 1;
+		}
+	}
+
+	//希尔排序
+	for (int gap = 9 / 2; gap > 0; gap /= 2)
+	{
+		for (int i = gap; i < 9; ++i) 
+		{
+			for (int j = i - gap; j >= 0 && grey[j] > grey[j + gap]; j -= gap)
+			{
+				swap(grey[j], grey[j + gap]);
+				swap(colors[j], colors[j + gap]);
+			}
+		}
+	}
+		
+	//######################## 
+	//end
+	float3 re = 0; 
+	//re.yz = oriColor.yz;
+	re = colors[4];
+	Result[id.xy] = float4(re, 0);
 }

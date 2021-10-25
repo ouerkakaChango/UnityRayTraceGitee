@@ -89,7 +89,8 @@ void SDFScene(inout Ray ray,out HitInfo info)
 
 	//old错误方法：ray.pos += ray.dir*TraceStart;
 	//new方法：向N方向走出去
-	while (true)
+	int c1 = 0;
+	while (c1<10000)
 	{
 		sdf = 1000;
 		for (int inx = 0; inx < OBJNUM; inx++)
@@ -107,9 +108,11 @@ void SDFScene(inout Ray ray,out HitInfo info)
 		}
 
 		ray.pos += GetObjNormal(objInx, ray.pos)*TraceStart;
+		c1 += 1;
 	}
 	
-	while (true)
+	int c2 = 0;
+	while (c2<10000)
 	{
 		sdf = 1000; //a very large,can be larger than maxTraceDis
 		for (int inx = 0; inx < OBJNUM; inx++)
@@ -131,10 +134,21 @@ void SDFScene(inout Ray ray,out HitInfo info)
 			traceDis = sdf;
 			info.bHit = 1;
 			info.obj = objInx;
-			info.N = GetObjNormal(objInx, ray.pos);
 			info.P = ray.pos;
+			info.N = GetObjNormal(objInx, ray.pos);
+			//int count = 1;
+			//while (length(info.N)<0.001)
+			//{
+			//	info.N = GetObjNormal(objInx, info.P - ray.dir*0.001*count);
+			//	count++;
+			//}
 			break;
 		}
 		ray.pos += ray.dir*sdf;
+		c2 += 1;
+	}
+	if (c2 > 10000)
+	{
+		info.bHit = -1;
 	}
 }
