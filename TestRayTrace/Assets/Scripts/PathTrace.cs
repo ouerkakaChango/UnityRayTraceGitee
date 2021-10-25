@@ -121,10 +121,17 @@ public class PathTrace : MonoBehaviour
 
     void DisposeRays()
     {
-        buffer_mainRays .Dispose();
-        buffer_subRays  .Dispose();
-        buffer_mainHits .Dispose();
-        buffer_subHits  .Dispose();
+        //!!!
+        if (buffer_mainRays != null)
+        {
+            buffer_mainRays.Dispose();
+            buffer_mainHits.Dispose();
+            buffer_subRays.Dispose();
+        }
+        if (buffer_subHits != null)
+        {
+            buffer_subHits.Dispose();
+        }
     }
 
     void CreateRaysBlock(int i,int j)
@@ -348,12 +355,12 @@ public class PathTrace : MonoBehaviour
 
     void PathTraceBlock(int i, int j)
     {
-        InitBlock(i, j);
-        DoTraceBounceBlock(i, j);
-        RenderBlock(i, j);
+        //InitBlock(i, j);
+        //DoTraceBounceBlock(i, j);
+        //RenderBlock(i, j);
 
-        //InitBlock(0, 0);
-        //TraceBlock(0, 0);
+        InitBlock(0, 0);
+        TraceBlock(0, 0);
         //BounceBlock(0, 0);
         //TraceBlock(0, 0);
     }

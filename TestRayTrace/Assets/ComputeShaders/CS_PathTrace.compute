@@ -50,8 +50,8 @@ struct Light
 };
 RWStructuredBuffer<Light> subLights;
 
-#include "../HLSL/SDF/SDFScene.hlsl"
 #include  "../HLSL/Random/RandUtility.hlsl"
+#include "../HLSL/SDF/SDFScene.hlsl"
 #include "../HLSL/Render/Light.hlsl"
 #include "../HLSL/Render/PBR.hlsl"
 
@@ -99,16 +99,28 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 
 	SDFScene(ray,hit);
 
+	//??? debug
+	if (hit.bHit == -1)
+	{
+		Result[Inx_img(i, j)] = float4(1, 0, 0, 0);
+		return;
+	}
+	else if (hit.bHit == -2)
+	{
+		Result[Inx_img(i, j)] = float4(0, 1, 0, 0);
+		return;
+	}
+
 	//在hit上初始化SPP个subRay
 	for (int k = 0; k < SPP; k++)
 	{
 		Ray subRay;
 		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY,0);
 		{//type1
-		//subRay.dir = normalize(randP_round(seed) + hit.N);
+			//subRay.dir = hit.N;//normalize(randP_round(seed) + hit.N);
 		}
 		//type2 uni 
-		//subRay.dir = randP_halfRound(seed, hit.N);
+		//subRay.dir = toNormalHemisphere(randP_hemiRound(seed), hit.N);
 		{//type3 Importance Sample (GGX NDF2)
 			//1.prepare a
 			Material_PBR param = GetObjMaterial_PBR(hit.obj);
@@ -153,8 +165,8 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 	mainRays[Inx2D(i,j)] = ray;
 	mainHits[Inx2D(i, j)] = hit;
 
-	float3 re = 0;
-	re = hit.N;
+	float3 re = 0.5;
+	//re = hit.N;
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //#########################################################################################################
@@ -174,18 +186,27 @@ void TraceBlock(uint3 id : SV_DispatchThreadID)
 		//初始化
 		hit.bHit = 0;
 		SDFScene(ray, hit);
+		//??? debug
 		if (hit.bHit == -1)
 		{
-			Result[Inx_img(i, j)] = float4(0,0,1,0);
+			Result[Inx_img(i, j)] = float4(1,0,0,0);
+			return;
+		}
+		else if (hit.bHit == -2)
+		{
+			Result[Inx_img(i, j)] = float4(0, 1, 0, 0);
+			return;
+		}
+		else if (hit.bHit == -3)
+		{
+			Result[Inx_img(i, j)] = float4(1, 0, 1, 0);
 			return;
 		}
 		subHits[Inx4D(i, j, k, BI)] = hit;
 	}
 	//######################## 
-
 	float3 re = float3(0, 0, 0);
-
-	re = float3(subHits[Inx4D(i, j, 0, BI)].P.xy,0);
+	//re = subHits[Inx4D(i, j, 0, BI)].P;
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //############################################################################
@@ -206,6 +227,7 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 			ray.dir = normalize(randP_round(seed) + ref);
 		}
 		{
+			//不能太扁平了，不然永远出不去sdf-thre
 			//ray.dir = toNormalHemisphere(randP_hemiRound(seed), hit.N);
 		}
 		subRays[Inx3D(i, j, k)] = ray;
@@ -379,7 +401,7 @@ void Filter(uint3 id : SV_DispatchThreadID)
 	}
 
 	//希尔排序
-	for (int gap = 9 / 2; gap > 0; gap /= 2)
+	for (float gap = 9 / 2.0f; gap > 0; gap /= 2.0f)
 	{
 		for (int i = gap; i < 9; ++i) 
 		{

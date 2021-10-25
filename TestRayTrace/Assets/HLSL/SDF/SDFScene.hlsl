@@ -1,7 +1,7 @@
 ﻿#define OBJNUM 8
 
 #define TraceThre 0.01
-#define TraceStart 0.05
+#define TraceStart 0.011
 
 float SDFBox(float3 p, float3 center, float3 bound)
 {
@@ -47,7 +47,7 @@ float GetObjSDF(int inx, float3 p)
 	}
 	else if (inx == 7)
 	{//前（封光）
-		return SDFBox(p, float3(0.0, 0.0, 1.1), float3(8.0, 8.0, 0.1));
+		return SDFBox(p, float3(0.0, 0.0, 1.1+50), float3(8.0, 8.0, 0.1));
 	}
 	else
 	{
@@ -80,6 +80,12 @@ float3 GetObjNormal(int inx, float3 p)
 
 void SDFScene(inout Ray ray,out HitInfo info)
 {
+	info.bHit = 0;
+	info.obj = -1;
+	info.N = 0;
+	info.P = 0;
+
+	bool bConti = true;
 	float maxTraceDis = 100.0f;
 
 	float traceDis = -1.0f;
@@ -102,53 +108,66 @@ void SDFScene(inout Ray ray,out HitInfo info)
 				objInx = inx;
 			}
 		}
+		//???
+		//if (objInx == 7)
+		//{
+		//	info.bHit = -3;
+		//	bConti = false;
+		//}
 		if (sdf >= TraceStart)
 		{
 			break;
 		}
 
-		ray.pos += GetObjNormal(objInx, ray.pos)*TraceStart;
+		ray.pos += GetObjNormal(objInx, ray.pos)*TraceStart*c1;
 		c1 += 1;
 	}
-	
-	int c2 = 0;
-	while (c2<10000)
+	if (c1 >= 10000)
 	{
-		sdf = 1000; //a very large,can be larger than maxTraceDis
-		for (int inx = 0; inx < OBJNUM; inx++)
-		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos);
-			if (objSDF[inx] < sdf)
-			{
-				sdf = objSDF[inx];
-				objInx = inx;
-			}
-		}
-
-		if (sdf > maxTraceDis)
-		{
-			break;
-		}
-		else if (sdf <= TraceThre)
-		{
-			traceDis = sdf;
-			info.bHit = 1;
-			info.obj = objInx;
-			info.P = ray.pos;
-			info.N = GetObjNormal(objInx, ray.pos);
-			//int count = 1;
-			//while (length(info.N)<0.001)
-			//{
-			//	info.N = GetObjNormal(objInx, info.P - ray.dir*0.001*count);
-			//	count++;
-			//}
-			break;
-		}
-		ray.pos += ray.dir*sdf;
-		c2 += 1;
+		info.bHit = -2;
+		bConti = false;
 	}
-	if (c2 > 10000)
+	if (bConti)
 	{
-		info.bHit = -1;
+		int c2 = 0;
+		while (c2 < 10000)
+		{
+			sdf = 1000; //a very large,can be larger than maxTraceDis
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				objSDF[inx] = GetObjSDF(inx, ray.pos);
+				if (objSDF[inx] < sdf)
+				{
+					sdf = objSDF[inx];
+					objInx = inx;
+				}
+			}
+
+			if (sdf > maxTraceDis)
+			{
+				break;
+			}
+			else if (sdf <= TraceThre)
+			{
+				traceDis = sdf;
+				info.bHit = 1;
+				info.obj = objInx;
+				info.P = ray.pos;
+				info.N = GetObjNormal(objInx, ray.pos);
+				//int count = 1;
+				//while (length(info.N)<0.001)
+				//{
+				//	info.N = GetObjNormal(objInx, info.P - ray.dir*0.001*count);
+				//	count++;
+				//}
+				break;
+			}
+			ray.pos += ray.dir*sdf;
+			c2 += 1;
+		}
+		if (c2 >= 10000)
+		{
+			info.bHit = -1;
+		}
 	}
 }
