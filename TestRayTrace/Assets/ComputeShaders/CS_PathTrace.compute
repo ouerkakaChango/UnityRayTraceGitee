@@ -99,8 +99,6 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 
 	Ray ray;
 	HitInfo hit;
-	//初始化
-	hit.bHit = 0;
 	PathInfo path;
 	path.hasEnd = 0;
 	path.endInx = 0;
@@ -129,7 +127,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 		{
 			PathInfo subPath;
 			subPath.hasEnd = 1;
-			subPath.endInx = 0;
+			subPath.endInx = -1;
 			subPaths[Inx3D(i, j, k)] = subPath;
 		}
 	}
@@ -183,6 +181,11 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 			}
 			subRay.pos = hit.P;
 			subRays[Inx3D(i, j, k)] = subRay;
+
+			PathInfo subPath;
+			subPath.hasEnd = 0;
+			subPath.endInx = -1;
+			subPaths[Inx3D(i, j, k)] = subPath;
 		}
 	}
 	//######################## 
@@ -192,8 +195,8 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 	mainPaths[Inx2D(i, j)] = path;
 
 	float3 re = 0;
-	//re = hit.N;
-	re = path.hasEnd;
+	re = hit.N;
+	//re = path.hasEnd;
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //#########################################################################################################
@@ -205,35 +208,58 @@ void TraceBlock(uint3 id : SV_DispatchThreadID)
 	int i = id.x;
 	int j = id.y;
 
+	PathInfo mainPath = mainPaths[Inx2D(i, j)];
+	if (mainPath.hasEnd == 1)
+	{
+		return;
+	}
 	HitInfo hit;// = subHits[Inx4D(i, j, 0, BI)];
 	//######################## 
+
 	for (int k = traceInx*SPP_cell; k < (traceInx+1)*SPP_cell; k++)
 	{
+		PathInfo path = subPaths[Inx3D(i, j, k)];
+		if (path.hasEnd == 1)
+		{
+			continue;
+		}
+
 		Ray ray = subRays[Inx3D(i,j,k)];
-		//初始化
-		hit.bHit = 0;
 		SDFScene(ray, hit);
 		//??? debug
-		if (hit.bHit == -1)
+		//if (hit.bHit == -1)
+		//{
+		//	Result[Inx_img(i, j)] = float4(1,0,0,0);
+		//	return;
+		//}
+		//else if (hit.bHit == -2)
+		//{
+		//	Result[Inx_img(i, j)] = float4(0, 1, 0, 0);
+		//	return;
+		//}
+		//else if (hit.bHit == -3)
+		//{
+		//	Result[Inx_img(i, j)] = float4(1, 0, 1, 0);
+		//	return;
+		//}
+		if (hit.bHit <= 0)
 		{
-			Result[Inx_img(i, j)] = float4(1,0,0,0);
-			return;
+			path.hasEnd = 1;
+			path.endInx = -1;
 		}
-		else if (hit.bHit == -2)
+		else if (rgbSum(GetObjEmissive(hit.obj)) > 0)
 		{
-			Result[Inx_img(i, j)] = float4(0, 1, 0, 0);
-			return;
+			path.hasEnd = 1;
+			path.endInx = BI;
 		}
-		else if (hit.bHit == -3)
-		{
-			Result[Inx_img(i, j)] = float4(1, 0, 1, 0);
-			return;
-		}
+		subPaths[Inx3D(i, j, k)] = path;
 		subHits[Inx4D(i, j, k, BI)] = hit;
 	}
 	//######################## 
 	float3 re = float3(0, 0, 0);
-	//re = subHits[Inx4D(i, j, 0, BI)].P;
+	//re = subRays[Inx3D(i, j, 0)].dir;
+	re = subHits[Inx4D(i, j, 0, BI)].P;
+	//re = subPaths[Inx3D(i, j, k)].hasEnd;
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //############################################################################
@@ -242,9 +268,19 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
+	PathInfo mainPath = mainPaths[Inx2D(i, j)];
+	if (mainPath.hasEnd == 1)
+	{
+		return;
+	}
 	//######################## 
 	for (int k = 0; k < SPP; k++)
 	{
+		PathInfo path = subPaths[Inx3D(i, j, k)];
+		if (path.hasEnd == 1)
+		{
+			continue;
+		}
 		Ray ray = subRays[Inx3D(i, j, k)];
 		HitInfo hit = subHits[Inx4D(i, j, k, BI)];
 		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
@@ -289,11 +325,17 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 	int i = id.x;
 	int j = id.y;
 
+	PathInfo mainPath = mainPaths[Inx2D(i, j)];
+	if (mainPath.hasEnd == 1)
+	{
+		Result[Inx_img(i, j)] = float4(0,0,0, 0);
+		return;
+	}
+
 	int k = 0;
 	float3 finalColor = 0;
 	HitInfo mainHit = mainHits[Inx2D(i,j)];
 	Ray mainRay = mainRays[Inx2D(i, j)];
-	int subRayValid = 0;
 	//######################## 
 	Material_PBR mainParam = GetObjMaterial_PBR(mainHit.obj);
 	float a = mainParam.roughness;
@@ -303,45 +345,33 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 	{
 		Light light;
 		light.color = 0;
-		subRayValid = 0;
-		for (int inx = BI; inx >= 0; inx--)
+		PathInfo path = subPaths[Inx3D(i, j, k)];
+		if (path.endInx <0)
+		{
+			continue;
+		}
+		for (int inx = path.endInx; inx >= 0; inx--)
 		{
 			HitInfo hit = subHits[Inx4D(i,j,k,inx)];
-			if (inx == BI)
+			if (inx == path.endInx)
 			{
 				light.color = GetObjEmissive(hit.obj);
-				if (rgbSum(GetObjEmissive(hit.obj)) > 0)
-				{
-					Result[Inx_img(i, j)] = float4(light.color, 0);
-					subRayValid = 1;
-				}
 			}
 			else if (inx == 0)
 			{
 				HitInfo preHit = mainHits[Inx2D(i, j)];
 				HitInfo nextHit = subHits[Inx4D(i, j, k, inx + 1)];
 				light = ShadeSublight(light, preHit, hit, nextHit);
-				if (rgbSum(GetObjEmissive(hit.obj)) > 0)
-				{
-					Result[Inx_img(i, j)] = float4(light.color, 0);
-					subRayValid = 1;
-				}
 			}
 			else
 			{
 				HitInfo preHit = subHits[Inx4D(i, j, k, inx - 1)];
 				HitInfo nextHit = subHits[Inx4D(i, j, k, inx + 1)];
 				light = ShadeSublight(light, preHit, hit, nextHit);
-				if (rgbSum(GetObjEmissive(hit.obj)) > 0)
-				{
-					Result[Inx_img(i, j)] = float4(light.color, 0);
-					subRayValid = 1;
-				}
 			}
 		}
 
 		//2.
-		if (subRayValid == 1)
 		{			
 			HitInfo firstHit = subHits[Inx4D(i, j, k, 0)];
 			float3 N = mainHit.N;
@@ -380,10 +410,6 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 	float3 re = 0; 
 	re = finalColor;
 
-	//re = -cross(float3(0, 1, 0), float3(1, 0, 0));
-	//re = toNormalHemisphere(float3(1, 1, 1), float3(0, 1, 0));
-	//float3 seed = mainHit.P + float3(i, j, 0) + float3(blockX, blockY, 0);
-	//re = toNormalHemisphere(randP_hemiRound(seed), float3(0,1,0)).y>0;
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 

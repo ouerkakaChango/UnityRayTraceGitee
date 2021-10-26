@@ -46,8 +46,8 @@ float GetObjSDF(int inx, float3 p)
 		//return length(p - float3(0, 3.5, -5)) - 0.2;
 	}
 	else if (inx == 7)
-	{//前（封光）
-		return SDFBox(p, float3(0.0, 0.0, 1.1+50), float3(8.0, 8.0, 0.1));
+	{//前（封光,但不完全封）
+		return SDFBox(p, float3(0.0, 0.0, 1.1), float3(8.0, 8.0, 0.1));
 	}
 	else
 	{

@@ -281,12 +281,19 @@ public class PathTrace : MonoBehaviour
 
         PreComputeRayBuffer(ref buffer_subRays, cw * ch * SPP, subRays);
         PreComputeHitinfoBuffer(ref buffer_subHits, cw * ch * SPP * BN, subHits);
+
+        PreComputePathinfoBuffer(ref buffer_mainPaths, cw * ch, mainPaths);
+        PreComputePathinfoBuffer(ref buffer_subPaths, cw * ch * SPP, subPaths);
         //##################################
         //### compute
         int kInx = cs.FindKernel("TraceBlock");
 
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "subHits", buffer_subHits);
+
+        cs.SetBuffer(kInx, "mainPaths", buffer_mainPaths);
+        cs.SetBuffer(kInx, "subPaths", buffer_subPaths);
+
         cs.SetTexture(kInx, "Result", rt);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
@@ -304,6 +311,9 @@ public class PathTrace : MonoBehaviour
         //#####################################
         PostComputeBuffer(ref buffer_subRays, subRays);
         PostComputeBuffer(ref buffer_subHits, subHits);
+
+        PostComputeBuffer(ref buffer_mainPaths, mainPaths);
+        PostComputeBuffer(ref buffer_subPaths, subPaths);
     }
     //#######################################################################################################################
     void BounceBlock(int i,int j)
@@ -315,12 +325,19 @@ public class PathTrace : MonoBehaviour
         //??? make sure has inited
         PreComputeRayBuffer(ref buffer_subRays, cw * ch * SPP, subRays);
         PreComputeHitinfoBuffer(ref buffer_subHits, cw * ch * SPP * BN, subHits);
+
+        PreComputePathinfoBuffer(ref buffer_mainPaths, cw * ch, mainPaths);
+        PreComputePathinfoBuffer(ref buffer_subPaths, cw * ch * SPP, subPaths);
         //##################################
         //### compute
         int kInx = cs.FindKernel("BounceBlock");
 
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "subHits", buffer_subHits);
+
+        cs.SetBuffer(kInx, "mainPaths", buffer_mainPaths);
+        cs.SetBuffer(kInx, "subPaths", buffer_subPaths);
+
         cs.SetTexture(kInx, "Result", rt);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
@@ -337,6 +354,9 @@ public class PathTrace : MonoBehaviour
         PostComputeBuffer(ref buffer_subRays, subRays);
         PostComputeBuffer(ref buffer_subHits, subHits);
 
+        PostComputeBuffer(ref buffer_mainPaths, mainPaths);
+        PostComputeBuffer(ref buffer_subPaths, subPaths);
+
         BI += 1;
     }
 
@@ -348,6 +368,9 @@ public class PathTrace : MonoBehaviour
         PreComputeRayBuffer(ref buffer_subRays, cw * ch * SPP, subRays);
         PreComputeHitinfoBuffer(ref buffer_mainHits, cw * ch, mainHits);
         PreComputeHitinfoBuffer(ref buffer_subHits, cw * ch * SPP * BN, subHits);
+
+        PreComputePathinfoBuffer(ref buffer_mainPaths, cw * ch, mainPaths);
+        PreComputePathinfoBuffer(ref buffer_subPaths, cw * ch * SPP, subPaths);
         //##################################
         //### compute
         int kInx = cs.FindKernel("RenderBlock");
@@ -356,6 +379,10 @@ public class PathTrace : MonoBehaviour
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "mainHits", buffer_mainHits);
         cs.SetBuffer(kInx, "subHits", buffer_subHits);
+
+        cs.SetBuffer(kInx, "mainPaths", buffer_mainPaths);
+        cs.SetBuffer(kInx, "subPaths", buffer_subPaths);
+
         cs.SetTexture(kInx, "Result", rt);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
@@ -373,19 +400,23 @@ public class PathTrace : MonoBehaviour
         PostComputeBuffer(ref buffer_subRays, subRays);
         PostComputeBuffer(ref buffer_mainHits, mainHits);
         PostComputeBuffer(ref buffer_subHits, subHits);
+
+        PostComputeBuffer(ref buffer_mainPaths, mainPaths);
+        PostComputeBuffer(ref buffer_subPaths, subPaths);
     }
 
     //###
     void PathTraceBlock(int i, int j)
     {
-        //InitBlock(i, j);
-        //DoTraceBounceBlock(i, j);
-        //RenderBlock(i, j);
+        InitBlock(i, j);
+        DoTraceBounceBlock(i, j);
+        RenderBlock(i, j);
 
-        InitBlock(0, 0);
+        //InitBlock(0, 0);
         //TraceBlock(0, 0);
         //BounceBlock(0, 0);
         //TraceBlock(0, 0);
+        //RenderBlock(0, 0);
     }
 
     void DoPathTrace()
