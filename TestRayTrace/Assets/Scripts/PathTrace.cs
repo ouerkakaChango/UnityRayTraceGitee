@@ -37,9 +37,10 @@ public class PathTrace : MonoBehaviour
         public Vector3 dir;
     }
 
-    public struct Light
+    public struct PathInfo
     {
-        public Vector3 color;
+        public int hasEnd; //没打中东西||已经打中灯光
+        public int endInx; //最后一次hit中时的BI
     }
 
     public ComputeShader cs;
@@ -60,13 +61,17 @@ public class PathTrace : MonoBehaviour
     Ray[] mainRays; //1pp
     Ray[] subRays; //SPP pp
     HitInfo[] mainHits; //1pp
-    HitInfo[] subHits;//BN per subRay == BN*SPP pp
-    Light[] subLights;
+    HitInfo[] subHits;//BN per subRay == BN*SPP pp 
+
+    PathInfo[] mainPaths;//1 pp
+    PathInfo[] subPaths;//SPP pp
 
     ComputeBuffer buffer_mainRays;
     ComputeBuffer buffer_subRays;
     ComputeBuffer buffer_mainHits;
     ComputeBuffer buffer_subHits;
+    ComputeBuffer buffer_mainPaths;
+    ComputeBuffer buffer_subPaths;
 
     // Start is called before the first frame update
     void Start()
@@ -94,10 +99,10 @@ public class PathTrace : MonoBehaviour
         return intSize * 2 + vector3Size * 2;
     }
 
-    static public int GetLightStride()
-    {//Light
-        int vector3Size = sizeof(float) * 3;
-        return vector3Size;
+    static public int GetPathInfoStride()
+    {//PathInfo
+        int intSize = sizeof(int);
+        return intSize*2;
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -111,26 +116,31 @@ public class PathTrace : MonoBehaviour
         Graphics.Blit(rt, destination);
     }
 
-    void CreateRays()
-    {
-        mainRays = new Ray[w * h];
-        subRays = new Ray[w * h * SPP];
-        mainHits = new HitInfo[w * h];
-        subHits = new HitInfo[w * h * SPP * BN];
-    }
-
     void DisposeRays()
     {
-        //!!!
         if (buffer_mainRays != null)
         {
             buffer_mainRays.Dispose();
+        }
+        if (buffer_mainHits != null)
+        {
             buffer_mainHits.Dispose();
+        }
+        if (buffer_subRays != null)
+        {
             buffer_subRays.Dispose();
         }
         if (buffer_subHits != null)
         {
             buffer_subHits.Dispose();
+        }
+        if (buffer_mainPaths!=null)
+        {
+            buffer_mainPaths.Dispose();
+        }
+        if (buffer_subPaths!=null)
+        {
+            buffer_subPaths.Dispose();
         }
     }
 
@@ -145,6 +155,8 @@ public class PathTrace : MonoBehaviour
             subRays = new Ray[cw * ch * SPP];
             mainHits = new HitInfo[cw * ch];
             subHits = new HitInfo[cw * ch * SPP * BN];
+            mainPaths = new PathInfo[cw * ch];
+            subPaths = new PathInfo[cw * ch * SPP];
         }
     }
 
@@ -192,21 +204,21 @@ public class PathTrace : MonoBehaviour
         buffer.SetData(hits);
     }
 
-    static public void PreComputeLightBuffer(ref ComputeBuffer buffer, int count, Light[] lights)
+    static public void PreComputePathinfoBuffer(ref ComputeBuffer buffer, int count, PathInfo[] pathInfos)
     {
         if (buffer != null)
         {
             return;
         }
-        buffer = new ComputeBuffer(count, GetLightStride());
-        buffer.SetData(lights);
+        buffer = new ComputeBuffer(count, GetPathInfoStride());
+        buffer.SetData(pathInfos);
     }
 
     static public void PostComputeBuffer(ref ComputeBuffer buffer,System.Array arr)
     {
         return;
-        buffer.GetData(arr);
-        buffer.Dispose();
+        //buffer.GetData(arr);
+        //buffer.Dispose();
     }
 
     void Compute_InitRaysBlock(int i,int j)
@@ -221,6 +233,9 @@ public class PathTrace : MonoBehaviour
         PreComputeRayBuffer(ref buffer_mainRays, cw * ch, mainRays);
         PreComputeRayBuffer(ref buffer_subRays, cw * ch * SPP, subRays);
         PreComputeHitinfoBuffer(ref buffer_mainHits, cw * ch, mainHits);
+
+        PreComputePathinfoBuffer(ref buffer_mainPaths, cw * ch, mainPaths);
+        PreComputePathinfoBuffer(ref buffer_subPaths, cw * ch * SPP, subPaths);
         //##################################
         //### compute
         int kInx = cs.FindKernel("InitRaysBlock");
@@ -228,6 +243,10 @@ public class PathTrace : MonoBehaviour
         cs.SetBuffer(kInx, "mainRays", buffer_mainRays);
         cs.SetBuffer(kInx, "subRays", buffer_subRays);
         cs.SetBuffer(kInx, "mainHits", buffer_mainHits);
+
+        cs.SetBuffer(kInx, "mainPaths", buffer_mainPaths);
+        cs.SetBuffer(kInx, "subPaths", buffer_subPaths);
+
         cs.SetTexture(kInx, "Result", rt);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
@@ -243,6 +262,9 @@ public class PathTrace : MonoBehaviour
         PostComputeBuffer(ref buffer_mainRays, mainRays);
         PostComputeBuffer(ref buffer_subRays, subRays);
         PostComputeBuffer(ref buffer_mainHits, mainHits);
+
+        PostComputeBuffer(ref buffer_mainPaths, mainPaths);
+        PostComputeBuffer(ref buffer_subPaths, subPaths);
     }
     //#######################################################################################################################
     void TraceBlock(int i, int j)
@@ -353,6 +375,7 @@ public class PathTrace : MonoBehaviour
         PostComputeBuffer(ref buffer_subHits, subHits);
     }
 
+    //###
     void PathTraceBlock(int i, int j)
     {
         //InitBlock(i, j);
@@ -360,7 +383,7 @@ public class PathTrace : MonoBehaviour
         //RenderBlock(i, j);
 
         InitBlock(0, 0);
-        TraceBlock(0, 0);
+        //TraceBlock(0, 0);
         //BounceBlock(0, 0);
         //TraceBlock(0, 0);
     }
