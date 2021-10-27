@@ -108,6 +108,8 @@ Material_PBR GetObjMaterial_PBR(int obj)
 			{
 				re.metallic = 0.8;
 				re.roughness = 0.1;
+				//re.metallic = 0.7;
+				//re.roughness = 0.3;
 			}
 		}
 		
