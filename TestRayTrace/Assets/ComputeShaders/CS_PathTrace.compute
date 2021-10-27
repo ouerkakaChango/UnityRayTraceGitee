@@ -332,7 +332,7 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
 
 	Light re;
 	//??? 反射系数
-	re.color = GetObjEmissive(hit.obj) + c*0.9f;
+	re.color = GetObjEmissive(hit.obj) + c*0.98f;
 	return re;
 }
 
@@ -388,7 +388,7 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			}
 		}
 
-		//2.
+		//2.??? 根据表面材质决定IS类型
 		{			
 			HitInfo firstHit = subHits[Inx4D(i, j, k, 0)];
 			float3 N = mainHit.N;
@@ -406,9 +406,12 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 					float c = cos(theta);
 					
 					float nomi = a * a * c;
-					float deno = c * c * (a*a - 1) + 1;
-					pdf = nomi / deno;
-					pdf /= 4 * dot(L, H);
+					float NdotH = max(dot(N, H), 0.0);
+					float NdotH2 = NdotH * NdotH;
+
+					float denom = (NdotH2 * (a*a - 1.0) + 1.0);
+					denom = PI * denom * denom;
+					pdf /= 4 * saturate(dot(L, H));
 				}
 				{//type4 Importance Sample(Diffuse)
 					//float3 H = normalize(V + L);
