@@ -149,12 +149,12 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 			//!!! 根据roughness决定采用什么样的IS
 			float r = GetObjMaterial_PBR(hit.obj).roughness;
 			if(r<0.5f)
-			{//type3 Importance Sample (GGX NDF2)
+			{	//type3 Importance Sample (GGX NDF2)
 				//1.prepare a
 				float a = max(0.001f, r*r);
 				//2.sample h 
 				float x1 = rand01(seed);
-				float x2 = rand01(seed.zxy);
+				float x2 = rand01(seed.zyx);
 				float phi = 2 * PI*x1;
 				float costheta = sqrt((1 - x2) / (1 + (a*a - 1)*x2));
 				float sintheta = sqrt(max(0.0, 1.0 - costheta * costheta)); //防止极限误差 -0.00000x
@@ -164,6 +164,22 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 					costheta);
 				H = toNormalHemisphere(H, hit.N);
 				subRay.dir = reflect(ray.dir, H);
+
+				//(GGX NDF1)
+				//1.prepare a
+				//Material_PBR param = GetObjMaterial_PBR(hit.obj);
+				//float a = max(0.001f, r*r);
+				////2.sample h 
+				//float x1 = rand01(seed);
+				//float e = rand01(seed.zxy);
+				//float phi = 2 * PI*x1;
+				//float theta = atan(a*sqrt(e / (1 - e)));
+				//float3 H = float3(
+				//	sin(theta)*cos(phi),
+				//	sin(theta)*sin(phi),
+				//	cos(theta));
+				//H = toNormalHemisphere(H, hit.N);
+				//subRay.dir = reflect(ray.dir, H);
 			}
 			else{
 				//type4 Importance Sample (Diffuse)
@@ -322,6 +338,17 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
 	return re;
 }
 
+//Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
+//{
+//	Material_PBR param = GetObjMaterial_PBR(hit.obj);
+//
+//	Light re;
+//	//??? 反射系数
+//	re.color = GetObjEmissive(hit.obj) + param.albedo;
+//	re.color *= light.color * 0.98f;
+//	return re;
+//}
+
 [numthreads(CoreX, CoreY, 1)]
 void RenderBlock(uint3 id : SV_DispatchThreadID)
 {
@@ -382,33 +409,62 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			float3 L = normalize(firstHit.P - mainHit.P);
 			float3 Li = GetAttenuationed(light.color, mainHit.P, firstHit.P);
 			Material_PBR param = GetObjMaterial_PBR(mainHit.obj);
-			float pdf = 1;
-			float r = param.roughness;
+			float3 H = normalize(V + L);
+			float NdotH = max(dot(N, H), 0.0);
+			//float pdf = 1;
+			//float r = param.roughness;
+			//{
+			//	//type1
+			//	//pdf = 1/(2*PI);
+			//
+			//	//!!! 根据roughness决定采用什么样的IS-pdf
+			//	float3 H = normalize(V + L);
+			//	float NdotH = max(dot(N, H), 0.0);
+			//	if(r<0.5f)
+			//	{	//type3 Importance Sample(NDF2)	
+			//		float a = max(0.001f, r*r);
+			//		float theta = acos(dot(N, H));
+			//		
+			//		float nomi = a * a * NdotH;
+			//		float NdotH2 = NdotH * NdotH;
+			//		
+			//		float denom = (NdotH2 * (a*a - 1.0) + 1.0);
+			//		denom = PI * denom * denom;
+			//		pdf = nomi / denom;
+			//		pdf /= 4 * dot(L, H);
+			//
+			//		//type3 Importance Sample(NDF1)	 
+			//		//float a = max(0.001f, r*r);
+			//		//float theta = acos(dot(N, H));
+			//		//float c = cos(theta);
+			//		//
+			//		//float nomi = 2* a * a * c * sin(theta);
+			//		//float NdotH2 = NdotH * NdotH;
+			//		//
+			//		//float denom = (NdotH2 * (a*a - 1.0) + 1.0);
+			//		//denom = PI * denom * denom;
+			//		//pdf = nomi / denom;
+			//	}
+			//	else{//type4 Importance Sample(Diffuse)
+			//		pdf = dot(N, H) / PI;
+			//	}
+			//}
+			float pdf_diffuse = dot(N, H) / PI;
+			float pdf_GGX = 0;
 			{
-				//type1
-				//pdf = 1/(2*PI);
-
-				//!!! 根据roughness决定采用什么样的IS-pdf
-				float3 H = normalize(V + L);
-				float NdotH = dot(N, H);//max(dot(N, H), 0.0);
-				if(r<0.5f)
-				{//type3 Importance Sample(NDF2)	
-					float a = max(0.001f, r*r);
-					float theta = acos(dot(N, H));
-					float c = cos(theta);
-					
-					float nomi = a * a * c;
-					float NdotH2 = NdotH * NdotH;
-
-					float denom = (NdotH2 * (a*a - 1.0) + 1.0);
-					denom = PI * denom * denom;
-					pdf /= 4 * dot(L, H);//saturate(dot(L, H));
-				}
-				else{//type4 Importance Sample(Diffuse)
-					pdf = dot(N, H) / PI;
-				}
+				float a = param.roughness;
+				a = max(0.001f, a*a);
+				
+				float nomi = a * a * NdotH;
+				float NdotH2 = NdotH * NdotH;
+				
+				float denom = (NdotH2 * (a*a - 1.0) + 1.0);
+				denom = PI * denom * denom;
+				pdf_GGX = nomi / denom;
+				pdf_GGX /= 4 * dot(L, H);	
+				pdf_GGX = max(pdf_GGX, 0.001f);
 			}
-			finalColor += PBR_GGX(param, N, V, L, Li)/pdf;
+			finalColor += PBR_GGX_IS(param, N, V, L, Li, pdf_diffuse, pdf_GGX);
 		}
 	}
 	finalColor = finalColor / SPP;

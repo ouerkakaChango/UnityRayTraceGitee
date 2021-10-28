@@ -28,7 +28,7 @@ float DistributionGGX(float3 N, float3 H, float roughness)
 {
 	float a = max(0.001f,roughness * roughness);
 	float a2 = a * a;
-	float NdotH = dot(N, H);//max(dot(N, H), 0.0);
+	float NdotH = max(dot(N, H), 0.0);
 	float NdotH2 = NdotH * NdotH;
 
 	float nom = a2;
@@ -72,22 +72,44 @@ float3 PBR_GGX(Material_PBR param, float3 n, float3 v, float3 l, float3 Li)
 	return Lo;
 }
 
+float3 PBR_GGX_IS(Material_PBR param, float3 n, float3 v, float3 l, float3 Li, float pdf_diffuse, float pdf_specular)
+{
+	float3 h = normalize(l + v);
+
+	//Calculate F
+	float3 F0 = 0.04;
+	F0 = lerp(F0, param.albedo, param.metallic);
+	float3 F = fresnelSchlick(max(dot(h, v), 0.0), F0);
+
+	//Calculate diffuse
+	float3 kD = 1.0 - F;
+	float3 diffuse = (1.0 - param.metallic) * kD * param.albedo / PI;
+
+	//Calculate specular
+	float G = GeometrySmith(n, v, l, param.roughness);
+	float3 nominator;
+	float NDF = DistributionGGX(n, h, param.roughness);
+	nominator = NDF * G * F;
+	float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.001;
+	float3 specular = nominator / denominator;
+
+	float3 Lo = diffuse/ pdf_diffuse + specular/ pdf_specular;
+	Lo *= Li * max(dot(n, l), 0);
+
+	return Lo;
+}
+
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
 	re.metallic = 0.01;
 	re.roughness = 0.98;
-	int type = 0;
+	int type = 1;
 	if (obj == 0)
 	{
 		re.albedo = float3(1, 1, 1);
 		re.metallic = 0.7;
 		re.roughness = 0.3;
-		if (type == 1)
-		{
-			re.metallic = 0.7;
-			re.roughness = 0.3;
-		}
 	}
 	else if (obj == 6)
 	{
@@ -108,7 +130,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 		{
 			if (type == 1)
 			{
-				re.metallic = 0.8;
+				re.metallic = 1.0;
 				re.roughness = 0.1;
 				//re.metallic = 0.7;
 				//re.roughness = 0.3;

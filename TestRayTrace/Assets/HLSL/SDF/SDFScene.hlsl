@@ -1,7 +1,7 @@
 ﻿#define OBJNUM 8
 
 #define TraceThre 0.01
-#define TraceStart 0.011
+#define TraceStart 0.05
 
 float SDFBox(float3 p, float3 center, float3 bound)
 {
@@ -47,7 +47,7 @@ float GetObjSDF(int inx, float3 p)
 	}
 	else if (inx == 7)
 	{//前（封光,但不完全封）
-		return SDFBox(p, float3(0.0, 0.0, 1.1+50*1), float3(8.0, 8.0, 0.1));
+		return SDFBox(p, float3(0.0, 0.0, 1.1+50*0), float3(8.0, 8.0, 0.1));
 	}
 	else
 	{
