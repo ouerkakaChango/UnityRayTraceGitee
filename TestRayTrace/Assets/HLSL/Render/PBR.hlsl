@@ -26,9 +26,9 @@ float GeometrySmith(float3 N, float3 V, float3 L, float roughness)
 
 float DistributionGGX(float3 N, float3 H, float roughness)
 {
-	float a = roughness * roughness;
+	float a = max(0.001f,roughness * roughness);
 	float a2 = a * a;
-	float NdotH = max(dot(N, H), 0.0);
+	float NdotH = dot(N, H);//max(dot(N, H), 0.0);
 	float NdotH2 = NdotH * NdotH;
 
 	float nom = a2;

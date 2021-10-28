@@ -138,16 +138,20 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 		{
 			Ray subRay;
 			float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
-			{//type1
-				//subRay.dir = hit.N;//normalize(randP_round(seed) + hit.N);
-			}
-			//type2 uni 
-			//subRay.dir = toNormalHemisphere(randP_hemiRound(seed), hit.N);
+
+			//{//type1
+			//	//subRay.dir = hit.N;//normalize(randP_round(seed) + hit.N);
+			//}
+			//{//type2 uni 
+			//	//subRay.dir = toNormalHemisphere(randP_hemiRound(seed), hit.N);
+			//}
+
+			//!!! 根据roughness决定采用什么样的IS
+			float r = GetObjMaterial_PBR(hit.obj).roughness;
+			if(r<0.5f)
 			{//type3 Importance Sample (GGX NDF2)
 				//1.prepare a
-				Material_PBR param = GetObjMaterial_PBR(hit.obj);
-				float a = param.roughness;
-				a = max(0.001f, a*a);
+				float a = max(0.001f, r*r);
 				//2.sample h 
 				float x1 = rand01(seed);
 				float x2 = rand01(seed.zxy);
@@ -161,23 +165,22 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 				H = toNormalHemisphere(H, hit.N);
 				subRay.dir = reflect(ray.dir, H);
 			}
-			{
-				////type4 Importance Sample (Diffuse)
-				////1.prepare a
-				//Material_PBR param = GetObjMaterial_PBR(hit.obj);
-				//float a = param.roughness;
-				//a = max(0.001f, a*a);
-				////2.sample h 
-				//float x1 = rand01(seed);
-				//float x2 = rand01(seed.zxy);
-				//float r = sqrt(x1);
-				//float theta = x2 * 2 * PI;
-				//float x = r * cos(theta);
-				//float y = r * sin(theta);
-				//float z = sqrt(1 - x * x - y * y);
-				//float3 H = float3(x, y, z);
-				//H = toNormalHemisphere(H, hit.N);
-				//subRay.dir = reflect(ray.dir, H);
+			else{
+				//type4 Importance Sample (Diffuse)
+				//1.prepare a
+				Material_PBR param = GetObjMaterial_PBR(hit.obj);
+				float a = max(0.001f, r*r);
+				//2.sample h 
+				float x1 = rand01(seed);
+				float x2 = rand01(seed.zxy);
+				float r = sqrt(x1);
+				float theta = x2 * 2 * PI;
+				float x = r * cos(theta);
+				float y = r * sin(theta);
+				float z = sqrt(1 - x * x - y * y);
+				float3 H = float3(x, y, z);
+				H = toNormalHemisphere(H, hit.N);
+				subRay.dir = reflect(ray.dir, H);
 			}
 			subRay.pos = hit.P;
 			subRays[Inx3D(i, j, k)] = subRay;
@@ -293,23 +296,6 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 			//不能太扁平了，不然永远出不去sdf-thre
 			//ray.dir = toNormalHemisphere(randP_hemiRound(seed), hit.N);
 		}
-		{//type3 Importance Sample (GGX NDF2)
-			////1.prepare a
-			//float a = param.roughness;
-			//a = max(0.001f, a*a);
-			////2.sample h 
-			//float x1 = rand01(seed);
-			//float x2 = rand01(seed.zxy);
-			//float phi = 2 * PI*x1;
-			//float costheta = sqrt((1 - x2) / (1 + (a*a - 1)*x2));
-			//float sintheta = sqrt(max(0.0, 1.0 - costheta * costheta)); //防止极限误差 -0.00000x
-			//float3 H = float3(
-			//	sintheta*cos(phi),
-			//	sintheta*sin(phi),
-			//	costheta);
-			//H = toNormalHemisphere(H, hit.N);
-			//ray.dir = reflect(ray.dir, H);
-		}
 		subRays[Inx3D(i, j, k)] = ray;
 	}
 	//######################## 
@@ -397,25 +383,29 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			float3 Li = GetAttenuationed(light.color, mainHit.P, firstHit.P);
 			Material_PBR param = GetObjMaterial_PBR(mainHit.obj);
 			float pdf = 1;
+			float r = param.roughness;
 			{
 				//type1
 				//pdf = 1/(2*PI);
-				{//type3 Importance Sample(NDF2)					
-					float3 H = normalize(V + L);
+
+				//!!! 根据roughness决定采用什么样的IS-pdf
+				float3 H = normalize(V + L);
+				float NdotH = dot(N, H);//max(dot(N, H), 0.0);
+				if(r<0.5f)
+				{//type3 Importance Sample(NDF2)	
+					float a = max(0.001f, r*r);
 					float theta = acos(dot(N, H));
 					float c = cos(theta);
 					
 					float nomi = a * a * c;
-					float NdotH = max(dot(N, H), 0.0);
 					float NdotH2 = NdotH * NdotH;
 
 					float denom = (NdotH2 * (a*a - 1.0) + 1.0);
 					denom = PI * denom * denom;
-					pdf /= 4 * saturate(dot(L, H));
+					pdf /= 4 * dot(L, H);//saturate(dot(L, H));
 				}
-				{//type4 Importance Sample(Diffuse)
-					//float3 H = normalize(V + L);
-					//pdf = dot(N, H) / PI;
+				else{//type4 Importance Sample(Diffuse)
+					pdf = dot(N, H) / PI;
 				}
 			}
 			finalColor += PBR_GGX(param, N, V, L, Li)/pdf;

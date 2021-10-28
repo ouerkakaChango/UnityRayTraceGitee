@@ -40,7 +40,7 @@ float3 GetObjEmissive(int obj)
 {
 	if (obj == 6)
 	{
-		return 300;
+		return 200;
 	}
 	else
 	{
