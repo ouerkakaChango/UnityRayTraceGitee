@@ -3,6 +3,9 @@
 #define TraceThre 0.01
 #define TraceStart 0.05
 
+#define BallHeight 0
+#define BallDepth -5
+
 float SDFBox(float3 p, float3 center, float3 bound)
 {
 	float3 q = abs(p - center) - bound;
@@ -16,7 +19,7 @@ float GetObjSDF(int inx, float3 p)
 	if (inx == 0)
 	{//球
 		//sphere center(0, 0, -5), radius 1
-		return length(p - float3(0, 1, -5)) - 1;
+		return length(p - float3(0, BallHeight, BallDepth)) - 1;
 	}
 	else if (inx == 1)
 	{//地面
@@ -41,7 +44,7 @@ float GetObjSDF(int inx, float3 p)
 	}
 	else if (inx == 6)
 	{//lightBox
-		return SDFBox(p, float3(0.0, height-0.1, -5.0), float3(0.8, 0.08, 0.8));
+		return SDFBox(p, float3(0.0, height-0.1, -5.0), float3(1.5, 0.08, 1.5));
 		//return SDFBox(p, float3(0.0, 3.9, -5.0), float3(1.5, 0.08, 1.5));
 		//return length(p - float3(0, 3.5, -5)) - 0.2;
 	}
@@ -70,7 +73,7 @@ float3 GetObjNormal(int inx, float3 p)
 	if (inx == 0)
 	{
 		//sphere center(0, 0, -5), radius 1
-		return normalize(p - float3(0, 1, -5));
+		return normalize(p - float3(0, BallHeight, BallDepth));
 	}
 	else
 	{

@@ -101,7 +101,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 	HitInfo hit;
 	PathInfo path;
 	path.hasEnd = 0;
-	path.endInx = 0;
+	path.endInx = -1;
 	//######################## 
 	ray.pos = screenPos + screenLeftDownPos + float3(i*dx, j*dx, 0) + blockOffset;
 	ray.dir = ray.pos - screenPos - eyeOffset; //默认eyePos在屏幕后一单位，z轴向屏幕外为(0,0,1)
@@ -164,22 +164,6 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 					costheta);
 				H = toNormalHemisphere(H, hit.N);
 				subRay.dir = reflect(ray.dir, H);
-
-				//(GGX NDF1)
-				//1.prepare a
-				//Material_PBR param = GetObjMaterial_PBR(hit.obj);
-				//float a = max(0.001f, r*r);
-				////2.sample h 
-				//float x1 = rand01(seed);
-				//float e = rand01(seed.zxy);
-				//float phi = 2 * PI*x1;
-				//float theta = atan(a*sqrt(e / (1 - e)));
-				//float3 H = float3(
-				//	sin(theta)*cos(phi),
-				//	sin(theta)*sin(phi),
-				//	cos(theta));
-				//H = toNormalHemisphere(H, hit.N);
-				//subRay.dir = reflect(ray.dir, H);
 			}
 			else{
 				//type4 Importance Sample (Diffuse)
@@ -194,9 +178,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 				float x = r * cos(theta);
 				float y = r * sin(theta);
 				float z = sqrt(1 - x * x - y * y);
-				float3 H = float3(x, y, z);
-				H = toNormalHemisphere(H, hit.N);
-				subRay.dir = reflect(ray.dir, H);
+				subRay.dir = toNormalHemisphere(float3(x, y, z), hit.N);
 			}
 			subRay.pos = hit.P;
 			subRays[Inx3D(i, j, k)] = subRay;
@@ -216,6 +198,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 	float3 re = 0;
 	re = hit.N;
 	//re = path.hasEnd;
+	//re = subRays[Inx3D(i, j, 0)].dir;
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //#########################################################################################################
@@ -264,7 +247,7 @@ void TraceBlock(uint3 id : SV_DispatchThreadID)
 		if (hit.bHit <= 0)
 		{
 			path.hasEnd = 1;
-			path.endInx = -1;
+			path.endInx = -2;
 		}
 		else if (rgbSum(GetObjEmissive(hit.obj)) > 0)
 		{
@@ -338,17 +321,6 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
 	return re;
 }
 
-//Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
-//{
-//	Material_PBR param = GetObjMaterial_PBR(hit.obj);
-//
-//	Light re;
-//	//??? 反射系数
-//	re.color = GetObjEmissive(hit.obj) + param.albedo;
-//	re.color *= light.color * 0.98f;
-//	return re;
-//}
-
 [numthreads(CoreX, CoreY, 1)]
 void RenderBlock(uint3 id : SV_DispatchThreadID)
 {
@@ -380,6 +352,14 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 		{
 			continue;
 		}
+
+		//??? debug 简介光部分
+		//if (path.endInx > 0)
+		//{
+		//	Result[Inx_img(i, j)] = float4(1,0,1, 0);
+		//	return;
+		//}
+
 		for (int inx = path.endInx; inx >= 0; inx--)
 		{
 			HitInfo hit = subHits[Inx4D(i,j,k,inx)];
@@ -401,13 +381,16 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			}
 		}
 
-		//2.??? 根据表面材质决定IS类型
 		{			
 			HitInfo firstHit = subHits[Inx4D(i, j, k, 0)];
 			float3 N = mainHit.N;
 			float3 V = -mainRay.dir;
 			float3 L = normalize(firstHit.P - mainHit.P);
 			float3 Li = GetAttenuationed(light.color, mainHit.P, firstHit.P);
+			//???
+			//Result[Inx_img(i, j)] = float4(light.color, 0);
+			//return;
+			//___
 			Material_PBR param = GetObjMaterial_PBR(mainHit.obj);
 			float3 H = normalize(V + L);
 			float NdotH = max(dot(N, H), 0.0);
