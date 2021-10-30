@@ -16,7 +16,7 @@ float GetObjSDF(int inx, float3 p)
 	if (inx == 0)
 	{//球
 		//sphere center(0, 0, -5), radius 1
-		return length(p - float3(0, 0, -5)) - 1;
+		return length(p - float3(0, 1, -5)) - 1;
 	}
 	else if (inx == 1)
 	{//地面
@@ -70,7 +70,7 @@ float3 GetObjNormal(int inx, float3 p)
 	if (inx == 0)
 	{
 		//sphere center(0, 0, -5), radius 1
-		return normalize(p - float3(0, 0, -5));
+		return normalize(p - float3(0, 1, -5));
 	}
 	else
 	{
