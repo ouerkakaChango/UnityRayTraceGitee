@@ -131,6 +131,17 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 			subPaths[Inx3D(i, j, k)] = subPath;
 		}
 	}
+	else if (rgbSum(GetObjEmissive(hit.obj)) > 0)
+	{
+		path.hasEnd = 2;
+		for (int k = 0; k < SPP; k++)
+		{
+			PathInfo subPath;
+			subPath.hasEnd = 1;
+			subPath.endInx = -1;
+			subPaths[Inx3D(i, j, k)] = subPath;
+		}
+	}
 	else
 	{
 		//在hit上初始化SPP个subRay
@@ -196,8 +207,8 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 	mainPaths[Inx2D(i, j)] = path;
 
 	float3 re = 0;
-	re = hit.N;
-	//re = path.hasEnd;
+	//re = hit.N;
+	re = path.hasEnd;
 	//re = subRays[Inx3D(i, j, 0)].dir;
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
@@ -211,11 +222,11 @@ void TraceBlock(uint3 id : SV_DispatchThreadID)
 	int j = id.y;
 
 	PathInfo mainPath = mainPaths[Inx2D(i, j)];
-	if (mainPath.hasEnd == 1)
+	if (mainPath.hasEnd >= 1)
 	{
 		return;
 	}
-	HitInfo hit;// = subHits[Inx4D(i, j, 0, BI)];
+	HitInfo hit;
 	//######################## 
 
 	for (int k = traceInx*SPP_cell; k < (traceInx+1)*SPP_cell; k++)
@@ -256,12 +267,12 @@ void TraceBlock(uint3 id : SV_DispatchThreadID)
 		}
 		subPaths[Inx3D(i, j, k)] = path;
 		subHits[Inx4D(i, j, k, BI)] = hit;
+		subRays[Inx3D(i, j, k)] = ray;
 	}
 	//######################## 
 	float3 re = float3(0, 0, 0);
-	//re = subRays[Inx3D(i, j, 0)].dir;
-	re = subHits[Inx4D(i, j, 0, BI)].P;
-	//re = subPaths[Inx3D(i, j, k)].hasEnd;
+	//re = subHits[Inx4D(i, j, 0, BI)].P;
+	re = subRays[Inx3D(i, j, 0)].pos;
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
 //############################################################################
@@ -271,7 +282,7 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 	int i = id.x;
 	int j = id.y;
 	PathInfo mainPath = mainPaths[Inx2D(i, j)];
-	if (mainPath.hasEnd == 1)
+	if (mainPath.hasEnd >= 1)
 	{
 		return;
 	}
@@ -286,10 +297,12 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 		Ray ray = subRays[Inx3D(i, j, k)];
 		HitInfo hit = subHits[Inx4D(i, j, k, BI)];
 		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
-		Material_PBR param = GetObjMaterial_PBR(hit.obj);
 		{
-			float3 ref = reflect(ray.dir, hit.N);
-			ray.dir = normalize(randP_round(seed) + ref);
+			//float3 ref = reflect(ray.dir, hit.N);
+			//Material_PBR param = GetObjMaterial_PBR(hit.obj);
+			//ray.dir = normalize(randP_round(seed)*param.roughness + ref);
+
+			ray.dir = normalize(randP_round(seed) + hit.N);
 		}
 		{
 			//不能太扁平了，不然永远出不去sdf-thre
@@ -300,7 +313,7 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 	//######################## 
 	//end
 	float3 re = float3(0, 0, 0);
-	re = subRays[Inx3D(i, j, 0)].dir;
+	re = subRays[Inx3D(i, j, 0)].pos;
 	//re = subHits[Inx4D(i, j, 0, BI)].P;
 	Result[Inx_img(i, j)] = float4(re, 0);
 }
@@ -328,15 +341,21 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 	int j = id.y;
 
 	PathInfo mainPath = mainPaths[Inx2D(i, j)];
+	HitInfo mainHit = mainHits[Inx2D(i, j)];
 	if (mainPath.hasEnd == 1)
 	{
-		Result[Inx_img(i, j)] = float4(0,0,0, 0);
+		Result[Inx_img(i, j)] = float4(1,0,1, 0);
+		return;
+	}
+	else if (mainPath.hasEnd == 2)
+	{
+		float3 tt = GetObjEmissive(mainHit.obj);
+		Result[Inx_img(i, j)] = float4(tt, 0);
 		return;
 	}
 
 	int k = 0;
 	float3 finalColor = 0;
-	HitInfo mainHit = mainHits[Inx2D(i,j)];
 	Ray mainRay = mainRays[Inx2D(i, j)];
 	//######################## 
 	Material_PBR mainParam = GetObjMaterial_PBR(mainHit.obj);
@@ -348,17 +367,11 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 		Light light;
 		light.color = 0;
 		PathInfo path = subPaths[Inx3D(i, j, k)];
+
 		if (path.endInx <0)
 		{
 			continue;
 		}
-
-		//??? debug 简介光部分
-		//if (path.endInx > 0)
-		//{
-		//	Result[Inx_img(i, j)] = float4(1,0,1, 0);
-		//	return;
-		//}
 
 		for (int inx = path.endInx; inx >= 0; inx--)
 		{
@@ -387,10 +400,7 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			float3 V = -mainRay.dir;
 			float3 L = normalize(firstHit.P - mainHit.P);
 			float3 Li = GetAttenuationed(light.color, mainHit.P, firstHit.P);
-			//???
-			//Result[Inx_img(i, j)] = float4(light.color, 0);
-			//return;
-			//___
+
 			Material_PBR param = GetObjMaterial_PBR(mainHit.obj);
 			float3 H = normalize(V + L);
 			float NdotH = max(dot(N, H), 0.0);

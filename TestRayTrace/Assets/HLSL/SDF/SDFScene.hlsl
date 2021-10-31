@@ -44,7 +44,7 @@ float GetObjSDF(int inx, float3 p)
 	}
 	else if (inx == 6)
 	{//lightBox
-		return SDFBox(p, float3(0.0, height-0.1, -5.0), float3(1.5, 0.08, 1.5));
+		return SDFBox(p, float3(0.0, height-0.1, -5.0), float3(0.8, 0.08, 0.8));
 		//return SDFBox(p, float3(0.0, 3.9, -5.0), float3(1.5, 0.08, 1.5));
 		//return length(p - float3(0, 3.5, -5)) - 0.2;
 	}
@@ -111,12 +111,6 @@ void SDFScene(inout Ray ray,out HitInfo info)
 				objInx = inx;
 			}
 		}
-		//???
-		//if (objInx == 7)
-		//{
-		//	info.bHit = -3;
-		//	bConti = false;
-		//}
 		if (sdf >= TraceStart)
 		{
 			break;
