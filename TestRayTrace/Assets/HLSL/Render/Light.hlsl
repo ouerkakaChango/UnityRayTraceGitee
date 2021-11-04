@@ -25,7 +25,7 @@ float3 GetAttenuationed(float3 lightColor, float3 pos, float3 lightPos)
 	}
 	{
 		float d = length(pos - lightPos);
-		attenuation = 1 / (1 + 0.05*d + 0.01*d*d);
+		attenuation = 1 / (1 + 0.2*d + 0.04*d*d);
 	}
 
 	return attenuation * lightColor;

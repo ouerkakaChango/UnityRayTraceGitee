@@ -330,7 +330,7 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
 
 	Light re;
 	//??? 反射系数
-	re.color = GetObjEmissive(hit.obj) + c*0.98f;
+	re.color = GetObjEmissive(hit.obj) + c*0.9f;
 	return re;
 }
 

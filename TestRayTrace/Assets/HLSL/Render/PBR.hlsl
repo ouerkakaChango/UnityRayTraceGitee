@@ -148,5 +148,12 @@ Material_PBR GetObjMaterial_PBR(int obj)
 		re.roughness = 1;
 	}
 
+	//???
+	if (obj <= 1)
+	{
+		re.roughness = 0.01;
+
+	}
+
 	return re;
 }

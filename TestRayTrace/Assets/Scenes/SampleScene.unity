@@ -317,10 +317,10 @@ MonoBehaviour:
   BN: 8
   w: 1024
   h: 1024
-  SPP: 1024
+  SPP: 256
   SPP_cell: 16
-  wDivide: 16
-  hDivide: 16
+  wDivide: 8
+  hDivide: 8
 --- !u!850595691 &1105758469
 LightingSettings:
   m_ObjectHideFlags: 0
