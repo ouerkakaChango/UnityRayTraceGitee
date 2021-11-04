@@ -99,6 +99,32 @@ float3 PBR_GGX_IS(Material_PBR param, float3 n, float3 v, float3 l, float3 Li, f
 	return Lo;
 }
 
+float3 IS_SampleDiffuse(float3 N, float roughness, float x1, float x2)
+{
+	float a = max(0.001f, roughness*roughness);
+	float r = sqrt(x1);
+	float theta = x2 * 2 * PI;
+	float x = r * cos(theta);
+	float y = r * sin(theta);
+	float z = sqrt(1 - x * x - y * y);
+	return toNormalHemisphere(float3(x, y, z), N);
+}
+
+float3 IS_SampleSpecular(float3 rayDir, float3 N, float roughness, float x1, float x2)
+{
+	float a = max(0.001f, roughness*roughness);
+	float phi = 2 * PI*x1;
+	float costheta = sqrt((1 - x2) / (1 + (a*a - 1)*x2));
+	float sintheta = sqrt(max(0.0, 1.0 - costheta * costheta)); //·ÀÖ¹¼«ÏÞÎó²î -0.00000x
+	float3 H = float3(
+		sintheta*cos(phi),
+		sintheta*sin(phi),
+		costheta);
+	H = toNormalHemisphere(H, N);
+	return reflect(rayDir, H);
+}
+
+
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;

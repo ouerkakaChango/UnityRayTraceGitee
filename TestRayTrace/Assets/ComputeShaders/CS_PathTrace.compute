@@ -157,40 +157,70 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 			//	//subRay.dir = toNormalHemisphere(randP_hemiRound(seed), hit.N);
 			//}
 
-			//!!! 根据roughness决定采用什么样的IS
-			float r = GetObjMaterial_PBR(hit.obj).roughness;
-			if(r<0.5f)
-			{	//type3 Importance Sample (GGX NDF2)
-				//1.prepare a
-				float a = max(0.001f, r*r);
-				//2.sample h 
-				float x1 = rand01(seed);
-				float x2 = rand01(seed.zyx);
-				float phi = 2 * PI*x1;
-				float costheta = sqrt((1 - x2) / (1 + (a*a - 1)*x2));
-				float sintheta = sqrt(max(0.0, 1.0 - costheta * costheta)); //防止极限误差 -0.00000x
-				float3 H = float3(
-					sintheta*cos(phi),
-					sintheta*sin(phi),
-					costheta);
-				H = toNormalHemisphere(H, hit.N);
-				subRay.dir = reflect(ray.dir, H);
+			//根据辐射度决定用什么样的采样
+			//https://blog.csdn.net/weixin_44176696/article/details/119988866
+			Material_PBR param = GetObjMaterial_PBR(hit.obj);
+			float r = param.roughness;
+			// 辐射度统计
+			float r_diffuse = (1.0 - param.metallic);
+			float r_specular = 1.0;
+			//float r_clearcoat = 0.25 * material.clearcoat;
+			//float r_sum = r_diffuse + r_specular + r_clearcoat;
+			//--- 临时修改：无清漆项
+			float r_sum = r_diffuse + r_specular;
+			//___
+
+			// 根据辐射度计算概率
+			float p_diffuse = r_diffuse / r_sum;
+			float p_specular = r_specular / r_sum;
+			//float p_clearcoat = r_clearcoat / r_sum;
+
+			// 按照概率采样
+			float rd = rand01(seed.yxz);
+			// 漫反射
+			if (rd <= p_diffuse) {
+				//return SampleCosineHemisphere(xi_1, xi_2, N);
+				subRay.dir = IS_SampleDiffuse(hit.N, r, rand01(seed), rand01(seed.zyx));
 			}
-			else{
-				//type4 Importance Sample (Diffuse)
-				//1.prepare a
-				Material_PBR param = GetObjMaterial_PBR(hit.obj);
-				float a = max(0.001f, r*r);
-				//2.sample h 
-				float x1 = rand01(seed);
-				float x2 = rand01(seed.zxy);
-				float r = sqrt(x1);
-				float theta = x2 * 2 * PI;
-				float x = r * cos(theta);
-				float y = r * sin(theta);
-				float z = sqrt(1 - x * x - y * y);
-				subRay.dir = toNormalHemisphere(float3(x, y, z), hit.N);
+			// 镜面反射
+			else if (p_diffuse < rd && rd <= p_diffuse + p_specular) {
+				//return SampleGTR2(xi_1, xi_2, V, N, alpha_GTR2);
+				subRay.dir = IS_SampleSpecular(ray.dir, hit.N, r, rand01(seed), rand01(seed.zyx));
 			}
+			
+			
+			//if(r<0.5f)
+			//{	//type3 Importance Sample (GGX NDF2)
+			//	//1.prepare a
+			//	float a = max(0.001f, r*r);
+			//	//2.sample h 
+			//	float x1 = rand01(seed);
+			//	float x2 = rand01(seed.zyx);
+			//	float phi = 2 * PI*x1;
+			//	float costheta = sqrt((1 - x2) / (1 + (a*a - 1)*x2));
+			//	float sintheta = sqrt(max(0.0, 1.0 - costheta * costheta)); //防止极限误差 -0.00000x
+			//	float3 H = float3(
+			//		sintheta*cos(phi),
+			//		sintheta*sin(phi),
+			//		costheta);
+			//	H = toNormalHemisphere(H, hit.N);
+			//	subRay.dir = reflect(ray.dir, H);
+			//}
+			//else{
+			//	//type4 Importance Sample (Diffuse)
+			//	//1.prepare a
+			//	Material_PBR param = GetObjMaterial_PBR(hit.obj);
+			//	float a = max(0.001f, r*r);
+			//	//2.sample h 
+			//	float x1 = rand01(seed);
+			//	float x2 = rand01(seed.zxy);
+			//	float r = sqrt(x1);
+			//	float theta = x2 * 2 * PI;
+			//	float x = r * cos(theta);
+			//	float y = r * sin(theta);
+			//	float z = sqrt(1 - x * x - y * y);
+			//	subRay.dir = toNormalHemisphere(float3(x, y, z), hit.N);
+			//}
 			subRay.pos = hit.P;
 			subRays[Inx3D(i, j, k)] = subRay;
 
@@ -404,7 +434,12 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			Material_PBR param = GetObjMaterial_PBR(mainHit.obj);
 			float3 H = normalize(V + L);
 			float NdotH = max(dot(N, H), 0.0);
-			float pdf_diffuse = dot(N, H) / PI;
+			float NdotL = max(dot(N, L), 0.0);
+
+			//根据辐射度决定用什么样的采样
+			//https://blog.csdn.net/weixin_44176696/article/details/119988866
+			// 分别计算三种 BRDF 的概率密度
+			float pdf_diffuse = NdotL / PI;
 			float pdf_GGX = 0;
 			{
 				float a = param.roughness;
@@ -419,7 +454,51 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 				pdf_GGX /= 4 * dot(L, H);	
 				pdf_GGX = max(pdf_GGX, 0.001f);
 			}
-			finalColor += PBR_GGX_IS(param, N, V, L, Li, pdf_diffuse, pdf_GGX);
+			float pdf_specular = pdf_GGX;//Ds * NdotH / (4.0 * dot(L, H));
+			//float pdf_clearcoat = Dr * NdotH / (4.0 * dot(L, H));
+
+			// 辐射度统计
+			float r_diffuse = (1.0 - param.metallic);
+			float r_specular = 1.0;
+			//float r_clearcoat = 0.25 * material.clearcoat;
+			//float r_sum = r_diffuse + r_specular + r_clearcoat;
+			//--- 临时修改：无清漆项
+			float r_sum = r_diffuse + r_specular;
+			//___
+
+			// 根据辐射度计算选择某种采样方式的概率
+			float p_diffuse = r_diffuse / r_sum;
+			float p_specular = r_specular / r_sum;
+			//float p_clearcoat = r_clearcoat / r_sum;
+
+			// 根据概率混合 pdf
+			//float pdf = p_diffuse * pdf_diffuse
+			//	+ p_specular * pdf_specular
+			//	+ p_clearcoat * pdf_clearcoat;
+			//--- 临时修改：无清漆项
+			float pdf = p_diffuse * pdf_diffuse
+				+ p_specular * pdf_specular;
+			//___
+
+			pdf = max(0.001f, pdf);
+			finalColor += PBR_GGX(param, N, V, L, Li) / pdf;
+
+			//float pdf_diffuse = dot(N, H) / PI;
+			//float pdf_GGX = 0;
+			//{
+			//	float a = param.roughness;
+			//	a = max(0.001f, a*a);
+			//	
+			//	float nomi = a * a * NdotH;
+			//	float NdotH2 = NdotH * NdotH;
+			//	
+			//	float denom = (NdotH2 * (a*a - 1.0) + 1.0);
+			//	denom = PI * denom * denom;
+			//	pdf_GGX = nomi / denom;
+			//	pdf_GGX /= 4 * dot(L, H);	
+			//	pdf_GGX = max(pdf_GGX, 0.001f);
+			//}
+			//finalColor += PBR_GGX_IS(param, N, V, L, Li, pdf_diffuse, pdf_GGX);
 		}
 	}
 	finalColor = finalColor / SPP;
