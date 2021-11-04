@@ -148,11 +148,12 @@ Material_PBR GetObjMaterial_PBR(int obj)
 		re.roughness = 1;
 	}
 
-	//???
+	//??? test
 	if (obj <= 1)
 	{
-		re.roughness = 0.01;
-
+		re.albedo = float3(1, 1, 1);
+		re.roughness = 0.1;
+		re.metallic = 0.0;
 	}
 
 	return re;
