@@ -332,13 +332,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cs: {fileID: 7200000, guid: 767e133b056254a41ad0792dbd34d890, type: 3}
   rt: {fileID: 0}
-  BN: 8
+  BN: 4
   w: 1024
   h: 1024
-  SPP: 256
+  SPP: 1024
   SPP_cell: 16
-  wDivide: 8
-  hDivide: 8
+  wDivide: 16
+  hDivide: 16
 --- !u!850595691 &1105758469
 LightingSettings:
   m_ObjectHideFlags: 0

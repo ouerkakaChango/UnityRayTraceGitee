@@ -179,7 +179,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	{
 		re.albedo = float3(1, 1, 1);
 		re.roughness = 0.1;
-		re.metallic = 0.0;
+		re.metallic = 1.0;
 	}
 
 	return re;

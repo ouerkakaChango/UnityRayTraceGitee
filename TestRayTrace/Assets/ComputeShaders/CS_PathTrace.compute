@@ -148,7 +148,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 		for (int k = 0; k < SPP; k++)
 		{
 			Ray subRay;
-			float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
+			float3 seed = normalize(hit.P+float3(0,0,2.5)) + float3(i, j, k) + float3(blockX, blockY, 0);
 
 			//{//type1
 			//	//subRay.dir = hit.N;//normalize(randP_round(seed) + hit.N);
@@ -176,16 +176,26 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 			//float p_clearcoat = r_clearcoat / r_sum;
 
 			// 按照概率采样
-			float rd = rand01(seed.yxz);
+			float rd = rand01(seed.zyx);
 			// 漫反射
 			if (rd <= p_diffuse) {
-				//return SampleCosineHemisphere(xi_1, xi_2, N);
-				subRay.dir = IS_SampleDiffuse(hit.N, r, rand01(seed), rand01(seed.zyx));
+				//float2 pix = Inx_img(i, j);
+				//float2 tt = randfloat2(w, h, (int)pix.x, (int)pix.y, (uint)(seed.x + seed.z), (uint)seed.y % 4);
+				//subRay.dir = IS_SampleDiffuse(hit.N, r, tt.x, tt.y);
+
+				subRay.dir = IS_SampleDiffuse(hit.N, r, rand01(seed), rand01(seed.zxy*PI*seed));
 			}
 			// 镜面反射
 			else if (p_diffuse < rd && rd <= p_diffuse + p_specular) {
-				//return SampleGTR2(xi_1, xi_2, V, N, alpha_GTR2);
-				subRay.dir = IS_SampleSpecular(ray.dir, hit.N, r, rand01(seed), rand01(seed.zyx));
+				//float2 pix = Inx_img(i, j);
+				//float2 tt = randfloat2(w, h, (int)pix.x, (int)pix.y, (uint)(seed.x + seed.z), (uint)seed.y %4);
+				//subRay.dir = IS_SampleSpecular(ray.dir, hit.N, r, tt.x, tt.y);
+
+				subRay.dir = IS_SampleSpecular(ray.dir, hit.N, r, rand01(seed), rand01(seed.zxy*PI*seed));
+			}
+			else
+			{//!!!
+				subRay.dir = IS_SampleDiffuse(hit.N, r, rand01(seed), rand01(seed.zxy*PI*seed));
 			}
 			
 			
