@@ -336,23 +336,60 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 		}
 		Ray ray = subRays[Inx3D(i, j, k)];
 		HitInfo hit = subHits[Inx4D(i, j, k, BI)];
-		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
+		//float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
+		float3 seed = normalize(hit.P + float3(0, 0, 2.5)) + float3(i, j, k);// +float3(blockX, blockY, 0);
 		{
-			//错误
-			//float3 ref = reflect(ray.dir, hit.N);
-			//Material_PBR param = GetObjMaterial_PBR(hit.obj);
-			//ray.dir = normalize(randP_round(seed)*param.roughness + ref);
+			{
+				//错误
+				//float3 ref = reflect(ray.dir, hit.N);
+				//Material_PBR param = GetObjMaterial_PBR(hit.obj);
+				//ray.dir = normalize(randP_round(seed)*param.roughness + ref);
+			}
 
-			//ray.dir = normalize(randP_round(seed) + hit.N);
+			{
+				//ray.dir = normalize(randP_round(seed) + hit.N);
+			}
 
-			float3 d1 = normalize(randP_round(seed) + hit.N); 
-			float3 d2 = reflect(ray.dir, hit.N);
-			Material_PBR param = GetObjMaterial_PBR(hit.obj);
-			ray.dir = lerp(d2, d1, param.roughness);
-		}
-		{
-			//不能太扁平了，不然永远出不去sdf-thre
-			//ray.dir = toNormalHemisphere(randP_hemiRound(seed), hit.N);
+			{
+				//float3 d1 = normalize(randP_round(seed) + hit.N); 
+				//float3 d2 = reflect(ray.dir, hit.N);
+				//Material_PBR param = GetObjMaterial_PBR(hit.obj);
+				//ray.dir = lerp(d2, d1, param.roughness);
+			}
+
+
+			{
+				Material_PBR param = GetObjMaterial_PBR(hit.obj);
+				// “反”（辐）射度统计
+				//!!!
+				float r_diffuse = 1.0;
+				float r_specular = (1.0 - pow(param.roughness,0.5));
+				float r_sum = r_diffuse + r_specular;
+
+				// 根据辐射度计算概率
+				float p_diffuse = r_diffuse / r_sum;
+				float p_specular = r_specular / r_sum;
+
+				// 按照概率采样
+				float rd = rand01(seed.zyx);
+				// 漫反射
+				if (rd <= p_diffuse) {
+					ray.dir = normalize(randP_round(seed) + hit.N);
+				}
+				// 镜面反射
+				else if (p_diffuse < rd && rd <= p_diffuse + p_specular) {
+					float3 d1 = normalize(randP_round(seed) + hit.N); 
+					float3 d2 = reflect(ray.dir, hit.N);
+					Material_PBR param = GetObjMaterial_PBR(hit.obj);
+					ray.dir = lerp(d2, d1, param.roughness);
+
+					//ray.dir = normalize(randP_round(seed) + hit.N);
+				}
+				else
+				{//!!!
+					ray.dir = normalize(randP_round(seed) + hit.N);
+				}
+			}
 		}
 		subRays[Inx3D(i, j, k)] = ray;
 	}
