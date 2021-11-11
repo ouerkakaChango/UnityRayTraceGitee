@@ -338,11 +338,17 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 		HitInfo hit = subHits[Inx4D(i, j, k, BI)];
 		float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
 		{
+			//错误
 			//float3 ref = reflect(ray.dir, hit.N);
 			//Material_PBR param = GetObjMaterial_PBR(hit.obj);
 			//ray.dir = normalize(randP_round(seed)*param.roughness + ref);
 
-			ray.dir = normalize(randP_round(seed) + hit.N);
+			//ray.dir = normalize(randP_round(seed) + hit.N);
+
+			float3 d1 = normalize(randP_round(seed) + hit.N); 
+			float3 d2 = reflect(ray.dir, hit.N);
+			Material_PBR param = GetObjMaterial_PBR(hit.obj);
+			ray.dir = lerp(d2, d1, param.roughness);
 		}
 		{
 			//不能太扁平了，不然永远出不去sdf-thre

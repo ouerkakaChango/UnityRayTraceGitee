@@ -130,7 +130,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	Material_PBR re;
 	re.metallic = 0.01;
 	re.roughness = 0.98;
-	int type = 0;
+	int type = 1;
 	if (obj == 0)
 	{
 		re.albedo = float3(1, 1, 1);
