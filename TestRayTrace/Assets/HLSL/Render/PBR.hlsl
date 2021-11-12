@@ -45,7 +45,7 @@ struct Material_PBR
 	float roughness;
 };
 
-float3 PBR_GGX(Material_PBR param, float3 n, float3 v, float3 l, float3 Li)
+float3 PBR_GGX(Material_PBR param, float3 n, float3 v, float3 l, float3 Li, float diffuseRate=1.0f, float specularRate=1.0f)
 {
 	float3 h = normalize(l + v);
 
@@ -66,7 +66,7 @@ float3 PBR_GGX(Material_PBR param, float3 n, float3 v, float3 l, float3 Li)
 	float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.001;
 	float3 specular = nominator / denominator;
 
-	float3 Lo = diffuse + specular;
+	float3 Lo = diffuse* diffuseRate + specular* specularRate;
 	Lo *= Li * max(dot(n, l), 0);
 
 	return Lo;
@@ -130,7 +130,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	Material_PBR re;
 	re.metallic = 0.01;
 	re.roughness = 0.98;
-	int type = 0;
+	int type = 1;
 	if (obj == 0)
 	{
 		re.albedo = float3(1, 1, 1);

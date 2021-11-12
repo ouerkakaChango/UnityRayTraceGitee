@@ -403,13 +403,13 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 //############################################################################
 
 //#################################################################
-Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit)
+Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit, float diffuseRate=1.0f, float specularRate = 1.0f)
 {
 	float3 Li = GetAttenuationed(light.color, hit.P, nextHit.P);
 	Material_PBR param = GetObjMaterial_PBR(hit.obj);
 	float3 V = normalize(preHit.P - hit.P);
 	float3 L = normalize(nextHit.P - hit.P);
-	float3 c = PBR_GGX(param, hit.N, V, L, Li);
+	float3 c = PBR_GGX(param, hit.N, V, L, Li, diffuseRate, specularRate);
 
 	Light re;
 	//??? 反射系数
@@ -450,6 +450,8 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 		Light light;
 		light.color = 0;
 		PathInfo path = subPaths[Inx3D(i, j, k)];
+		//!!! 如果主材料不反光，忽略子ray中的高光项，算是一种对混合bounce策略带来的副作用的补偿修正
+		float specularK = mainParam.roughness < 0.5 ? 1.0f : 0.0f;
 
 		if (path.endInx <0)
 		{
@@ -467,13 +469,17 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			{
 				HitInfo preHit = mainHits[Inx2D(i, j)];
 				HitInfo nextHit = subHits[Inx4D(i, j, k, inx + 1)];
-				light = ShadeSublight(light, preHit, hit, nextHit);
+				light = ShadeSublight(light, preHit, hit, nextHit,1, specularK);
+
+				Material_PBR subParam = GetObjMaterial_PBR(hit.obj);
 			}
 			else
 			{
 				HitInfo preHit = subHits[Inx4D(i, j, k, inx - 1)];
 				HitInfo nextHit = subHits[Inx4D(i, j, k, inx + 1)];
-				light = ShadeSublight(light, preHit, hit, nextHit);
+				light = ShadeSublight(light, preHit, hit, nextHit,1, specularK);
+
+				Material_PBR subParam = GetObjMaterial_PBR(hit.obj);
 			}
 		}
 
@@ -484,7 +490,6 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			float3 L = normalize(firstHit.P - mainHit.P);
 			float3 Li = GetAttenuationed(light.color, mainHit.P, firstHit.P);
 
-			Material_PBR param = GetObjMaterial_PBR(mainHit.obj);
 			float3 H = normalize(V + L);
 			float NdotH = max(dot(N, H), 0.0);
 			float NdotL = max(dot(N, L), 0.0);
@@ -495,7 +500,7 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			float pdf_diffuse = NdotL / PI;
 			float pdf_GGX = 0;
 			{
-				float a = param.roughness;
+				float a = mainParam.roughness;
 				a = max(0.001f, a*a);
 				
 				float nomi = a * a * NdotH;
@@ -511,7 +516,7 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			//float pdf_clearcoat = Dr * NdotH / (4.0 * dot(L, H));
 
 			// 辐射度统计
-			float r_diffuse = (1.0 - param.metallic);
+			float r_diffuse = (1.0 - mainParam.metallic);
 			float r_specular = 1.0;
 			//float r_clearcoat = 0.25 * material.clearcoat;
 			//float r_sum = r_diffuse + r_specular + r_clearcoat;
@@ -534,24 +539,7 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 			//___
 
 			pdf = max(0.001f, pdf);
-			finalColor += PBR_GGX(param, N, V, L, Li) / pdf;
-
-			//float pdf_diffuse = dot(N, H) / PI;
-			//float pdf_GGX = 0;
-			//{
-			//	float a = param.roughness;
-			//	a = max(0.001f, a*a);
-			//	
-			//	float nomi = a * a * NdotH;
-			//	float NdotH2 = NdotH * NdotH;
-			//	
-			//	float denom = (NdotH2 * (a*a - 1.0) + 1.0);
-			//	denom = PI * denom * denom;
-			//	pdf_GGX = nomi / denom;
-			//	pdf_GGX /= 4 * dot(L, H);	
-			//	pdf_GGX = max(pdf_GGX, 0.001f);
-			//}
-			//finalColor += PBR_GGX_IS(param, N, V, L, Li, pdf_diffuse, pdf_GGX);
+			finalColor += PBR_GGX(mainParam, N, V, L, Li) / pdf;
 		}
 	}
 	finalColor = finalColor / SPP;
