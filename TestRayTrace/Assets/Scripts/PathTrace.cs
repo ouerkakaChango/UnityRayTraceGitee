@@ -45,6 +45,10 @@ public class PathTrace : MonoBehaviour
 
     public ComputeShader cs;
     public RenderTexture rt;
+    public RenderTexture final_rt;
+
+    public int IterNum = 400;
+    public int nowIter = 0;
 
     public int BN = 1; //BounceNum >=1。为1时，从光源Bounce到surful反射进眼睛，是直接光。
     int BI = 0; //now BounceInx
@@ -105,16 +109,16 @@ public class PathTrace : MonoBehaviour
         return intSize*2;
     }
 
-    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+   private void OnRenderImage(RenderTexture source, RenderTexture destination)
    {
-        if (rt == null)
-        {
-            rt = new RenderTexture(w, h, 24);
-            rt.enableRandomWrite = true;
-            rt.Create();
-        }
-        Graphics.Blit(rt, destination);
-    }
+       if (rt == null)
+       {
+           rt = new RenderTexture(w, h, 24);
+           rt.enableRandomWrite = true;
+           rt.Create();
+       }
+       Graphics.Blit(rt, destination);
+   }
 
     void DisposeRays()
     {
@@ -248,6 +252,7 @@ public class PathTrace : MonoBehaviour
         cs.SetBuffer(kInx, "subPaths", buffer_subPaths);
 
         cs.SetTexture(kInx, "Result", rt);
+        cs.SetInt("nowIter", nowIter);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
         cs.SetInt("cw", cw);
@@ -339,6 +344,7 @@ public class PathTrace : MonoBehaviour
         cs.SetBuffer(kInx, "subPaths", buffer_subPaths);
 
         cs.SetTexture(kInx, "Result", rt);
+        cs.SetInt("nowIter", nowIter);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
         cs.SetInt("cw", cw);
@@ -383,7 +389,9 @@ public class PathTrace : MonoBehaviour
         cs.SetBuffer(kInx, "mainPaths", buffer_mainPaths);
         cs.SetBuffer(kInx, "subPaths", buffer_subPaths);
 
-        cs.SetTexture(kInx, "Result", rt);
+        //!!!
+        cs.SetTexture(kInx, "Result", final_rt);
+        cs.SetInt("nowIter", nowIter);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
         cs.SetInt("cw", cw);
@@ -421,14 +429,33 @@ public class PathTrace : MonoBehaviour
 
     void DoPathTrace()
     {
-        for(int j=0;j<hDivide;j++)
+        if (final_rt == null)
+        {
+            final_rt = new RenderTexture(w, h, 24);
+            final_rt.enableRandomWrite = true;
+            final_rt.Create();
+        }
+
+        if (rt == null)
+        {
+            rt = new RenderTexture(w, h, 24);
+            rt.enableRandomWrite = true;
+            rt.Create();
+        }
+
+        for (int j=0;j<hDivide;j++)
         {
             for(int i=0;i<wDivide;i++)
             {
                 PathTraceBlock(i, j);
             }
         }
-        DisposeRays();
+        //!!!
+        Graphics.Blit(final_rt, rt);
+        if (nowIter == IterNum)
+        {
+            DisposeRays();
+        }
     }
 
     void Filter()
@@ -449,6 +476,7 @@ public class PathTrace : MonoBehaviour
         //#####################################
     }
 
+    IEnumerator Co_GoIter;
     //@@@
     private void OnGUI()
     {
@@ -460,5 +488,43 @@ public class PathTrace : MonoBehaviour
         {
             Filter();
         }
+
+        if (GUI.Button(new Rect(100, 50, 100, 50), "AddIteration"))
+        {
+            nowIter++;
+        }
+
+        if (GUI.Button(new Rect(100, 50*2, 100, 50), "GoIter!"))
+        {
+            Co_GoIter = GoIter();
+            StartCoroutine(Co_GoIter);
+        }
     }
+
+    IEnumerator GoIter()
+    {
+        for (; nowIter < IterNum;)
+        {
+            //yield return new WaitForEndOfFrame();
+            DoPathTrace();
+            nowIter++;
+            yield return null;
+            //yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    //IEnumerator OnPostRender()
+    //{
+    //    if (rt == null)
+    //    {
+    //        rt = new RenderTexture(w, h, 24);
+    //        rt.enableRandomWrite = true;
+    //        rt.Create();
+    //    }
+    //
+    //    yield return new WaitForEndOfFrame();
+    //    var cam = GetComponent<Camera>();
+    //    var cameraViewRect = new Rect(cam.rect.xMin * Screen.width, Screen.height - cam.rect.yMax * Screen.height, cam.pixelWidth, cam.pixelHeight);
+    //    Graphics.DrawTexture(cameraViewRect, rt);
+    //}
 }

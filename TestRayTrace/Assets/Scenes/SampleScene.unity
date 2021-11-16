@@ -332,13 +332,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cs: {fileID: 7200000, guid: 767e133b056254a41ad0792dbd34d890, type: 3}
   rt: {fileID: 0}
+  final_rt: {fileID: 0}
+  IterNum: 400
+  nowIter: 0
   BN: 4
   w: 1024
   h: 1024
-  SPP: 1024
+  SPP: 64
   SPP_cell: 16
-  wDivide: 16
-  hDivide: 16
+  wDivide: 4
+  hDivide: 4
 --- !u!850595691 &1105758469
 LightingSettings:
   m_ObjectHideFlags: 0

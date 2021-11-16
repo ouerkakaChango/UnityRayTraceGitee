@@ -13,6 +13,7 @@
 
 #define PI 3.14159f
 
+int nowIter;
 int BI;
 
 RWTexture2D<float4> Result;
@@ -148,7 +149,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 		for (int k = 0; k < SPP; k++)
 		{
 			Ray subRay;
-			float3 seed = normalize(hit.P+float3(0,0,2.5)) + float3(i, j, k) + float3(blockX, blockY, 0);
+			float3 seed = float3(Inx_img(i, j), nowIter);
 
 			//{//type1
 			//	//subRay.dir = hit.N;//normalize(randP_round(seed) + hit.N);
@@ -336,8 +337,7 @@ void BounceBlock(uint3 id : SV_DispatchThreadID)
 		}
 		Ray ray = subRays[Inx3D(i, j, k)];
 		HitInfo hit = subHits[Inx4D(i, j, k, BI)];
-		//float3 seed = hit.P + float3(i, j, k) + float3(blockX, blockY, 0);
-		float3 seed = normalize(hit.P + float3(0, 0, 2.5)) + float3(i, j, k);// +float3(blockX, blockY, 0);
+		float3 seed = float3(Inx_img(i, j), nowIter);
 		{
 			{
 				//错误
@@ -417,23 +417,34 @@ Light ShadeSublight(Light light, HitInfo preHit, HitInfo hit, HitInfo nextHit, f
 	return re;
 }
 
+float4 MixIteration(float4 ori,float4 now, int iter)
+{
+	float srcK = iter / (float)(iter + 1);
+	float dstK = 1 / (float)(iter + 1);
+	return ori * srcK + now * dstK;
+}
+
 [numthreads(CoreX, CoreY, 1)]
 void RenderBlock(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
 
+	float4 oriColor = Result[Inx_img(i, j)];
+	float4 nowColor = 0;
+
 	PathInfo mainPath = mainPaths[Inx2D(i, j)];
 	HitInfo mainHit = mainHits[Inx2D(i, j)];
 	if (mainPath.hasEnd == 1)
-	{
-		Result[Inx_img(i, j)] = float4(1,0,1, 0);
+	{//没有打到物件
+		nowColor = 0;
+		Result[Inx_img(i, j)] = MixIteration(oriColor,nowColor,nowIter);
 		return;
 	}
 	else if (mainPath.hasEnd == 2)
 	{
-		float3 tt = GetObjEmissive(mainHit.obj);
-		Result[Inx_img(i, j)] = float4(tt, 0);
+		nowColor = float4(GetObjEmissive(mainHit.obj),0);
+		Result[Inx_img(i, j)] = MixIteration(oriColor, nowColor, nowIter);
 		return;
 	}
 
@@ -548,10 +559,9 @@ void RenderBlock(uint3 id : SV_DispatchThreadID)
 	finalColor = pow(abs(finalColor), 1.0f / 2.2f);
 	//######################## 
 	//end
-	float3 re = 0; 
-	re = finalColor;
+	nowColor = float4(finalColor,0);
 
-	Result[Inx_img(i, j)] = float4(re, 0);
+	Result[Inx_img(i, j)] = MixIteration(oriColor, nowColor, nowIter);
 }
 
 float GetGrey(float3 c)
