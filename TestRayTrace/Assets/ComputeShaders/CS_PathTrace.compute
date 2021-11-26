@@ -105,7 +105,7 @@ void InitRaysBlock(uint3 id : SV_DispatchThreadID)
 	path.endInx = -1;
 	//######################## 
 	ray.pos = screenPos + screenLeftDownPos + float3(i*dx, j*dx, 0) + blockOffset;
-	ray.dir = ray.pos - screenPos - eyeOffset; //默认eyePos在屏幕后一单位，z轴向屏幕外为(0,0,1)
+	ray.dir = normalize(ray.pos - screenPos - eyeOffset); //默认eyePos在屏幕后一单位，z轴向屏幕外为(0,0,1)
 
 	SDFScene(ray,hit);
 

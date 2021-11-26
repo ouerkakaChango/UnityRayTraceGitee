@@ -1,5 +1,7 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel Init
+#pragma kernel TestTrace
+#pragma kernel Trace
 
 #define PI 3.14159f
 
@@ -8,15 +10,98 @@ int w;
 int h;
 RWStructuredBuffer<int> tris;
 
+struct Vertex
+{
+	float3 p;
+	float3 n;
+};
+RWStructuredBuffer<Vertex> vertices;
+
+struct Ray
+{
+	float3 pos; 
+	float3 dir;
+};
+RWStructuredBuffer<Ray> mainRays;
+
+struct HitInfo
+{
+	int bHit;
+	int obj;
+	float3 N;
+	float3 P;
+};
+
+//#########################################################################################################
+int Inx2D(int i, int j)
+{
+	return i + w * j;
+}
+//#########################################################################################################
+float3 screenLeftDownPix;
+float3 eyePos;
+float pixW;
+float pixH;
+float3 screenU;
+float3 screenV;
 [numthreads(8, 8, 1)]
 void Init(uint3 id : SV_DispatchThreadID)
 {
 	int i = id.x;
 	int j = id.y;
 
-	float u = i / (float)w;
-	float v = j / (float)h;
+	Ray ray;
+	ray.pos = screenLeftDownPix + screenU * i * pixW + screenV * j * pixH;
+	ray.dir = normalize(ray.pos - eyePos); 
 
-	Result[id.xy] = float4(u,v,0,1);
+	mainRays[Inx2D(i,j)] = ray;
+
+	Result[id.xy] = float4(ray.dir,1);
+	//Result[id.xy] = float4(screenLeftDownPix, 1);
 }
 //#########################################################################################################
+#include  "../HLSL/RayMath.hlsl"
+
+[numthreads(8, 8, 1)]
+void TestTrace(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	Ray ray = mainRays[Inx2D(i, j)];
+
+	//计算射线与(0,0,0)的距离，如果小于r就为hit
+	int hit = Dis(ray, float3(0, 0, 0)) < 0.5f ? 1:0;
+
+	Result[id.xy] = float4(hit, 0, 0, 1);
+	//Result[id.xy] = float4(screenLeftDownPix, 1);
+}
+
+//#########################################################################################################
+int triNum;
+[numthreads(8, 8, 1)]
+void Trace(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	Ray ray = mainRays[Inx2D(i, j)];
+
+	int re = 0;
+	for (int i = 0; i < triNum; i += 3)
+	{
+		Vertex v1 = vertices[tris[i]];
+		Vertex v2 = vertices[tris[i+1]];
+		Vertex v3 = vertices[tris[i+2]];
+
+		HitInfo hit = RayCastTri(ray, v1, v2, v3);
+		if (hit.bHit)
+		{
+			re = 1;
+			break;
+		}
+	}
+
+	Result[id.xy] = float4(re, 0, 0, 1);
+	//Result[id.xy] = float4(screenLeftDownPix, 1);
+}
