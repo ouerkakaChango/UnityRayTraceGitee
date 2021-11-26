@@ -2,32 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct Ray
-{
-    public Vector3 pos;
-    public Vector3 dir;
-}
-
-public struct HitInfo
-{
-    public int bHit;
-    public int obj;
-    public Vector3 hitN;
-    public Vector3 hitP;
-}
-
-public struct ShadeTask
-{
-    public int obj;
-    public Vector3 N;
-    public Vector3 V;
-
-    public Vector3[] Li;
-    public Vector3[] L;
-}
-
 public class testRT : MonoBehaviour
 {
+
+    public struct Ray
+    {
+        public Vector3 pos;
+        public Vector3 dir;
+    }
+
+    public struct HitInfo
+    {
+        public int bHit;
+        public int obj;
+        public Vector3 hitN;
+        public Vector3 hitP;
+    }
+
+    public struct ShadeTask
+    {
+        public int obj;
+        public Vector3 N;
+        public Vector3 V;
+
+        public Vector3[] Li;
+        public Vector3[] L;
+    }
+
     public int TraceTime = 2; //第一次Trace只看见自发光物体（光源），第二次看见光源照出的直接光，第三次包含间接光(2bounce)
     public const int SSP = 64;
 

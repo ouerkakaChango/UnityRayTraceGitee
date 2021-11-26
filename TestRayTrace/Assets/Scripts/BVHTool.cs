@@ -11,7 +11,6 @@ public class BVHTool : MonoBehaviour
     {
         var meshFiliter = gameObject.GetComponent<MeshFilter>();
         mesh = meshFiliter.mesh;
-
     }
 
     // Update is called once per frame
@@ -23,7 +22,5 @@ public class BVHTool : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        //Gizmos.DrawSphere(this.transform.position, 0.1f);
-        //Gizmos.DrawSphere(this.transform.position+new Vector3(0,2,0), 0.1f);
     }
 }
