@@ -66,7 +66,6 @@ public class PathTrace : MonoBehaviour
     Ray[] subRays; //SPP pp
     HitInfo[] mainHits; //1pp
     HitInfo[] subHits;//BN per subRay == BN*SPP pp 
-
     PathInfo[] mainPaths;//1 pp
     PathInfo[] subPaths;//SPP pp
 
