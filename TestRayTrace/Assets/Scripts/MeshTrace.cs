@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FastGeo;
+using Ray = FastGeo.Ray;
 
 public class MeshTrace : MonoBehaviour
 {
@@ -9,18 +11,6 @@ public class MeshTrace : MonoBehaviour
     //threads数量过低会慢很多
     const int CoreX = 8;
     const int CoreY = 8;
-
-    public struct Ray
-    {
-        public Vector3 pos;
-        public Vector3 dir;
-    }
-
-    public struct Vertex
-    {
-        public Vector3 p;
-        public Vector3 n;
-    }
 
     Vertex[] vertices;
     int[] tris;
