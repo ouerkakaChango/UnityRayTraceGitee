@@ -87,7 +87,7 @@ void Trace(uint3 id : SV_DispatchThreadID)
 
 	Ray ray = mainRays[Inx2D(i, j)];
 
-	int re = 0;
+	float3 re = 0;
 	for (int i = 0; i < triNum; i += 3)
 	{
 		Vertex v1 = vertices[tris[i]];
@@ -97,11 +97,11 @@ void Trace(uint3 id : SV_DispatchThreadID)
 		HitInfo hit = RayCastTri(ray, v1, v2, v3);
 		if (hit.bHit)
 		{
-			re = 1;
+			re = hit.N;
 			break;
 		}
 	}
 
-	Result[id.xy] = float4(re, 0, 0, 1);
+	Result[id.xy] = float4(re, 1);
 	//Result[id.xy] = float4(screenLeftDownPix, 1);
 }

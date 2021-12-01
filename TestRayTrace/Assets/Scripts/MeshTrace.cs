@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FastGeo;
 using Ray = FastGeo.Ray;
+using Debugger;
 
 public class MeshTrace : MonoBehaviour
 {
@@ -46,14 +47,15 @@ public class MeshTrace : MonoBehaviour
         var far = cam.farClipPlane;
         var camPos = gameObject.transform.position;
         var camForward = gameObject.transform.forward;
-
+        Debug.Log(camForward);
+        Log.DebugVec(camForward);
         eyePos = camPos;
         var screenPos = camPos + near * camForward;
         screenU = gameObject.transform.right;
         screenV = gameObject.transform.up;
 
-        //大概在Unity场景中比划了一下取景屏的大小，定下了合理的像素晶元大小
-        pixW = 0.0004f;
+        //大概在Unity场景中对比了一下渲染大小，定下了合理的像素晶元大小（也就是根据了原始的cam nf,FOV,尝试出合适的pixW）
+        pixW = 0.000485f;
         pixH = pixW;
         screenLeftDownPix = screenPos + screenU * (-w / 2.0f + 0.5f) * pixW + screenV * (-h / 2.0f + 0.5f) * pixH;
     }
@@ -200,13 +202,16 @@ public class MeshTrace : MonoBehaviour
     {
         tris = mesh.triangles;
         int vertCount = mesh.vertices.Length;
+        var matrix = meshObj.transform.localToWorldMatrix;
         vertices = new Vertex[vertCount];
         for (int i = 0; i < vertCount; i++)
         {
             Vertex v = new Vertex();
-            v.p = mesh.vertices[i];
-            v.n = mesh.normals[i];
+            v.p = matrix.MultiplyPoint(mesh.vertices[i]);
+            v.n = matrix.MultiplyPoint(mesh.normals[i]);
             vertices[i] = v;
+
+            //Log.DebugVert(v);
         }
     }
     void Init()
@@ -230,8 +235,10 @@ public class MeshTrace : MonoBehaviour
             Init();
             Compute_InitRays();
         } 
-        if (GUI.Button(new Rect(0, 50, 100, 50), "Trace"))
+        if (GUI.Button(new Rect(0, 50, 100, 50), "InitAndTrace"))
         {
+            Init();
+            Compute_InitRays();
             Compute_Trace();
         }
         if (GUI.Button(new Rect(100, 0, 100, 50), "TestTrace"))
@@ -243,8 +250,16 @@ public class MeshTrace : MonoBehaviour
     private void OnDisable()
     {
         // Release gracefully.
-        buffer_mainRays.Dispose();
-        buffer_tris.Dispose();
-        buffer_vertices.Dispose();
+        SafeDispose(buffer_mainRays);
+        SafeDispose(buffer_tris);
+        SafeDispose(buffer_vertices);
+    }
+
+    static public void SafeDispose(ComputeBuffer cb)
+    {
+        if (cb != null)
+        {
+            cb.Dispose();
+        }
     }
 }
