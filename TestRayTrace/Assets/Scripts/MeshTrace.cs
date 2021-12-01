@@ -22,7 +22,7 @@ public class MeshTrace : MonoBehaviour
     ComputeBuffer buffer_mainRays;
 
     public ComputeShader cs;
-    public RenderTexture rt;
+    RenderTexture rt;
 
     public int w = 1024;
     public int h = 1024;
@@ -47,8 +47,6 @@ public class MeshTrace : MonoBehaviour
         var far = cam.farClipPlane;
         var camPos = gameObject.transform.position;
         var camForward = gameObject.transform.forward;
-        Debug.Log(camForward);
-        Log.DebugVec(camForward);
         eyePos = camPos;
         var screenPos = camPos + near * camForward;
         screenU = gameObject.transform.right;
@@ -202,13 +200,15 @@ public class MeshTrace : MonoBehaviour
     {
         tris = mesh.triangles;
         int vertCount = mesh.vertices.Length;
-        var matrix = meshObj.transform.localToWorldMatrix;
+        var l2w = meshObj.transform.localToWorldMatrix;
+        var rot = meshObj.transform.rotation;
         vertices = new Vertex[vertCount];
         for (int i = 0; i < vertCount; i++)
         {
             Vertex v = new Vertex();
-            v.p = matrix.MultiplyPoint(mesh.vertices[i]);
-            v.n = matrix.MultiplyPoint(mesh.normals[i]);
+            v.p = l2w.MultiplyPoint(mesh.vertices[i]);
+            v.n = rot * (mesh.normals[i]);
+            //Log.DebugVec(v.n);
             vertices[i] = v;
 
             //Log.DebugVert(v);

@@ -80,6 +80,11 @@ float3 GetTriBlendedNorm(float3 pos, Vertex v1, Vertex v2, Vertex v3)
 	return v1.n;
 }
 
+bool FrontFace(float3 pos, Plane plane)
+{
+	return dot(pos-plane.p,plane.n) >= 0;
+}
+
 //(三个vert的法线不一定一致)
 //1.先3p组成平面,其plane.N要和v1.n的dot为正
 //2.得到与平面交点，判断是否在三角形内（重心法）
@@ -93,6 +98,11 @@ HitInfo RayCastTri(Ray ray, Vertex v1, Vertex v2, Vertex v3)
 	re.P = 0;
 
 	Plane plane = FormPlane(v1.p, v2.p, v3.p, v1.n);
+
+	if (!FrontFace(ray.pos, plane))
+	{
+		return re;
+	}
 
 	float k = RayCastPlane(ray, plane);
 

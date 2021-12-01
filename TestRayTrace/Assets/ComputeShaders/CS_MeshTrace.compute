@@ -97,7 +97,7 @@ void Trace(uint3 id : SV_DispatchThreadID)
 		HitInfo hit = RayCastTri(ray, v1, v2, v3);
 		if (hit.bHit)
 		{
-			re = hit.N;
+			re = normalize(hit.N);
 			break;
 		}
 	}
