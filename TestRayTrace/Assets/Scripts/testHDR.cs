@@ -20,7 +20,7 @@ public class testHDR : MonoBehaviour
     public ComputeShader cs;
     RenderTexture rt;
     public Texture2D envTex;
-    RenderTexture envRT;
+    RenderTexture envRT=null;
 
     public int w = 1024;
     public int h = 720;
@@ -34,10 +34,39 @@ public class testHDR : MonoBehaviour
 
     void Start()
     {
+        UpdateCamParam();
+    }
 
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
+    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+    {
+        if (rt == null)
+        {
+            rt = new RenderTexture(w, h, 24);
+            rt.enableRandomWrite = true;
+            rt.Create();
+        }
+        Graphics.Blit(rt, destination);
+    }
+
+    private void OnDisable()
+    {
+        // Release gracefully.
+        SafeDispose(buffer_mainRays);
+    }
+
+    //##################################################################################################
+    void UpdateCamParam()
+    {
         var cam = gameObject.GetComponent<Camera>();
         var near = cam.nearClipPlane;
         var far = cam.farClipPlane;
+
         var camPos = gameObject.transform.position;
         var camForward = gameObject.transform.forward;
         eyePos = camPos;
@@ -61,6 +90,13 @@ public class testHDR : MonoBehaviour
         buffer.SetData(dataArr);
     }
 
+    static public void PostComputeBuffer(ref ComputeBuffer buffer, System.Array arr)
+    {
+        return;
+        //buffer.GetData(arr);
+        //buffer.Dispose();
+    }
+
     static public int GetTriStride()
     {
         int intSize = sizeof(int);
@@ -78,23 +114,7 @@ public class testHDR : MonoBehaviour
         int vec3Size = sizeof(float) * 3;
         return 2 * vec3Size;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    private void OnRenderImage(RenderTexture source, RenderTexture destination)
-    {
-        if (rt == null)
-        {
-            rt = new RenderTexture(w, h, 24);
-            rt.enableRandomWrite = true;
-            rt.Create();
-        }
-        Graphics.Blit(rt, destination);
-    }
+    //##################################################################################################
 
     void Compute_InitRays()
     {
@@ -148,44 +168,48 @@ public class testHDR : MonoBehaviour
         //#####################################
         PostComputeBuffer(ref buffer_mainRays, mainRays);
     }
+    //################################################################################################################
+    void Compute_Render()
+    {
+        PreComputeBuffer(ref buffer_mainRays, GetRayStride(), mainRays);
+        //##################################
+        //### compute
+        int kInx = cs.FindKernel("Render");
 
+        cs.SetTexture(kInx, "Result", rt);
+        cs.SetTexture(kInx, "envRT", envRT);
+        cs.SetInt("w", w);
+        cs.SetInt("h", h);
+        cs.SetFloat("pixW", pixW);
+        cs.SetFloat("pixH", pixH);
+        cs.SetVector("screenLeftDownPix", screenLeftDownPix);
+        cs.SetVector("eyePos", eyePos);
+        cs.SetVector("screenU", screenU);
+        cs.SetVector("screenV", screenV);
+
+        cs.Dispatch(kInx, w / CoreX, h / CoreY, 1);
+        //### compute
+        //#####################################
+        PostComputeBuffer(ref buffer_mainRays, mainRays);
+    }
+    //####################################################################################
     void Init()
     {
-        mainRays = new Ray[w * h];
-        Tex2RT(ref envRT, envTex);
-    }
-
-    static public void PostComputeBuffer(ref ComputeBuffer buffer, System.Array arr)
-    {
-        return;
-        //buffer.GetData(arr);
-        //buffer.Dispose();
-    }
-
-    //@@@
-    private void OnGUI()
-    {
-        if (GUI.Button(new Rect(0, 0, 100, 50), "Init"))
+        if (mainRays == null)
         {
-            Init();
-            Compute_InitRays();
-        } 
-        if (GUI.Button(new Rect(0, 50, 100, 50), "Trace"))
+            mainRays = new Ray[w * h];
+        }
+        if (envRT == null)
         {
-            TimeLogger logger = new TimeLogger("Trace",true);
-            logger.Start();
-            //###
-            Compute_Trace();
-            //###
-            logger.Log();
+            Tex2RT(ref envRT, envTex);
         }
     }
 
-    private void OnDisable()
+    void DoRender()
     {
-        // Release gracefully.
-        SafeDispose(buffer_mainRays);
+        Compute_Render();
     }
+    //####################################################################################
 
     static public void SafeDispose(ComputeBuffer cb)
     {
@@ -210,5 +234,42 @@ public class testHDR : MonoBehaviour
         rt.Create();
 
         RenderTexture.active = ori;
+    }
+
+    IEnumerator Co_GoIter;
+    //@@@
+    private void OnGUI()
+    {
+        if (GUI.Button(new Rect(0, 0, 100, 50), "Init"))
+        {
+            Init();
+            Compute_InitRays();
+        }
+        if (GUI.Button(new Rect(0, 50, 100, 50), "Trace"))
+        {
+            TimeLogger logger = new TimeLogger("Trace", true);
+            logger.Start();
+            //###
+            Compute_Trace();
+            //###
+            logger.Log();
+        }
+
+        if (GUI.Button(new Rect(100, 50 * 2, 100, 50), "GoRender!"))
+        {
+            Co_GoIter = GoIter();
+            StartCoroutine(Co_GoIter);
+        }
+    }
+
+    IEnumerator GoIter()
+    {
+        while(true)
+        {
+            Init();
+            UpdateCamParam();
+            DoRender();
+            yield return null;
+        }
     }
 }
