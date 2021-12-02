@@ -1,18 +1,15 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel Init
-#pragma kernel TestTrace
 #pragma kernel Trace
 
-#include "../HLSL/CommonDef.hlsl"
+#include  "../HLSL/CommonDef.hlsl"
 
 #define PI 3.14159f
 
+RWTexture2D<float4> Result;
 int w;
 int h;
-RWTexture2D<float4> Result;
 
-RWStructuredBuffer<int> tris;
-RWStructuredBuffer<Vertex> vertices;
 RWStructuredBuffer<Ray> mainRays;
 
 //#########################################################################################################
@@ -40,28 +37,10 @@ void Init(uint3 id : SV_DispatchThreadID)
 	mainRays[Inx2D(i,j)] = ray;
 
 	Result[id.xy] = float4(ray.dir,1);
-	//Result[id.xy] = float4(screenLeftDownPix, 1);
 }
 //#########################################################################################################
 #include  "../HLSL/RayMath.hlsl"
 
-[numthreads(8, 8, 1)]
-void TestTrace(uint3 id : SV_DispatchThreadID)
-{
-	int i = id.x;
-	int j = id.y;
-
-	Ray ray = mainRays[Inx2D(i, j)];
-
-	//计算射线与(0,0,0)的距离，如果小于r就为hit
-	int hit = Dis(ray, float3(0, 0, 0)) < 0.5f ? 1:0;
-
-	Result[id.xy] = float4(hit, 0, 0, 1);
-	//Result[id.xy] = float4(screenLeftDownPix, 1);
-}
-
-//#########################################################################################################
-int triNum;
 [numthreads(8, 8, 1)]
 void Trace(uint3 id : SV_DispatchThreadID)
 {
@@ -71,32 +50,7 @@ void Trace(uint3 id : SV_DispatchThreadID)
 	Ray ray = mainRays[Inx2D(i, j)];
 
 	float3 re = 0;
-	HitInfo minHit;
-	Init(minHit);
-	for (int i = 0; i < triNum; i += 3)
-	{
-		Vertex v1 = vertices[tris[i]];
-		Vertex v2 = vertices[tris[i+1]];
-		Vertex v3 = vertices[tris[i+2]];
 	
-		HitInfo hit = RayCastTri(ray, v1, v2, v3);
-		if (hit.bHit)
-		{
-			if (!minHit.bHit)
-			{
-				Assgin(minHit,hit);
-			}
-			else if (length(hit.P - ray.pos) < length(minHit.P - ray.pos))
-			{				
-				Assgin(minHit, hit);
-			}
-		}
-	}
-	
-	if (minHit.bHit)
-	{
-		re = normalize(minHit.N);
-	}
 
 	Result[id.xy] = float4(re, 1);
 }

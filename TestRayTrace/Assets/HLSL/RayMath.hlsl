@@ -1,3 +1,6 @@
+#ifndef RAYMATH_HLSL
+#define RAYMATH_HLSL
+#include "CommonDef.hlsl"
 float Dis(Ray ray, float3 p)
 {
 	float3 v = p - ray.pos;
@@ -71,14 +74,104 @@ bool IsPointInsideTri(float3 pos, float3 p1, float3 p2, float3 p3)
 //https://blog.csdn.net/qq_41524721/article/details/103490144
 float RayCastPlane(Ray ray, Plane plane)
 {
-	return -dot(ray.pos - plane.p, plane.n) / dot(ray.dir, plane.n);
+	float dd = dot(ray.dir, plane.n);
+	if (NearZero(dd))
+	{
+		return -12345.0f;
+	}
+	return -dot(ray.pos - plane.p, plane.n) / dd;
 }
 
-float3 GetTriBlendedNorm(float3 pos, Vertex v1, Vertex v2, Vertex v3)
+//### NormBlend
+float3 Tri_P1CInterP2P3(float3 c, Vertex v1, Vertex v2, Vertex v3)
 {
-	//???
-	return v1.n;
+	float3 p1 = v1.p;
+	float3 p2 = v2.p;
+	float3 p3 = v3.p;
+	Plane plane1 = FormPlane(v1.p, v2.p, v3.p, v1.n);
+	float3 n2 = cross(plane1.n, normalize(p3 - p2));
+	Plane plane2;
+	plane2.n = n2;
+	plane2.p = p2;
+	Ray ray;
+	ray.pos = c;
+	ray.dir = normalize(c - p1);
+	float k = RayCastPlane(ray, plane2);
+	if (k < 0)
+	{
+		return c;
+	}
+	return c + k * ray.dir;
 }
+
+//1. 获取p1c与p2p3的交点c2 https://blog.csdn.net/qq_41524721/article/details/121606678
+//2. 根据相似，CA:C2P2 = P1C:P1C2 , 求出A
+void Tri_ParallelP2P3(out float3 A, out float3 B, float3 c, Vertex v1, Vertex v2, Vertex v3)
+{
+	float3 p1 = v1.p;
+	float3 p2 = v2.p;
+	float3 p3 = v3.p;
+	float3 c2 = Tri_P1CInterP2P3(c, v1, v2, v3);
+
+	float lenP1C2 = length(p1 - c2);
+
+	if (NearZero(lenP1C2))
+	{
+		A = p2;
+		B = p3;
+		return;
+	}
+
+	float lenCA = length(p1 - c) * length(p2 - c2) / length(p1 - c2);
+	float3 dir1 = normalize(p2 - p3);
+	A = c + dir1 * lenCA;
+
+	float lenCB = length(p1 - c) * length(p3 - c2) / length(p1 - c2);
+	float3 dir2 = -dir1;
+	B = c + dir2 * lenCB;
+}
+
+//根据A lerp(n1,n2)，根据B lerp(n1,n3)，根据c lerp(nA, nB)
+float3 GetTriBlendedNorm(float3 c, Vertex v1, Vertex v2, Vertex v3)
+{
+	float3 p1 = v1.p;
+	float3 p2 = v2.p;
+	float3 p3 = v3.p;
+
+	float lenP2P1 = length(p2 - p1);
+	float lenP3P1 = length(p3 - p1);
+
+	if (NearZero(lenP2P1))
+	{
+		return lerp(v1.n, v3.n, 0.5f);
+	}
+	if (NearZero(lenP3P1))
+	{
+		return lerp(v1.n, v2.n, 0.5f);
+	}
+
+	float3 A, B;
+	Tri_ParallelP2P3(A, B, c, v1, v2, v3);
+
+	float kA = length(A - p1) / lenP2P1;
+	float3 nA = lerp(v1.n, v2.n, kA);
+
+	float kB = length(B - p1) / lenP3P1;
+	float3 nB = lerp(v1.n, v3.n, kB);
+	
+	float lenAB = length(B - A);
+	float kC=0;
+	if (NearZero(lenAB))
+	{
+		kC = 0.5f;
+	}
+	else
+	{
+		kC = length(c - A) / lenAB;
+	}
+	return lerp(nA, nB, kC);
+}
+//### NormBlend
 
 bool FrontFace(float3 pos, Plane plane)
 {
@@ -126,3 +219,5 @@ HitInfo RayCastTri(Ray ray, Vertex v1, Vertex v2, Vertex v3)
 
 	return re;
 }
+
+#endif
