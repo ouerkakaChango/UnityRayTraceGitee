@@ -1,6 +1,8 @@
 #ifndef COMMONDEF_HLSL
 #define COMMONDEF_HLSL
 
+#define PI 3.14159f
+
 struct Ray
 {
 	float3 pos;

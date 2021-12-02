@@ -19,12 +19,11 @@ public class testHDR : MonoBehaviour
 
     public ComputeShader cs;
     RenderTexture rt;
+    public Texture2D envTex;
+    RenderTexture envRT;
 
     public int w = 1024;
-    public int h = 1024;
-
-    public GameObject meshObj;
-    Mesh mesh;
+    public int h = 720;
 
     Vector3 eyePos;
     Vector3 screenLeftDownPix;
@@ -35,8 +34,6 @@ public class testHDR : MonoBehaviour
 
     void Start()
     {
-        var meshFiliter = meshObj.GetComponent<MeshFilter>();
-        mesh = meshFiliter.mesh;
 
         var cam = gameObject.GetComponent<Camera>();
         var near = cam.nearClipPlane;
@@ -48,7 +45,7 @@ public class testHDR : MonoBehaviour
         screenU = gameObject.transform.right;
         screenV = gameObject.transform.up;
 
-        //大概在Unity场景中对比了一下渲染大小，定下了合理的像素晶元大小（也就是根据了原始的cam nf,FOV,尝试出合适的pixW）
+        //大概在Unity场景中对比了一下渲染大小，定下了合理的像素晶元大小（也就是根据了w,h和原始的cam nf,FOV,尝试出合适的pixW）
         pixW = 0.000485f;
         pixH = pixW;
         screenLeftDownPix = screenPos + screenU * (-w / 2.0f + 0.5f) * pixW + screenV * (-h / 2.0f + 0.5f) * pixH;
@@ -142,7 +139,8 @@ public class testHDR : MonoBehaviour
         cs.SetBuffer(kInx, "mainRays", buffer_mainRays);
 
         cs.SetTexture(kInx, "Result", rt);
-        cs.SetInt("w", w);
+        cs.SetTexture(kInx, "envRT", envRT);
+        cs.SetInt("w", w); 
         cs.SetInt("h", h);
 
         cs.Dispatch(kInx, w / CoreX, h / CoreY, 1);
@@ -154,6 +152,7 @@ public class testHDR : MonoBehaviour
     void Init()
     {
         mainRays = new Ray[w * h];
+        Tex2RT(ref envRT, envTex);
     }
 
     static public void PostComputeBuffer(ref ComputeBuffer buffer, System.Array arr)
@@ -194,5 +193,22 @@ public class testHDR : MonoBehaviour
         {
             cb.Dispose();
         }
+    }
+
+    static public void Tex2RT(ref RenderTexture rt, Texture2D tex, bool enableRW=true)
+    { 
+        rt = new RenderTexture(tex.width, tex.height, 24);
+        if (enableRW)
+        {
+            rt.enableRandomWrite = true;
+        }
+        var ori = RenderTexture.active;
+
+        RenderTexture.active = rt;
+
+        Graphics.Blit(tex, rt);
+        rt.Create();
+
+        RenderTexture.active = ori;
     }
 }

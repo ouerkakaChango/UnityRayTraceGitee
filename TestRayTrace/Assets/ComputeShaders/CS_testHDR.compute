@@ -4,11 +4,11 @@
 
 #include  "../HLSL/CommonDef.hlsl"
 
-#define PI 3.14159f
-
-RWTexture2D<float4> Result;
 int w;
 int h;
+
+RWTexture2D<float4> Result;
+RWTexture2D<float4> envRT;
 
 RWStructuredBuffer<Ray> mainRays;
 
@@ -49,8 +49,17 @@ void Trace(uint3 id : SV_DispatchThreadID)
 
 	Ray ray = mainRays[Inx2D(i, j)];
 
-	float3 re = 0;
-	
+	float3 re = 0.1;
 
+	//???unity到底是怎么确定视线取skySphere的哪个点？
+	//1.将ray与超大sphere求交，获取sphere上的point
+	//2.将ray的起点移到(0,0,0)。也就是ray.dir即是交点
+	//先尝试方案2.因为好像没看见哪里设置skysphere的大小
+
+	float2 uv = EquirectangularToUV(ray.dir);
+	//re = float3(uv, 0);
+	uint envTexW, envTexH;
+	envRT.GetDimensions(envTexW, envTexH);
+	re = envRT[uv*float2(envTexW, envTexH)];
 	Result[id.xy] = float4(re, 1);
 }

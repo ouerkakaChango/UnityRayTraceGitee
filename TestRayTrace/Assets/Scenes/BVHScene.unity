@@ -582,8 +582,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1114819489}
-  m_LocalRotation: {x: -0.0021597603, y: 0.9857871, z: -0.16750447, w: -0.012706859}
-  m_LocalPosition: {x: -8.117955, y: -0.030290604, z: 3.6085167}
+  m_LocalRotation: {x: -0.06253022, y: 0.91926306, z: 0.16268958, w: 0.35295534}
+  m_LocalPosition: {x: -1.414774, y: 0.7233982, z: 8.839188}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -596,7 +596,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1114819489}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b3e5b07083e67a41b1df543270a025d, type: 3}
   m_Name: 
@@ -612,15 +612,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1114819489}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4cf249e888fe1084290d196a7e2b7975, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cs: {fileID: 0}
+  cs: {fileID: 7200000, guid: ae631b89fe622b74799fb5ac2892ace3, type: 3}
+  envTex: {fileID: 2800000, guid: 2238d9f827054d045835b6a7f2923071, type: 3}
   w: 1024
-  h: 1024
-  meshObj: {fileID: 0}
+  h: 720
 --- !u!1 &1849057840
 GameObject:
   m_ObjectHideFlags: 0
