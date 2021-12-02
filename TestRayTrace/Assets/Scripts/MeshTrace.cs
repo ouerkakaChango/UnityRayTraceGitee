@@ -198,6 +198,9 @@ public class MeshTrace : MonoBehaviour
 
     void CreateMesh()
     {
+        TimeLogger logger = new TimeLogger("CreateMesh", true);
+        logger.Start();
+
         tris = mesh.triangles;
         int vertCount = mesh.vertices.Length;
         var l2w = meshObj.transform.localToWorldMatrix;
@@ -213,6 +216,8 @@ public class MeshTrace : MonoBehaviour
 
             //Log.DebugVert(v);
         }
+
+        logger.Log();
     }
     void Init()
     {
@@ -235,11 +240,14 @@ public class MeshTrace : MonoBehaviour
             Init();
             Compute_InitRays();
         } 
-        if (GUI.Button(new Rect(0, 50, 100, 50), "InitAndTrace"))
+        if (GUI.Button(new Rect(0, 50, 100, 50), "Trace"))
         {
-            Init();
-            Compute_InitRays();
+            TimeLogger logger = new TimeLogger("Trace",true);
+            logger.Start();
+            //###
             Compute_Trace();
+            //###
+            logger.Log();
         }
         if (GUI.Button(new Rect(100, 0, 100, 50), "TestTrace"))
         {

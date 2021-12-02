@@ -93,7 +93,7 @@ void Trace(uint3 id : SV_DispatchThreadID)
 		Vertex v1 = vertices[tris[i]];
 		Vertex v2 = vertices[tris[i+1]];
 		Vertex v3 = vertices[tris[i+2]];
-
+	
 		HitInfo hit = RayCastTri(ray, v1, v2, v3);
 		if (hit.bHit)
 		{
@@ -103,5 +103,4 @@ void Trace(uint3 id : SV_DispatchThreadID)
 	}
 
 	Result[id.xy] = float4(re, 1);
-	//Result[id.xy] = float4(screenLeftDownPix, 1);
 }
