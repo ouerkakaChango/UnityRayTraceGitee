@@ -229,7 +229,7 @@ float3 CartesianToSpherical(in float3 xyz)
 	xyz *= 1.f / r;
 	float theta = acos(xyz.z);
 
-	float phi = atan2(xyz.y, xyz.x); //atan [-PI,PI]
+	float phi = atan2(xyz.y, xyz.x); //atan2 [-PI,PI]
 	phi += PI;
 
 	return float3(phi, theta, r);
