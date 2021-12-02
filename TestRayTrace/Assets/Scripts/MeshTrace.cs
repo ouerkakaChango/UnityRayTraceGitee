@@ -198,7 +198,7 @@ public class MeshTrace : MonoBehaviour
 
     void CreateMesh()
     {
-        TimeLogger logger = new TimeLogger("CreateMesh", true);
+        TimeLogger logger = new TimeLogger("CreateMesh", false);
         logger.Start();
 
         tris = mesh.triangles;
