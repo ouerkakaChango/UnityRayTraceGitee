@@ -40,7 +40,21 @@ public class TimeLogger
         float re = (Time.realtimeSinceStartup - startTime);
         startTime = Time.realtimeSinceStartup;
         part++;
+        if (part == 10000)//防止溢出，应该不会用到part那么多，但GetFPS会。
+        {
+            part = 0;
+        }
         return re;
+    }
+
+    public float GetMSec()
+    {
+        return GetSec() * 1000;
+    }
+
+    public float GetFPS()
+    {
+        return 1.0f / GetSec();
     }
 
     float startTime;

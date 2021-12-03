@@ -38,6 +38,10 @@ public class IBLTrace : MonoBehaviour
     public GameObject meshObj;
     Mesh mesh;
 
+    //Tools for Screen show
+    float fps = 0;
+    TimeLogger fpsTimer = new TimeLogger("fps");
+
     void Start()
     {
         var meshFiliter = meshObj.GetComponent<MeshFilter>();
@@ -216,6 +220,8 @@ public class IBLTrace : MonoBehaviour
     private void OnGUI()
     {
 
+        GUI.Label(new Rect(0, 50, 300, 50), "FPS: " + fps);
+
         if (GUI.Button(new Rect(0, 0, 100, 50), "GoRender!"))
         {
             Co_GoIter = GoIter();
@@ -227,10 +233,12 @@ public class IBLTrace : MonoBehaviour
     {
         while(true)
         {
+            fpsTimer.Start();
             Init();
             UpdateCamParam();
             DoRender();
             yield return null;
+            fps = fpsTimer.GetFPS();
         }
     }
 }
