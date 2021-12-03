@@ -19,8 +19,7 @@ public class testHDR : MonoBehaviour
 
     public ComputeShader cs;
     RenderTexture rt;
-    public Texture2D envTex;
-    RenderTexture envRT=null;
+    public Texture2D envBgTex = null;
 
     public int w = 1024;
     public int h = 720;
@@ -159,7 +158,7 @@ public class testHDR : MonoBehaviour
         cs.SetBuffer(kInx, "mainRays", buffer_mainRays);
 
         cs.SetTexture(kInx, "Result", rt);
-        cs.SetTexture(kInx, "envRT", envRT);
+        cs.SetTexture(kInx, "envBgTex", envBgTex);
         cs.SetInt("w", w); 
         cs.SetInt("h", h);
 
@@ -177,7 +176,7 @@ public class testHDR : MonoBehaviour
         int kInx = cs.FindKernel("Render");
 
         cs.SetTexture(kInx, "Result", rt);
-        cs.SetTexture(kInx, "envRT", envRT);
+        cs.SetTexture(kInx, "envBgTex", envBgTex);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
         cs.SetFloat("pixW", pixW);
@@ -198,10 +197,6 @@ public class testHDR : MonoBehaviour
         if (mainRays == null)
         {
             mainRays = new Ray[w * h];
-        }
-        if (envRT == null)
-        {
-            Tex2RT(ref envRT, envTex);
         }
     }
 

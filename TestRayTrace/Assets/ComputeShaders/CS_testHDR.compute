@@ -5,12 +5,13 @@
 
 #include  "../HLSL/CommonDef.hlsl"
 #include "../HLSL/TransferMath/TransferMath.hlsl"
+#include "../HLSL/PBR/PBR_IBL.hlsl"
 
 int w;
 int h;
 
 RWTexture2D<float4> Result;
-RWTexture2D<float4> envRT;
+Texture2D envBgTex;
 
 RWStructuredBuffer<Ray> mainRays;
 
@@ -58,15 +59,22 @@ void Trace(uint3 id : SV_DispatchThreadID)
 	//2.将ray的起点移到(0,0,0)。也就是ray.dir即是交点
 	//先尝试方案2.因为好像没看见哪里设置skysphere的大小
 
-	float2 uv = EquirectangularToUV(ray.dir);
-	//re = float3(uv, 0);
-	uint envTexW, envTexH;
-	envRT.GetDimensions(envTexW, envTexH);
-	re = envRT[uv*float2(envTexW, envTexH)];
+	//float2 uv = EquirectangularToUV(ray.dir);
+	////re = float3(uv, 0);
+	//uint envTexW, envTexH;
+	//envRT.GetDimensions(envTexW, envTexH);
+	//re = envRT[uv*float2(envTexW, envTexH)];
 	Result[id.xy] = float4(re, 1);
 }
 
 //#########################################################################################################
+//https://docs.unity3d.com/Manual/SL-SamplerStates.html
+//SamplerState my_point_repeat_sampler;
+//{
+//	Filter = MIN_MAG_MIP_POINT;
+//	AddressU = Wrap;
+//	AddressV = Wrap;
+//};
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
 {
@@ -85,10 +93,8 @@ void Render(uint3 id : SV_DispatchThreadID)
 	//2.将ray的起点移到(0,0,0)。也就是ray.dir即是交点
 	//先尝试方案2.因为好像没看见哪里设置skysphere的大小
 
-	float2 uv = EquirectangularToUV(ray.dir);
-	uint envTexW, envTexH;
-	envRT.GetDimensions(envTexW, envTexH);
-	re = envRT[uv*float2(envTexW, envTexH)];
+	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir);
+	re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, 0);
 
 	//re = float3(uv, 0);
 	Result[id.xy] = float4(re, 1);
