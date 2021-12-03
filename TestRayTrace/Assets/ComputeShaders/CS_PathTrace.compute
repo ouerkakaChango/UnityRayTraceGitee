@@ -61,8 +61,8 @@ RWStructuredBuffer<PathInfo> subPaths;
 
 #include  "../HLSL/Random/RandUtility.hlsl"
 #include "../HLSL/SDF/SDFScene.hlsl"
-#include "../HLSL/Render/Light.hlsl"
-#include "../HLSL/Render/PBR.hlsl"
+#include "../HLSL/Render_Old/Light.hlsl" 
+#include "../HLSL/Render_Old/PBR.hlsl"
 
 int Inx2D(int i, int j)
 {

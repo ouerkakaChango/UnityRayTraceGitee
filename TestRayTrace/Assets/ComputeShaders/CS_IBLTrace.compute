@@ -1,7 +1,8 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel Render
 
-#include  "../HLSL/RayMath.hlsl"
+#include "../HLSL/RayMath.hlsl"
+#include "../HLSL/Scenes/IBLSceneInfo.hlsl"
 
 int w;
 int h;
@@ -20,12 +21,13 @@ float3 screenU;
 float3 screenV;
 
 RWTexture2D<float4> Result;
-RWTexture2D<float4> envRT;
+Texture2D<float4> envDiffTex;
+Texture2D<float4> envBgTex;
 
 int triNum;
 RWStructuredBuffer<int> tris;
 RWStructuredBuffer<Vertex> vertices;
-
+//#########################################################################################################
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
 {
@@ -64,15 +66,21 @@ void Render(uint3 id : SV_DispatchThreadID)
 	//___Trace
 
 	if (minHit.bHit)
-	{//Trace到Mesh了，返回Mesh的颜色
-		re = normalize(minHit.N);
+	{//Trace到Mesh了，返回Mesh的颜色 
+		//???
+		minHit.obj = 0;
+
+		Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
+		re = PBR_IBL(envDiffTex, mat, minHit.N, ray.dir);
 	}
 	else
 	{//没Trace到，返回天空盒的颜色
-		float2 uv = EquirectangularToUV(ray.dir);
-		uint envTexW, envTexH;
-		envRT.GetDimensions(envTexW, envTexH);
-		re = envRT[uv*float2(envTexW, envTexH)];
+		//float2 uv = EquirectangularToUV(ray.dir);
+		//uint envTexW, envTexH;
+		//envTex.GetDimensions(envTexW, envTexH);
+		//re = envTex[uv*float2(envTexW, envTexH)];
+
+		re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir);
 	}
 
 	Result[id.xy] = float4(re, 1);

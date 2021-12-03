@@ -4,6 +4,7 @@
 #pragma kernel Render
 
 #include  "../HLSL/CommonDef.hlsl"
+#include "../HLSL/TransferMath/TransferMath.hlsl"
 
 int w;
 int h;

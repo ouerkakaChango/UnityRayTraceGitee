@@ -19,10 +19,11 @@ public class IBLTrace : MonoBehaviour
     ComputeBuffer buffer_tris;
     ComputeBuffer buffer_vertices;
 
-    public ComputeShader cs;
     RenderTexture rt;
-    public Texture2D envTex;
-    RenderTexture envRT=null;
+
+    public ComputeShader cs;
+    public Texture2D envDiffTex;
+    public Texture2D envBgTex;
 
     public int w = 1024;
     public int h = 720;
@@ -122,7 +123,6 @@ public class IBLTrace : MonoBehaviour
         int vec3Size = sizeof(float) * 3;
         return 2 * vec3Size;
     }
-
     //################################################################################################################
     void Compute_Render()
     {
@@ -136,7 +136,8 @@ public class IBLTrace : MonoBehaviour
         cs.SetBuffer(kInx, "vertices", buffer_vertices);
 
         cs.SetTexture(kInx, "Result", rt);
-        cs.SetTexture(kInx, "envRT", envRT);
+        cs.SetTexture(kInx, "envDiffTex", envDiffTex);
+        cs.SetTexture(kInx, "envBgTex", envBgTex);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
         cs.SetInt("triNum", tris.Length);
@@ -173,10 +174,6 @@ public class IBLTrace : MonoBehaviour
 
     void Init()
     {
-        if (envRT == null)
-        {
-            Tex2RT(ref envRT, envTex);
-        }
         if (vertices == null)
         {
             CreateMesh();
