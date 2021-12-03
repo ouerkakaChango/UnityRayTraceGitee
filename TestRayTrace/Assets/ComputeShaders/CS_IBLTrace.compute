@@ -1,0 +1,79 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Render
+
+#include  "../HLSL/RayMath.hlsl"
+
+int w;
+int h;
+
+//#########################################################################################################
+int Inx2D(int i, int j)
+{
+	return i + w * j;
+}
+//#########################################################################################################
+float3 screenLeftDownPix;
+float3 eyePos;
+float pixW;
+float pixH;
+float3 screenU;
+float3 screenV;
+
+RWTexture2D<float4> Result;
+RWTexture2D<float4> envRT;
+
+int triNum;
+RWStructuredBuffer<int> tris;
+RWStructuredBuffer<Vertex> vertices;
+
+[numthreads(8, 8, 1)]
+void Render(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	Ray ray;
+	ray.pos = screenLeftDownPix + screenU * i * pixW + screenV * j * pixH;
+	ray.dir = normalize(ray.pos - eyePos);
+
+	
+	float3 re = 0.1;
+
+	//---Trace
+	HitInfo minHit;
+	Init(minHit);
+	for (int i = 0; i < triNum; i += 3)
+	{
+		Vertex v1 = vertices[tris[i]];
+		Vertex v2 = vertices[tris[i + 1]];
+		Vertex v3 = vertices[tris[i + 2]];
+
+		HitInfo hit = RayCastTri(ray, v1, v2, v3);
+		if (hit.bHit)
+		{
+			if (!minHit.bHit)
+			{
+				Assgin(minHit, hit);
+			}
+			else if (length(hit.P - ray.pos) < length(minHit.P - ray.pos))
+			{
+				Assgin(minHit, hit);
+			}
+		}
+	}
+	//___Trace
+
+	if (minHit.bHit)
+	{//Trace到Mesh了，返回Mesh的颜色
+		re = normalize(minHit.N);
+	}
+	else
+	{//没Trace到，返回天空盒的颜色
+		float2 uv = EquirectangularToUV(ray.dir);
+		uint envTexW, envTexH;
+		envRT.GetDimensions(envTexW, envTexH);
+		re = envRT[uv*float2(envTexW, envTexH)];
+	}
+
+	Result[id.xy] = float4(re, 1);
+}
