@@ -21,7 +21,8 @@ public class IBLSpecBaker : MonoBehaviour
     {
         w = envRefTex.width;
         h = envRefTex.height;
-        Debug.Log("envRef "+w+" "+h);
+        //Debug.Log("envRef "+w+" "+h);
+        //DebugHDRImg(envRefTex);
     }
 
     // Update is called once per frame
@@ -50,7 +51,8 @@ public class IBLSpecBaker : MonoBehaviour
     {
         if (outRT == null)
         {
-            outRT = new RenderTexture(w, h, 24);
+            //### 一定要声明为ARGBFloat，才能被computeshader输出大于1的值
+            outRT = new RenderTexture(w, h, 24, RenderTextureFormat.ARGBFloat);
             outRT.enableRandomWrite = true;
             outRT.Create();
         }
@@ -62,9 +64,29 @@ public class IBLSpecBaker : MonoBehaviour
         Compute_Bake();
     }
 
+    void DebugHDRImg(Texture2D hdrImg)
+    {
+        int c = 0;
+        var colors = hdrImg.GetPixels();
+        foreach (var pix in colors)
+        {
+            if (pix.r > 1)
+            {
+                Debug.Log(pix);
+                c += 1;
+            }
+
+            if (c == 100)
+            {
+                break;
+            }
+        }
+    }
+
     void Export()
     {
         var tex = RT2Tex2D(outRT, TextureFormat.RGBAFloat);
+        //DebugHDRImg(tex);
         System.IO.File.WriteAllBytes(saveFolder+"/IBLSpecTest.exr", tex.EncodeToEXR());
     }
 
@@ -72,6 +94,7 @@ public class IBLSpecBaker : MonoBehaviour
     {
         Texture2D dest = new Texture2D(rTex.width, rTex.height, format, false);
         dest.Apply(false);
+        RenderTexture.active = rTex;
         Graphics.CopyTexture(rTex, dest);
         return dest;
     }

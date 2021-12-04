@@ -1,21 +1,21 @@
 #include "../PBR/PBRCommonDef.hlsl"
 #include "../TransferMath/TransferMath.hlsl"
 
-float3 GetEnvIrradiance_equirectangular(Texture2D envTex, float3 dir)
+float3 GetEnvIrradiance_equirectangular(Texture2D envTex, float3 dir, bool unityDir = true)
 {
 	dir = normalize(dir);
 
-	float2 uv = EquirectangularToUV(dir);
+	float2 uv = EquirectangularToUV(dir, unityDir);
 	uint envTexW, envTexH;
 	envTex.GetDimensions(envTexW, envTexH);
 	return envTex[uv*float2(envTexW, envTexH)].rgb;
 }
 
 SamplerState my_point_repeat_sampler;
-float3 GetEnvIrradiance_equirectangular(Texture2D envTex, float3 dir, float mip)
+float3 GetEnvIrradiance_equirectangular(Texture2D envTex, float3 dir, float mip, bool unityDir = true)
 {
 	dir = normalize(dir);
-	float2 uv = EquirectangularToUV(dir);
+	float2 uv = EquirectangularToUV(dir, unityDir);
 	return envTex.SampleLevel(my_point_repeat_sampler, uv, mip).rgb;
 }
 
