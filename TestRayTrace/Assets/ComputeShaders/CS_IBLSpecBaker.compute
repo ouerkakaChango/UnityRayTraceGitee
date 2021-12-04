@@ -27,7 +27,7 @@ void Bake(uint3 id : SV_DispatchThreadID)
 	float2 uv = float2(i / w, j / h);
 
 	float3 N = UVToEquirectangular(uv);
-	re = GetEnvIrradiance_equirectangular(envRefTex, -N, false);
+	re = GetEnvIrradiance_equirectangular(envRefTex, N, false);
 	re = pow(re, 2.2);
-	outRT[float2(i,h-j)] = float4(re, 1);
+	outRT[id.xy] = float4(re, 1);
 }

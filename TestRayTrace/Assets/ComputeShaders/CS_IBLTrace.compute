@@ -78,12 +78,8 @@ void Render(uint3 id : SV_DispatchThreadID)
 	}
 	else
 	{//没Trace到，返回天空盒的颜色
-		//float2 uv = EquirectangularToUV(ray.dir);
-		//uint envTexW, envTexH;
-		//envTex.GetDimensions(envTexW, envTexH);
-		//re = envTex[uv*float2(envTexW, envTexH)];
 
-		re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir);
+		re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
 	}
 
 	Result[id.xy] = float4(re, 1);

@@ -93,9 +93,8 @@ void Render(uint3 id : SV_DispatchThreadID)
 	//2.将ray的起点移到(0,0,0)。也就是ray.dir即是交点
 	//先尝试方案2.因为好像没看见哪里设置skysphere的大小
 
-	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir);
-	re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, 0);
-
+	re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, 0, true);
+	//float2 uv = EquirectangularToUV(ray.dir, true);
 	//re = float3(uv, 0);
 	Result[id.xy] = float4(re, 1);
 }

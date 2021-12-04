@@ -3,14 +3,14 @@
 //x: phi [0,2PI)
 //y: theta [0,PI]
 //z: r
-float3 CartesianToSpherical(in float3 xyz)
+float3 CartesianToSpherical(float3 xyz)
 {
 	float r = length(xyz);
 	xyz *= 1.f / r;
 	float theta = acos(xyz.z);
 
 	float phi = atan2(xyz.y, xyz.x); //atan2 [-PI,PI]
-	phi += PI;
+	phi += (phi < 0) ? 2 * PI : 0;
 
 	return float3(phi, theta, r);
 }
@@ -38,6 +38,7 @@ float3 XYZ_UnityFromStandard(float3 p)
 	return p;
 }
 
+//uv.v:down to up
 float2 EquirectangularToUV(float3 dir, bool unityDir = false)
 {
 	float2 uv = 0;
@@ -62,6 +63,7 @@ float2 EquirectangularToUV(float3 dir, bool unityDir = false)
 	return uv;
 }
 
+//uv.v:down to up
 float3 UVToEquirectangular(float2 uv, bool unityDir = false)
 {
 	uv.y = 1 - uv.y;
