@@ -1,0 +1,28 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Bake
+
+#include "../HLSL/RayMath.hlsl"
+#include "../HLSL/Scenes/IBLSceneInfo.hlsl"
+
+int w;
+int h;
+
+//#########################################################################################################
+int Inx2D(int i, int j)
+{
+	return i + w * j;
+}
+//#########################################################################################################
+RWTexture2D<float4> outRT;
+Texture2D<float4> envRefTex;
+//#########################################################################################################
+[numthreads(8, 8, 1)]
+void Bake(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	float3 re = float3(1,0,0);
+
+	outRT[id.xy] = float4(re, 1);
+}

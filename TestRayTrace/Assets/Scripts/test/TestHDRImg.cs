@@ -10,12 +10,19 @@ public class TestHDRImg : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        int c = 0;
         var colors = hdrImg.GetPixels();
         foreach (var pix in colors)
         {
             if (pix.r > 1)
             {
                 Debug.Log(pix);
+                c += 1;
+            }
+
+            if(c==100)
+            {
+                break;
             }
         }
     }
