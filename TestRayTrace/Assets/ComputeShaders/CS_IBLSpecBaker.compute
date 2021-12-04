@@ -3,6 +3,7 @@
 
 #include "../HLSL/RayMath.hlsl"
 #include "../HLSL/Scenes/IBLSceneInfo.hlsl"
+#include "../HLSL/Random/RandUtility.hlsl"
 
 int w;
 int h;
@@ -12,9 +13,17 @@ int Inx2D(int i, int j)
 {
 	return i + w * j;
 }
+
+float2 Inx_img(int i, int j)
+{
+	//return float2(i + blockX * cw, j + blockY * ch);
+	return i + w * j;
+}
 //#########################################################################################################
 RWTexture2D<float4> outRT;
 Texture2D<float4> envRefTex;
+uint SPP;
+float bakeRough;
 //#########################################################################################################
 [numthreads(8, 8, 1)]
 void Bake(uint3 id : SV_DispatchThreadID)
@@ -27,7 +36,26 @@ void Bake(uint3 id : SV_DispatchThreadID)
 	float2 uv = float2(i / w, j / h);
 
 	float3 N = UVToEquirectangular(uv);
-	re = GetEnvIrradiance_equirectangular(envRefTex, N, false);
+	//re = GetEnvIrradiance_equirectangular(envRefTex, N, false);
+
+	//https://learnopengl-cn.github.io/07%20PBR/03%20IBL/02%20Specular%20IBL/
+	float3 V = N;
+	float totalWeight = 0;
+	for (int i = 0; i < SPP; i++)
+	{
+		float2 Xi = Hammersley(i, SPP);
+		float3 H = IS_SampleSpecularH(N, bakeRough, Xi.x, Xi.y);
+		float3 L = normalize(2.0 * dot(V, H) * H - V);
+
+		float NdotL = max(dot(N, L), 0.0);
+		if (NdotL > 0.0)
+		{
+			re += GetEnvIrradiance_equirectangular(envRefTex, L, false) * NdotL;
+			totalWeight += NdotL;
+		}
+	}
+	re /= totalWeight;
+
 	re = pow(re, 2.2);
 	outRT[id.xy] = float4(re, 1);
 }

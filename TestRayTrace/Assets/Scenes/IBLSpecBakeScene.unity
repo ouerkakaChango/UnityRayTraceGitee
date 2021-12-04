@@ -357,6 +357,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cs: {fileID: 7200000, guid: e2130cfa22e054d45bf7a29d7da4c15c, type: 3}
+  SPP: 1024
+  bakeRough: 0.5
   saveFolder: Assets
   IterNum: 1
   nowIter: 0

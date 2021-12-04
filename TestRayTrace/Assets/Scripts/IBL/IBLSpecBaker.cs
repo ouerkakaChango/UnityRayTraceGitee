@@ -6,6 +6,8 @@ public class IBLSpecBaker : MonoBehaviour
 {
     public ComputeShader cs;
 
+    public int SPP = 16;
+    public float bakeRough = 0.25f;
     public string saveFolder = "Assets";
     public int IterNum = 1;
     public int nowIter = 0;
@@ -41,6 +43,8 @@ public class IBLSpecBaker : MonoBehaviour
         cs.SetTexture(kInx, "outRT", outRT);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
+        cs.SetInt("SPP", SPP);
+        cs.SetFloat("bakeRough", bakeRough);
 
         cs.Dispatch(kInx, w / CoreX, h / CoreY, 1);
         //### compute

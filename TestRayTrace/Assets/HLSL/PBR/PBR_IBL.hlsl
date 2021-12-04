@@ -1,5 +1,4 @@
 #include "../PBR/PBRCommonDef.hlsl"
-#include "../TransferMath/TransferMath.hlsl"
 
 float3 GetEnvIrradiance_equirectangular(Texture2D envTex, float3 dir, bool unityDir)
 {
