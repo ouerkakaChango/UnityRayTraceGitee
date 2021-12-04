@@ -46,7 +46,7 @@ float3 PBR_IBL(Texture2D envDiffTex, Texture2D envRefTex, Texture2D brdfLUT, Mat
 		//???
 		//Unity_ComputeShader里没法用cubemap和它自带的卷积mip功能
 		//得自己用texArr，将预积分的5张图放进去。
-		//prefilteredColor = GetEnvIrradiance_equirectangular(envRefTex, R, param.roughness * MAX_REFLECTION_LOD, true);
+		//prefilteredColor = IBLBakeSpecMip(envRefTex, R, param.roughness * MAX_REFLECTION_LOD, true);
 	}
 	{
 		//??? 临时应付，不正确

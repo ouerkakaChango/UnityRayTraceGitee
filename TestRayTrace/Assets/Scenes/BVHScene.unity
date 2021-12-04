@@ -744,7 +744,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cs: {fileID: 7200000, guid: b7deeb40d4953bd458910fcf447cbebe, type: 3}
-  envDiffTex: {fileID: 2800000, guid: e4fde251ecb45f044a58cbedf03538f5, type: 3}
+  envDiffTex: {fileID: 2800000, guid: aa03e788bfe303f4ba02b8bc6d51f957, type: 3}
   envRefTex: {fileID: 2800000, guid: e2c20b5b965658145947ef9b6b62cf7b, type: 3}
   brdfLUT: {fileID: 2800000, guid: d23d36bf5e9b7b94d88f158d7ed343da, type: 3}
   envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
