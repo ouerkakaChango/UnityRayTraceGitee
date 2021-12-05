@@ -23,7 +23,7 @@ public class IBLTrace : MonoBehaviour
 
     public ComputeShader cs;
     public Texture2D envDiffTex;
-    public Texture2D envRefTex;
+    public Texture2DArray envSpecTex2DArr;
     public Texture2D brdfLUT;
     public Texture2D envBgTex;
 
@@ -143,7 +143,7 @@ public class IBLTrace : MonoBehaviour
 
         cs.SetTexture(kInx, "Result", rt);
         cs.SetTexture(kInx, "envDiffTex", envDiffTex);
-        cs.SetTexture(kInx, "envRefTex", envRefTex);
+        cs.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
         cs.SetTexture(kInx, "brdfLUT", brdfLUT);
         cs.SetTexture(kInx, "envBgTex", envBgTex);
         cs.SetInt("w", w);

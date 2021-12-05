@@ -12,6 +12,7 @@ int h;
 
 RWTexture2D<float4> Result;
 Texture2D envBgTex;
+Texture2DArray envSpecTex2DArr;
 
 RWStructuredBuffer<Ray> mainRays;
 
@@ -93,7 +94,10 @@ void Render(uint3 id : SV_DispatchThreadID)
 	//2.将ray的起点移到(0,0,0)。也就是ray.dir即是交点
 	//先尝试方案2.因为好像没看见哪里设置skysphere的大小
 
-	re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, 0, true);
+	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, 0, true);
+	//re = IBLBakeSpecMip(envSpecTex2DArr, ray.dir, 0.25*4, true);
+	re = IBLBakeSpecMipByRoughness(envSpecTex2DArr, ray.dir, 0.15f, 4, true);
+
 	//float2 uv = EquirectangularToUV(ray.dir, true);
 	//re = float3(uv, 0);
 	Result[id.xy] = float4(re, 1);

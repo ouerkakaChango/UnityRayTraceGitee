@@ -22,7 +22,7 @@ public class testHDR : MonoBehaviour
     public Texture2D envBgTex = null;
 
     //public Texture2D[] envSpecArr;
-    //Texture2DArray envSpecTex2DArr = null;
+    public Texture2DArray envSpecTex2DArr;
 
     public int w = 1024;
     public int h = 720;
@@ -180,6 +180,8 @@ public class testHDR : MonoBehaviour
 
         cs.SetTexture(kInx, "Result", rt);
         cs.SetTexture(kInx, "envBgTex", envBgTex);
+        cs.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
+
         cs.SetInt("w", w);
         cs.SetInt("h", h);
         cs.SetFloat("pixW", pixW);
