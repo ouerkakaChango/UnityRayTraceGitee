@@ -21,6 +21,9 @@ public class testHDR : MonoBehaviour
     RenderTexture rt;
     public Texture2D envBgTex = null;
 
+    //public Texture2D[] envSpecArr;
+    //Texture2DArray envSpecTex2DArr = null;
+
     public int w = 1024;
     public int h = 720;
 
@@ -198,6 +201,7 @@ public class testHDR : MonoBehaviour
         {
             mainRays = new Ray[w * h];
         }
+
     }
 
     void DoRender()
