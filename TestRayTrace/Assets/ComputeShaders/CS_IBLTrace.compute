@@ -28,8 +28,15 @@ Texture2D<float4> brdfLUT;
 Texture2D<float4> envBgTex;
 
 int triNum;
-RWStructuredBuffer<int> tris;
-RWStructuredBuffer<Vertex> vertices;
+StructuredBuffer<int> tris;
+StructuredBuffer<float3> vertices;
+StructuredBuffer<float3> normals;
+
+struct MeshInfo
+{
+	float4x4 localToWorldMatrix;
+};
+RWStructuredBuffer<MeshInfo> meshInfos;
 //#########################################################################################################
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
@@ -47,18 +54,37 @@ void Render(uint3 id : SV_DispatchThreadID)
 	//---Trace
 	HitInfo minHit;
 	Init(minHit);
+	//???
+	MeshInfo meshObject = meshInfos[0];
+
 	for (int inx = 0; inx < triNum; inx += 3)
 	{
-		Vertex v1 = vertices[tris[inx]];
-		Vertex v2 = vertices[tris[inx + 1]];
-		Vertex v3 = vertices[tris[inx + 2]];
+		Vertex v1;
+		Vertex v2;
+		Vertex v3;
+
+		v1.p = vertices[tris[inx]];
+		v2.p = vertices[tris[inx + 1]];
+		v3.p = vertices[tris[inx + 2]];
+
+		v1.n = normals[tris[inx]];
+		v2.n = normals[tris[inx + 1]];
+		v3.n = normals[tris[inx + 2]];
+
+		v1.p = (mul(meshObject.localToWorldMatrix, float4(v1.p, 1.0f) )).xyz;
+		v2.p = (mul(meshObject.localToWorldMatrix, float4(v2.p, 1.0f) )).xyz;
+		v3.p = (mul(meshObject.localToWorldMatrix, float4(v3.p, 1.0f) )).xyz;
+
+		v1.n = normalize(mul(meshObject.localToWorldMatrix, float4(v1.n, 0.0f) )).xyz;
+		v2.n = normalize(mul(meshObject.localToWorldMatrix, float4(v2.n, 0.0f) )).xyz;
+		v3.n = normalize(mul(meshObject.localToWorldMatrix, float4(v3.n, 0.0f) )).xyz;
 
 		HitInfo hit = RayCastTri(ray, v1, v2, v3);
 		if (hit.bHit)
 		{
 			if (!minHit.bHit)
 			{
-				Assgin(minHit, hit);
+				Assgin(minHit, hit); 
 			}
 			else if (length(hit.P - ray.pos) < length(minHit.P - ray.pos))
 			{

@@ -7,17 +7,22 @@ using Debugger;
 
 public class IBLTrace : MonoBehaviour
 {
-    //根据网上资料，N卡最小也有32threads，A卡64
-    //所以 Use 64 threads (e.g. (64, 1, 1), (8, 8, 1), (16, 2, 2) etc.)
-    //threads数量过低会慢很多
+    struct MeshInfo
+    {
+        public Matrix4x4 localToWorldMatrix;
+    };
+
     const int CoreX = 8;
     const int CoreY = 8;
 
-    Vertex[] vertices=null;
     int[] tris=null;
+    Vector3[] vertices,normals;
+    MeshInfo[] meshInfos = null;
 
     ComputeBuffer buffer_tris;
     ComputeBuffer buffer_vertices;
+    ComputeBuffer buffer_normals;
+    ComputeBuffer buffer_meshInfos;
 
     RenderTexture rt;
 
@@ -73,6 +78,8 @@ public class IBLTrace : MonoBehaviour
     {
         SafeDispose(buffer_tris);
         SafeDispose(buffer_vertices);
+        SafeDispose(buffer_normals);
+        SafeDispose(buffer_meshInfos);
     }
 
     //##################################################################################################
@@ -112,34 +119,34 @@ public class IBLTrace : MonoBehaviour
         //buffer.Dispose();
     }
 
-    static public int GetTriStride()
-    {
-        int intSize = sizeof(int);
-        return intSize;
-    }
-
-    static public int GetVertexStride()
-    {
-        int vec3Size = sizeof(float) * 3;
-        return 2 * vec3Size;
-    }
 
     static public int GetRayStride()
     {
         int vec3Size = sizeof(float) * 3;
         return 2 * vec3Size;
     }
+
+    static public int GetMeshInfoStride()
+    {
+        int mat44size = sizeof(float) * 16;
+        return mat44size*1;
+    }
     //################################################################################################################
     void Compute_Render()
     {
-        PreComputeBuffer(ref buffer_vertices, GetVertexStride(), vertices);
-        PreComputeBuffer(ref buffer_tris, GetTriStride(), tris);
+        PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, vertices);
+        PreComputeBuffer(ref buffer_normals, sizeof(float) * 3, normals);
+        PreComputeBuffer(ref buffer_tris, sizeof(int), tris);
+        PreComputeBuffer(ref buffer_meshInfos, GetMeshInfoStride(), meshInfos);
         //##################################
         //### compute
         int kInx = cs.FindKernel("Render");
 
         cs.SetBuffer(kInx, "tris", buffer_tris);
         cs.SetBuffer(kInx, "vertices", buffer_vertices);
+        cs.SetBuffer(kInx, "normals", buffer_normals);
+        cs.SetBuffer(kInx, "meshInfos", buffer_meshInfos);
+        
 
         cs.SetTexture(kInx, "Result", rt);
         cs.SetTexture(kInx, "envDiffTex", envDiffTex);
@@ -165,19 +172,15 @@ public class IBLTrace : MonoBehaviour
     //####################################################################################
     void CreateMesh()
     {
+        TimeLogger lo = new TimeLogger("CreateMesh", false);
+        lo.Start();
         tris = mesh.triangles;
+        vertices = mesh.vertices;
+        normals = mesh.normals;
 
-        int vertCount = mesh.vertices.Length;
-        var l2w = meshObj.transform.localToWorldMatrix;
-        var rot = meshObj.transform.rotation;
-        vertices = new Vertex[vertCount];
-        for (int i = 0; i < vertCount; i++)
-        {
-            Vertex v = new Vertex();
-            v.p = l2w.MultiplyPoint(mesh.vertices[i]);
-            v.n = rot * (mesh.normals[i]);
-            vertices[i] = v;
-        }
+        meshInfos = new MeshInfo[1];
+        meshInfos[0].localToWorldMatrix = meshObj.transform.localToWorldMatrix;
+        lo.LogSec();
     }
 
     void Init()
@@ -185,6 +188,12 @@ public class IBLTrace : MonoBehaviour
         if (vertices == null)
         {
             CreateMesh();
+        }
+        if (rt == null)
+        {
+            rt = new RenderTexture(w, h, 24);
+            rt.enableRandomWrite = true;
+            rt.Create();
         }
     }
 
@@ -202,22 +211,22 @@ public class IBLTrace : MonoBehaviour
         }
     }
 
-    static public void Tex2RT(ref RenderTexture rt, Texture2D tex, bool enableRW=true)
-    { 
-        rt = new RenderTexture(tex.width, tex.height, 24);
-        if (enableRW)
-        {
-            rt.enableRandomWrite = true;
-        }
-        var ori = RenderTexture.active;
-
-        RenderTexture.active = rt;
-
-        Graphics.Blit(tex, rt);
-        rt.Create();
-
-        RenderTexture.active = ori;
-    }
+    //static public void Tex2RT(ref RenderTexture rt, Texture2D tex, bool enableRW=true)
+    //{ 
+    //    rt = new RenderTexture(tex.width, tex.height, 24);
+    //    if (enableRW)
+    //    {
+    //        rt.enableRandomWrite = true;
+    //    }
+    //    var ori = RenderTexture.active;
+    //
+    //    RenderTexture.active = rt;
+    //
+    //    Graphics.Blit(tex, rt);
+    //    rt.Create();
+    //
+    //    RenderTexture.active = ori;
+    //}
 
     IEnumerator Co_GoIter;
     //@@@
