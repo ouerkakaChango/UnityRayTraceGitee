@@ -22,16 +22,20 @@ struct Line
 //使用最简单的思路
 //1.对于每个bbox，找3轴最长k轴切2分
 //2.切2分的标准为，沿k轴，数量为一半的三角形 （根据三角形重心，按k轴排序）
+//3.调整顺序后的tris传给BVHTrace(IBLTrace改)
 public class BVHTool : MonoBehaviour
 {
     static public float MAXFloat = 100000.0f;
+
+    public int usrDepth = 10;   //用户建议的深度，当三角面数量够多，就会优先用这个浅的深度
+    int depth = -1;             //深度从0开始
 
     public Material mat;
 
     Mesh mesh;
     Vector3[] vertices;
     int[] tris;
-    BVHNode root;
+    BVHNode[] tree;
 
     List<Line> lines = new List<Line>();
 
@@ -64,32 +68,44 @@ public class BVHTool : MonoBehaviour
 
     void Init()
     {
+        TimeLogger logger = new TimeLogger("BVHInit",false);
+        logger.Start();
         vertices = mesh.vertices;
         ToWorldCoord();
+        logger.LogSec();
         tris = mesh.triangles;
-        SetNode(ref root,0,tris.Length/3);
 
-        AddRender(root);
-        //Log.DebugVec(root.min);
-        //Log.DebugVec(root.max);
+        Debug.Log(tris.Length);
+        int triNum = tris.Length;
+        int maxDepth = (int)Mathf.Log((float)triNum, 2.0f);
+        depth = Mathf.Min(maxDepth, usrDepth);
+        tree = new BVHNode[(int)(Mathf.Pow(2,depth+1))-1];
+        Debug.Log("BVH树深被设置为：" + depth);
+
+        SetNode(0, tris.Length/3, 0);
+
+        logger.LogSec();
+
+        AddRender(tree[0]);
+
+        logger.LogSec();
     }
 
     void ToWorldCoord()
     {
         var local2world = gameObject.transform.localToWorldMatrix;
-        Debug.Log("Trans ing...");
         for (int i = 0; i < vertices.Length; i++)
         {
             vertices[i] = local2world.MultiplyPoint3x4(vertices[i]);
         }
-        Debug.Log("Trans done.");
     }
 
-    void SetNode(ref BVHNode root, int start, int end)
+    void SetNode(int start, int end, int inx)
     {
-        root.start = start;
-        root.end = end;
+        tree[inx].start = start;
+        tree[inx].end = end;
 
+        //1.算bbox
         //遍历，设置bbox的minmax X,Y,Z (2个float3)
         Vector3 min = Vector3.one * MAXFloat;
         Vector3 max = -Vector3.one * MAXFloat;
@@ -104,8 +120,26 @@ public class BVHTool : MonoBehaviour
             CheckMinMax(p2, ref min, ref max);
             CheckMinMax(p3, ref min, ref max);
         }
-        root.min = min;
-        root.max = max;
+        tree[inx].min = min;
+        tree[inx].max = max;
+
+        //2.根据最长轴reArrange tris
+        //???
+        //ReArrangeDataByMaxAxis
+
+        
+        if (inx >= Mathf.Pow(2, depth)-1) 
+        {//已经在最后一层
+            return;
+        }
+        else
+        {
+            int lInx = 2 * inx + 1;
+            int rInx = lInx + 1;
+            //??? 确定左右半范围，递归
+            //SetNode(...,lInx);
+            //SetNode(...,rInx);
+        }
     }
 
     void CheckMinMax(in Vector3 p, ref Vector3 min, ref Vector3 max)

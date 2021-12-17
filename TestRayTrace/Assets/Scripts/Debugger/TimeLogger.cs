@@ -29,7 +29,7 @@ public class TimeLogger
     {
         if (active)
         {
-            Debug.Log(funcName + " " + ((Time.realtimeSinceStartup - startTime)) + "s");
+            Debug.Log(funcName + " Part" + part + " " + ((Time.realtimeSinceStartup - startTime)) + "s");
             startTime = Time.realtimeSinceStartup;
             part++;
         }
