@@ -2,7 +2,7 @@ Shader "Unlit/S_Line"
 {
     Properties
     {
-		_Color("LineColor",Color) = (1,0,0,1)
+		_Color("Color",Color) = (1,0,0,1)
     }
     SubShader
     {
