@@ -37,6 +37,15 @@ struct MeshInfo
 	float4x4 localToWorldMatrix;
 };
 RWStructuredBuffer<MeshInfo> meshInfos;
+
+struct BVHNode
+{
+	int start;
+	int end;
+	float3 min;
+	float3 max;
+};
+RWStructuredBuffer<BVHNode> bvh;
 //#########################################################################################################
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)

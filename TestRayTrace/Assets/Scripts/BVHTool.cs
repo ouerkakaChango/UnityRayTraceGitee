@@ -288,6 +288,10 @@ public class BVHTool : MonoBehaviour
 
     void RenderBBox()
     {
+        if (tree == null)
+        {
+            return;
+        }
         for (int i = 0; i < tree.Length; i++)
         {
             mat.SetColor("_Color", debugColors[i]);
