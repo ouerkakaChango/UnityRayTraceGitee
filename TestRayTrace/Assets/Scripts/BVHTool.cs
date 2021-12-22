@@ -4,7 +4,7 @@ using UnityEngine;
 using Debugger;
 
 //start,endÊÇtri£¬×ó±ÕÓÒ¿ª
-struct BVHNode
+public struct BVHNode
 {
     public int start;
     public int end;
@@ -34,8 +34,8 @@ public class BVHTool : MonoBehaviour
 
     Mesh mesh;
     Vector3[] vertices;
-    int[] tris;
-    BVHNode[] tree;
+    public int[] tris;
+    public BVHNode[] tree;
     public Color[] debugColors;
 
     List<Line> lines = new List<Line>();
@@ -47,9 +47,7 @@ public class BVHTool : MonoBehaviour
         var meshFiliter = gameObject.GetComponent<MeshFilter>();
         mesh = meshFiliter.mesh;
 
-        Init();
-
-        BuildBVH();
+        //Init();
     }
 
     // Update is called once per frame
@@ -68,7 +66,7 @@ public class BVHTool : MonoBehaviour
         RenderBBox();
     }
 
-    void Init()
+    public void Init()
     {
         TimeLogger logger = new TimeLogger("BVHInit",false);
         logger.Start();
@@ -77,7 +75,7 @@ public class BVHTool : MonoBehaviour
         logger.LogSec();
         tris = mesh.triangles;
 
-        Debug.Log(tris.Length);
+        Debug.Log(tris.Length/3+" tiangles");
         int triNum = tris.Length;
         int maxDepth = (int)Mathf.Log((float)triNum, 2.0f);
         depth = Mathf.Min(maxDepth, usrDepth);
@@ -147,10 +145,10 @@ public class BVHTool : MonoBehaviour
             int rInx = lInx + 1;
             //È·¶¨×óÓÒ°ë·¶Î§£¬µÝ¹é
             int lEnd = start + leftTriNum-1;
-            Debug.Log("ÇÐ·Ö£ºÔ­[" + start + "," + end + "], " +
-                "×ó:[" + start + "," + lEnd + "], " +
-                "ÓÒ:[" + lEnd + 1 + "," + end + "]"
-                );
+            //Debug.Log("ÇÐ·Ö£ºÔ­[" + start + "," + end + "], " +
+            //    "×ó:[" + start + "," + lEnd + "], " +
+            //    "ÓÒ:[" + (lEnd + 1) + "," + end + "]"
+            //    );
             SetNode(start, lEnd, lInx);
             SetNode(lEnd+1, end, rInx);            
         }
@@ -321,10 +319,5 @@ public class BVHTool : MonoBehaviour
         re[6] = new Vector3(max.x, max.y, max.z);
         re[7] = new Vector3(min.x, max.y, max.z);
         return re;
-    }
-
-    void BuildBVH()
-    {
-        
     }
 }

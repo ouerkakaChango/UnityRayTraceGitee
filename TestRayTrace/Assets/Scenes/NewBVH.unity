@@ -140,8 +140,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd667142c4d729a40b48d83af0e66b31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usrDepth: 2
+  usrDepth: 10
   mat: {fileID: 2100000, guid: 90473b5f86ae7bc41a6f7b53f23d9e78, type: 2}
+  tris: 
   debugColors: []
 --- !u!1 &381333613
 GameObject:
@@ -412,7 +413,7 @@ GameObject:
   - component: {fileID: 1622745218}
   - component: {fileID: 1622745217}
   - component: {fileID: 1622745216}
-  - component: {fileID: 1622745219}
+  - component: {fileID: 1622745221}
   - component: {fileID: 1622745220}
   m_Layer: 0
   m_Name: Main Camera
@@ -486,26 +487,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1622745219
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1622745215}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42bf5715a6ca0d74e8541458ba0b839f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cs: {fileID: 7200000, guid: b7deeb40d4953bd458910fcf447cbebe, type: 3}
-  envDiffTex: {fileID: 2800000, guid: 4e87347d2e700854c83b1dc31b3fce43, type: 3}
-  envSpecTex2DArr: {fileID: 18700000, guid: 0f551ab412a7b6a43adb8fff0951af3f, type: 2}
-  brdfLUT: {fileID: 2800000, guid: d23d36bf5e9b7b94d88f158d7ed343da, type: 3}
-  envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
-  w: 1024
-  h: 720
-  meshObj: {fileID: 1946664197}
 --- !u!114 &1622745220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -518,6 +499,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47dc37f02ee7ac149b628f5112ab1b4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1622745221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1622745215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ddc31fa1cee46447893cf28b2a73c74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bvhComp: {fileID: 119792191}
+  cs: {fileID: 7200000, guid: b5c421b027707944cbcf7da25f71eacb, type: 3}
+  envDiffTex: {fileID: 2800000, guid: 4e87347d2e700854c83b1dc31b3fce43, type: 3}
+  envSpecTex2DArr: {fileID: 18700000, guid: 0f551ab412a7b6a43adb8fff0951af3f, type: 2}
+  brdfLUT: {fileID: 2800000, guid: d23d36bf5e9b7b94d88f158d7ed343da, type: 3}
+  envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
+  w: 1024
+  h: 720
+  meshObj: {fileID: 119792190}
 --- !u!1 &1946664197
 GameObject:
   m_ObjectHideFlags: 0

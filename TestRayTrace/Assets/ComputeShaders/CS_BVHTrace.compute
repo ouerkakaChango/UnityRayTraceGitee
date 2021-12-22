@@ -1,0 +1,116 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Render
+
+#include "../HLSL/RayMath.hlsl"
+#include "../HLSL/Scenes/IBLSceneInfo.hlsl"
+
+int w;
+int h;
+
+//#########################################################################################################
+int Inx2D(int i, int j)
+{
+	return i + w * j;
+}
+//#########################################################################################################
+float3 screenLeftDownPix;
+float3 eyePos;
+float pixW;
+float pixH;
+float3 screenU;
+float3 screenV;
+
+RWTexture2D<float4> Result;
+Texture2D<float4> envDiffTex;
+Texture2DArray envSpecTex2DArr;
+Texture2D<float4> brdfLUT;
+
+Texture2D<float4> envBgTex;
+
+int triNum;
+StructuredBuffer<int> tris;
+StructuredBuffer<float3> vertices;
+StructuredBuffer<float3> normals;
+
+struct MeshInfo
+{
+	float4x4 localToWorldMatrix;
+};
+RWStructuredBuffer<MeshInfo> meshInfos;
+//#########################################################################################################
+[numthreads(8, 8, 1)]
+void Render(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	Ray ray;
+	ray.pos = screenLeftDownPix + screenU * i * pixW + screenV * j * pixH;
+	ray.dir = normalize(ray.pos - eyePos);
+
+	
+	float3 re = 0.1;
+
+	//---Trace
+	HitInfo minHit;
+	Init(minHit);
+	//trace bvh to determin start inx
+	int start = 0, end = triNum-1;
+
+	//for loop to find
+	//???
+	MeshInfo meshObject = meshInfos[0]; 
+
+	for (int inx = start; inx <= end; inx += 3)
+	{
+		Vertex v1;
+		Vertex v2;
+		Vertex v3;
+
+		v1.p = vertices[tris[inx]];
+		v2.p = vertices[tris[inx + 1]];
+		v3.p = vertices[tris[inx + 2]];
+
+		v1.n = normals[tris[inx]];
+		v2.n = normals[tris[inx + 1]];
+		v3.n = normals[tris[inx + 2]];
+
+		v1.p = (mul(meshObject.localToWorldMatrix, float4(v1.p, 1.0f) )).xyz;
+		v2.p = (mul(meshObject.localToWorldMatrix, float4(v2.p, 1.0f) )).xyz;
+		v3.p = (mul(meshObject.localToWorldMatrix, float4(v3.p, 1.0f) )).xyz;
+
+		v1.n = normalize(mul(meshObject.localToWorldMatrix, float4(v1.n, 0.0f) )).xyz;
+		v2.n = normalize(mul(meshObject.localToWorldMatrix, float4(v2.n, 0.0f) )).xyz;
+		v3.n = normalize(mul(meshObject.localToWorldMatrix, float4(v3.n, 0.0f) )).xyz;
+
+		HitInfo hit = RayCastTri(ray, v1, v2, v3);
+		if (hit.bHit)
+		{
+			if (!minHit.bHit)
+			{
+				Assgin(minHit, hit); 
+			}
+			else if (length(hit.P - ray.pos) < length(minHit.P - ray.pos))
+			{
+				Assgin(minHit, hit);
+			}
+		}
+	}
+	//___Trace
+
+	if (minHit.bHit)
+	{//Trace到Mesh了，返回Mesh的颜色 
+		//???
+		minHit.obj = 0;
+
+		Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
+		re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
+	}
+	else
+	{//没Trace到，返回天空盒的颜色
+
+		re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+	}
+
+	Result[id.xy] = float4(re, 1);
+}
