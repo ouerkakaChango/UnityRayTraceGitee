@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd667142c4d729a40b48d83af0e66b31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usrDepth: 1
+  usrDepth: 9
   depth: -1
   mat: {fileID: 2100000, guid: 90473b5f86ae7bc41a6f7b53f23d9e78, type: 2}
   tris: 
@@ -482,8 +482,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1622745215}
-  m_LocalRotation: {x: -0.002818152, y: 0.9704796, z: -0.24089926, w: -0.011354207}
-  m_LocalPosition: {x: -4.7669353, y: 3.7392519, z: 7.7655907}
+  m_LocalRotation: {x: 0.0019813457, y: 0.96717596, z: -0.2539879, w: 0.007544651}
+  m_LocalPosition: {x: -4.8458624, y: 3.9577608, z: 8.164184}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -516,7 +516,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1622745215}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47dc37f02ee7ac149b628f5112ab1b4d, type: 3}
   m_Name: 

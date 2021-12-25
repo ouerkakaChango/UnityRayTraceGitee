@@ -46,8 +46,9 @@ struct BVHNode
 	float3 max;
 };
 RWStructuredBuffer<BVHNode> bvh;
-int treeDepth;
+const int treeDepth;
 //#########################################################################################################
+#define MAXLEAVES 1024 
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
 {
@@ -67,117 +68,112 @@ void Render(uint3 id : SV_DispatchThreadID)
 	//trace bvh to determin start inx
 	int start = 0, end = triInxNum/3-1;
 
-	int nowDepth = 0;
-	int nowInx = 0;
-	bool hitBVH = true;
-	bool rearchEnd=false;
-	int rightBrother = -1;
-	int hitInx = -1;
-	while (nowDepth != treeDepth + 1)
+	bool bResultDone = false;
+	int toCheck1[MAXLEAVES];
+	int iter1 = 0;
+	int toCheck2[MAXLEAVES];
+	int iter2 = 0;
+	bool bUse1 = true;
+
+	toCheck1[iter1] = 0;
+	iter1++;
+	for (int nowDepth = 1; nowDepth <= treeDepth&&(!bResultDone); nowDepth++)
 	{
-		//1.ray与nowNode的bbox测交
-		//2.1如果nowInx==0，不交跳出
-		//2.2如果不交，认为交了右兄弟节点，令nowInx=右兄弟的左子节点，开启下一个循环
-		//3.如果交了，则令nowInx为左子节点(2*inx+1)，记rightBrother = 2*inx+2，开启下一个循环
-		BVHNode node = bvh[nowInx];
-		bool nodeHit = IsRayBBox(ray, node.min, node.max);
-	
-		if (!nodeHit)
+		if (bUse1)
 		{
-			if (nowInx == 0)
-			{//和主box都不交，结束
-				hitBVH = false;
-				break;
-			}
-			else
-			{
-				if (nowDepth == treeDepth)
-				{//到底了，直接返回右兄弟
-					node = bvh[rightBrother];
-					start = node.start;
-					end = node.end;
-					hitInx = rightBrother;
-					break;
-				}
-				{
-					//认为交了右兄弟,则下次判别右兄弟的左子节点
-					nowInx = 2 * rightBrother + 1;
-					rightBrother = nowInx + 1;
-				}
-			}
+			iter2 = 0;
 		}
 		else
 		{
-			if (nowDepth == treeDepth)
+			iter1 = 0;
+		}
+		bResultDone = true;
+		for (int leafInx = 0; leafInx < (bUse1?iter1:iter2); leafInx++)
+		{
+			//如果相交，把子节点放到check1/check2列表里
+			int nowInx = bUse1 ? toCheck1[leafInx] : toCheck2[leafInx];
+			BVHNode node = bvh[nowInx];
+			if (IsRayBBox(ray, node.min, node.max))
 			{
-				start = node.start;
-				end = node.end;
-				hitInx = nowInx;
-				break;
-			}
-			else
-			{
-				nowInx = 2 * nowInx + 1;
-				rightBrother = nowInx + 1;
+				bResultDone = false;
+				if (nowDepth == treeDepth)
+				{
+					if (bUse1)
+					{
+						toCheck2[iter2] = nowInx;
+						iter2++;
+					}
+					else
+					{
+						toCheck1[iter1] = nowInx;
+						iter1++;
+					}
+				}
+				else
+				{
+					if (bUse1)
+					{
+						toCheck2[iter2] = 2 * nowInx + 1;
+						iter2++;
+						toCheck2[iter2] = 2 * nowInx + 2;
+						iter2++;
+					}
+					else
+					{
+						toCheck1[iter1] = 2 * nowInx + 1;
+						iter1++;
+						toCheck1[iter1] = 2 * nowInx + 2;
+						iter1++;
+					}
+				}
 			}
 		}
-		nowDepth++;
+		bUse1 = !bUse1;
+	}
+	
+	if (treeDepth % 2 != 0)
+	{//叶节点的结果如果存在toCheck2，搬到toCheck1里
+		for (int i1 = 0; i1 < iter2; i1++)
+		{
+			toCheck1[i1] = toCheck2[i1];
+		}
+		iter1 = iter2;
 	}
 
-	start = 3 * start;
-	end = 3 * end + 3;
-
-	//start = bvh[2].start;
-	//end = bvh[2].end;
-	//start = 3 * start;
-	//end = 3 * end + 3;
-	//bool ttHit = IsRayBBox(ray, float3(-5.6,-1.0,-0.4), float3(-3.0, 4.0, 3.5));
-	//bool ttHit = IsRayBBox(ray, bvh[2].min, bvh[2].max);
-	//bool ttHit = IsRayBBox(ray, bvh[0].min, bvh[0].max);
+	for(int i1=0;i1<iter1;i1++)
 	{
-		//Plane plane;
-		//plane.p = float3(-2.5,0,-2.5);
-		//plane.n = float3(0, 1, 0);
-		//bool ttHit = IsRayQuad_Corner(ray, plane, float2(5, 5), float3(1, 0, 0), float3(0,0,1));
-	}
-
-	//if (ttHit)
-	//{
-	//	Result[id.xy] = float4(0, 0, 1, 1);
-	//	return;
-	//}
-
-	if (hitBVH)// && hitInx == 2)
-	{
-		//Result[id.xy] = float4(1,0,0, 1);
-		//return;
-
+		int nowInx = toCheck1[i1];
+		start = bvh[nowInx].start;
+		end = bvh[nowInx].end;
+		start = 3 * start;
+		end = 3 * end + 3;
+	
 		//for loop to find
-		//??? only one mesh now
+		//!!! only one mesh now
 		MeshInfo meshObject = meshInfos[0];
-
+	
 		for (int inx = start; inx <end; inx += 3)
 		{
 			Vertex v1;
 			Vertex v2;
 			Vertex v3;
-
+	
 			v1.p = vertices[tris[inx]];
 			v2.p = vertices[tris[inx + 1]];
 			v3.p = vertices[tris[inx + 2]];
-
+	
 			v1.n = normals[tris[inx]];
 			v2.n = normals[tris[inx + 1]];
 			v3.n = normals[tris[inx + 2]];
-
+	
 			v1.p = (mul(meshObject.localToWorldMatrix, float4(v1.p, 1.0f))).xyz;
 			v2.p = (mul(meshObject.localToWorldMatrix, float4(v2.p, 1.0f))).xyz;
 			v3.p = (mul(meshObject.localToWorldMatrix, float4(v3.p, 1.0f))).xyz;
-
+	
 			v1.n = normalize(mul(meshObject.localToWorldMatrix, float4(v1.n, 0.0f))).xyz;
 			v2.n = normalize(mul(meshObject.localToWorldMatrix, float4(v2.n, 0.0f))).xyz;
 			v3.n = normalize(mul(meshObject.localToWorldMatrix, float4(v3.n, 0.0f))).xyz;
-
+	
 			HitInfo hit = RayCastTri(ray, v1, v2, v3);
 			if (hit.bHit)
 			{

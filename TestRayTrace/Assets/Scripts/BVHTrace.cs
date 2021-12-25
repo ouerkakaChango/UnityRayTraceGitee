@@ -152,11 +152,11 @@ public class BVHTrace : MonoBehaviour
             return;
         }
         //??? debug
-        Debug.Log(bvhComp.depth);
-        for(int i=0;i<bvh.Length;i++)
-        {
-            bvh[i].Log();
-        }
+        //Debug.Log(bvhComp.depth);
+        //for(int i=0;i<bvh.Length;i++)
+        //{
+        //    bvh[i].Log();
+        //}
         //___
         PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, vertices);
         PreComputeBuffer(ref buffer_normals, sizeof(float) * 3, normals);
