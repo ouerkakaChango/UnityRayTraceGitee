@@ -44,4 +44,14 @@ bool NearZero(float x)
 	return abs(x) < 0.000001f;
 }
 
+bool gt(float3 a, float3 b)
+{
+	return a.r > b.r&&a.g > b.g&&a.b > b.b;
+}
+
+bool lt(float3 a, float3 b)
+{
+	return a.r < b.r&&a.g < b.g&&a.b < b.b;
+}
+
 #endif

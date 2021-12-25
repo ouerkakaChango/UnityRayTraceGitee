@@ -245,7 +245,7 @@ bool IsRayQuad_Corner(Ray ray, Plane plane, float2 size, float3 v1, float3 v2)
 
 //1.从x,y,z方向，每两个平面和ray测交点
 //只要有一个交点在bbox内，则返回true
-bool IsRayBBox(Ray ray, float3 min, float3 max)
+bool Slow_IsRayBBox(Ray ray, float3 min, float3 max)
 {
 	//1.x方向
 	Plane plane; 
@@ -296,6 +296,134 @@ bool IsRayBBox(Ray ray, float3 min, float3 max)
 		return true;
 	}
 
+	return false;
+}
+
+//https://blog.csdn.net/Qinhaifu/article/details/102629742
+bool IsRayAABB(in Ray ray, float3 min, float3 max)
+{
+	float lowt = 0.0f;
+	float t;
+	bool hit = false;
+	float3 hitpoint;
+	
+	/**
+	*   点在包围盒里面
+	*/
+	if (gt(ray.pos,min) && lt(ray.pos,max))
+	{
+		return true;
+	}
+	
+	// Check each face in turn, only check closest 3
+	// Min x
+	if (ray.pos.x <= min.x && ray.dir.x > 0)
+	{
+		t = (min.x - ray.pos.x) / ray.dir.x;
+		if (t >= 0)
+		{
+			// Substitute t back into ray and check bounds and dist
+			hitpoint = ray.pos + ray.dir * t;
+			if (hitpoint.y >= min.y &&
+				hitpoint.y <= max.y &&
+				hitpoint.z >= min.z &&
+				hitpoint.z <= max.z
+				)
+			{
+				return true;
+			}
+		}
+	}
+	// Max x
+	if (ray.pos.x >= max.x && ray.dir.x < 0)
+	{
+		t = (max.x - ray.pos.x) / ray.dir.x;
+		if (t >= 0)
+		{
+			// Substitute t back into ray and check bounds and dist
+			hitpoint = ray.pos + ray.dir * t;
+			if (hitpoint.y >= min.y &&
+				hitpoint.y <= max.y &&
+				hitpoint.z >= min.z &&
+				hitpoint.z <= max.z 
+				)
+			{
+				return true;
+			}
+		}
+	}
+	// Min y
+	if (ray.pos.y <= min.y && ray.dir.y > 0)
+	{
+		t = (min.y - ray.pos.y) / ray.dir.y;
+		if (t >= 0)
+		{
+			// Substitute t back into ray and check bounds and dist
+			hitpoint = ray.pos + ray.dir * t;
+			if (hitpoint.x >= min.x &&
+				hitpoint.x <= max.x &&
+				hitpoint.z >= min.z &&
+				hitpoint.z <= max.z 
+				)
+			{
+				return true;
+			}
+		}
+	}
+	// Max y
+	if (ray.pos.y >= max.y && ray.dir.y < 0)
+	{
+		t = (max.y - ray.pos.y) / ray.dir.y;
+		if (t >= 0)
+		{
+			// Substitute t back into ray and check bounds and dist
+			hitpoint = ray.pos + ray.dir * t;
+			if (hitpoint.x >= min.x &&
+				hitpoint.x <= max.x &&
+				hitpoint.z >= min.z &&
+				hitpoint.z <= max.z 
+				)
+			{
+				return true;
+			}
+		}
+	}
+	// Min z
+	if (ray.pos.z <= min.z && ray.dir.z > 0)
+	{
+		t = (min.z - ray.pos.z) / ray.dir.z;
+		if (t >= 0)
+		{
+			// Substitute t back into ray and check bounds and dist
+			hitpoint = ray.pos + ray.dir * t;
+			if (hitpoint.x >= min.x &&
+				hitpoint.x <= max.x &&
+				hitpoint.y >= min.y &&
+				hitpoint.y <= max.y
+				)
+			{
+				return true;
+			}
+		}
+	}
+	// Max z
+	if (ray.pos.z >= max.z && ray.dir.z < 0)
+	{
+		t = (max.z - ray.pos.z) / ray.dir.z;
+		if (t >= 0)
+		{
+			// Substitute t back into ray and check bounds and dist
+			hitpoint = ray.pos + ray.dir * t;
+			if (hitpoint.x >= min.x &&
+				hitpoint.x <= max.x &&
+				hitpoint.y >= min.y &&
+				hitpoint.y <= max.y 
+				)
+			{
+				return true;
+			}
+		}
+	}
 	return false;
 }
 

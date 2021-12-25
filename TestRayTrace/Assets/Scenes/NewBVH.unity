@@ -482,8 +482,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1622745215}
-  m_LocalRotation: {x: 0.0019813457, y: 0.96717596, z: -0.2539879, w: 0.007544651}
-  m_LocalPosition: {x: -4.8458624, y: 3.9577608, z: 8.164184}
+  m_LocalRotation: {x: -0.10633903, y: 0.87181944, z: -0.2177978, w: -0.42566073}
+  m_LocalPosition: {x: -0.079916954, y: 4.0133567, z: 5.466378}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -508,7 +508,7 @@ MonoBehaviour:
   envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
   w: 1024
   h: 720
-  meshObj: {fileID: 381333613}
+  meshObj: {fileID: 119792190}
 --- !u!114 &1622745220
 MonoBehaviour:
   m_ObjectHideFlags: 0
