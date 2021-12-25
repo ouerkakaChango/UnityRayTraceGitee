@@ -52,6 +52,8 @@ public class BVHTrace : MonoBehaviour
     float fps = 0;
     TimeLogger fpsTimer = new TimeLogger("fps");
 
+    bool hasInited = false;
+
     void Start()
     {
         var meshFiliter = meshObj.GetComponent<MeshFilter>();
@@ -145,6 +147,17 @@ public class BVHTrace : MonoBehaviour
     //################################################################################################################
     void Compute_Render()
     {
+        if(!hasInited)
+        {
+            return;
+        }
+        //??? debug
+        Debug.Log(bvhComp.depth);
+        for(int i=0;i<bvh.Length;i++)
+        {
+            bvh[i].Log();
+        }
+        //___
         PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, vertices);
         PreComputeBuffer(ref buffer_normals, sizeof(float) * 3, normals);
         PreComputeBuffer(ref buffer_tris, sizeof(int), tris);
@@ -167,7 +180,8 @@ public class BVHTrace : MonoBehaviour
         cs.SetTexture(kInx, "envBgTex", envBgTex);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
-        cs.SetInt("triNum", tris.Length);
+        cs.SetInt("triInxNum", tris.Length);
+        cs.SetInt("treeDepth", bvhComp.depth);
         cs.SetFloat("pixW", pixW);
         cs.SetFloat("pixH", pixH);
         cs.SetVector("screenLeftDownPix", screenLeftDownPix);
@@ -193,6 +207,7 @@ public class BVHTrace : MonoBehaviour
         meshInfos = new MeshInfo[1];
         meshInfos[0].localToWorldMatrix = meshObj.transform.localToWorldMatrix;
         lo.LogSec();
+        hasInited = true;
     }
 
     void Init()

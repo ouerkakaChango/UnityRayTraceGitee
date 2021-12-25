@@ -27,7 +27,7 @@ Texture2D<float4> brdfLUT;
 
 Texture2D<float4> envBgTex;
 
-int triNum;
+int triInxNum;
 StructuredBuffer<int> tris;
 StructuredBuffer<float3> vertices;
 StructuredBuffer<float3> normals;
@@ -46,6 +46,7 @@ struct BVHNode
 	float3 max;
 };
 RWStructuredBuffer<BVHNode> bvh;
+int treeDepth;
 //#########################################################################################################
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
@@ -64,48 +65,134 @@ void Render(uint3 id : SV_DispatchThreadID)
 	HitInfo minHit;
 	Init(minHit);
 	//trace bvh to determin start inx
-	int start = 0, end = triNum-1;
+	int start = 0, end = triInxNum/3-1;
 
-	//for loop to find
-	//???
-	MeshInfo meshObject = meshInfos[0]; 
-
-	for (int inx = start; inx <= end; inx += 3)
+	int nowDepth = 0;
+	int nowInx = 0;
+	bool hitBVH = true;
+	bool rearchEnd=false;
+	int rightBrother = -1;
+	int hitInx = -1;
+	while (nowDepth != treeDepth + 1)
 	{
-		Vertex v1;
-		Vertex v2;
-		Vertex v3;
-
-		v1.p = vertices[tris[inx]];
-		v2.p = vertices[tris[inx + 1]];
-		v3.p = vertices[tris[inx + 2]];
-
-		v1.n = normals[tris[inx]];
-		v2.n = normals[tris[inx + 1]];
-		v3.n = normals[tris[inx + 2]];
-
-		v1.p = (mul(meshObject.localToWorldMatrix, float4(v1.p, 1.0f) )).xyz;
-		v2.p = (mul(meshObject.localToWorldMatrix, float4(v2.p, 1.0f) )).xyz;
-		v3.p = (mul(meshObject.localToWorldMatrix, float4(v3.p, 1.0f) )).xyz;
-
-		v1.n = normalize(mul(meshObject.localToWorldMatrix, float4(v1.n, 0.0f) )).xyz;
-		v2.n = normalize(mul(meshObject.localToWorldMatrix, float4(v2.n, 0.0f) )).xyz;
-		v3.n = normalize(mul(meshObject.localToWorldMatrix, float4(v3.n, 0.0f) )).xyz;
-
-		HitInfo hit = RayCastTri(ray, v1, v2, v3);
-		if (hit.bHit)
+		//1.ray与nowNode的bbox测交
+		//2.1如果nowInx==0，不交跳出
+		//2.2如果不交，认为交了右兄弟节点，令nowInx=右兄弟的左子节点，开启下一个循环
+		//3.如果交了，则令nowInx为左子节点(2*inx+1)，记rightBrother = 2*inx+2，开启下一个循环
+		BVHNode node = bvh[nowInx];
+		bool nodeHit = IsRayBBox(ray, node.min, node.max);
+	
+		if (!nodeHit)
 		{
-			if (!minHit.bHit)
-			{
-				Assgin(minHit, hit); 
+			if (nowInx == 0)
+			{//和主box都不交，结束
+				hitBVH = false;
+				break;
 			}
-			else if (length(hit.P - ray.pos) < length(minHit.P - ray.pos))
+			else
 			{
-				Assgin(minHit, hit);
+				if (nowDepth == treeDepth)
+				{//到底了，直接返回右兄弟
+					node = bvh[rightBrother];
+					start = node.start;
+					end = node.end;
+					hitInx = rightBrother;
+					break;
+				}
+				{
+					//认为交了右兄弟,则下次判别右兄弟的左子节点
+					nowInx = 2 * rightBrother + 1;
+					rightBrother = nowInx + 1;
+				}
 			}
 		}
+		else
+		{
+			if (nowDepth == treeDepth)
+			{
+				start = node.start;
+				end = node.end;
+				hitInx = nowInx;
+				break;
+			}
+			else
+			{
+				nowInx = 2 * nowInx + 1;
+				rightBrother = nowInx + 1;
+			}
+		}
+		nowDepth++;
 	}
-	//___Trace
+
+	start = 3 * start;
+	end = 3 * end + 3;
+
+	//start = bvh[2].start;
+	//end = bvh[2].end;
+	//start = 3 * start;
+	//end = 3 * end + 3;
+	//bool ttHit = IsRayBBox(ray, float3(-5.6,-1.0,-0.4), float3(-3.0, 4.0, 3.5));
+	//bool ttHit = IsRayBBox(ray, bvh[2].min, bvh[2].max);
+	//bool ttHit = IsRayBBox(ray, bvh[0].min, bvh[0].max);
+	{
+		//Plane plane;
+		//plane.p = float3(-2.5,0,-2.5);
+		//plane.n = float3(0, 1, 0);
+		//bool ttHit = IsRayQuad_Corner(ray, plane, float2(5, 5), float3(1, 0, 0), float3(0,0,1));
+	}
+
+	//if (ttHit)
+	//{
+	//	Result[id.xy] = float4(0, 0, 1, 1);
+	//	return;
+	//}
+
+	if (hitBVH)// && hitInx == 2)
+	{
+		//Result[id.xy] = float4(1,0,0, 1);
+		//return;
+
+		//for loop to find
+		//??? only one mesh now
+		MeshInfo meshObject = meshInfos[0];
+
+		for (int inx = start; inx <end; inx += 3)
+		{
+			Vertex v1;
+			Vertex v2;
+			Vertex v3;
+
+			v1.p = vertices[tris[inx]];
+			v2.p = vertices[tris[inx + 1]];
+			v3.p = vertices[tris[inx + 2]];
+
+			v1.n = normals[tris[inx]];
+			v2.n = normals[tris[inx + 1]];
+			v3.n = normals[tris[inx + 2]];
+
+			v1.p = (mul(meshObject.localToWorldMatrix, float4(v1.p, 1.0f))).xyz;
+			v2.p = (mul(meshObject.localToWorldMatrix, float4(v2.p, 1.0f))).xyz;
+			v3.p = (mul(meshObject.localToWorldMatrix, float4(v3.p, 1.0f))).xyz;
+
+			v1.n = normalize(mul(meshObject.localToWorldMatrix, float4(v1.n, 0.0f))).xyz;
+			v2.n = normalize(mul(meshObject.localToWorldMatrix, float4(v2.n, 0.0f))).xyz;
+			v3.n = normalize(mul(meshObject.localToWorldMatrix, float4(v3.n, 0.0f))).xyz;
+
+			HitInfo hit = RayCastTri(ray, v1, v2, v3);
+			if (hit.bHit)
+			{
+				if (!minHit.bHit)
+				{
+					Assgin(minHit, hit);
+				}
+				else if (length(hit.P - ray.pos) < length(minHit.P - ray.pos))
+				{
+					Assgin(minHit, hit);
+				}
+			}
+		}
+		//___Trace
+	}
 
 	if (minHit.bHit)
 	{//Trace到Mesh了，返回Mesh的颜色 

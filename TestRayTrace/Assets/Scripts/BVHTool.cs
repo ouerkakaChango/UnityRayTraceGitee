@@ -10,6 +10,11 @@ public struct BVHNode
     public int end;
     public Vector3 min;
     public Vector3 max;
+    
+    public void Log()
+    {
+        Debug.Log("start:" + start + " end:" + end + " min:" + min + " max:" + max);
+    }
 }
 
 struct Line
@@ -28,7 +33,7 @@ public class BVHTool : MonoBehaviour
     static public float MAXFloat = 100000.0f;
 
     public int usrDepth = 1;   //用户建议的深度，当三角面数量够多，就会优先用这个浅的深度
-    int depth = -1;             //深度从0开始
+    public int depth = -1;             //深度从0开始
 
     public Material mat;
 
