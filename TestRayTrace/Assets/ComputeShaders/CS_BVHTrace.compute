@@ -67,126 +67,226 @@ void Render(uint3 id : SV_DispatchThreadID)
 	//trace bvh to determin start inx
 	int start = 0, end = triInxNum/3-1;
 
-	bool bResultDone = false;
-	int toCheck1[MAXLEAVES];
-	int iter1 = 0;
-	int toCheck2[MAXLEAVES];
-	int iter2 = 0;
-	bool bUse1 = true;
+	//bool bResultDone = false;
+	//int toCheck1[MAXLEAVES];
+	//int iter1 = 0;
+	//int toCheck2[MAXLEAVES];
+	//int iter2 = 0;
+	//bool bUse1 = true;
+	//
+	//toCheck1[iter1] = 0;
+	//iter1++;
+	//for (int nowDepth = 1; nowDepth <= treeDepth&&(!bResultDone); nowDepth++)
+	//{
+	//	if (bUse1)
+	//	{
+	//		iter2 = 0;
+	//	}
+	//	else
+	//	{
+	//		iter1 = 0;
+	//	}
+	//	bResultDone = true;
+	//	for (int leafInx = 0; leafInx < (bUse1?iter1:iter2); leafInx++)
+	//	{
+	//		//如果相交，把子节点放到check1/check2列表里
+	//		int nowInx = bUse1 ? toCheck1[leafInx] : toCheck2[leafInx];
+	//		BVHNode node = bvh[nowInx];
+	//		if (IsRayAABB(ray, node.min, node.max))
+	//		{
+	//			bResultDone = false;
+	//			if (nowDepth == treeDepth)
+	//			{
+	//				if (bUse1)
+	//				{
+	//					toCheck2[iter2] = nowInx;
+	//					iter2++;
+	//				}
+	//				else
+	//				{
+	//					toCheck1[iter1] = nowInx;
+	//					iter1++;
+	//				}
+	//			}
+	//			else
+	//			{
+	//				if (bUse1)
+	//				{
+	//					toCheck2[iter2] = 2 * nowInx + 1;
+	//					iter2++;
+	//					toCheck2[iter2] = 2 * nowInx + 2;
+	//					iter2++;
+	//				}
+	//				else
+	//				{
+	//					toCheck1[iter1] = 2 * nowInx + 1;
+	//					iter1++;
+	//					toCheck1[iter1] = 2 * nowInx + 2;
+	//					iter1++;
+	//				}
+	//			}
+	//		}
+	//	}
+	//	bUse1 = !bUse1;
+	//}
+	//
+	//if (treeDepth % 2 != 0)
+	//{//叶节点的结果如果存在toCheck2，搬到toCheck1里
+	//	for (int i1 = 0; i1 < iter2; i1++)
+	//	{
+	//		toCheck1[i1] = toCheck2[i1];
+	//	}
+	//	iter1 = iter2;
+	//}
 
-	toCheck1[iter1] = 0;
-	iter1++;
-	for (int nowDepth = 1; nowDepth <= treeDepth&&(!bResultDone); nowDepth++)
-	{
-		if (bUse1)
-		{
-			iter2 = 0;
-		}
-		else
-		{
-			iter1 = 0;
-		}
-		bResultDone = true;
-		for (int leafInx = 0; leafInx < (bUse1?iter1:iter2); leafInx++)
-		{
-			//如果相交，把子节点放到check1/check2列表里
-			int nowInx = bUse1 ? toCheck1[leafInx] : toCheck2[leafInx];
-			BVHNode node = bvh[nowInx];
-			if (IsRayAABB(ray, node.min, node.max))
+	//1.从toCheck1中取出一个，然后Cast ； 如果toCheck1中没有，则从toCheck2中拿一个
+	//2.1如果相交，不是叶子节点，则Cast左右子节点，选择dis小的，放入toCheck1；另一个如果相交，则放入toCheck2
+	//2.2.如果相交，是叶子节点，则进入遍历找minHit。如果有minHit,直接跳出；如果没有，继续循环
+	//2.3如果不相交，则从toCheck2中选择堆栈尾，放入toCheck1。如果没有，则直接跳出
+
+	//???
+	//BVHNode node = bvh[0];
+	//if (CastBBox(ray, node.min, node.max).bHit)
+	//{
+	//	Result[id.xy] = 1;
+	//	return;
+	//}
+	//else
+	//{
+	//	Result[id.xy] = 0;
+	//	return;
+	//}
+
+	int toCheck2[32];
+	int iter2 = 0;
+
+	int nowInx = 0;
+	int cc = 0;
+	while(true)
+	{ 
+		cc++;
+		bool bLeafDetect = false;
+		bool takeFromCheck2 = false;
+		int nowDepth = GetTreeDepth(nowInx, treeDepth);
+		{//??? DEBUG
+			if (nowDepth == -1 || nowDepth>treeDepth)
 			{
-				bResultDone = false;
-				if (nowDepth == treeDepth)
+				Result[id.xy] = float4(1,0,1,1);
+				return;
+			}
+		}
+		BVHNode node = bvh[nowInx];
+		CastInfo castInfo = CastBBox(ray, node.min, node.max);
+		//???
+		//castInfo.bHit = false;
+		if (!castInfo.bHit)
+		{
+			takeFromCheck2 = true;
+		}
+		else if(castInfo.bHit && nowDepth!=treeDepth)
+		{
+			int leftInx = 2 * nowInx + 1;
+			int rightInx = 2 * nowInx + 2;
+			CastInfo leftCast = CastBBox(ray, bvh[leftInx].min, bvh[leftInx].max);
+			CastInfo rightCast = CastBBox(ray, bvh[rightInx].min, bvh[rightInx].max);
+			if (leftCast.bHit && !rightCast.bHit)
+			{
+				nowInx = leftInx;
+			}
+			else if (!leftCast.bHit && rightCast.bHit)
+			{
+				nowInx = rightInx;
+			}
+			else if (leftCast.bHit && rightCast.bHit)
+			{
+				if (leftCast.dis <= rightCast.dis)
 				{
-					if (bUse1)
-					{
-						toCheck2[iter2] = nowInx;
-						iter2++;
-					}
-					else
-					{
-						toCheck1[iter1] = nowInx;
-						iter1++;
-					}
+					nowInx = leftInx;
+					toCheck2[iter2] = rightInx;
+					iter2++;
 				}
 				else
 				{
-					if (bUse1)
-					{
-						toCheck2[iter2] = 2 * nowInx + 1;
-						iter2++;
-						toCheck2[iter2] = 2 * nowInx + 2;
-						iter2++;
-					}
-					else
-					{
-						toCheck1[iter1] = 2 * nowInx + 1;
-						iter1++;
-						toCheck1[iter1] = 2 * nowInx + 2;
-						iter1++;
-					}
+					nowInx = rightInx;
+					toCheck2[iter2] = leftInx;
+					iter2++;
 				}
 			}
-		}
-		bUse1 = !bUse1;
-	}
-	
-	if (treeDepth % 2 != 0)
-	{//叶节点的结果如果存在toCheck2，搬到toCheck1里
-		for (int i1 = 0; i1 < iter2; i1++)
-		{
-			toCheck1[i1] = toCheck2[i1];
-		}
-		iter1 = iter2;
-	}
-
-	for(int i1=0;i1<iter1;i1++)
-	{
-		int nowInx = toCheck1[i1];
-		start = bvh[nowInx].start;
-		end = bvh[nowInx].end;
-		start = 3 * start;
-		end = 3 * end + 3;
-	
-		//for loop to find
-		//!!! only one mesh now
-		MeshInfo meshObject = meshInfos[0];
-	
-		for (int inx = start; inx <end; inx += 3)
-		{
-			Vertex v1;
-			Vertex v2;
-			Vertex v3;
-	
-			v1.p = vertices[tris[inx]];
-			v2.p = vertices[tris[inx + 1]];
-			v3.p = vertices[tris[inx + 2]];
-	
-			v1.n = normals[tris[inx]];
-			v2.n = normals[tris[inx + 1]];
-			v3.n = normals[tris[inx + 2]];
-	
-			v1.p = (mul(meshObject.localToWorldMatrix, float4(v1.p, 1.0f))).xyz;
-			v2.p = (mul(meshObject.localToWorldMatrix, float4(v2.p, 1.0f))).xyz;
-			v3.p = (mul(meshObject.localToWorldMatrix, float4(v3.p, 1.0f))).xyz;
-	
-			v1.n = normalize(mul(meshObject.localToWorldMatrix, float4(v1.n, 0.0f))).xyz;
-			v2.n = normalize(mul(meshObject.localToWorldMatrix, float4(v2.n, 0.0f))).xyz;
-			v3.n = normalize(mul(meshObject.localToWorldMatrix, float4(v3.n, 0.0f))).xyz;
-	
-			HitInfo hit = RayCastTri(ray, v1, v2, v3);
-			if (hit.bHit)
+			else
 			{
-				if (!minHit.bHit)
-				{
-					Assgin(minHit, hit);
-				}
-				else if (length(hit.P - ray.pos) < length(minHit.P - ray.pos))
-				{
-					Assgin(minHit, hit);
-				}
+				takeFromCheck2 = true;
 			}
 		}
-		//___Trace
+		else if (castInfo.bHit && nowDepth == treeDepth)
+		{
+			bLeafDetect = true;
+			takeFromCheck2 = true;
+		}
+
+		if(bLeafDetect)
+		{
+			start = bvh[nowInx].start;
+			end = bvh[nowInx].end;
+			start = 3 * start;
+			end = 3 * end + 3;
+
+			//for loop to find
+			//!!! only one mesh now
+			MeshInfo meshObject = meshInfos[0];
+
+			for (int inx = start; inx < end; inx += 3)
+			{
+				Vertex v1;
+				Vertex v2;
+				Vertex v3;
+
+				v1.p = vertices[tris[inx]];
+				v2.p = vertices[tris[inx + 1]];
+				v3.p = vertices[tris[inx + 2]];
+
+				v1.n = normals[tris[inx]];
+				v2.n = normals[tris[inx + 1]];
+				v3.n = normals[tris[inx + 2]];
+
+				v1.p = (mul(meshObject.localToWorldMatrix, float4(v1.p, 1.0f))).xyz;
+				v2.p = (mul(meshObject.localToWorldMatrix, float4(v2.p, 1.0f))).xyz;
+				v3.p = (mul(meshObject.localToWorldMatrix, float4(v3.p, 1.0f))).xyz;
+
+				v1.n = normalize(mul(meshObject.localToWorldMatrix, float4(v1.n, 0.0f))).xyz;
+				v2.n = normalize(mul(meshObject.localToWorldMatrix, float4(v2.n, 0.0f))).xyz;
+				v3.n = normalize(mul(meshObject.localToWorldMatrix, float4(v3.n, 0.0f))).xyz;
+
+				HitInfo hit = RayCastTri(ray, v1, v2, v3);
+				if (hit.bHit)
+				{
+					if (!minHit.bHit)
+					{
+						Assgin(minHit, hit);
+					}
+					else if (length(hit.P - ray.pos) < length(minHit.P - ray.pos))
+					{
+						Assgin(minHit, hit);
+					}
+				}
+			}
+			//___循环三角形
+			if (minHit.bHit)
+			{
+				break;
+			}
+		}//___if bLeafDetect
+		if (takeFromCheck2)
+		{
+			if (iter2 == 0)
+			{
+				break;
+			}
+			else
+			{
+				nowInx = toCheck2[iter2-1];
+				iter2--;
+			}
+		}
 	}
 
 	if (minHit.bHit)

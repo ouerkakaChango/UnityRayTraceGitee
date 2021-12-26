@@ -244,8 +244,9 @@ bool IsRayQuad_Corner(Ray ray, Plane plane, float2 size, float3 v1, float3 v2)
 }
 
 //1.从x,y,z方向，每两个平面和ray测交点
-//只要有一个交点在bbox内，则返回true
-bool Slow_IsRayBBox(Ray ray, float3 min, float3 max)
+//只要有一个交点在bbox内，则返回truebb
+//!!! 没考虑ray在bbox内
+bool Error_IsRayBBox(Ray ray, float3 min, float3 max)
 {
 	//1.x方向
 	Plane plane; 
@@ -297,6 +298,103 @@ bool Slow_IsRayBBox(Ray ray, float3 min, float3 max)
 	}
 
 	return false;
+}
+
+//默认该Normalize的已经normalize
+//Plane是quad所在plane,plane.p是quad的某顶点
+//size是quad的大小，v1,v2是以plane.p为起点，两边的方向向量，和size顺序对应
+CastInfo CastQuad_Corner(in Ray ray, in Plane plane, in float2 size, in float3 v1, in float3 v2)
+{
+	CastInfo re;
+	Init(re);
+
+	if (dot(ray.dir, plane.n) >= 0)
+	{
+		return re;
+	}
+
+	re.dis = RayCastPlane(ray, plane);
+	if (re.dis < 0)
+	{
+		return re;
+	}
+	float3 hitP = ray.pos + re.dis * ray.dir;
+	float3 center = plane.p + v1 * size.x / 2 + v2 * size.y / 2;
+	float3 dv = hitP - center;
+	re.bHit = (abs(dot(dv, v1)) <= (size.x / 2)) &&
+		(abs(dot(dv, v2)) <= (size.y / 2));
+	return re;
+}
+
+//1.从x,y,z方向，每两个平面和ray测交点
+//只要有一个交点在bbox内，则返回true
+CastInfo CastBBox(in Ray ray, in float3 min, in float3 max)
+{
+	CastInfo re;
+	Init(re);
+
+	if (gt(ray.pos, min) && lt(ray.pos, max))
+	{
+		re.bHit = true;
+		return re;
+	}
+
+	//1.x方向
+	Plane plane;
+	plane.p = min;
+	plane.n = float3(-1, 0, 0);
+	float2 quadSize = max.yz - min.yz;
+	re = CastQuad_Corner(ray, plane, quadSize, float3(0, 1, 0), float3(0, 0, 1));
+	if (re.bHit)
+	{
+		return re;
+	}
+
+	plane.p = max;
+	plane.n = float3(1, 0, 0);
+	re = CastQuad_Corner(ray, plane, quadSize, float3(0, -1, 0), float3(0, 0, -1));
+	if (re.bHit)
+	{
+		return re;
+	}
+
+	//2.y方向
+	plane.p = min;
+	plane.n = float3(0, -1, 0);
+	quadSize = max.xz - min.xz;
+	re = CastQuad_Corner(ray, plane, quadSize, float3(1, 0, 0), float3(0, 0, 1));
+	if (re.bHit)
+	{
+		return re;
+	}
+
+	plane.p = max;
+	plane.n = float3(0, 1, 0);
+	re = CastQuad_Corner(ray, plane, quadSize, float3(-1, 0, 0), float3(0, 0, -1));
+	if (re.bHit)
+	{
+		return re;
+	}
+
+	//3.z方向
+	plane.p = min;
+	plane.n = float3(0, 0, -1);
+	quadSize = max.xy - min.xy;
+	re = CastQuad_Corner(ray, plane, quadSize, float3(1, 0, 0), float3(0, 1, 0));
+	if (re.bHit)
+	{
+		return re;
+	}
+
+	plane.p = max;
+	plane.n = float3(0, 0, 1);
+	re = CastQuad_Corner(ray, plane, quadSize, float3(-1, 0, 0), float3(0, -1, 0));
+	if (re.bHit)
+	{
+		return re;
+	}
+
+	return re;
 }
 
 //https://blog.csdn.net/Qinhaifu/article/details/102629742
