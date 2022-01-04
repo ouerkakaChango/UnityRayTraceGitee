@@ -3,18 +3,25 @@
 #define TraceThre 0.01
 #define TraceStart 0.05
 
-float SDFBox(float3 p, float3 center, float3 bound)
+#include "../PBR/PBRCommonDef.hlsl"
+
+Material_PBR GetObjMaterial_PBR(int obj)
 {
-	float3 q = abs(p - center) - bound;
-	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+	Material_PBR re;
+	re.albedo = float3(1, 1, 1);
+	re.metallic = 1.0f;
+	re.roughness = 0.2f;
+	return re;
 }
+//###################################################################################
+#include "SDFCommonDef.hlsl"
 
 float GetObjSDF(int inx, float3 p)
 {
 	if (inx == 0)
 	{//球
 		//sphere center(0, 0, 0), radius 5
-		return length(p - float3(0, 0, 0)) - 5;
+		return SDFSphere(p, float3(0, 0, 0), 5);
 	}
 	//else if (inx == 1)
 	//{//地面
@@ -41,7 +48,7 @@ float3 GetObjNormal(int inx, float3 p)
 {
 	if (inx == 0)
 	{
-		return normalize(p - float3(0, 0, 0));
+		return SDFSphereNormal(p, float3(0, 0, 0));
 	}
 	else
 	{
@@ -49,7 +56,7 @@ float3 GetObjNormal(int inx, float3 p)
 	}
 }
 
-void SDFScene(inout Ray ray,out HitInfo info)
+void SDFScene(in Ray ray,out HitInfo info)
 {
 	info.bHit = 0;
 	info.obj = -1;

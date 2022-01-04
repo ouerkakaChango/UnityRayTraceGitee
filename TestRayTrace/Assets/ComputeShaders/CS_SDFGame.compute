@@ -2,8 +2,8 @@
 #pragma kernel Render
 
 #include "../HLSL/RayMath.hlsl"
-//???
-#include "../HLSL/Scenes/IBLSceneInfo.hlsl"
+#include "../HLSL/PBR/PBR_IBL.hlsl"
+#include "../HLSL/SDFGame/SDFCommonSys.hlsl"
 #include "../HLSL/SDFGame/SDFGameScene1.hlsl"
 
 int w;
@@ -29,24 +29,16 @@ Texture2D<float4> brdfLUT;
 Texture2D<float4> envBgTex;
 
 //#########################################################################################################
-#define MAXLEAVES 32
-[numthreads(8, 8, 1)]
-void Render(uint3 id : SV_DispatchThreadID)
+
+float3 GetSDFGameColor(in Ray ray)
 {
-	int i = id.x;
-	int j = id.y;
-
-	Ray ray;
-	ray.pos = screenLeftDownPix + screenU * i * pixW + screenV * j * pixH;
-	ray.dir = normalize(ray.pos - eyePos);
-
+	float3 re = 0;
 	//---Trace
 	HitInfo minHit;
 	Init(minHit);
 	SDFScene(ray, minHit);
 	//___Trace
-	
-	float3 re = 0; 
+
 	if (minHit.bHit)
 	{//Trace到Mesh了，返回Mesh的颜色 
 		//???
@@ -60,6 +52,52 @@ void Render(uint3 id : SV_DispatchThreadID)
 
 		re = 1;//GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
 	}
+
+	//##############################
+	HitInfo sysHit;
+	Init(sysHit);
+	float3 sysColor;
+	RaySys(ray, sysHit, sysColor);
+	if (sysHit.bHit)
+	{
+		re = lerp(re, sysColor, 0.5);
+	}
+	//##############################
+	return re;
+}
+
+#define SSAA_num 9
+[numthreads(8, 8, 1)]
+void Render(uint3 id : SV_DispatchThreadID)
+{
+	float3 re = 0;
+
+	int idx = id.x;
+	int idy = id.y;
+
+	int SSAA_edge = (int)sqrt(SSAA_num);
+	float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (idx-0.5) + screenV * pixH * (idy - 0.5);
+	float SSAA_unitDis = 1.0f / SSAA_edge;
+	float3 SSAA_colors[SSAA_num];
+
+	for (int j = 1; j <= SSAA_edge; j++)
+	{
+		for (int i = 1; i <= SSAA_edge; i++)
+		{
+			Ray ray;
+			ray.pos = pixLeftDownPos + screenU * pixW * i * SSAA_unitDis + screenV * pixH * j * SSAA_unitDis;
+			ray.dir = normalize(ray.pos - eyePos);
+
+			SSAA_colors[i-1+(j-1)* SSAA_edge] = GetSDFGameColor(ray);
+		}
+	}
+
+	for (int i = 0; i < SSAA_num; i++)
+	{
+		re += SSAA_colors[i];
+	}
+
+	re /= (float)SSAA_num;
 
 	Result[id.xy] = float4(re, 1);
 }
