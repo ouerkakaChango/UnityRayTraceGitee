@@ -33,6 +33,8 @@ public class SDFGameTrace : MonoBehaviour
     float pixW;
     float pixH;
 
+    float daoScale = 1.0f;
+
     //Tools for Screen show
     float fps = 0;
     TimeLogger fpsTimer = new TimeLogger("fps");
@@ -41,14 +43,30 @@ public class SDFGameTrace : MonoBehaviour
 
     void Start()
     {
-
         UpdateCamParam();
+
+        Co_GoIter = GoIter();
+        StartCoroutine(Co_GoIter);
     }
 
-    // Update is called once per frame
+    float daoSpeed = 20.0f;
     void Update()
     {
+        if (Input.GetKeyDown("q"))
+        {
+            //print("q key was pressed");
+            float delDao = -1 * daoSpeed * Time.deltaTime;
+            daoScale += delDao;
+            //print(delDao + " " + daoScale);
+        }
 
+        if (Input.GetKeyDown("e"))
+        {
+            //print("q key was pressed");
+            float delDao = 1 * daoSpeed * Time.deltaTime;
+            daoScale += delDao;
+            //print(delDao + " " + daoScale);
+        }
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -84,6 +102,8 @@ public class SDFGameTrace : MonoBehaviour
         //大概在Unity场景中对比了一下渲染大小，定下了合理的像素晶元大小（也就是根据了w,h和原始的cam nf,FOV,尝试出合适的pixW）
         pixW = 0.000485f;
         pixH = pixW;
+        pixW *= daoScale;
+        pixH *= daoScale;
         screenLeftDownPix = screenPos + screenU * (-w / 2.0f + 0.5f) * pixW + screenV * (-h / 2.0f + 0.5f) * pixH;
     }
 
@@ -186,6 +206,11 @@ public class SDFGameTrace : MonoBehaviour
     //    RenderTexture.active = ori;
     //}
 
+    public float GetDaoScale()
+    {
+        return daoScale;
+    }
+    //####################################################################################
     IEnumerator Co_GoIter;
     //@@@
     private void OnGUI()
