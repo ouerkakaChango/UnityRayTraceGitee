@@ -9,8 +9,11 @@ Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
 	re.albedo = float3(1, 1, 1);
-	re.metallic = 1.0f;
-	re.roughness = 0.2f;
+	//re.metallic = 1.0f;
+	//re.roughness = 0.2f;
+
+	re.metallic = 0.0f;
+	re.roughness = 0.8f;
 	return re;
 }
 //###################################################################################
@@ -21,7 +24,7 @@ float GetObjSDF(int inx, float3 p)
 	if (inx == 0)
 	{//球
 		//sphere center(0, 0, 0), radius 5
-		return SDFSphere(p, float3(0, 0, 0), 5);
+		return SDFSphere(p, float3(0, 5, 0), 5);
 	}
 	//else if (inx == 1)
 	//{//地面
@@ -48,7 +51,7 @@ float3 GetObjNormal(int inx, float3 p)
 {
 	if (inx == 0)
 	{
-		return SDFSphereNormal(p, float3(0, 0, 0));
+		return SDFSphereNormal(p, float3(0, 5, 0));
 	}
 	else
 	{

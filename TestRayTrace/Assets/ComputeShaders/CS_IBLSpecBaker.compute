@@ -4,6 +4,7 @@
 #include "../HLSL/RayMath.hlsl"
 #include "../HLSL/Scenes/IBLSceneInfo.hlsl"
 #include "../HLSL/Random/RandUtility.hlsl"
+#include "../HLSL/PBR/PBR_GGX.hlsl"
 
 int w;
 int h;
