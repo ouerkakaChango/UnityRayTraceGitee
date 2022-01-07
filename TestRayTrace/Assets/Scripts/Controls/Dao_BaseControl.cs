@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using SDFUtility;
 
 public class Dao_BaseControl : MonoBehaviour
 {
@@ -9,10 +10,13 @@ public class Dao_BaseControl : MonoBehaviour
     float minSpeed = 1.0f;
     float deltaSpeed = 500; //1s
 
+    SDFShape characterShape = null;
+
     // Start is called before the first frame update
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        characterShape = new SDFSphere(0.8f);
     }
 
     // Update is called once per frame
@@ -20,12 +24,13 @@ public class Dao_BaseControl : MonoBehaviour
     {
         float daoScale = GetDaoScale();
         Debug.Log(daoScale);
-        float translation = Input.GetAxis("Vertical") * speed * daoScale;  //z方向
-        float straffe = Input.GetAxis("Horizontal") * speed * daoScale;    //x方向
-        translation *= Time.deltaTime;
-        straffe *= Time.deltaTime;
+        float forwardMove = Input.GetAxis("Vertical") * speed * daoScale;  //前z
+        float rightMove = Input.GetAxis("Horizontal") * speed * daoScale;  //右x
+        forwardMove *= Time.deltaTime;
+        rightMove *= Time.deltaTime;
 
-        transform.Translate(straffe, 0, translation);
+        CheckDaoCollision(ref rightMove, ref forwardMove);
+        transform.Translate(rightMove, 0, forwardMove);
 
         if (Input.GetKeyDown("escape"))
         {
@@ -53,5 +58,11 @@ public class Dao_BaseControl : MonoBehaviour
     {
         var daoComp = GetComponent<SDFGameTrace>();
         return daoComp.GetDaoScale();
+    }
+
+    void CheckDaoCollision(ref float rightMove, ref float forwardMove)
+    {
+        var collisionMgr = GetComponent<SDFGameCollisionMgr>();
+        collisionMgr.CheckMovement(characterShape, transform.position, transform.right, transform.forward, ref rightMove, ref forwardMove);
     }
 }

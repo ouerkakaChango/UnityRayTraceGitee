@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Debugger;
+using FastGeo;
 
 //start,end是tri，左闭右开
 public struct BVHNode
@@ -17,11 +18,6 @@ public struct BVHNode
     }
 }
 
-struct Line
-{
-    public Vector3 p1;
-    public Vector3 p2;
-}
 
 //参考：https://blog.csdn.net/weixin_39548859/article/details/107490251
 //使用最简单的思路
@@ -51,7 +47,7 @@ public class BVHTool : MonoBehaviour
     {
         var meshFiliter = gameObject.GetComponent<MeshFilter>();
         mesh = meshFiliter.mesh;
-
+       
         //Init();
     }
 
@@ -265,8 +261,8 @@ public class BVHTool : MonoBehaviour
     Line MakeLine(in Vector3 p1, in Vector3 p2)
     {
         Line re = new Line();
-        re.p1 = p1;
-        re.p2 = p2;
+        re.a = p1;
+        re.b = p2;
         return re;
     }
 
@@ -307,8 +303,8 @@ public class BVHTool : MonoBehaviour
 
             for (int i1 = 0; i1 < 12; i1++)
             {
-                GL.Vertex(lines[i1+i*12].p1);
-                GL.Vertex(lines[i1+i*12].p2);
+                GL.Vertex(lines[i1+i*12].a);
+                GL.Vertex(lines[i1+i*12].b);
             }
 
             GL.End();

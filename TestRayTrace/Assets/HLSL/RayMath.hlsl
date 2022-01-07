@@ -6,7 +6,6 @@ float Dis(Ray ray, float3 p)
 	float3 v = p - ray.pos;
 	float mapLen = dot(v, ray.dir);
 
-	//为防止奇怪问题（while中提前return失败），采用最后return的写法
 	float re = -1.0f;
 	if (mapLen < 0)
 	{

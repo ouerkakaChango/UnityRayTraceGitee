@@ -23,6 +23,27 @@ namespace FastGeo
         public Vector3 n;
     }
 
+    public struct Line
+    {
+        public Vector3 a;
+        public Vector3 b;
+
+        public Line(Vector3 a_, Vector3 b_)
+        {
+            a = a_;
+            b = b_;
+        }
+
+    }
+
+    //#####################################################################
+    public struct DisInfo
+    {
+        public float dis;
+        public Vector3 p;
+    }
+    //#####################################################################
+
     static public class Former
     {
         static public Plane FormPlane(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 guideN)
@@ -46,7 +67,7 @@ namespace FastGeo
         }
     }
 
-    static public class RayMath
+    public static class RayMath
     {
         //https://blog.csdn.net/qq_41524721/article/details/103490144
         static public float RayCastPlane(Ray ray, Plane plane)
@@ -68,7 +89,7 @@ namespace FastGeo
             ray.pos = c;
             ray.dir = (c - p1).normalized;
             float k = RayCastPlane(ray, plane2);
-            if(k<0)
+            if (k < 0)
             {
                 return c;
             }
@@ -102,14 +123,51 @@ namespace FastGeo
             Vector3 A, B;
             Tri_ParallelP2P3(out A, out B, c, v1, v2, v3);
 
-            float kA = (A - p1).magnitude /(p2-p1).magnitude;
+            float kA = (A - p1).magnitude / (p2 - p1).magnitude;
             Vector3 nA = Vector3.Lerp(v1.n, v2.n, kA);
 
             float kB = (B - p1).magnitude / (p3 - p1).magnitude;
-            Vector3 nB =  Vector3.Lerp(v1.n, v3.n, kB);
+            Vector3 nB = Vector3.Lerp(v1.n, v3.n, kB);
 
             float kC = (c - A).magnitude / (B - A).magnitude;
             return Vector3.Lerp(nA, nB, kC);
+        }
+    }
+
+    public static class LineMath
+    {
+        public static DisInfo LineDis(Line line, Vector3 p)
+        {
+            DisInfo re;
+            Vector3 ap = p - line.a;
+            float d2 = ap.sqrMagnitude;
+            Vector3 dir = (line.b - line.a).normalized;
+            float proj = Vector3.Dot(ap, dir);
+            re.dis = Mathf.Sqrt(d2 - proj * proj);
+            re.p = line.a + dir * proj;
+            return re;
+        }
+
+        public static bool LineIntersect_Sphere(Line line, Vector3 center, float r)
+        {
+            //1.直线距离球心最短距都大于r，不相交
+            DisInfo disInfo = LineDis(line, center);
+            if (disInfo.dis > r)
+            {
+                return false;
+            }
+
+            //2.两点任意一点在球内，intersect
+            if ((line.a - center).magnitude <= r ||
+                (line.b - center).magnitude <= r)
+            {
+                return true;
+            }
+
+            //3.两点在垂足两端（前面已经判断不在球内），且直线距离已经小于r，那必然相交；否则必然不交
+            Vector3 pa = line.a - disInfo.p;
+            Vector3 pb = line.b - disInfo.p;
+            return Vector3.Dot(pa, pb) < 0;
         }
     }
 }
