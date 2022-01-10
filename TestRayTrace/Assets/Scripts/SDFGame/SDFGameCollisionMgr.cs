@@ -52,17 +52,17 @@ public class SDFGameCollisionMgr : MonoBehaviour
         }
 
         float r = shape.GetRadiusInDir(right);
-        //if (HitInScene(pos + (r + rightMove) * right)) 
-        //速度太快会穿墙，不能只根据结束点判断
-        if(HitInScene(pos + r * right, pos + (r + rightMove) * right))
+
+        Vector3 dMove = right * rightMove + forward * forwardMove;
+        if (dMove.magnitude < 0.00001f)
+        {
+            return;
+        }
+        Vector3 dir = dMove.normalized;
+        pos += r * dir;
+        if (HitInScene(pos, pos + dMove))
         {
             rightMove = 0;
-        }
-
-        r = shape.GetRadiusInDir(forward);
-        //if (HitInScene(pos+ (r + forwardMove) * forward))
-        if (HitInScene(pos + r * forward, pos + (r + forwardMove) * forward))
-        {
             forwardMove = 0;
         }
     }

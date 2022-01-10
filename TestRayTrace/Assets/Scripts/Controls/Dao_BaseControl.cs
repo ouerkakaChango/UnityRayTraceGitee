@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using SDFUtility;
+using Debugger;
 
 public class Dao_BaseControl : MonoBehaviour
 {
@@ -23,7 +24,7 @@ public class Dao_BaseControl : MonoBehaviour
     void Update()
     {
         float daoScale = GetDaoScale();
-        Debug.Log(daoScale);
+        //Debug.Log(daoScale);
         float forwardMove = Input.GetAxis("Vertical") * speed * daoScale;  //«∞z
         float rightMove = Input.GetAxis("Horizontal") * speed * daoScale;  //”“x
         forwardMove *= Time.deltaTime;
@@ -31,6 +32,17 @@ public class Dao_BaseControl : MonoBehaviour
 
         CheckDaoCollision(ref rightMove, ref forwardMove);
         transform.Translate(rightMove, 0, forwardMove);
+
+        //???
+        float dis = (transform.position - new Vector3(0, 0.5f, 0)).magnitude;
+        if (dis <= 0.5f)
+        {
+            Debug.Log("In!");
+        }
+        else
+        {
+            //Debug.Log(dis);
+        }
 
         if (Input.GetKeyDown("escape"))
         {
@@ -64,5 +76,6 @@ public class Dao_BaseControl : MonoBehaviour
     {
         var collisionMgr = GetComponent<SDFGameCollisionMgr>();
         collisionMgr.CheckMovement(characterShape, transform.position, transform.right, transform.forward, ref rightMove, ref forwardMove);
+        //Log.DebugVec(transform.forward);
     }
 }
