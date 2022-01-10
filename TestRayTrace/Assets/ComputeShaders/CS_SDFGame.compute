@@ -1,6 +1,8 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel Render
 
+float4 _Time;
+
 #include "../HLSL/RayMath.hlsl"
 #include "../HLSL/PBR/PBR_IBL.hlsl"
 #include "../HLSL/PBR/PBR_GGX.hlsl"
@@ -46,11 +48,14 @@ float3 GetSDFGameColor(in Ray ray)
 		minHit.obj = 0;
 
 		Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
-		//re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
-		float3 lightDir = normalize(float3(1, -1, 1));
-		float lightColor = float3(1, 1, 1)*2;
-		//re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor);
-		re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
+		{
+			re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
+		}
+		{
+			//float3 lightDir = normalize(float3(1, -1, 1));
+			//float lightColor = float3(1, 1, 1) * 2;
+			//re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
+		}
 	}
 	else
 	{//没Trace到，返回背景/天空盒的颜色
@@ -59,14 +64,14 @@ float3 GetSDFGameColor(in Ray ray)
 	}
 
 	//##############################
-	HitInfo sysHit;
-	Init(sysHit);
-	float3 sysColor;
-	RaySys(ray, sysHit, sysColor);
-	if (sysHit.bHit)
-	{
-		re = lerp(re, sysColor, 0.5);
-	}
+	//HitInfo sysHit;
+	//Init(sysHit);
+	//float3 sysColor;
+	//RaySys(ray, sysHit, sysColor);
+	//if (sysHit.bHit)
+	//{
+	//	re = lerp(re, sysColor, 0.5);
+	//}
 	//##############################
 	return re;
 }

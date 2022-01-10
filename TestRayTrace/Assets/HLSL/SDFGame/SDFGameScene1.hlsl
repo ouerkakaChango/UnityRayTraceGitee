@@ -1,7 +1,7 @@
 ﻿#define OBJNUM 1
 
-#define TraceThre 0.01
-#define TraceStart 0.05
+#define TraceThre 0.0001
+#define TraceStart 0.0005
 
 #include "../PBR/PBRCommonDef.hlsl"
 
@@ -9,21 +9,36 @@ Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
 	re.albedo = float3(1, 1, 1);
-	//re.metallic = 1.0f;
-	//re.roughness = 0.2f;
+	re.metallic = 1.0f;
+	re.roughness = 0.0f;
 
-	re.metallic = 0.0f;
-	re.roughness = 0.8f;
+	//re.metallic = 0.0f;
+	//re.roughness = 0.8f;
 	return re;
 }
 //###################################################################################
 #include "SDFCommonDef.hlsl"
 
+//tutorial: iq modeling https://www.youtube.com/watch?v=-pdSjBPH3zM
+
+float SDFPlanet(float3 p)
+{
+	float re = 0;
+	float r = 10.45 + 0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+	float3 center = float3(0, 0.5, 0);
+	re = length(p - center) - r;
+	re *= 0.5f;
+	return re;
+}
+
+//float3 SDFPlanetNormal(float3 p);
+
 float GetObjSDF(int inx, float3 p)
 {
 	if (inx == 0)
-	{//球
-		return SDFSphere(p, float3(0, 0.5, 0), 0.5);
+	{
+		//return SDFSphere(p, float3(0, 0.5, 0), 0.5); //球
+		return SDFPlanet(p);
 	}
 	//else if (inx == 1)
 	//{//地面
@@ -38,7 +53,7 @@ float GetObjSDF(int inx, float3 p)
 
 float3 GetObjSDFNormal(int inx, float3 p)
 {
-	float epsilon = 0.0001f;
+	float epsilon = 0.00001f;
 	return normalize(float3(
 		GetObjSDF(inx, float3(p.x + epsilon, p.y, p.z)) - GetObjSDF(inx, float3(p.x - epsilon, p.y, p.z)),
 		GetObjSDF(inx, float3(p.x, p.y + epsilon, p.z)) - GetObjSDF(inx, float3(p.x, p.y - epsilon, p.z)),
@@ -50,7 +65,9 @@ float3 GetObjNormal(int inx, float3 p)
 {
 	if (inx == 0)
 	{
-		return SDFSphereNormal(p, float3(0, 0.5, 0));
+		//return SDFSphereNormal(p, float3(0, 0.5, 0));
+		//return SDFPlanetNormal(p);
+		return GetObjSDFNormal(inx, p);
 	}
 	else
 	{

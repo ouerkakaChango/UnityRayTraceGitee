@@ -157,6 +157,7 @@ public class SDFGameTrace : MonoBehaviour
         cs.SetVector("eyePos", eyePos);
         cs.SetVector("screenU", screenU);
         cs.SetVector("screenV", screenV);
+        cs.SetVector("_Time", Shader.GetGlobalVector("_Time"));
 
         cs.Dispatch(kInx, w / CoreX, h / CoreY, 1);
         //### compute
