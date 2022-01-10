@@ -22,6 +22,8 @@ public class SDFGameTrace : MonoBehaviour
     public Texture2DArray envSpecTex2DArr;
     public Texture2D brdfLUT;
     public Texture2D envBgTex;
+    //???
+    public Texture2D testTex;
 
     public int w = 1024;
     public int h = 720;
@@ -43,6 +45,7 @@ public class SDFGameTrace : MonoBehaviour
 
     void Start()
     {
+        testTex = ShaderToyTool.Instance.GetTexture("NoiseRGBTex");
         UpdateCamParam();
 
         Co_GoIter = GoIter();
@@ -55,15 +58,18 @@ public class SDFGameTrace : MonoBehaviour
         if (Input.GetKeyDown("q"))
         {
             //print("q key was pressed");
-            float delDao = -1 * daoSpeed * Time.deltaTime;
+            float dt = Mathf.Min(0.001f, Time.deltaTime);
+            float delDao = -1 * daoSpeed * dt;
             daoScale += delDao;
+            daoScale = Mathf.Max(0.00001f, daoScale);
             //print(delDao + " " + daoScale);
         }
 
         if (Input.GetKeyDown("e"))
         {
             //print("q key was pressed");
-            float delDao = 1 * daoSpeed * Time.deltaTime;
+            float dt = Mathf.Min(0.016f, Time.deltaTime);
+            float delDao = 1 * daoSpeed * dt;
             daoScale += delDao;
             //print(delDao + " " + daoScale);
         }
@@ -143,6 +149,12 @@ public class SDFGameTrace : MonoBehaviour
         //### compute
         int kInx = cs.FindKernel("Render");
 
+        //####
+        //System Value
+        cs.SetVector("_Time", Shader.GetGlobalVector("_Time"));
+        cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.GetTexture("NoiseRGBTex"));
+        //####
+
         cs.SetTexture(kInx, "Result", rt);
         cs.SetTexture(kInx, "envDiffTex", envDiffTex);
         cs.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
@@ -157,7 +169,6 @@ public class SDFGameTrace : MonoBehaviour
         cs.SetVector("eyePos", eyePos);
         cs.SetVector("screenU", screenU);
         cs.SetVector("screenV", screenV);
-        cs.SetVector("_Time", Shader.GetGlobalVector("_Time"));
 
         cs.Dispatch(kInx, w / CoreX, h / CoreY, 1);
         //### compute

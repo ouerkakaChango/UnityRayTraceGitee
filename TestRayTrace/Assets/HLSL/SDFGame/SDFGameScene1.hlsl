@@ -18,14 +18,28 @@ Material_PBR GetObjMaterial_PBR(int obj)
 }
 //###################################################################################
 #include "SDFCommonDef.hlsl"
+#include "../Noise/NoiseCommonDef.hlsl"
 
 //tutorial: iq modeling https://www.youtube.com/watch?v=-pdSjBPH3zM
+
+//float SDFFoTou(float3 p)
+//{
+//	float re = 0;
+//	float r = 10.45 + 0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+//	float3 center = float3(0, 0.5, 0);
+//	re = length(p - center) - r;
+//	re *= 0.5f;
+//	return re;
+//}
 
 float SDFPlanet(float3 p)
 {
 	float re = 0;
-	float r = 10.45 + 0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+	float r = 0.5;// +0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+	float dis = fbm4(p.zxy*10);
+	r += 0.02*smoothstep(0.5f, 1.0f, dis);
 	float3 center = float3(0, 0.5, 0);
+	 
 	re = length(p - center) - r;
 	re *= 0.5f;
 	return re;
@@ -53,7 +67,7 @@ float GetObjSDF(int inx, float3 p)
 
 float3 GetObjSDFNormal(int inx, float3 p)
 {
-	float epsilon = 0.00001f;
+	float epsilon = 0.0001f;
 	return normalize(float3(
 		GetObjSDF(inx, float3(p.x + epsilon, p.y, p.z)) - GetObjSDF(inx, float3(p.x - epsilon, p.y, p.z)),
 		GetObjSDF(inx, float3(p.x, p.y + epsilon, p.z)) - GetObjSDF(inx, float3(p.x, p.y - epsilon, p.z)),

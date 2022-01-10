@@ -1,8 +1,7 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel Render
 
-float4 _Time;
-
+#include "../HLSL/UnityCommonDef.hlsl"
 #include "../HLSL/RayMath.hlsl"
 #include "../HLSL/PBR/PBR_IBL.hlsl"
 #include "../HLSL/PBR/PBR_GGX.hlsl"
@@ -52,8 +51,10 @@ float3 GetSDFGameColor(in Ray ray)
 			re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
 		}
 		{
+			//mat.metallic = 0.0f;
+			//mat.roughness = 0.8f;
 			//float3 lightDir = normalize(float3(1, -1, 1));
-			//float lightColor = float3(1, 1, 1) * 2;
+			//float3 lightColor = float3(1, 1, 1) * 2;
 			//re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
 		}
 	}
@@ -64,14 +65,14 @@ float3 GetSDFGameColor(in Ray ray)
 	}
 
 	//##############################
-	//HitInfo sysHit;
-	//Init(sysHit);
-	//float3 sysColor;
-	//RaySys(ray, sysHit, sysColor);
-	//if (sysHit.bHit)
-	//{
-	//	re = lerp(re, sysColor, 0.5);
-	//}
+	HitInfo sysHit;
+	Init(sysHit);
+	float3 sysColor;
+	RaySys(ray, sysHit, sysColor);
+	if (sysHit.bHit)
+	{
+		re = lerp(re, sysColor, 0.5);
+	}
 	//##############################
 	return re;
 }
@@ -84,6 +85,12 @@ void Render(uint3 id : SV_DispatchThreadID)
 
 	int idx = id.x;
 	int idy = id.y;
+
+	//???
+	//float2 uv = id.xy / float2(1024,720);;
+	//re = 0.5*fbm4(float3(uv*100, 0));
+	//Result[id.xy] = float4(re,1);
+	//return;
 
 	int SSAA_edge = (int)sqrt(SSAA_num);
 	float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (idx-0.5) + screenV * pixH * (idy - 0.5);
