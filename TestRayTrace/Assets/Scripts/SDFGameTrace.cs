@@ -68,7 +68,7 @@ public class SDFGameTrace : MonoBehaviour
         if (Input.GetKeyDown("e"))
         {
             //print("q key was pressed");
-            float dt = Mathf.Min(0.016f, Time.deltaTime);
+            float dt = Mathf.Min(0.01f, Time.deltaTime);
             float delDao = 1 * daoSpeed * dt;
             daoScale += delDao;
             //print(delDao + " " + daoScale);

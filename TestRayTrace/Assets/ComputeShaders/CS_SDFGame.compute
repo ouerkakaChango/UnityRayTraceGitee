@@ -87,8 +87,8 @@ void Render(uint3 id : SV_DispatchThreadID)
 	int idy = id.y;
 
 	//???
-	//float2 uv = id.xy / float2(1024,720);;
-	//re = 0.5*fbm4(float3(uv*100, 0));
+	//float2 uv = id.xy / float2(1024,720);
+	//re = 0.5*fbm4(float3(uv*15, 0));
 	//Result[id.xy] = float4(re,1);
 	//return;
 
