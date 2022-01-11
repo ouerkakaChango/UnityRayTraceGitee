@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Debugger;
+using XUtility;
 using FastGeo;
+using Debugger;
 
 //start,end是tri，左闭右开
 public struct BVHNode
@@ -24,17 +25,20 @@ public struct BVHNode
 //1.对于每个bbox，找3轴最长k轴切2分
 //2.切2分的标准为，沿k轴，数量为一半的三角形 （根据三角形重心，按k轴排序）
 //3.调整顺序后的tris传给BVHTrace(IBLTrace改)
+[ExecuteInEditMode]
 public class BVHTool : MonoBehaviour
 {
     static public float MAXFloat = 100000.0f;
-
+    public bool initOnStart = false;
     public int usrDepth = 1;   //用户建议的深度，当三角面数量够多，就会优先用这个浅的深度
+    [ReadOnly]
     public int depth = -1;             //深度从0开始
 
-    public Material mat;
+    public Material debugLineMat;
 
     Mesh mesh;
     Vector3[] vertices;
+    [HideInInspector]
     public int[] tris;
     public BVHNode[] tree;
     public Color[] debugColors;
@@ -46,9 +50,20 @@ public class BVHTool : MonoBehaviour
     void Start()
     {
         var meshFiliter = gameObject.GetComponent<MeshFilter>();
-        mesh = meshFiliter.mesh;
-       
-        //Init();
+        mesh = meshFiliter.sharedMesh;
+        if (debugLineMat == null)
+        {
+            Debug.Log("Set default line Mat");
+            debugLineMat = Resources.Load("Material/DebugLine", typeof(Material)) as Material;
+        }
+        if (debugLineMat == null)
+        {
+            Debug.LogError("default mat not found");
+        }
+        if (initOnStart)
+        {
+            Init();
+        }
     }
 
     // Update is called once per frame
@@ -57,10 +72,11 @@ public class BVHTool : MonoBehaviour
        
     }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-    }
+    //void OnDrawGizmos()
+    //{
+    //    //Gizmos.color = Color.red;
+    //    //Gizmos.DrawWireCube(transform.position,Vector3.one*2);
+    //}
 
     void OnRenderObject()
     {
@@ -75,7 +91,7 @@ public class BVHTool : MonoBehaviour
         ToWorldCoord();
         logger.LogSec();
         tris = mesh.triangles;
-
+        Debug.Log(mesh);
         Debug.Log(tris.Length/3+" tiangles");
         int triNum = tris.Length;
         int maxDepth = (int)Mathf.Log((float)triNum, 2.0f);
@@ -268,9 +284,14 @@ public class BVHTool : MonoBehaviour
 
     void AddRender(in BVHNode node)
     {
+        AddRender(node.min, node.max);
+    }
+
+    void AddRender(Vector3 min, Vector3 max)
+    {
         // 4 5 6 7
         // 0 1 2 3
-        var p = GetBBoxVerts(node.min, node.max);
+        var p = GetBBoxVerts(min, max);
         lines.Add(MakeLine(p[0], p[1]));
         lines.Add(MakeLine(p[1], p[2]));
         lines.Add(MakeLine(p[2], p[3]));
@@ -281,10 +302,10 @@ public class BVHTool : MonoBehaviour
         lines.Add(MakeLine(p[2], p[6]));
         lines.Add(MakeLine(p[3], p[7]));
 
-        lines.Add(MakeLine(p[0+4], p[1+4]));
-        lines.Add(MakeLine(p[1+4], p[2+4]));
-        lines.Add(MakeLine(p[2+4], p[3+4]));
-        lines.Add(MakeLine(p[3+4], p[0+4]));
+        lines.Add(MakeLine(p[0 + 4], p[1 + 4]));
+        lines.Add(MakeLine(p[1 + 4], p[2 + 4]));
+        lines.Add(MakeLine(p[2 + 4], p[3 + 4]));
+        lines.Add(MakeLine(p[3 + 4], p[0 + 4]));
     }
 
     void RenderBBox()
@@ -295,8 +316,8 @@ public class BVHTool : MonoBehaviour
         }
         for (int i = 0; i < tree.Length; i++)
         {
-            mat.SetColor("_Color", debugColors[i]);
-            mat.SetPass(0);
+            debugLineMat.SetColor("_Color", debugColors[i]);
+            debugLineMat.SetPass(0);
             GL.Color(new Color(1, 1, 0, 0.8f));
             GL.PushMatrix();
             GL.Begin(GL.LINES);
