@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using XUtility;
 using FastGeo;
+using XFileHelper;
 using Debugger;
 
 //start,endÊÇtri£¬×ó±ÕÓÒ¿ª
@@ -45,6 +47,7 @@ public class BVHTool : MonoBehaviour
 
     List<Line> lines = new List<Line>();
 
+    public string savePath;
 
     // Start is called before the first frame update
     void Start()
@@ -345,5 +348,79 @@ public class BVHTool : MonoBehaviour
         re[6] = new Vector3(max.x, max.y, max.z);
         re[7] = new Vector3(min.x, max.y, max.z);
         return re;
+    }
+
+    void WriteNode(ref BinaryWriter writer, in BVHNode node)
+    {
+        writer.Write(node.start);
+        writer.Write(node.end);
+        writer.Write(node.min);
+        writer.Write(node.max);
+    }
+
+    void ReadNode(ref BinaryReader reader, ref BVHNode node)
+    {
+        node.start = reader.ReadInt32();
+        node.end = reader.ReadInt32();
+        reader.Read(ref node.min);
+        reader.Read(ref node.max);
+    }
+
+    public void Save()
+    {
+        if (tree == null)
+        {
+            return;
+        }
+        var writer = FileHelper.BeginWrite(savePath);
+        writer.Write(tris);
+        writer.Write(tree.Length);
+        for (int i = 0; i < tree.Length; i++)
+        {
+            WriteNode(ref writer, tree[i]);
+        }
+    }
+
+    public void Parse(string path="")
+    {
+        if (path == "")
+        {
+            path = savePath;
+        }
+
+        var reader = FileHelper.BeginRead(path);
+
+        if (reader == null)
+        {
+            Debug.LogError("Error in parse:null");
+            return;
+        }
+        if (vertices == null)
+        {
+            vertices = mesh.vertices;
+        }
+        reader.Read(ref tris);
+
+        int treeLen = reader.ReadInt32();
+        tree = new BVHNode[treeLen];
+        lines.Clear();
+        for (int i = 0; i < treeLen; i++)
+        {
+            ReadNode(ref reader, ref tree[i]);
+            AddRender(tree[i]);
+            if (i == 0) 
+            {
+                Log.DebugVec(tree[0].min);
+            }
+        }
+
+        if (debugColors == null || debugColors.Length != tree.Length)
+        {
+            debugColors = new Color[tree.Length];
+            for (int i = 0; i < debugColors.Length; i++)
+            {
+                debugColors[i] = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
+            }
+        }
     }
 }
