@@ -754,6 +754,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ced892624d0f0134380aa832ecd8b466, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  showGrid: 1
   needFixScale100: 1
   extendType: 1
   unitDivide: {x: 10, y: 10, z: 10}
@@ -1044,3 +1045,16 @@ MonoBehaviour:
   - {r: 0.2172854, g: 0.22300851, b: 0.4545061, a: 1}
   - {r: 0.3222261, g: 0.13214731, b: 0.35114783, a: 1}
   savePath: Assets/Mesh/SavedBVH/tree.bytes
+  autoParseInEditorMode: 1
+--- !u!114 &2067387702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2067387698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cf23d60f72a71f4dbc2640410628b60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

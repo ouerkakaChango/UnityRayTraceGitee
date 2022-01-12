@@ -9,6 +9,12 @@ namespace FastGeo
     {
         public Vector3 pos;
         public Vector3 dir;
+
+        public Ray(in Vector3 pos_, in Vector3 dir_)
+        {
+            pos = pos_;
+            dir = dir_;
+        }
     }
 
     public struct Vertex
@@ -41,6 +47,20 @@ namespace FastGeo
     {
         public float dis;
         public Vector3 p;
+    }
+
+    public struct HitInfo
+    {
+        public bool bHit;
+        public Vector3 p;
+
+        public static HitInfo Default()
+        {
+            HitInfo re;
+            re.bHit = false;
+            re.p = Vector3.zero;
+            return re;
+        }
     }
     //#####################################################################
 

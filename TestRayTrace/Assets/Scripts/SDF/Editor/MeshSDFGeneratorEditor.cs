@@ -17,9 +17,14 @@ public class MeshSDFGeneratorEditor : Editor
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        if (GUILayout.Button("Generate"))
+        if (GUILayout.Button("GenerateGrid"))
         {
             Target.Generate();
+        }
+
+        if (GUILayout.Button("TestTrace"))
+        {
+            Target.TestTrace();
         }
     }
 }

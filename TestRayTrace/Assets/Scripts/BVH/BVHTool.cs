@@ -5,6 +5,7 @@ using UnityEngine;
 using XUtility;
 using FastGeo;
 using XFileHelper;
+using Ray = FastGeo.Ray;
 using Debugger;
 
 //start,endÊÇtri£¬×ó±ÕÓÒ¿ª
@@ -48,6 +49,7 @@ public class BVHTool : MonoBehaviour
     List<Line> lines = new List<Line>();
 
     public string savePath;
+    public bool autoParseInEditorMode=false;
 
     // Start is called before the first frame update
     void Start()
@@ -315,6 +317,10 @@ public class BVHTool : MonoBehaviour
     {
         if (tree == null)
         {
+            if (autoParseInEditorMode)
+            {
+                Parse();
+            }
             return;
         }
         for (int i = 0; i < tree.Length; i++)
@@ -408,10 +414,6 @@ public class BVHTool : MonoBehaviour
         {
             ReadNode(ref reader, ref tree[i]);
             AddRender(tree[i]);
-            if (i == 0) 
-            {
-                Log.DebugVec(tree[0].min);
-            }
         }
 
         if (debugColors == null || debugColors.Length != tree.Length)
@@ -422,5 +424,19 @@ public class BVHTool : MonoBehaviour
                 debugColors[i] = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
             }
         }
+    }
+
+    public bool IsInited()
+    {
+        return tree != null;
+    }
+
+    public HitInfo Trace(Ray ray)
+    {
+        HitInfo re;
+
+        re.bHit = true;
+        re.p = ray.pos + 2 * ray.dir;
+        return re;
     }
 }
