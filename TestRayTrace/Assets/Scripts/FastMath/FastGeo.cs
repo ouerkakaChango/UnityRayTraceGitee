@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MathHelper;
+using static MathHelper.Vec;
 
 namespace FastGeo
 {
@@ -52,16 +54,31 @@ namespace FastGeo
     public struct HitInfo
     {
         public bool bHit;
-        public Vector3 p;
+        public Vector3 P;
+        public Vector3 N;
 
         public static HitInfo Default()
         {
             HitInfo re;
             re.bHit = false;
-            re.p = Vector3.zero;
+            re.P = Vector3.zero;
+            re.N = Vector3.zero;
             return re;
         }
     }
+
+    public struct CastInfo
+    {
+        public bool bHit;
+        public float dis;
+        public static CastInfo Default()
+        {
+            CastInfo re;
+            re.bHit = false;
+            re.dis = 0;
+            return re;
+        }
+    };
     //#####################################################################
 
     static public class Former
@@ -151,6 +168,215 @@ namespace FastGeo
 
             float kC = (c - A).magnitude / (B - A).magnitude;
             return Vector3.Lerp(nA, nB, kC);
+        }
+
+        //默认该Normalize的已经normalize
+        //Plane是quad所在plane,plane.p是quad的某顶点
+        //size是quad的大小，v1,v2是以plane.p为起点，两边的方向向量，和size顺序对应
+        public static CastInfo CastQuad_Corner(in Ray ray, in Plane plane, in Vector2 size, in Vector3 v1, in Vector3 v2)
+        {
+            CastInfo re = CastInfo.Default();
+
+            if (Vector3.Dot(ray.dir, plane.n) >= 0)
+            {
+                return re;
+            }
+
+            re.dis = RayCastPlane(ray, plane);
+            if (re.dis < 0)
+            {
+                return re;
+            }
+            Vector3 hitP = ray.pos + re.dis * ray.dir;
+            Vector3 center = plane.p + v1 * size.x / 2 + v2 * size.y / 2;
+            Vector3 dv = hitP - center;
+            re.bHit = (Mathf.Abs(Vector3.Dot(dv, v1)) <= (size.x / 2)) &&
+                (Mathf.Abs(Vector3.Dot(dv, v2)) <= (size.y / 2));
+            return re;
+        }
+
+        //1.从x,y,z方向，每两个平面和ray测交点
+        //只要有一个交点在bbox内，则返回true
+        public static CastInfo CastBBox(in Ray ray, in Vector3 min, in Vector3 max)
+        {
+            CastInfo re = CastInfo.Default();
+
+            if (gt(ray.pos, min) && lt(ray.pos, max))
+            {
+                re.bHit = true;
+                return re;
+            }
+
+            //1.x方向
+            Plane plane;
+            plane.p = min;
+            plane.n = new Vector3(-1, 0, 0);
+            Vector2 quadSize = new Vector2(max.y - min.y, max.z - min.z);//max.yz - min.yz;
+            re = CastQuad_Corner(ray, plane, quadSize, new Vector3(0, 1, 0), new Vector3(0, 0, 1));
+            if (re.bHit)
+            {
+                return re;
+            }
+
+            plane.p = max;
+            plane.n = new Vector3(1, 0, 0);
+            re = CastQuad_Corner(ray, plane, quadSize, new Vector3(0, -1, 0), new Vector3(0, 0, -1));
+            if (re.bHit)
+            {
+                return re;
+            }
+
+            //2.y方向
+            plane.p = min;
+            plane.n = new Vector3(0, -1, 0);
+            quadSize = new Vector2(max.x - min.x, max.z - min.z);//max.xz - min.xz;
+            re = CastQuad_Corner(ray, plane, quadSize, new Vector3(1, 0, 0), new Vector3(0, 0, 1));
+            if (re.bHit)
+            {
+                return re;
+            }
+
+            plane.p = max;
+            plane.n = new Vector3(0, 1, 0);
+            re = CastQuad_Corner(ray, plane, quadSize, new Vector3(-1, 0, 0), new Vector3(0, 0, -1));
+            if (re.bHit)
+            {
+                return re;
+            }
+
+            //3.z方向
+            plane.p = min;
+            plane.n = new Vector3(0, 0, -1);
+            quadSize = new Vector2(max.x - min.x, max.y - min.y);//max.xy - min.xy;
+            re = CastQuad_Corner(ray, plane, quadSize, new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+            if (re.bHit)
+            {
+                return re;
+            }
+
+            plane.p = max;
+            plane.n = new Vector3(0, 0, 1);
+            re = CastQuad_Corner(ray, plane, quadSize, new Vector3(-1, 0, 0), new Vector3(0, -1, 0));
+            if (re.bHit)
+            {
+                return re;
+            }
+
+            return re;
+        }
+
+        static bool FrontFace(Vector3 pos, Plane plane)
+        {
+            return Vector3.Dot(pos - plane.p, plane.n) >= 0;
+        }
+
+        //所谓"重心法"：https://blog.csdn.net/wkl115211/article/details/80215421
+        public static bool IsPointInsideTri(Vector3 pos, Vector3 p1, Vector3 p2, Vector3 p3)
+        {
+            Vector3 v0 = p3 - p1;
+            Vector3 v1 = p2 - p1;
+            Vector3 v2 = pos - p1;
+
+            float dot00 = dot(v0, v0);
+            float dot01 = dot(v0, v1);
+            float dot02 = dot(v0, v2);
+            float dot11 = dot(v1, v1);
+            float dot12 = dot(v1, v2);
+
+            float invDeno = 1 / (dot00 * dot11 - dot01 * dot01);
+
+            float u = (dot11 * dot02 - dot01 * dot12) * invDeno;
+            if (u < 0 || u > 1)
+            {
+                return false;
+            }
+
+            float v = (dot00 * dot12 - dot01 * dot02) * invDeno;
+            if (v < 0 || v > 1)
+            {
+                return false;
+            }
+
+            return u + v <= 1;
+        }
+
+        //根据A lerp(n1,n2)，根据B lerp(n1,n3)，根据c lerp(nA, nB)
+        public static Vector3 GetTriBlendedNorm(Vector3 c, Vertex v1, Vertex v2, Vertex v3)
+        {
+            Vector3 p1 = v1.p;
+            Vector3 p2 = v2.p;
+            Vector3 p3 = v3.p;
+
+            float lenP2P1 = length(p2 - p1);
+            float lenP3P1 = length(p3 - p1);
+
+            if (NearZero(lenP2P1))
+            {
+                return lerp(v1.n, v3.n, 0.5f);
+            }
+            if (NearZero(lenP3P1))
+            {
+                return lerp(v1.n, v2.n, 0.5f);
+            }
+
+            Vector3 A, B;
+            Tri_ParallelP2P3(out A, out B, c, v1, v2, v3);
+
+            float kA = length(A - p1) / lenP2P1;
+            Vector3 nA = lerp(v1.n, v2.n, kA);
+
+            float kB = length(B - p1) / lenP3P1;
+            Vector3 nB = lerp(v1.n, v3.n, kB);
+
+            float lenAB = length(B - A);
+            float kC = 0;
+            if (NearZero(lenAB))
+            {
+                kC = 0.5f;
+            }
+            else
+            {
+                kC = length(c - A) / lenAB;
+            }
+            return lerp(nA, nB, kC);
+        }
+
+        //(三个vert的法线不一定一致)
+        //1.先3p组成平面,其plane.N要和v1.n的Vector3.Dot为正
+        //2.得到与平面交点，判断是否在三角形内（重心法）
+        //3.根据位置Blend三个vert的N
+        public static HitInfo RayCastTri(Ray ray, Vertex v1, Vertex v2, Vertex v3)
+        {
+            HitInfo re = HitInfo.Default();
+
+            Plane plane = Former.FormPlane(v1.p, v2.p, v3.p, v1.n);
+
+            if (!FrontFace(ray.pos, plane))
+            {
+                return re;
+            }
+
+            float k = RayCastPlane(ray, plane);
+
+            //如果屏幕在射线反方向
+            if (k < 0)
+            {
+                return re;
+            }
+
+            re.P = ray.pos + ray.dir * k;
+            re.bHit = IsPointInsideTri(re.P, v1.p, v2.p, v3.p);
+
+            //如果打点在三角形之外
+            if (!re.bHit)
+            {
+                return re;
+            }
+
+            //Blend三个顶点的Normal
+            re.N = GetTriBlendedNorm(re.P, v1, v2, v3);
+
+            return re;
         }
     }
 

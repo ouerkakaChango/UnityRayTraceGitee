@@ -9,6 +9,8 @@ public class RayHitVisualizer : MonoBehaviour
 {
     public List<Line> hitLines = new List<Line>();
     public List<Vector3> hitPnts = new List<Vector3>();
+
+    public List<Line> missLines = new List<Line>();
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +35,14 @@ public class RayHitVisualizer : MonoBehaviour
         {
             Gizmos.DrawCube(hitPnts[i], Vector3.one * 0.02f);
         }
+
+        Gizmos.color = Color.magenta;
+
+        //missLines
+        for (int i = 0; i < missLines.Count; i++)
+        {
+            Gizmos.DrawLine(missLines[i].a, missLines[i].b);
+        }
     }
 
     void OnRenderObject()
@@ -44,8 +54,19 @@ public class RayHitVisualizer : MonoBehaviour
     {
         if (hitInfo.bHit)
         {
-            hitLines.Add(new Line(ray.pos, hitInfo.p));
-            hitPnts.Add(hitInfo.p);
+            hitLines.Add(new Line(ray.pos, hitInfo.P));
+            hitPnts.Add(hitInfo.P);
         }
+        else
+        {
+            missLines.Add(new Line(ray.pos, ray.pos + 20 * ray.dir));
+        }
+    }
+
+    public void ClearAll()
+    {
+        hitLines.Clear();
+        hitPnts.Clear();
+        missLines.Clear();
     }
 }

@@ -38,5 +38,10 @@ public class BVHToolEditor : Editor
         {
             Target.Parse();
         }
+
+        if (GUILayout.Button("Test"))
+        {
+            Target.Test();
+        }
     }
 }

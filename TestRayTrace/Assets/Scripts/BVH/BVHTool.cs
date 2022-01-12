@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using XUtility;
-using FastGeo;
 using XFileHelper;
+using FastGeo;
 using Ray = FastGeo.Ray;
+using static FastGeo.RayMath;
+using AlgorithmHelper;
 using Debugger;
 
 //start,end是tri，左闭右开
@@ -41,6 +43,7 @@ public class BVHTool : MonoBehaviour
 
     Mesh mesh;
     Vector3[] vertices;
+
     [HideInInspector]
     public int[] tris;
     public BVHNode[] tree;
@@ -50,6 +53,14 @@ public class BVHTool : MonoBehaviour
 
     public string savePath;
     public bool autoParseInEditorMode=false;
+
+    //##########################################
+    //## for CPU Trace BVH 
+    bool hasInitMeshWorldData = false;
+    Vector3[] world_vertices;
+    Vector3[] world_normals;
+    bool bTest = false;
+    //##########################################
 
     // Start is called before the first frame update
     void Start()
@@ -77,11 +88,18 @@ public class BVHTool : MonoBehaviour
        
     }
 
-    //void OnDrawGizmos()
-    //{
-    //    //Gizmos.color = Color.red;
-    //    //Gizmos.DrawWireCube(transform.position,Vector3.one*2);
-    //}
+    void OnDrawGizmos()
+    {
+        
+        if (bTest)
+        {
+            Gizmos.color = Color.blue;
+            for (int i = 0; i < world_vertices.Length; i++)
+            {
+                Gizmos.DrawSphere(world_vertices[i], 0.01f);
+            }
+        }
+    }
 
     void OnRenderObject()
     {
@@ -101,6 +119,7 @@ public class BVHTool : MonoBehaviour
         int triNum = tris.Length;
         int maxDepth = (int)Mathf.Log((float)triNum, 2.0f);
         depth = Mathf.Min(maxDepth, usrDepth);
+        //treeLen = 2^(depth+1) - 1
         tree = new BVHNode[(int)(Mathf.Pow(2,depth+1))-1];
         debugColors = new Color[tree.Length];
         for(int i=0;i<debugColors.Length;i++)
@@ -408,6 +427,8 @@ public class BVHTool : MonoBehaviour
         reader.Read(ref tris);
 
         int treeLen = reader.ReadInt32();
+        //treeLen = 2^(depth+1) - 1
+        depth = (int)(Mathf.Log((float)(treeLen + 1), 2.0f)) - 1;
         tree = new BVHNode[treeLen];
         lines.Clear();
         for (int i = 0; i < treeLen; i++)
@@ -431,12 +452,168 @@ public class BVHTool : MonoBehaviour
         return tree != null;
     }
 
+    void InitMeshWorldData()
+    {
+        var l2w = transform.localToWorldMatrix;
+        world_vertices = new Vector3[vertices.Length];
+        for (int i=0;i<vertices.Length;i++)
+        {
+            world_vertices[i] = l2w.MultiplyPoint(vertices[i]);//l2w * vertices[i];
+        }
+
+        world_normals = new Vector3[mesh.normals.Length];
+        for (int i = 0; i < mesh.normals.Length; i++)
+        {
+            world_normals[i] = l2w.MultiplyPoint(mesh.normals[i]);
+        }
+
+        hasInitMeshWorldData = true;
+    }
+
+    const int MAXLEAVES = 32;
     public HitInfo Trace(Ray ray)
     {
-        HitInfo re;
+        HitInfo re = HitInfo.Default();
 
-        re.bHit = true;
-        re.p = ray.pos + 2 * ray.dir;
+        //re.bHit = true;
+        //re.p = ray.pos + 2 * ray.dir;
+        //return re;
+
+        if (!hasInitMeshWorldData)
+        {
+            InitMeshWorldData();
+        }
+        TimeLogger logger = new TimeLogger("BVH.Trace");
+        logger.Start();
+        //---
+        int start = 0, end = tris.Length / 3 - 1;
+        int[] toCheck = new int[MAXLEAVES]; //used as a stack
+        int iter = 0; //used as a stack helper
+        int nowInx = 0;
+        while (true)
+        {
+            bool bLeafDetect = false;
+            bool takeFromCheck = false;
+            int nowDepth = AlgoHelper.GetTreeDepth(nowInx, depth);
+            {//!!! Error situation
+                if (nowDepth == -1 || nowDepth > depth)
+                {
+                    Debug.LogError("");
+                    return re;
+                }
+            }
+            BVHNode node = tree[nowInx];
+            CastInfo castInfo = CastBBox(ray, node.min, node.max);
+
+            if (!castInfo.bHit)
+            {
+                takeFromCheck = true;
+            }
+            else if (castInfo.bHit && nowDepth != depth)
+            {
+                int leftInx = 2 * nowInx + 1;
+                int rightInx = 2 * nowInx + 2;
+                CastInfo leftCast = CastBBox(ray, tree[leftInx].min, tree[leftInx].max);
+                CastInfo rightCast = CastBBox(ray, tree[rightInx].min, tree[rightInx].max);
+                if (leftCast.bHit && !rightCast.bHit)
+                {
+                    nowInx = leftInx;
+                }
+                else if (!leftCast.bHit && rightCast.bHit)
+                {
+                    nowInx = rightInx;
+                }
+                else if (leftCast.bHit && rightCast.bHit)
+                {
+                    if (leftCast.dis <= rightCast.dis)
+                    {
+                        nowInx = leftInx;
+                        toCheck[iter] = rightInx;
+                        iter++;
+                    }
+                    else
+                    {
+                        nowInx = rightInx;
+                        toCheck[iter] = leftInx;
+                        iter++;
+                    }
+                }
+                else
+                {
+                    takeFromCheck = true;
+                }
+            }
+            else if (castInfo.bHit && nowDepth == depth)
+            {
+                bLeafDetect = true;
+                takeFromCheck = true;
+            }
+
+            if (bLeafDetect)
+            {
+                start = tree[nowInx].start;
+                end = tree[nowInx].end;
+                start = 3 * start;
+                end = 3 * end + 3;
+
+                //for loop all triangles in leave to trace
+                for (int inx = start; inx < end; inx += 3)
+                {
+                    Vertex v1;
+                    Vertex v2;
+                    Vertex v3;
+
+                    v1.p = world_vertices[tris[inx]];
+                    v2.p = world_vertices[tris[inx + 1]];
+                    v3.p = world_vertices[tris[inx + 2]];
+
+                    v1.n = world_normals[tris[inx]];
+                    v2.n = world_normals[tris[inx + 1]];
+                    v3.n = world_normals[tris[inx + 2]];
+
+                    HitInfo hit = RayCastTri(ray, v1, v2, v3);
+                    if (hit.bHit)
+                    {
+                        if (!re.bHit)
+                        {                           
+                            re = hit;
+                        }
+                        else if ((hit.P - ray.pos).sqrMagnitude < (re.P - ray.pos).sqrMagnitude)
+                        {
+                            re = hit;
+                        }
+                    }
+                }
+                //___循环三角形
+                if (re.bHit)
+                {
+                    break;
+                }
+            }//___if bLeafDetect
+            if (takeFromCheck)
+            {
+                if (iter == 0)
+                {
+                    break;
+                }
+                else
+                {
+                    nowInx = toCheck[iter - 1];
+                    iter--;
+                }
+            }
+        }
+        //___
+        logger.Log();
         return re;
+    }
+
+    public void Test()
+    {
+        if (!hasInitMeshWorldData)
+        {
+            InitMeshWorldData();
+        }
+        bTest = !bTest;
     }
 }

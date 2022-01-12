@@ -67,108 +67,17 @@ void Render(uint3 id : SV_DispatchThreadID)
 	//trace bvh to determin start inx
 	int start = 0, end = triInxNum/3-1;
 
-	//bool bResultDone = false;
-	//int toCheck1[MAXLEAVES];
-	//int iter1 = 0;
-	//int toCheck2[MAXLEAVES];
-	//int iter2 = 0;
-	//bool bUse1 = true;
-	//
-	//toCheck1[iter1] = 0;
-	//iter1++;
-	//for (int nowDepth = 1; nowDepth <= treeDepth&&(!bResultDone); nowDepth++)
-	//{
-	//	if (bUse1)
-	//	{
-	//		iter2 = 0;
-	//	}
-	//	else
-	//	{
-	//		iter1 = 0;
-	//	}
-	//	bResultDone = true;
-	//	for (int leafInx = 0; leafInx < (bUse1?iter1:iter2); leafInx++)
-	//	{
-	//		//如果相交，把子节点放到check1/check2列表里
-	//		int nowInx = bUse1 ? toCheck1[leafInx] : toCheck2[leafInx];
-	//		BVHNode node = bvh[nowInx];
-	//		if (IsRayAABB(ray, node.min, node.max))
-	//		{
-	//			bResultDone = false;
-	//			if (nowDepth == treeDepth)
-	//			{
-	//				if (bUse1)
-	//				{
-	//					toCheck2[iter2] = nowInx;
-	//					iter2++;
-	//				}
-	//				else
-	//				{
-	//					toCheck1[iter1] = nowInx;
-	//					iter1++;
-	//				}
-	//			}
-	//			else
-	//			{
-	//				if (bUse1)
-	//				{
-	//					toCheck2[iter2] = 2 * nowInx + 1;
-	//					iter2++;
-	//					toCheck2[iter2] = 2 * nowInx + 2;
-	//					iter2++;
-	//				}
-	//				else
-	//				{
-	//					toCheck1[iter1] = 2 * nowInx + 1;
-	//					iter1++;
-	//					toCheck1[iter1] = 2 * nowInx + 2;
-	//					iter1++;
-	//				}
-	//			}
-	//		}
-	//	}
-	//	bUse1 = !bUse1;
-	//}
-	//
-	//if (treeDepth % 2 != 0)
-	//{//叶节点的结果如果存在toCheck2，搬到toCheck1里
-	//	for (int i1 = 0; i1 < iter2; i1++)
-	//	{
-	//		toCheck1[i1] = toCheck2[i1];
-	//	}
-	//	iter1 = iter2;
-	//}
-
-	//1.从toCheck1中取出一个，然后Cast ； 如果toCheck1中没有，则从toCheck2中拿一个
-	//2.1如果相交，不是叶子节点，则Cast左右子节点，选择dis小的，放入toCheck1；另一个如果相交，则放入toCheck2
-	//2.2.如果相交，是叶子节点，则进入遍历找minHit。如果有minHit,直接跳出；如果没有，继续循环
-	//2.3如果不相交，则从toCheck2中选择堆栈尾，放入toCheck1。如果没有，则直接跳出
-
-	//???
-	//BVHNode node = bvh[0];
-	//if (CastBBox(ray, node.min, node.max).bHit)
-	//{
-	//	Result[id.xy] = 1;
-	//	return;
-	//}
-	//else
-	//{
-	//	Result[id.xy] = 0;
-	//	return;
-	//}
-
-	int toCheck2[32];
-	int iter2 = 0;
+	int toCheck[MAXLEAVES]; //used as a stack
+	int iter = 0; //used as a stack helper
 
 	int nowInx = 0;
-	int cc = 0;
+
 	while(true)
 	{ 
-		cc++;
 		bool bLeafDetect = false;
-		bool takeFromCheck2 = false;
+		bool takeFromCheck = false;
 		int nowDepth = GetTreeDepth(nowInx, treeDepth);
-		{//??? DEBUG
+		{//!!! Error situation
 			if (nowDepth == -1 || nowDepth>treeDepth)
 			{
 				Result[id.xy] = float4(1,0,1,1);
@@ -177,11 +86,10 @@ void Render(uint3 id : SV_DispatchThreadID)
 		}
 		BVHNode node = bvh[nowInx];
 		CastInfo castInfo = CastBBox(ray, node.min, node.max);
-		//???
-		//castInfo.bHit = false;
+
 		if (!castInfo.bHit)
 		{
-			takeFromCheck2 = true;
+			takeFromCheck = true;
 		}
 		else if(castInfo.bHit && nowDepth!=treeDepth)
 		{
@@ -202,25 +110,25 @@ void Render(uint3 id : SV_DispatchThreadID)
 				if (leftCast.dis <= rightCast.dis)
 				{
 					nowInx = leftInx;
-					toCheck2[iter2] = rightInx;
-					iter2++;
+					toCheck[iter] = rightInx;
+					iter++;
 				}
 				else
 				{
 					nowInx = rightInx;
-					toCheck2[iter2] = leftInx;
-					iter2++;
+					toCheck[iter] = leftInx;
+					iter++;
 				}
 			}
 			else
 			{
-				takeFromCheck2 = true;
+				takeFromCheck = true;
 			}
 		}
 		else if (castInfo.bHit && nowDepth == treeDepth)
 		{
 			bLeafDetect = true;
-			takeFromCheck2 = true;
+			takeFromCheck = true;
 		}
 
 		if(bLeafDetect)
@@ -230,10 +138,10 @@ void Render(uint3 id : SV_DispatchThreadID)
 			start = 3 * start;
 			end = 3 * end + 3;
 
-			//for loop to find
 			//!!! only one mesh now
 			MeshInfo meshObject = meshInfos[0];
 
+			//for loop all triangles in leave to trace
 			for (int inx = start; inx < end; inx += 3)
 			{
 				Vertex v1;
@@ -275,16 +183,16 @@ void Render(uint3 id : SV_DispatchThreadID)
 				break;
 			}
 		}//___if bLeafDetect
-		if (takeFromCheck2)
+		if (takeFromCheck)
 		{
-			if (iter2 == 0)
+			if (iter == 0)
 			{
 				break;
 			}
 			else
 			{
-				nowInx = toCheck2[iter2-1];
-				iter2--;
+				nowInx = toCheck[iter-1];
+				iter--;
 			}
 		}
 	}

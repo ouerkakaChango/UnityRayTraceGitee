@@ -58,12 +58,12 @@ bool NearZero(float x)
 
 bool gt(float3 a, float3 b)
 {
-	return a.r > b.r&&a.g > b.g&&a.b > b.b;
+	return a.x > b.x && a.y > b.y && a.z > b.z;
 }
 
 bool lt(float3 a, float3 b)
 {
-	return a.r < b.r&&a.g < b.g&&a.b < b.b;
+	return a.x < b.x && a.y < b.y && a.z < b.z;
 }
 
 int GetTreeDepth(int inx,int maxDepth)
