@@ -4,14 +4,23 @@ using UnityEngine;
 using PointCloudHelper;
 using Debugger;
 using MathHelper;
+using static MathHelper.Vec;
 using FastGeo;
 using Ray = FastGeo.Ray;
+
+public enum MeshSDFGenerateSampleType
+{
+    unitSphere, //unform distribute 
+    testCenter, //always center
+};
 
 public class MeshSDFGenerator : MonoBehaviour
 {
     bool hasInited = false;
 
+    public bool showMeshBound = true;
     public bool showGrid = true;
+    public bool showSDF = true;
     public bool needFixScale100 = true;
     Vector3[] vertices;
 
@@ -22,6 +31,11 @@ public class MeshSDFGenerator : MonoBehaviour
     Vector3 startUnitPos;   //model coordinate
     Bounds meshBounds;
     Vector3Int unitCount;
+
+    MeshSDFGenerateSampleType sampleType = MeshSDFGenerateSampleType.unitSphere;
+    float[] sdfArr;
+    float[] debugColor;
+    //###########################################
     // Start is called before the first frame update
     void Start()
     {
@@ -40,8 +54,12 @@ public class MeshSDFGenerator : MonoBehaviour
         {
             return;
         }
-        Gizmos.color = new Color(0, 1, 0, 0.2f);
-        Gizmos.DrawCube(transform.position + meshBounds.center, meshBounds.extents * 2);
+
+        if (showMeshBound)
+        {
+            Gizmos.color = new Color(0, 1, 0, 0.2f);
+            Gizmos.DrawCube(transform.position + meshBounds.center, meshBounds.extents * 2);
+        }
 
         if (showGrid)
         {
@@ -93,11 +111,35 @@ public class MeshSDFGenerator : MonoBehaviour
                 }
             }
         }
+
+        if (showSDF && debugColor != null)
+        {
+            int cc = 0;
+            Gizmos.color = Color.red;
+            for (int k = 0; k < unitCount.z; k++)
+            {
+                for (int j = 0; j < unitCount.y; j++)
+                {
+                    for (int i = 0; i < unitCount.x; i++)
+                    {
+                        float c = debugColor[i + j * unitCount.x + k * unitCount.x * unitCount.y];
+                        Gizmos.color = new Color(0, 0,0,c);
+                        Gizmos.DrawSphere(ToWorld(startUnitPos + Mul(unit,new Vector3(i,j,k))), 0.05f);
+                        cc++;
+                        //if (cc > 5000)
+                        //{
+                        //    return;
+                        //}
+                    }
+                }
+            }
+                        
+        }
     }
 
     //#######################################################################
 
-    public void Generate()
+    public void InitGrid()
     {
         var mf = GetComponent<MeshFilter>();
         var mesh = mf.sharedMesh;
@@ -141,7 +183,7 @@ public class MeshSDFGenerator : MonoBehaviour
     {
         if (extendType == MeshSDFExtendType.Ground)
         {
-            unitCount = unitDivide + Vec.MulInt(unitExtend,new Vector3(2,1,2));
+            unitCount = unitDivide + Vec.MulToInt3(unitExtend,new Vector3(2,1,2));
         }
     }
 
@@ -154,7 +196,7 @@ public class MeshSDFGenerator : MonoBehaviour
     {
         if (!hasInited)
         {
-            Debug.Log("TestTrace need grid has generated");
+            Debug.Log("TestTrace need grid has inited");
             return;
         }
         Debug.Log("TestTrace");
@@ -169,10 +211,92 @@ public class MeshSDFGenerator : MonoBehaviour
         var bvhComp = GetComponent<BVHTool>();
         if (!bvhComp.IsInited())
         {
-            Debug.Log("TestTrace need has inited");
+            Debug.Log("TestTrace need bvh has inited");
             return;
         }
         var hitInfo = bvhComp.Trace(ray);
         visual.Add(ray,hitInfo);
+    }
+
+    const int maxSampleCount = 30;
+
+    int GetSampleCount()
+    {
+        if (sampleType == MeshSDFGenerateSampleType.testCenter)
+        {
+            return 1;
+        }
+        else
+        {
+            return maxSampleCount;
+        }
+    }
+
+    Vector3 GetSampleDir(in Vector3 pos, int sampleInx)
+    {
+        return (ToWorld(meshBounds.center) - pos).normalized;
+    }
+
+    public void Bake()
+    {
+        TimeLogger logger = new TimeLogger("Bake Mesh SDF");
+        logger.Start();
+        var visual = GetComponent<RayHitVisualizer>();
+
+        var bvhComp = GetComponent<BVHTool>();
+        if (!bvhComp.IsInited())
+        {
+            Debug.Log("Bake need bvh has inited");
+            return;
+        }
+
+        sdfArr = new float[unitCount.x * unitCount.y * unitCount.z];
+
+        for (int k = 0; k < unitCount.z; k++)
+        {
+            for (int j = 0; j < unitCount.y; j++)
+            {
+                for (int i = 0; i < unitCount.x; i++)
+                {
+                    Vector3 pos = ToWorld(startUnitPos + Mul(unit,new Vector3(i,j,k)));
+                    {
+                        //Vector3 dir = (ToWorld(meshBounds.center) - pos).normalized;
+                        //Ray ray = new Ray(pos, dir);
+                        //var hitInfo = bvhComp.Trace(ray);
+                        //visual.Add(ray, hitInfo);
+                    }
+                    bool validSDF = false;
+                    float minDis = 1000000.0f;
+                    int sampleNum = GetSampleCount();
+                    for (int testInx = 0; testInx < sampleNum; testInx++)
+                    {
+                        Vector3 dir = GetSampleDir(pos, testInx);
+                        Ray ray = new Ray(pos, dir);
+                        HitInfo hitInfo = bvhComp.Trace(ray);
+                        if (hitInfo.bHit)
+                        {
+                            float tDis = length(hitInfo.P - pos);
+                            if (tDis < minDis)
+                            {
+                                minDis = tDis;
+                                validSDF = true;
+                            }
+                        }
+                    }
+                    //Save minDis to sdfArr
+                    sdfArr[i + j * unitCount.x + k * unitCount.x * unitCount.y] = minDis;
+                }
+            }
+        }
+
+        float maxDis = maxComp(unitCount) * maxComp(unit);
+
+        debugColor = new float[sdfArr.Length];
+        for (int i = 0; i < sdfArr.Length; i++)
+        {
+            float d = sdfArr[i] < maxDis ? sdfArr[i] : maxDis;
+            debugColor[i] = pow(saturate(1 - d / maxDis),5);
+        }
+        logger.LogSec();
     }
 }

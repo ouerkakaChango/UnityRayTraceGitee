@@ -24,5 +24,10 @@ public class RayHitVisualizerEditor : Editor
             Target.ClearAll();
         }
 
+        if (GUILayout.Button("ClearAllLines"))
+        {
+            Target.ClearAllLines();
+        }
+
     }
 }

@@ -65,8 +65,13 @@ public class RayHitVisualizer : MonoBehaviour
 
     public void ClearAll()
     {
-        hitLines.Clear();
+        ClearAllLines();
         hitPnts.Clear();
+    }
+
+    public void ClearAllLines()
+    {
+        hitLines.Clear();
         missLines.Clear();
     }
 }

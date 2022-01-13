@@ -34,6 +34,9 @@ public struct BVHNode
 public class BVHTool : MonoBehaviour
 {
     static public float MAXFloat = 100000.0f;
+
+    public bool needVisualize = true;
+
     public bool initOnStart = false;
     public int usrDepth = 1;   //用户建议的深度，当三角面数量够多，就会优先用这个浅的深度
     [ReadOnly]
@@ -103,6 +106,10 @@ public class BVHTool : MonoBehaviour
 
     void OnRenderObject()
     {
+        if (!needVisualize)
+        {
+            return;
+        }
         RenderBBox();
     }
 
@@ -483,7 +490,7 @@ public class BVHTool : MonoBehaviour
         {
             InitMeshWorldData();
         }
-        TimeLogger logger = new TimeLogger("BVH.Trace");
+        TimeLogger logger = new TimeLogger("BVH.Trace",false);
         logger.Start();
         //---
         int start = 0, end = tris.Length / 3 - 1;

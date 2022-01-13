@@ -727,6 +727,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: b81d102c1a18dc84795b9b3089919796, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -5754084199372789682, guid: b81d102c1a18dc84795b9b3089919796, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -754,7 +758,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ced892624d0f0134380aa832ecd8b466, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showGrid: 1
+  showMeshBound: 0
+  showGrid: 0
+  showSDF: 1
   needFixScale100: 1
   extendType: 1
   unitDivide: {x: 10, y: 10, z: 10}
@@ -783,6 +789,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd667142c4d729a40b48d83af0e66b31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  needVisualize: 0
   initOnStart: 0
   usrDepth: 7
   depth: 7
@@ -1058,3 +1065,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cf23d60f72a71f4dbc2640410628b60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hitPnts: []
