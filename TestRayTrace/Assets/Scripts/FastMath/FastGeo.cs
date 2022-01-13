@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MathHelper;
 using static MathHelper.Vec;
+using static MathHelper.XMathFunc;
 
 namespace FastGeo
 {

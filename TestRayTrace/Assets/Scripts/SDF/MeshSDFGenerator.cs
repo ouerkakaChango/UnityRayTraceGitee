@@ -5,6 +5,7 @@ using PointCloudHelper;
 using Debugger;
 using MathHelper;
 using static MathHelper.Vec;
+using static MathHelper.XMathFunc;
 using FastGeo;
 using Ray = FastGeo.Ray;
 
@@ -17,6 +18,8 @@ public enum MeshSDFGenerateSampleType
 public class MeshSDFGenerator : MonoBehaviour
 {
     bool hasInited = false;
+
+    public int maxSampleCount = 15;
 
     public bool showMeshBound = true;
     public bool showGrid = true;
@@ -218,8 +221,6 @@ public class MeshSDFGenerator : MonoBehaviour
         visual.Add(ray,hitInfo);
     }
 
-    const int maxSampleCount = 30;
-
     int GetSampleCount()
     {
         if (sampleType == MeshSDFGenerateSampleType.testCenter)
@@ -234,7 +235,14 @@ public class MeshSDFGenerator : MonoBehaviour
 
     Vector3 GetSampleDir(in Vector3 pos, int sampleInx)
     {
-        return (ToWorld(meshBounds.center) - pos).normalized;
+        if (sampleType == MeshSDFGenerateSampleType.testCenter)
+        {
+            return (ToWorld(meshBounds.center) - pos).normalized;
+        }
+        else
+        {
+            return CPURand.random_on_unit_sphere();
+        }
     }
 
     public void Bake()

@@ -758,6 +758,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ced892624d0f0134380aa832ecd8b466, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxSampleCount: 60
   showMeshBound: 0
   showGrid: 0
   showSDF: 1
