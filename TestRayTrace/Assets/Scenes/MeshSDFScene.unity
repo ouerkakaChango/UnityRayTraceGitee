@@ -760,7 +760,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxSampleCount: 60
   showMeshBound: 0
-  showGrid: 0
+  showGrid: 1
   showSDF: 1
   needFixScale100: 1
   extendType: 1

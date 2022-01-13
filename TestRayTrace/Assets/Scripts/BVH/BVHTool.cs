@@ -83,6 +83,13 @@ public class BVHTool : MonoBehaviour
         {
             Init();
         }
+        else
+        {
+            if (autoParseInEditorMode)
+            {
+                Parse();
+            }
+        }
     }
 
     // Update is called once per frame
