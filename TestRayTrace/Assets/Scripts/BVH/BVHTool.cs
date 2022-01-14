@@ -85,10 +85,10 @@ public class BVHTool : MonoBehaviour
         }
         else
         {
-            if (autoParseInEditorMode)
-            {
-                Parse();
-            }
+            //if (autoParseInEditorMode)
+            //{
+            //    Parse();
+            //}
         }
     }
 

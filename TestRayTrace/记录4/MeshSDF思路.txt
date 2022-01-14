@@ -1,0 +1,24 @@
+struct MeshSDF
+{
+	startPos
+	unitCount
+	unit
+	sdfArr
+}
+
+GPU:
+计算bbox
+ray;
+if(ray.pos在bbox外)
+{
+ray到bbox表面
+}
+
+//此时保证了ray已经在内部
+sdf = SDFAtPos(ray.pos,meshSDF)
+ray+=dir*sdf;
+
+if(ray在bbox外)
+{
+没trace到，stop
+}
