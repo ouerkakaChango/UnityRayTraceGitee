@@ -418,6 +418,7 @@ public class BVHTool : MonoBehaviour
         {
             WriteNode(ref writer, tree[i]);
         }
+        writer.Close();
     }
 
     public void Parse(string path="")
@@ -450,6 +451,7 @@ public class BVHTool : MonoBehaviour
             ReadNode(ref reader, ref tree[i]);
             AddRender(tree[i]);
         }
+        reader.Close();
 
         if (debugColors == null || debugColors.Length != tree.Length)
         {

@@ -388,8 +388,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1363387410}
-  m_LocalRotation: {x: 0.09990639, y: -0.4066126, z: 0.045041528, w: 0.90700406}
-  m_LocalPosition: {x: 7.618107, y: 3.62359, z: -3.3290234}
+  m_LocalRotation: {x: 0.08464338, y: -0.41410327, z: 0.038954493, w: 0.9054483}
+  m_LocalPosition: {x: 6.4223213, y: 3.3432071, z: -2.3311825}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -780,12 +780,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxSampleCount: 60
   showMeshBound: 0
-  showGrid: 1
+  showGrid: 0
   showSDF: 1
   needFixScale100: 1
   extendType: 1
   unitDivide: {x: 10, y: 10, z: 10}
   unitExtend: {x: 2, y: 2, z: 2}
+  outPath: Assets/treeMeshSDF.bytes
 --- !u!114 &2067387700
 MonoBehaviour:
   m_ObjectHideFlags: 0

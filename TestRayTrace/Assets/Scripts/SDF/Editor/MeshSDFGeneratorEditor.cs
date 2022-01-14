@@ -31,5 +31,16 @@ public class MeshSDFGeneratorEditor : Editor
         {
             Target.Bake();
         }
+
+        if (GUILayout.Button("Save"))
+        {
+            Target.Save();
+            AssetDatabase.Refresh();
+        }
+
+        if (GUILayout.Button("Parse"))
+        {
+            Target.Parse();
+        }
     }
 }

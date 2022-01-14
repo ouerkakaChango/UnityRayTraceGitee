@@ -32,14 +32,15 @@ Texture2D<float4> envBgTex;
 
 //#########################################################################################################
 
-float3 GetSDFGameColor(in Ray ray)
+float3 GetMeshSDFColor(in Ray ray)
 {
 	float3 re = 0;
 	//---Trace
 	HitInfo minHit;
 	Init(minHit);
 	//!!!
-	//SDFScene(ray, minHit);
+	//1.通过meshSDF计算得其SDF的bbox
+
 	//___Trace
 
 	if (minHit.bHit)
@@ -100,7 +101,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 			ray.pos = pixLeftDownPos + screenU * pixW * i * SSAA_unitDis + screenV * pixH * j * SSAA_unitDis;
 			ray.dir = normalize(ray.pos - eyePos);
 
-			SSAA_colors[i-1+(j-1)* SSAA_edge] = GetSDFGameColor(ray);
+			SSAA_colors[i-1+(j-1)* SSAA_edge] = GetMeshSDFColor(ray);
 		}
 	}
 

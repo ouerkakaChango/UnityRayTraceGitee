@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using PointCloudHelper;
 using Debugger;
@@ -8,6 +9,7 @@ using static MathHelper.Vec;
 using static MathHelper.XMathFunc;
 using FastGeo;
 using Ray = FastGeo.Ray;
+using XFileHelper;
 
 public enum MeshSDFGenerateSampleType
 {
@@ -38,6 +40,7 @@ public class MeshSDFGenerator : MonoBehaviour
     MeshSDFGenerateSampleType sampleType = MeshSDFGenerateSampleType.unitSphere;
     float[] sdfArr;
     float[] debugColor;
+    public string outPath = "Assets/meshSDF.bytes";
     //###########################################
     // Start is called before the first frame update
     void Start()
@@ -267,13 +270,6 @@ public class MeshSDFGenerator : MonoBehaviour
                 for (int i = 0; i < unitCount.x; i++)
                 {
                     Vector3 pos = ToWorld(startUnitPos + Mul(unit,new Vector3(i,j,k)));
-                    {
-                        //Vector3 dir = (ToWorld(meshBounds.center) - pos).normalized;
-                        //Ray ray = new Ray(pos, dir);
-                        //var hitInfo = bvhComp.Trace(ray);
-                        //visual.Add(ray, hitInfo);
-                    }
-                    bool validSDF = false;
                     float minDis = 1000000.0f;
                     int sampleNum = GetSampleCount();
                     for (int testInx = 0; testInx < sampleNum; testInx++)
@@ -287,7 +283,6 @@ public class MeshSDFGenerator : MonoBehaviour
                             if (tDis < minDis)
                             {
                                 minDis = tDis;
-                                validSDF = true;
                             }
                         }
                     }
@@ -297,14 +292,57 @@ public class MeshSDFGenerator : MonoBehaviour
             }
         }
 
-        float maxDis = maxComp(unitCount) * maxComp(unit);
+        UpdateDebugSDFColor();
+        logger.LogSec();
+    }
 
+    void UpdateDebugSDFColor()
+    {
+        float maxDis = maxComp(unitCount) * maxComp(unit);
         debugColor = new float[sdfArr.Length];
         for (int i = 0; i < sdfArr.Length; i++)
         {
             float d = sdfArr[i] < maxDis ? sdfArr[i] : maxDis;
-            debugColor[i] = pow(saturate(1 - d / maxDis),5);
+            debugColor[i] = pow(saturate(1 - d / maxDis), 5);
         }
-        logger.LogSec();
+    }
+
+    public void Save()
+    {
+        //struct MeshSDF
+        //{
+        //	startPos
+        //	unitCount
+        //	unit
+        //	sdfArr
+        //}
+
+        var writer = FileHelper.BeginWrite(outPath);
+        writer.Write(startUnitPos);
+        writer.Write(unitCount);
+        writer.Write(unit);
+        writer.Write(sdfArr);
+        writer.Close();
+
+        Debug.Log("Mesh SDF Saved");
+    }
+
+    public void Parse(string path = "")
+    {
+        if (path == "")
+        {
+            path = outPath;
+        }
+
+        var reader = FileHelper.BeginRead(path);
+        reader.Read(ref startUnitPos);
+        reader.Read(ref unitCount);
+        reader.Read(ref unit);
+        reader.Read(ref sdfArr);
+        reader.Close();
+
+        UpdateDebugSDFColor();
+
+        hasInited = true;
     }
 }
