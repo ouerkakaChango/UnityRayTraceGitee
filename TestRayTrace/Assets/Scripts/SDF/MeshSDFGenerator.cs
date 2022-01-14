@@ -37,7 +37,7 @@ public class MeshSDFGenerator : MonoBehaviour
     Bounds meshBounds;
     Vector3Int unitCount;
 
-    MeshSDFGenerateSampleType sampleType = MeshSDFGenerateSampleType.unitSphere;
+    public MeshSDFGenerateSampleType sampleType = MeshSDFGenerateSampleType.unitSphere;
     float[] sdfArr;
     float[] debugColor;
     public string outPath = "Assets/meshSDF.bytes";
@@ -220,7 +220,7 @@ public class MeshSDFGenerator : MonoBehaviour
             Debug.Log("TestTrace need bvh has inited");
             return;
         }
-        var hitInfo = bvhComp.Trace(ray);
+        var hitInfo = bvhComp.TraceLocalRay(ray);
         visual.Add(ray,hitInfo);
     }
 
@@ -236,7 +236,7 @@ public class MeshSDFGenerator : MonoBehaviour
         }
     }
 
-    Vector3 GetSampleDir(in Vector3 pos, int sampleInx)
+    public Vector3 GetSampleDir(in Vector3 pos, int sampleInx)
     {
         if (sampleType == MeshSDFGenerateSampleType.testCenter)
         {
@@ -253,6 +253,11 @@ public class MeshSDFGenerator : MonoBehaviour
         TimeLogger logger = new TimeLogger("Bake Mesh SDF");
         logger.Start();
         var visual = GetComponent<RayHitVisualizer>();
+        if (!visual)
+        {
+            Debug.Log("Bake need RayHitVisualizer");
+            return;
+        }
 
         var bvhComp = GetComponent<BVHTool>();
         if (!bvhComp.IsInited())
@@ -260,6 +265,7 @@ public class MeshSDFGenerator : MonoBehaviour
             Debug.Log("Bake need bvh has inited");
             return;
         }
+        bvhComp.UpdateMeshInfos();
 
         sdfArr = new float[unitCount.x * unitCount.y * unitCount.z];
 
@@ -271,20 +277,28 @@ public class MeshSDFGenerator : MonoBehaviour
                 {
                     Vector3 pos = ToWorld(startUnitPos + Mul(unit,new Vector3(i,j,k)));
                     float minDis = 1000000.0f;
+                    bool bValid = false;
                     int sampleNum = GetSampleCount();
                     for (int testInx = 0; testInx < sampleNum; testInx++)
                     {
                         Vector3 dir = GetSampleDir(pos, testInx);
                         Ray ray = new Ray(pos, dir);
-                        HitInfo hitInfo = bvhComp.Trace(ray);
+                        HitInfo hitInfo = bvhComp.TraceWorldRay(ray);
                         if (hitInfo.bHit)
                         {
                             float tDis = length(hitInfo.P - pos);
                             if (tDis < minDis)
                             {
                                 minDis = tDis;
+                                bValid = true;
                             }
+                            visual.hitPnts.Add(hitInfo.P);
+                            //visual.hitPnts.Add(ray.pos);
                         }
+                    }
+                    if (!bValid)
+                    {
+                        minDis = 0;
                     }
                     //Save minDis to sdfArr
                     sdfArr[i + j * unitCount.x + k * unitCount.x * unitCount.y] = minDis;

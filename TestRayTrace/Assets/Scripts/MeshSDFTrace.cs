@@ -5,12 +5,30 @@ using FastGeo;
 using Ray = FastGeo.Ray;
 using Debugger;
 
+public struct MeshSDFGrid
+{
+    public Vector3 startPos;
+    public Vector3Int unitCount;
+    public Vector3 unit;
+}
+
+public struct MeshSDFGPUArrData
+{
+    public float sdf;
+}
+
 public class MeshSDFTrace : MonoBehaviour
 {
     const int CoreX = 8;
     const int CoreY = 8;
 
     RenderTexture rt;
+
+    MeshSDFGrid grid;
+    ComputeBuffer buffer_sdfArr;
+    MeshSDFGPUArrData[] sdfArr;
+    public TextAsset meshSDFFile;
+    public Transform meshTrans;
 
     public ComputeShader cs;
     public Texture2D envDiffTex;
@@ -80,7 +98,7 @@ public class MeshSDFTrace : MonoBehaviour
 
     private void OnDisable()
     {
-        //SafeDispose(buffer_tris);
+        SafeDispose(buffer_sdfArr);
     }
 
     //##################################################################################################
@@ -136,7 +154,8 @@ public class MeshSDFTrace : MonoBehaviour
             return;
         }
 
-        //PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, vertices);
+        //PreComputeBuffer(ref buffer_meshSDFData, GetMeshSDFDataStride(), meshSDFData);
+        PreComputeBuffer(ref buffer_sdfArr, sizeof(float), sdfArr);
         //##################################
         //### compute
         int kInx = cs.FindKernel("Render");
@@ -162,6 +181,12 @@ public class MeshSDFTrace : MonoBehaviour
         cs.SetVector("screenU", screenU);
         cs.SetVector("screenV", screenV);
 
+        //$$$
+        cs.SetVector("startPos", grid.startPos);
+        cs.SetVector("unitCount", (Vector3)grid.unitCount);
+        cs.SetVector("unit", grid.unit);
+        cs.SetBuffer(kInx, "sdfArr", buffer_sdfArr);
+
         cs.Dispatch(kInx, w / CoreX, h / CoreY, 1);
         //### compute
         //#####################################;
@@ -176,6 +201,8 @@ public class MeshSDFTrace : MonoBehaviour
             rt.enableRandomWrite = true;
             rt.Create();
         }
+        MeshSDF.ParseGPU(meshSDFFile, out grid, out sdfArr);
+        grid.startPos += meshTrans.position;
         hasInited = true;
     }
 

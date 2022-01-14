@@ -58,6 +58,13 @@ namespace XFileHelper
             return reader;
         }
 
+        public static BinaryReader BeginRead(TextAsset file)
+        {
+            var steam = new MemoryStream(file.bytes);
+            var reader = new BinaryReader(steam);
+            return reader;
+        }
+
         public static void Read(this BinaryReader reader, ref int[] arr)
         {
             int len = reader.ReadInt32();

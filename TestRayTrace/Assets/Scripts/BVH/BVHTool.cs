@@ -124,6 +124,8 @@ public class BVHTool : MonoBehaviour
     {
         TimeLogger logger = new TimeLogger("BVHInit",false);
         logger.Start();
+        var meshFiliter = gameObject.GetComponent<MeshFilter>();
+        mesh = meshFiliter.sharedMesh;
         vertices = mesh.vertices;
         ToWorldCoord();
         logger.LogSec();
@@ -150,6 +152,7 @@ public class BVHTool : MonoBehaviour
         for (int i = 0; i < tree.Length;i++)
         {
             AddRender(tree[i]);
+            //Debug.Log(tree[i].min+" "+ tree[i].max)
         }
 
         logger.LogSec();
@@ -444,6 +447,7 @@ public class BVHTool : MonoBehaviour
         int treeLen = reader.ReadInt32();
         //treeLen = 2^(depth+1) - 1
         depth = (int)(Mathf.Log((float)(treeLen + 1), 2.0f)) - 1;
+        usrDepth = depth;
         tree = new BVHNode[treeLen];
         lines.Clear();
         for (int i = 0; i < treeLen; i++)
@@ -486,8 +490,9 @@ public class BVHTool : MonoBehaviour
         hasInitMeshWorldData = true;
     }
 
+    //!!! ray must be in local space
     const int MAXLEAVES = 32;
-    public HitInfo Trace(Ray ray)
+    public HitInfo TraceLocalRay(Ray ray)
     {
         HitInfo re = HitInfo.Default();
 
@@ -624,6 +629,12 @@ public class BVHTool : MonoBehaviour
         return re;
     }
 
+    public HitInfo TraceWorldRay(Ray ray)
+    {
+        ray.pos -= transform.position;
+        return TraceLocalRay(ray);
+    }
+
     public void Test()
     {
         if (!hasInitMeshWorldData)
@@ -631,5 +642,14 @@ public class BVHTool : MonoBehaviour
             InitMeshWorldData();
         }
         bTest = !bTest;
+    }
+
+    public void UpdateMeshInfos()
+    {
+        var meshFiliter = gameObject.GetComponent<MeshFilter>();
+        mesh = meshFiliter.sharedMesh;
+        Debug.Log("update bvh mesh: " + mesh);
+        vertices = mesh.vertices;
+        InitMeshWorldData();
     }
 }

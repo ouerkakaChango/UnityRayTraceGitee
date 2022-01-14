@@ -3,6 +3,7 @@
 
 #include "../HLSL/UnityCommonDef.hlsl"
 #include "../HLSL/RayMath.hlsl"
+#include "../HLSL/GridMath.hlsl"
 #include "../HLSL/PBR/PBR_IBL.hlsl"
 #include "../HLSL/PBR/PBR_GGX.hlsl"
 #include "../HLSL/SDFGame/SDFCommonSys.hlsl"
@@ -30,24 +31,127 @@ Texture2DArray envSpecTex2DArr;
 Texture2D<float4> brdfLUT;
 Texture2D<float4> envBgTex;
 
+float3 startPos;
+float3 unitCount;
+float3 unit;
+struct MeshSDFGPUArrData
+{
+	float sdf;
+};
+StructuredBuffer<MeshSDFGPUArrData> sdfArr;
+
 //#########################################################################################################
+#define MAXMeshSDFTrace 40
+#define Thre_MeshSDF 0.01f
+
+float GetMeshSDFByInx(int3 inx)
+{
+	return sdfArr[inx.x + inx.y *(unitCount.x) + inx.z*(unitCount.x*unitCount.y)].sdf;
+}
+
+float GetMeshSDF(in float3 p)
+{
+	//1.根据p-startPos，再除unit，得到当前位置i,j,k
+	int3 inx = GetCellInx(p, startPos - 0.5f*unit, unit, unitCount-float3(1,1,1));
+	float arr[8];
+	arr[0] = GetMeshSDFByInx(inx + int3(0, 0, 0));
+	arr[1] = GetMeshSDFByInx(inx + int3(1, 0, 0));
+	arr[2] = GetMeshSDFByInx(inx + int3(1, 1, 0));
+	arr[3] = GetMeshSDFByInx(inx + int3(0, 1, 0));
+
+	arr[4] = GetMeshSDFByInx(inx + int3(0, 0, 1));
+	arr[5] = GetMeshSDFByInx(inx + int3(1, 0, 1));
+	arr[6] = GetMeshSDFByInx(inx + int3(1, 1, 1));
+	arr[7] = GetMeshSDFByInx(inx + int3(0, 1, 1));
+
+	float3 cellStart = startPos + unit * inx;
+	float3 uvw = (p - cellStart) / unit;
+
+	return lerp3D(arr, uvw);
+}
+
+float3 GetMeshSDFNormal(float3 p)
+{
+	float epsilon = 0.0001f;
+	return normalize(float3(
+		GetMeshSDF(float3(p.x + epsilon, p.y, p.z)) - GetMeshSDF(float3(p.x - epsilon, p.y, p.z)),
+		GetMeshSDF(float3(p.x, p.y + epsilon, p.z)) - GetMeshSDF(float3(p.x, p.y - epsilon, p.z)),
+		GetMeshSDF(float3(p.x, p.y, p.z + epsilon)) - GetMeshSDF(float3(p.x, p.y, p.z - epsilon))
+		));
+}
+
+void TraceSDFMesh(Ray ray, out HitInfo info)
+{
+	Init(info);
+
+	float3 boxMin = startPos;
+	float3 boxMax = startPos + unitCount * unit;
+
+	int traceCount = 0;
+	while (traceCount <= MAXMeshSDFTrace)
+	{
+		if (!IsInBBox(ray.pos, boxMin, boxMax))
+		{
+			break;
+		}
+
+		//get sdf at now pos
+		float sdf = GetMeshSDF(ray.pos);
+
+		if (sdf < Thre_MeshSDF)
+		{
+			info.bHit = true;
+			//!!!
+			info.obj = 0;
+			info.N = GetMeshSDFNormal(ray.pos);
+			info.P = ray.pos;
+			break;
+		}
+		ray.pos += sdf * ray.dir;
+		traceCount++;
+	}
+}
 
 float3 GetMeshSDFColor(in Ray ray)
 {
 	float3 re = 0;
 	//---Trace
 	HitInfo minHit;
-	Init(minHit);
 	//!!!
 	//1.通过meshSDF计算得其SDF的bbox
-
+	{
+		//CastInfo castInfo = CastBBox(ray, startPos, startPos + unitCount * unit);
+		//if (castInfo.bHit)
+		//{
+		//	return float3(1, 0, 0);
+		//}
+	}
+	Ray sampleRay = ray;
+	bool needTrace = true;
+	float3 boxMin = startPos;
+	float3 boxMax = startPos + unitCount * unit;
+	if (!IsInBBox(ray.pos, boxMin, boxMax))
+	{
+		CastInfo castInfo = CastBBox(ray, startPos, startPos + unitCount * unit);
+		if (castInfo.bHit)
+		{
+			sampleRay.pos += sampleRay.dir * castInfo.dis;
+		}
+		else
+		{
+			needTrace = false;
+		}
+	}
+	//盒子内和会打到盒子的ray都需要进行SDFSphereTrace
+	if (needTrace)
+	{
+		//$$$
+		TraceSDFMesh(sampleRay, minHit);
+	}
 	//___Trace
 
-	if (minHit.bHit)
+	if (needTrace && minHit.bHit)
 	{//Trace到Mesh了，返回Mesh的颜色 
-		//???
-		minHit.obj = 0;
-
 		Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
 		{
 			//re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);

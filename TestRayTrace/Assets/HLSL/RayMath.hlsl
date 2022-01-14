@@ -242,63 +242,6 @@ bool IsRayQuad_Corner(Ray ray, Plane plane, float2 size, float3 v1, float3 v2)
 		(abs(dot(dv, v2)) <= (size.y / 2));
 }
 
-//1.从x,y,z方向，每两个平面和ray测交点
-//只要有一个交点在bbox内，则返回truebb
-//!!! 没考虑ray在bbox内
-bool Error_IsRayBBox(Ray ray, float3 min, float3 max)
-{
-	//1.x方向
-	Plane plane; 
-	plane.p = min;
-	plane.n = float3(-1, 0, 0);
-	float2 quadSize = max.yz - min.yz;
-	if (IsRayQuad_Corner(ray, plane, quadSize, float3(0, 1, 0), float3(0, 0, 1)))
-	{
-		return true;
-	}
-
-	plane.p = max;
-	plane.n = float3(1, 0, 0);
-	if (IsRayQuad_Corner(ray, plane, quadSize, float3(0, -1, 0), float3(0, 0, -1)))
-	{
-		return true;
-	}
-
-	//2.y方向
-	plane.p = min;
-	plane.n = float3(0, -1, 0);
-	quadSize = max.xz - min.xz;
-	if (IsRayQuad_Corner(ray, plane, quadSize, float3(1, 0, 0), float3(0, 0, 1)))
-	{
-		return true;
-	}
-
-	plane.p = max;
-	plane.n = float3(0, 1, 0);
-	if (IsRayQuad_Corner(ray, plane, quadSize, float3(-1, 0, 0), float3(0, 0, -1)))
-	{
-		return true;
-	}
-
-	//3.z方向
-	plane.p = min;
-	plane.n = float3(0, 0, -1);
-	quadSize = max.xy - min.xy;
-	if (IsRayQuad_Corner(ray, plane, quadSize, float3(1, 0, 0), float3(0, 1, 0)))
-	{
-		return true;
-	}
-
-	plane.p = max;
-	plane.n = float3(0, 0, 1);
-	if (IsRayQuad_Corner(ray, plane, quadSize, float3(-1, 0, 0), float3(0, -1, 0)))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 //默认该Normalize的已经normalize
 //Plane是quad所在plane,plane.p是quad的某顶点
 //size是quad的大小，v1,v2是以plane.p为起点，两边的方向向量，和size顺序对应
@@ -522,6 +465,11 @@ bool IsRayAABB(in Ray ray, float3 min, float3 max)
 		}
 	}
 	return false;
+}
+
+bool IsInBBox(in float3 pos, in float3 boxMin, in float3 boxMax)
+{
+	return gt(pos, boxMin) && lt(pos, boxMax);
 }
 
 #endif

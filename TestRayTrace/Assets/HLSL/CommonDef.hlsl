@@ -66,6 +66,18 @@ bool lt(float3 a, float3 b)
 	return a.x < b.x && a.y < b.y && a.z < b.z;
 }
 
+bool equal(float a, float b, float tolerance = 0.000001f)
+{
+	return abs(a - b) < tolerance;
+}
+
+bool equal(float3 a, float3 b, float tolerance = 0.000001f)
+{
+	return equal(a.x, b.x, tolerance) &&
+		equal(a.y, b.y, tolerance) &&
+		equal(a.z, b.z, tolerance);
+}
+
 int GetTreeDepth(int inx,int maxDepth)
 {
 	//depht = 2,  >=2^2-1, <=2^3-2
