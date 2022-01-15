@@ -52,6 +52,7 @@ float GetObjSDF(int inx, float3 p)
 	if (inx == 0)
 	{
 		//return SDFSphere(p, float3(0, 0.5, 0), 0.5); //球
+		//return SDFSphere(p, float3(0, 0, 0), 0.5); //球
 		return SDFPlanet(p);
 	}
 	//else if (inx == 1)

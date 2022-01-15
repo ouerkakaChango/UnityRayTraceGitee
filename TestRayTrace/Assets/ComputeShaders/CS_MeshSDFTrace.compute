@@ -46,13 +46,19 @@ StructuredBuffer<MeshSDFGPUArrData> sdfArr;
 
 float GetMeshSDFByInx(int3 inx)
 {
+	//return 0;
+
+	//???
+	//float3 pos = startPos + unit * inx;
+	//return length(pos) - 0.5f;
+
 	return sdfArr[inx.x + inx.y *(unitCount.x) + inx.z*(unitCount.x*unitCount.y)].sdf;
 }
 
 float GetMeshSDF(in float3 p)
 {
 	//1.根据p-startPos，再除unit，得到当前位置i,j,k
-	int3 inx = GetCellInx(p, startPos - 0.5f*unit, unit, unitCount-float3(1,1,1));
+	int3 inx = GetCellInx(p, startPos, unit, unitCount-1);
 	float arr[8];
 	arr[0] = GetMeshSDFByInx(inx + int3(0, 0, 0));
 	arr[1] = GetMeshSDFByInx(inx + int3(1, 0, 0));
@@ -85,7 +91,7 @@ void TraceSDFMesh(Ray ray, out HitInfo info)
 	Init(info);
 
 	float3 boxMin = startPos;
-	float3 boxMax = startPos + unitCount * unit;
+	float3 boxMax = startPos + (unitCount - 1) * unit;
 
 	int traceCount = 0;
 	while (traceCount <= MAXMeshSDFTrace)
@@ -95,15 +101,19 @@ void TraceSDFMesh(Ray ray, out HitInfo info)
 			break;
 		}
 
+		//???
 		//get sdf at now pos
 		float sdf = GetMeshSDF(ray.pos);
+		//float sdf = SDFSphere(ray.pos, float3(0,0,0), 0.5);
 
 		if (sdf < Thre_MeshSDF)
 		{
 			info.bHit = true;
 			//!!!
 			info.obj = 0;
-			info.N = GetMeshSDFNormal(ray.pos);
+			//???
+			//info.N = GetMeshSDFNormal(ray.pos);
+			info.N = SDFSphereNormal(ray.pos, float3(0, 0, 0));
 			info.P = ray.pos;
 			break;
 		}
@@ -129,13 +139,14 @@ float3 GetMeshSDFColor(in Ray ray)
 	Ray sampleRay = ray;
 	bool needTrace = true;
 	float3 boxMin = startPos;
-	float3 boxMax = startPos + unitCount * unit;
+	float3 boxMax = startPos + (unitCount-1) * unit;
 	if (!IsInBBox(ray.pos, boxMin, boxMax))
 	{
-		CastInfo castInfo = CastBBox(ray, startPos, startPos + unitCount * unit);
+		CastInfo castInfo = CastBBox(ray, boxMin, boxMax);
 		if (castInfo.bHit)
 		{
-			sampleRay.pos += sampleRay.dir * castInfo.dis;
+			//!!! offset 0.00..1f is a must!
+			sampleRay.pos += sampleRay.dir * (castInfo.dis+0.0001f);
 		}
 		else
 		{
