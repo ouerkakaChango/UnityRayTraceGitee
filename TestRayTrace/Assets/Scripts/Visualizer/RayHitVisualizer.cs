@@ -29,11 +29,11 @@ public class RayHitVisualizer : MonoBehaviour
 
         for (int i = 0; i < hitLines.Count; i++)
         {
-            Gizmos.DrawLine(hitLines[i].a, hitLines[i].b);
+            Gizmos.DrawLine(hitLines[i].a , hitLines[i].b );
         }
         for (int i = 0; i < hitPnts.Count; i++)
         {
-            Gizmos.DrawCube(hitPnts[i], Vector3.one * 0.02f);
+            Gizmos.DrawCube(hitPnts[i] , Vector3.one * 0.02f);
         }
 
         Gizmos.color = Color.magenta;
@@ -43,6 +43,10 @@ public class RayHitVisualizer : MonoBehaviour
         {
             Gizmos.DrawLine(missLines[i].a, missLines[i].b);
         }
+
+        Gizmos.color = Color.magenta;
+        //Gizmos.DrawIcon(Vector3.zero, "visual");
+        Gizmos.DrawSphere(new Vector3(1, 0, 0), 0.5f);
     }
 
     void OnRenderObject()

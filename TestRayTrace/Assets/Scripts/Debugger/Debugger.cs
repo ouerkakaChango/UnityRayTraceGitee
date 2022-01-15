@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FastGeo;
+using Ray = FastGeo.Ray;
 
 namespace Debugger
 {
@@ -35,6 +36,11 @@ namespace Debugger
         public static void DebugVert(Vertex vert)
         {
             Debug.Log("p: "+VecStr(vert.p) +"\n"+"n: "+ VecStr(vert.n));
+        }
+
+        public static void DebugRay(Ray ray)
+        {
+            Debug.Log("pos: " + VecStr(ray.pos) + " dir: " + VecStr(ray.dir));
         }
     }
 }

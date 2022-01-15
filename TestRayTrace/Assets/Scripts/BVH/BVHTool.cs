@@ -59,10 +59,9 @@ public class BVHTool : MonoBehaviour
 
     //##########################################
     //## for CPU Trace BVH 
-    bool hasInitMeshWorldData = false;
-    Vector3[] world_vertices;
-    Vector3[] world_normals;
-    bool bTest = false;
+    //bool hasInitMeshWorldData = false;
+    //Vector3[] world_vertices;
+    //Vector3[] world_normals;
     //##########################################
 
     // Start is called before the first frame update
@@ -100,15 +99,7 @@ public class BVHTool : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        
-        if (bTest)
-        {
-            Gizmos.color = Color.blue;
-            for (int i = 0; i < world_vertices.Length; i++)
-            {
-                Gizmos.DrawSphere(world_vertices[i], 0.01f);
-            }
-        }
+
     }
 
     void OnRenderObject()
@@ -120,6 +111,7 @@ public class BVHTool : MonoBehaviour
         RenderBBox();
     }
 
+    public bool oldRender = false;
     public void Init()
     {
         TimeLogger logger = new TimeLogger("BVHInit",false);
@@ -127,7 +119,10 @@ public class BVHTool : MonoBehaviour
         var meshFiliter = gameObject.GetComponent<MeshFilter>();
         mesh = meshFiliter.sharedMesh;
         vertices = mesh.vertices;
-        ToWorldCoord();
+        if (oldRender)
+        {
+            ToWorldCoord();
+        }
         logger.LogSec();
         tris = mesh.triangles;
         Debug.Log(mesh);
@@ -148,6 +143,8 @@ public class BVHTool : MonoBehaviour
         SetNode(0, tris.Length/3-1, 0);
 
         logger.LogSec();
+
+        
 
         for (int i = 0; i < tree.Length;i++)
         {
@@ -369,8 +366,8 @@ public class BVHTool : MonoBehaviour
 
             for (int i1 = 0; i1 < 12; i1++)
             {
-                GL.Vertex(lines[i1+i*12].a);
-                GL.Vertex(lines[i1+i*12].b);
+                GL.Vertex(lines[i1+i*12].a+transform.position);
+                GL.Vertex(lines[i1+i*12].b+transform.position);
             }
 
             GL.End();
@@ -472,38 +469,39 @@ public class BVHTool : MonoBehaviour
         return tree != null;
     }
 
-    void InitMeshWorldData()
+    //void InitMeshWorldData()
+    //{
+    //    var l2w = transform.localToWorldMatrix;
+    //    world_vertices = new Vector3[vertices.Length];
+    //    for (int i=0;i<vertices.Length;i++)
+    //    {
+    //        world_vertices[i] = l2w.MultiplyPoint(vertices[i]);//l2w * vertices[i];
+    //    }
+    //
+    //    world_normals = new Vector3[mesh.normals.Length];
+    //    for (int i = 0; i < mesh.normals.Length; i++)
+    //    {
+    //        world_normals[i] = l2w.MultiplyPoint(mesh.normals[i]);
+    //    }
+    //
+    //    hasInitMeshWorldData = true;
+    //}
+
+    public HitInfo TraceWorldRay(Ray ray)
     {
-        var l2w = transform.localToWorldMatrix;
-        world_vertices = new Vector3[vertices.Length];
-        for (int i=0;i<vertices.Length;i++)
-        {
-            world_vertices[i] = l2w.MultiplyPoint(vertices[i]);//l2w * vertices[i];
-        }
-
-        world_normals = new Vector3[mesh.normals.Length];
-        for (int i = 0; i < mesh.normals.Length; i++)
-        {
-            world_normals[i] = l2w.MultiplyPoint(mesh.normals[i]);
-        }
-
-        hasInitMeshWorldData = true;
+        ray.pos -= transform.position;
+        var re = TraceLocalRay(ray);
+        re.P += transform.position;
+        return re;
     }
 
-    //!!! ray must be in local space
+        //!!! ray must be in local space
     const int MAXLEAVES = 32;
     public HitInfo TraceLocalRay(Ray ray)
     {
+        //Log.DebugRay(ray);
         HitInfo re = HitInfo.Default();
 
-        //re.bHit = true;
-        //re.p = ray.pos + 2 * ray.dir;
-        //return re;
-
-        if (!hasInitMeshWorldData)
-        {
-            InitMeshWorldData();
-        }
         TimeLogger logger = new TimeLogger("BVH.Trace",false);
         logger.Start();
         //---
@@ -584,13 +582,13 @@ public class BVHTool : MonoBehaviour
                     Vertex v2;
                     Vertex v3;
 
-                    v1.p = world_vertices[tris[inx]];
-                    v2.p = world_vertices[tris[inx + 1]];
-                    v3.p = world_vertices[tris[inx + 2]];
+                    v1.p = mesh.vertices[tris[inx]];
+                    v2.p = mesh.vertices[tris[inx + 1]];
+                    v3.p = mesh.vertices[tris[inx + 2]];
 
-                    v1.n = world_normals[tris[inx]];
-                    v2.n = world_normals[tris[inx + 1]];
-                    v3.n = world_normals[tris[inx + 2]];
+                    v1.n = mesh.normals[tris[inx]];
+                    v2.n = mesh.normals[tris[inx + 1]];
+                    v3.n = mesh.normals[tris[inx + 2]];
 
                     HitInfo hit = RayCastTri(ray, v1, v2, v3);
                     if (hit.bHit)
@@ -629,19 +627,9 @@ public class BVHTool : MonoBehaviour
         return re;
     }
 
-    public HitInfo TraceWorldRay(Ray ray)
-    {
-        ray.pos -= transform.position;
-        return TraceLocalRay(ray);
-    }
-
     public void Test()
     {
-        if (!hasInitMeshWorldData)
-        {
-            InitMeshWorldData();
-        }
-        bTest = !bTest;
+
     }
 
     public void UpdateMeshInfos()
@@ -650,6 +638,5 @@ public class BVHTool : MonoBehaviour
         mesh = meshFiliter.sharedMesh;
         Debug.Log("update bvh mesh: " + mesh);
         vertices = mesh.vertices;
-        InitMeshWorldData();
     }
 }

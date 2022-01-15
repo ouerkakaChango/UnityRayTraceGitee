@@ -209,10 +209,9 @@ public class MeshSDFGenerator : MonoBehaviour
         var visual = GetComponent<RayHitVisualizer>();
 
         Vector3 pos = ToWorld(startUnitPos);
+        //Vector3 pos = startUnitPos;
         Vector3 dir = (meshBounds.center - startUnitPos).normalized; //旋转不需要model转world，都一样
         Ray ray = new Ray(pos, dir);
-
-        //visual.rays.Add(new Line(pos, pos + dir * 2));
 
         var bvhComp = GetComponent<BVHTool>();
         if (!bvhComp.IsInited())
@@ -220,7 +219,19 @@ public class MeshSDFGenerator : MonoBehaviour
             Debug.Log("TestTrace need bvh has inited");
             return;
         }
-        var hitInfo = bvhComp.TraceLocalRay(ray);
+        bvhComp.UpdateMeshInfos();
+
+        Debug.Log("FF");
+        Debug.Log(startUnitPos);
+        Debug.Log(pos);
+        //var hitInfo = bvhComp.TraceWorldRay(ray);
+
+        ray.pos -= transform.position;
+        //var hitInfo = bvhComp.TraceLocalRay(ray);
+        Debug.Log("diff" + Log.VecStr(ray.pos - startUnitPos));
+        //??? -0.8和-0.800002结果不同，可能正好穿过三角形顶点，漏了
+        var hitInfo = bvhComp.TraceLocalRay(new Ray(new Vector3(-0.8002f, startUnitPos.y, startUnitPos.z), ray.dir));
+
         visual.Add(ray,hitInfo);
     }
 
