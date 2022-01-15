@@ -27,6 +27,12 @@ public class MeshSDFGeneratorEditor : Editor
             Target.TestTrace();
         }
 
+        if (GUILayout.Button("TestSaveStandardSphere"))
+        {
+            Target.TestSaveStandardSphere();
+            AssetDatabase.Refresh();
+        }
+
         if (GUILayout.Button("Bake"))
         {
             Target.Bake();

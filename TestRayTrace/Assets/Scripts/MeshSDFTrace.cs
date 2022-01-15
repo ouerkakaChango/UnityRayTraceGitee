@@ -28,7 +28,7 @@ public class MeshSDFTrace : MonoBehaviour
     ComputeBuffer buffer_sdfArr;
     MeshSDFGPUArrData[] sdfArr;
     public TextAsset meshSDFFile;
-    public Transform meshTrans;
+    //public Transform meshTrans;
 
     public ComputeShader cs;
     public Texture2D envDiffTex;
@@ -202,7 +202,7 @@ public class MeshSDFTrace : MonoBehaviour
             rt.Create();
         }
         MeshSDF.ParseGPU(meshSDFFile, out grid, out sdfArr);
-        grid.startPos += meshTrans.position;
+        //grid.startPos += meshTrans.position;
         hasInited = true;
     }
 

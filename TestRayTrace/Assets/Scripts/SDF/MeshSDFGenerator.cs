@@ -164,6 +164,7 @@ public class MeshSDFGenerator : MonoBehaviour
         InitUnitCount();
 
         hasInited = true;
+        debugColor = null;
     }
 
     void FixScale100()
@@ -330,6 +331,42 @@ public class MeshSDFGenerator : MonoBehaviour
             float d = sdfArr[i] < maxDis ? sdfArr[i] : maxDis;
             debugColor[i] = pow(saturate(1 - d / maxDis), 5);
         }
+    }
+
+    public void TestSaveStandardSphere()
+    {
+        //0.5半径的正圆，5 divide, 1 extend
+        meshBounds.min = Vector3.one * (-0.5f);
+        meshBounds.max = Vector3.one * (0.5f);
+        unitDivide = new Vector3Int(5, 5, 5);
+        InitUnitCount();
+        unit = Vec.Divide(meshBounds.extents * 2, unitDivide);
+        startUnitPos = meshBounds.min + 0.5f * unit;
+        var t1 = unitExtend;
+        t1.y = 0;
+        startUnitPos -= Vec.Mul(unit, t1);
+
+        float radius = 0.5f;
+        sdfArr = new float[unitCount.x * unitCount.y * unitCount.z];
+        for (int k = 0; k < unitCount.z; k++)
+        {
+            for (int j = 0; j < unitCount.y; j++)
+            {
+                for (int i = 0; i < unitCount.x; i++)
+                {
+                    var p = startUnitPos + Mul(unit, new Vector3(i, j, k));
+                    if(p.magnitude<= radius)
+                    {
+                        sdfArr[i + j * unitCount.x + k * unitCount.x * unitCount.y] = 0;
+                    }
+                    else
+                    {
+                        sdfArr[i + j * unitCount.x + k * unitCount.x * unitCount.y] = p.magnitude - radius;
+                    }
+                }
+            }
+        }
+        Save();
     }
 
     public void Save()

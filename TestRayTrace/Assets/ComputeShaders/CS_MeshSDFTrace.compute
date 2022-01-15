@@ -146,6 +146,7 @@ float3 GetMeshSDFColor(in Ray ray)
 	if (needTrace)
 	{
 		//$$$
+		//return float3(1, 0, 0);
 		TraceSDFMesh(sampleRay, minHit);
 	}
 	//___Trace
