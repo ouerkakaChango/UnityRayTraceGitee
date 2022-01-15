@@ -41,7 +41,7 @@ struct MeshSDFGPUArrData
 StructuredBuffer<MeshSDFGPUArrData> sdfArr;
 
 //#########################################################################################################
-#define MAXMeshSDFTrace 40
+#define MAXMeshSDFTrace 20
 #define Thre_MeshSDF 0.01f
 
 float GetMeshSDFByInx(int3 inx)
@@ -50,7 +50,8 @@ float GetMeshSDFByInx(int3 inx)
 
 	//???
 	//float3 pos = startPos + unit * inx;
-	//return length(pos) - 0.5f;
+	//return length(pos) - 0.5f;		//Ok
+	//return max(length(pos) - 0.5f,0); //No
 
 	return sdfArr[inx.x + inx.y *(unitCount.x) + inx.z*(unitCount.x*unitCount.y)].sdf;
 }
@@ -112,8 +113,8 @@ void TraceSDFMesh(Ray ray, out HitInfo info)
 			//!!!
 			info.obj = 0;
 			//???
-			//info.N = GetMeshSDFNormal(ray.pos);
-			info.N = SDFSphereNormal(ray.pos, float3(0, 0, 0));
+			info.N = GetMeshSDFNormal(ray.pos);
+			//info.N = SDFSphereNormal(ray.pos, float3(0, 0, 0));
 			info.P = ray.pos;
 			break;
 		}
@@ -169,11 +170,14 @@ float3 GetMeshSDFColor(in Ray ray)
 			//re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
 		}
 		{
-			mat.metallic = 0.0f;
-			mat.roughness = 0.8f;
-			float3 lightDir = normalize(float3(1, -1, 1));
-			float3 lightColor = float3(1, 1, 1) * 2;
-			re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
+			//mat.metallic = 0.0f;
+			//mat.roughness = 0.8f;
+			//float3 lightDir = normalize(float3(1, -1, 1));
+			//float3 lightColor = float3(1, 1, 1) * 2;
+			//re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
+		}
+		{
+			re = minHit.N;
 		}
 	}
 	else

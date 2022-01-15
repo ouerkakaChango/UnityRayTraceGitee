@@ -338,7 +338,8 @@ public class MeshSDFGenerator : MonoBehaviour
         //0.5半径的正圆，5 divide, 1 extend
         meshBounds.min = Vector3.one * (-0.5f);
         meshBounds.max = Vector3.one * (0.5f);
-        unitDivide = new Vector3Int(5, 5, 5);
+        unitDivide = new Vector3Int(10, 10, 10);
+        unitExtend = new Vector3Int(2, 2, 2);
         InitUnitCount();
         unit = Vec.Divide(meshBounds.extents * 2, unitDivide);
         startUnitPos = meshBounds.min + 0.5f * unit;
@@ -348,6 +349,7 @@ public class MeshSDFGenerator : MonoBehaviour
 
         float radius = 0.5f;
         sdfArr = new float[unitCount.x * unitCount.y * unitCount.z];
+        string tt = "";
         for (int k = 0; k < unitCount.z; k++)
         {
             for (int j = 0; j < unitCount.y; j++)
@@ -355,17 +357,20 @@ public class MeshSDFGenerator : MonoBehaviour
                 for (int i = 0; i < unitCount.x; i++)
                 {
                     var p = startUnitPos + Mul(unit, new Vector3(i, j, k));
-                    if(p.magnitude<= radius)
-                    {
-                        sdfArr[i + j * unitCount.x + k * unitCount.x * unitCount.y] = 0;
-                    }
-                    else
+                    //if(p.magnitude<= radius)
+                    //{
+                    //    sdfArr[i + j * unitCount.x + k * unitCount.x * unitCount.y] = 0;
+                    //}
+                    //else
                     {
                         sdfArr[i + j * unitCount.x + k * unitCount.x * unitCount.y] = p.magnitude - radius;
                     }
+                    tt += sdfArr[i + j * unitCount.x + k * unitCount.x * unitCount.y] + " ";
                 }
             }
         }
+        //Debug.Log("raw test sdfArr");
+        //Debug.Log(tt);
         Save();
     }
 

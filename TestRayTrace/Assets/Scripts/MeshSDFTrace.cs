@@ -201,7 +201,10 @@ public class MeshSDFTrace : MonoBehaviour
             rt.enableRandomWrite = true;
             rt.Create();
         }
-        MeshSDF.ParseGPU(meshSDFFile, out grid, out sdfArr);
+        if (sdfArr == null)
+        {
+            MeshSDF.ParseGPU(meshSDFFile, out grid, out sdfArr);
+        }
         //grid.startPos += meshTrans.position;
         hasInited = true;
     }

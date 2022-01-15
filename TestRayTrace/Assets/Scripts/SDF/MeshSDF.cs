@@ -34,10 +34,13 @@ public class MeshSDF : MonoBehaviour
 
         int len = reader.ReadInt32();
         sdfArr = new MeshSDFGPUArrData[len];
+        string tt = "";
         for (int i = 0; i < len; i++)
         {
             sdfArr[i].sdf = reader.ReadSingle();
+            tt += sdfArr[i].sdf + " ";
         }
+        //Debug.Log(tt);
         reader.Close();
 
         reader.Close();
