@@ -28,5 +28,10 @@ namespace MathHelper
         {
             return new Vector3Int((int)(v1.x * v2.x), (int)(v1.y * v2.y), (int)(v1.z * v2.z));
         }
+
+        public static Vector3Int ToInt(in Vector3 v)
+        {
+            return new Vector3Int((int)v.x, (int)v.y, (int)v.z);
+        }
     }
 }

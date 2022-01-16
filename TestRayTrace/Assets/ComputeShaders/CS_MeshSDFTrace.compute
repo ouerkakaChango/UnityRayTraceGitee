@@ -77,13 +77,25 @@ float GetMeshSDF(in float3 p)
 	return lerp3D(arr, uvw);
 }
 
+//float3 GetMeshSDFNormal(float3 p)
+//{
+//	float epsilon = 0.0001f;
+//	return normalize(float3(
+//		GetMeshSDF(float3(p.x + epsilon, p.y, p.z)) - GetMeshSDF(float3(p.x - epsilon, p.y, p.z)),
+//		GetMeshSDF(float3(p.x, p.y + epsilon, p.z)) - GetMeshSDF(float3(p.x, p.y - epsilon, p.z)),
+//		GetMeshSDF(float3(p.x, p.y, p.z + epsilon)) - GetMeshSDF(float3(p.x, p.y, p.z - epsilon))
+//		));
+//}
+
+//讲道理当初没考虑超过bbox的MeshSDF,所以采样在bbox外面的MeshSDF，应该会出问题，
+//因此算出来的normal也可能会有问题
+//但是现在没问题，算了...
 float3 GetMeshSDFNormal(float3 p)
 {
-	float epsilon = 0.0001f;
 	return normalize(float3(
-		GetMeshSDF(float3(p.x + epsilon, p.y, p.z)) - GetMeshSDF(float3(p.x - epsilon, p.y, p.z)),
-		GetMeshSDF(float3(p.x, p.y + epsilon, p.z)) - GetMeshSDF(float3(p.x, p.y - epsilon, p.z)),
-		GetMeshSDF(float3(p.x, p.y, p.z + epsilon)) - GetMeshSDF(float3(p.x, p.y, p.z - epsilon))
+		GetMeshSDF(float3(p.x + unit.x*0.5f, p.y, p.z)) - GetMeshSDF(float3(p.x - unit.x*0.5f, p.y, p.z)),
+		GetMeshSDF(float3(p.x, p.y + unit.y*0.5, p.z)) - GetMeshSDF(float3(p.x, p.y - unit.y*0.5, p.z)),
+		GetMeshSDF(float3(p.x, p.y, p.z + unit.z*0.5)) - GetMeshSDF(float3(p.x, p.y, p.z - unit.z*0.5))
 		));
 }
 
@@ -104,8 +116,8 @@ void TraceSDFMesh(Ray ray, out HitInfo info)
 
 		//???
 		//get sdf at now pos
-		float sdf = GetMeshSDF(ray.pos);
-		//float sdf = SDFSphere(ray.pos, float3(0,0,0), 0.5);
+		//float sdf = GetMeshSDF(ray.pos);
+		float sdf = SDFSphere(ray.pos, float3(0,0,0), 0.5);
 
 		if (sdf < Thre_MeshSDF)
 		{
@@ -113,8 +125,8 @@ void TraceSDFMesh(Ray ray, out HitInfo info)
 			//!!!
 			info.obj = 0;
 			//???
-			info.N = GetMeshSDFNormal(ray.pos);
-			//info.N = SDFSphereNormal(ray.pos, float3(0, 0, 0));
+			//info.N = GetMeshSDFNormal(ray.pos);
+			info.N = SDFSphereNormal(ray.pos, float3(0, 0, 0));
 			info.P = ray.pos;
 			break;
 		}
@@ -170,14 +182,14 @@ float3 GetMeshSDFColor(in Ray ray)
 			//re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
 		}
 		{
-			//mat.metallic = 0.0f;
-			//mat.roughness = 0.8f;
-			//float3 lightDir = normalize(float3(1, -1, 1));
-			//float3 lightColor = float3(1, 1, 1) * 2;
-			//re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
+			mat.metallic = 0.0f;
+			mat.roughness = 0.8f;
+			float3 lightDir = normalize(float3(1, -1, 1));
+			float3 lightColor = float3(1, 1, 1) * 2;
+			re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
 		}
 		{
-			re = minHit.N;
+			//re = minHit.N;
 		}
 	}
 	else

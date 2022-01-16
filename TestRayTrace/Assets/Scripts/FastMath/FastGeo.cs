@@ -417,4 +417,45 @@ namespace FastGeo
             return Vector3.Dot(pa, pb) < 0;
         }
     }
+
+    public static class GridMath
+    {
+        static int ModInx(float x, float cellLength)
+        {
+            if (x < 0 || cellLength <= 0)
+            {
+                return -1;
+            }
+            return (int)((x - fmod(x, cellLength)) / cellLength);
+        }
+
+        static Vector3 ModInx(Vector3 p, Vector3 cellLength)
+        {
+            return new Vector3(ModInx(p.x, cellLength.x),
+                ModInx(p.y, cellLength.y),
+                ModInx(p.z, cellLength.z));
+        }
+
+        public static Vector3Int GetCellInx(in Vector3 pntPos, in Vector3 startPos, in Vector3 unit, in Vector3 subDivide)
+        {
+            Vector3 local = pntPos - startPos;
+            Vector3Int inx = Vec.ToInt(ModInx(local, unit));
+
+            //在计算pntPos的cellInx的时候，计算的是cell内的左下方点，
+            //但是当p正好在右上方的时候，用Mod已经越过了这个cell，正好在(+1,+1,+1)的左下方点，需要-1处理
+            if (equal(inx.x, subDivide.x))
+            {
+                inx.x -= 1;
+            }
+            if (equal(inx.y, subDivide.y))
+            {
+                inx.y -= 1;
+            }
+            if (equal(inx.z, subDivide.z))
+            {
+                inx.z -= 1;
+            }
+            return inx;
+        }
+    }
 }

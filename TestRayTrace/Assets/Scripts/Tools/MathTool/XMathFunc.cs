@@ -58,6 +58,16 @@ namespace MathHelper
             return Mathf.Sin(x);
         }
 
+        public static float fmod(float x, float y)
+        {
+            return  x - (int)(x / y) * y;
+        }
+
+        public static float abs(float x)
+        {
+            return x >= 0 ? x : -x;
+        }
+
         //#######################################################
         public static bool gt(in Vector3 a, in Vector3 b)
         {
@@ -72,6 +82,11 @@ namespace MathHelper
         public static float maxComp(in Vector3 v)
         {
             return max(max(v.x, v.y), v.z);
+        }
+
+        public static bool equal(float a, float b)
+        {
+            return abs(a - b) < 0.000001f;
         }
     }
 }
