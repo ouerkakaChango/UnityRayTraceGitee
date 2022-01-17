@@ -27,6 +27,7 @@ public class MeshSDFTrace : MonoBehaviour
     MeshSDFGrid grid;
     ComputeBuffer buffer_sdfArr;
     MeshSDFGPUArrData[] sdfArr;
+    public MeshSDFGenerator sdfComp;
     public TextAsset meshSDFFile;
     //public Transform meshTrans;
 
@@ -203,7 +204,22 @@ public class MeshSDFTrace : MonoBehaviour
         }
         if (sdfArr == null)
         {
-            MeshSDF.ParseGPU(meshSDFFile, out grid, out sdfArr);
+            if (sdfComp != null)
+            {
+                grid = new MeshSDFGrid();
+                grid.startPos = sdfComp.startUnitPos;
+                grid.unit = sdfComp.unit;
+                grid.unitCount = sdfComp.unitCount;
+                sdfArr = new MeshSDFGPUArrData[sdfComp.sdfArr.Length];
+                for (int i = 0; i < sdfArr.Length; i++)
+                {
+                    sdfArr[i].sdf = sdfComp.sdfArr[i];
+                }
+            }
+            else
+            {
+                MeshSDF.ParseGPU(meshSDFFile, out grid, out sdfArr);
+            }
         }
         //grid.startPos += meshTrans.position;
         hasInited = true;

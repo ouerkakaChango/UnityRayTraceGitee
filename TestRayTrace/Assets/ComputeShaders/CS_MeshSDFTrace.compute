@@ -77,6 +77,13 @@ float GetMeshSDF(in float3 p)
 	return re * 0.5f;
 }
 
+//float GetMeshSDF(in float3 p)
+//{
+//	//1.根据p-startPos，再除unit，得到当前位置i,j,k
+//	int3 inx = GetCellInx(p, startPos - unit*0.5f, unit, unitCount);
+//	return GetMeshSDFByInx(inx);
+//}
+
 //float3 GetMeshSDFNormal(float3 p)
 //{
 //	float epsilon = 0.0001f;
@@ -134,7 +141,7 @@ void TraceSDFMesh(Ray ray, out HitInfo info)
 			info.P = ray.pos;
 			break;
 		}
-		ray.pos += sdf * ray.dir;
+		ray.pos += sdf * 0.5f * ray.dir;
 		traceCount++;
 	}
 }

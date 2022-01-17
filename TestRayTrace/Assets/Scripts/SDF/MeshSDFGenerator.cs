@@ -34,7 +34,8 @@ public class MeshSDFGenerator : MonoBehaviour
     public MeshSDFExtendType extendType = MeshSDFExtendType.Ground;
     public Vector3Int unitDivide = new Vector3Int(10,10,10);
     public Vector3Int unitExtend = new Vector3Int(2,2,2);
-    Vector3 unit;
+    [ReadOnly]
+    public Vector3 unit;
     [ReadOnly]
     public Vector3 startUnitPos;   //model coordinate
     [SerializeField]
@@ -43,7 +44,8 @@ public class MeshSDFGenerator : MonoBehaviour
     public Vector3Int unitCount;
 
     public MeshSDFGenerateSampleType sampleType = MeshSDFGenerateSampleType.unitSphere;
-    float[] sdfArr;
+    [HideInInspector]
+    public float[] sdfArr;
     float[] debugColor;
     public string outPath = "Assets/meshSDF.bytes";
     //###########################################
