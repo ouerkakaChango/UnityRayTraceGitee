@@ -193,14 +193,17 @@ float3 GetMeshSDFColor(in Ray ray)
 			//re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
 		}
 		{
-			//mat.metallic = 0.0f;
-			//mat.roughness = 0.8f;
-			//float3 lightDir = normalize(float3(1, -1, 1));
-			//float3 lightColor = float3(1, 1, 1) * 2;
-			//re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
+			mat.metallic = 0.0f;
+			mat.roughness = 0.8f;
+			float3 lightDir = normalize(float3(-1, -1, -1));
+			float3 lightColor = float3(1, 1, 1) * 2;
+			re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
 		}
 		{
-			re = minHit.N;
+			//re = minHit.N;
+		}
+		{
+			//re = length(minHit.P - ray.pos) / 1.0f;
 		}
 	}
 	else
@@ -210,14 +213,14 @@ float3 GetMeshSDFColor(in Ray ray)
 	}
 
 	//##############################
-	HitInfo sysHit;
-	Init(sysHit);
-	float3 sysColor;
-	RaySys(ray, sysHit, sysColor);
-	if (sysHit.bHit)
-	{
-		re = lerp(re, sysColor, 0.5);
-	}
+	//HitInfo sysHit;
+	//Init(sysHit);
+	//float3 sysColor;
+	//RaySys(ray, sysHit, sysColor);
+	//if (sysHit.bHit)
+	//{
+	//	re = lerp(re, sysColor, 0.5);
+	//}
 	//##############################
 	return re;
 }
