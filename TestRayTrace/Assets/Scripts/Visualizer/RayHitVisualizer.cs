@@ -44,9 +44,6 @@ public class RayHitVisualizer : MonoBehaviour
             Gizmos.DrawLine(missLines[i].a, missLines[i].b);
         }
 
-        Gizmos.color = Color.magenta;
-        //Gizmos.DrawIcon(Vector3.zero, "visual");
-        Gizmos.DrawSphere(new Vector3(1, 0, 0), 0.5f);
     }
 
     void OnRenderObject()

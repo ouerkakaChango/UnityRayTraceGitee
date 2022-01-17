@@ -41,8 +41,6 @@ struct MeshSDFGPUArrData
 StructuredBuffer<MeshSDFGPUArrData> sdfArr;
 
 //#########################################################################################################
-#define MAXMeshSDFTrace 20
-#define Thre_MeshSDF 0.01f
 
 float GetMeshSDFByInx(int3 inx)
 {
@@ -73,7 +71,10 @@ float GetMeshSDF(in float3 p)
 
 	float3 cellStart = startPos + unit * inx;
 	float3 uvw = (p - cellStart) / unit;
-	return lerp3D(arr, uvw);
+	//???
+	uvw = saturate(uvw);
+	float re = lerp3D(arr, uvw);
+	return re * 0.5f;
 }
 
 //float3 GetMeshSDFNormal(float3 p)
@@ -91,13 +92,16 @@ float GetMeshSDF(in float3 p)
 //但是现在没问题，算了...
 float3 GetMeshSDFNormal(float3 p)
 {
+	float k = 0.5;
 	return normalize(float3(
-		GetMeshSDF(float3(p.x + unit.x*0.5f, p.y, p.z)) - GetMeshSDF(float3(p.x - unit.x*0.5f, p.y, p.z)),
-		GetMeshSDF(float3(p.x, p.y + unit.y*0.5, p.z)) - GetMeshSDF(float3(p.x, p.y - unit.y*0.5, p.z)),
-		GetMeshSDF(float3(p.x, p.y, p.z + unit.z*0.5)) - GetMeshSDF(float3(p.x, p.y, p.z - unit.z*0.5))
+		GetMeshSDF(float3(p.x + unit.x*k, p.y, p.z)) - GetMeshSDF(float3(p.x - unit.x*k, p.y, p.z)),
+		GetMeshSDF(float3(p.x, p.y + unit.y*k, p.z)) - GetMeshSDF(float3(p.x, p.y - unit.y*k, p.z)),
+		GetMeshSDF(float3(p.x, p.y, p.z + unit.z*k)) - GetMeshSDF(float3(p.x, p.y, p.z - unit.z*k))
 		));
 }
 
+#define MAXMeshSDFTrace 160
+#define Thre_MeshSDF 0.05f
 void TraceSDFMesh(Ray ray, out HitInfo info)
 {
 	Init(info);
@@ -118,7 +122,8 @@ void TraceSDFMesh(Ray ray, out HitInfo info)
 		float sdf = GetMeshSDF(ray.pos);
 		//float sdf = SDFSphere(ray.pos, float3(0,0,0), 0.5);
 
-		if (sdf < Thre_MeshSDF)
+		//???
+		if (sdf <= length(unit)*0.5)
 		{
 			info.bHit = true;
 			//!!!
@@ -168,7 +173,7 @@ float3 GetMeshSDFColor(in Ray ray)
 	//盒子内和会打到盒子的ray都需要进行SDFSphereTrace
 	if (needTrace)
 	{
-		//$$$
+		//$$$ 
 		//return float3(1, 0, 0);
 		TraceSDFMesh(sampleRay, minHit);
 	}
@@ -198,14 +203,14 @@ float3 GetMeshSDFColor(in Ray ray)
 	}
 
 	//##############################
-	HitInfo sysHit;
-	Init(sysHit);
-	float3 sysColor;
-	RaySys(ray, sysHit, sysColor);
-	if (sysHit.bHit)
-	{
-		re = lerp(re, sysColor, 0.5);
-	}
+	//HitInfo sysHit;
+	//Init(sysHit);
+	//float3 sysColor;
+	//RaySys(ray, sysHit, sysColor);
+	//if (sysHit.bHit)
+	//{
+	//	re = lerp(re, sysColor, 0.5);
+	//}
 	//##############################
 	return re;
 }

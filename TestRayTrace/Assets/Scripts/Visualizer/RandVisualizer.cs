@@ -33,11 +33,22 @@ public class RandVisualizer : MonoBehaviour
 
     public void RandSphere()
     {
-        pnts = new Vector3[5000];
-        for (int i = 0; i < pnts.Length; i++)
+        pnts = new Vector3[1000];
+        //for (int i = 0; i < pnts.Length; i++)
+        //{
+        //    //pnts[i] = CPURand.random_on_unit_sphere();
+        //    pnts[i] = meshSDFGenerator.GetSampleDir(transform.position, i, new Vector3(0,0,0));
+        //}
+        for (int k = 0; k < 10; k++)
         {
-            //pnts[i] = CPURand.random_on_unit_sphere();
-            pnts[i] = meshSDFGenerator.GetSampleDir(transform.position, i);
+            for (int j = 0; j < 10; j++)
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    int inx = i + j * 10 + k * 10 * 10;
+                    pnts[i+j*10+k*10*10] = meshSDFGenerator.GetSampleDir(transform.position, inx, new Vector3(i, j, k));
+                }
+            }
         }
     }
 }

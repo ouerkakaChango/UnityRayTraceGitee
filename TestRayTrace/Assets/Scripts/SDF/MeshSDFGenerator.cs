@@ -10,10 +10,12 @@ using static MathHelper.XMathFunc;
 using FastGeo;
 using Ray = FastGeo.Ray;
 using XFileHelper;
+using XUtility;
 
 public enum MeshSDFGenerateSampleType
 {
     unitSphere, //unform distribute 
+    lowDiscrepancy, //低差异序列
     testCenter, //always center
 };
 
@@ -33,9 +35,12 @@ public class MeshSDFGenerator : MonoBehaviour
     public Vector3Int unitDivide = new Vector3Int(10,10,10);
     public Vector3Int unitExtend = new Vector3Int(2,2,2);
     Vector3 unit;
-    Vector3 startUnitPos;   //model coordinate
+    [ReadOnly]
+    public Vector3 startUnitPos;   //model coordinate
+    [SerializeField]
     Bounds meshBounds;
-    Vector3Int unitCount;
+    [ReadOnly]
+    public Vector3Int unitCount;
 
     public MeshSDFGenerateSampleType sampleType = MeshSDFGenerateSampleType.unitSphere;
     float[] sdfArr;
@@ -117,7 +122,7 @@ public class MeshSDFGenerator : MonoBehaviour
                 }
             }
         }
-
+        //Debug.Log(debugColor);
         if (showSDF && debugColor != null)
         {
             int cc = 0;
@@ -129,8 +134,8 @@ public class MeshSDFGenerator : MonoBehaviour
                     for (int i = 0; i < unitCount.x; i++)
                     {
                         float c = debugColor[i + j * unitCount.x + k * unitCount.x * unitCount.y];
-                        Gizmos.color = new Color(0, 0,0,c);
-                        Gizmos.DrawSphere(ToWorld(startUnitPos + Mul(unit,new Vector3(i,j,k))), 0.05f);
+                        Gizmos.color = new Color(0, 0,0, c);
+                        Gizmos.DrawSphere(ToWorld(startUnitPos + Mul(unit,new Vector3(i,j,k))), unit.magnitude/4.0f);
                         cc++;
                         //if (cc > 5000)
                         //{
@@ -251,11 +256,33 @@ public class MeshSDFGenerator : MonoBehaviour
         }
     }
 
-    public Vector3 GetSampleDir(in Vector3 pos, int sampleInx)
+    public Vector3 GetSampleDir(in Vector3 pos, int sampleInx, Vector3 seed)
     {
         if (sampleType == MeshSDFGenerateSampleType.testCenter)
         {
             return (ToWorld(meshBounds.center) - pos).normalized;
+        }
+        else if (sampleType == MeshSDFGenerateSampleType.unitSphere)
+        {
+            if (sampleInx == 0)
+            {
+                return (ToWorld(meshBounds.center) - pos).normalized;
+            }
+            else
+            {
+                return CPURand.random_on_unit_sphere();
+            }
+        }
+        else if (sampleType == MeshSDFGenerateSampleType.lowDiscrepancy)
+        {
+            if (sampleInx == 0)
+            {
+                return (ToWorld(meshBounds.center) - pos).normalized;
+            }
+            else
+            {
+                return LDRand.randP_round(seed);
+            }
         }
         else
         {
@@ -296,7 +323,7 @@ public class MeshSDFGenerator : MonoBehaviour
                     int sampleNum = GetSampleCount();
                     for (int testInx = 0; testInx < sampleNum; testInx++)
                     {
-                        Vector3 dir = GetSampleDir(pos, testInx);
+                        Vector3 dir = GetSampleDir(pos, testInx, new Vector3(i, j,k + testInx));
                         Ray ray = new Ray(pos, dir);
                         HitInfo hitInfo = bvhComp.TraceWorldRay(ray);
                         if (hitInfo.bHit)
@@ -310,11 +337,17 @@ public class MeshSDFGenerator : MonoBehaviour
                             //visual.hitPnts.Add(hitInfo.P);
                             //visual.hitPnts.Add(ray.pos);
                         }
+                        //???
+                        if (i == 0 && j == 0 && k == 0)
+                        {
+                            visual.Add(ray, hitInfo);
+                        }
                     }
-                    //if (!bValid)
-                    //{
-                    //    minDis = 0;
-                    //}
+                    if (!bValid)
+                    {
+                        minDis = 0;
+                        //visual.missLines.Add(new Line(Vector3.zero, new Vector3(0, 2, 0)));
+                    }
                     //Save minDis to sdfArr
                     sdfArr[i + j * unitCount.x + k * unitCount.x * unitCount.y] = minDis;
                 }
@@ -327,14 +360,15 @@ public class MeshSDFGenerator : MonoBehaviour
 
     void UpdateDebugSDFColor()
     {
-        float maxDis = maxComp(unitCount) * maxComp(unit);
+        float maxDis = meshBounds.extents.magnitude*2.0f;
+        Debug.Log(maxDis);
         debugColor = new float[sdfArr.Length];
         for (int i = 0; i < sdfArr.Length; i++)
         {
             float d = sdfArr[i] < maxDis ? sdfArr[i] : maxDis;
-            debugColor[i] = pow(saturate(1 - d / maxDis), 5);
+            debugColor[i] = pow(saturate(1 - d / maxDis), 1);
         }
-    }
+    } 
 
     public void TestSaveStandardSphere()
     {

@@ -87,6 +87,7 @@ namespace XFileHelper
             int len = reader.ReadInt32();
             if (len <= 0)
             {
+                Debug.LogError("Error in Read Float[]!");
                 return;
             }
             if (arr ==null || arr.Length != len)
