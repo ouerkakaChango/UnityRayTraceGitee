@@ -36,7 +36,7 @@ public class BVHTool : MonoBehaviour
     static public float MAXFloat = 100000.0f;
 
     public bool needVisualize = true;
-
+    public bool importScale100 = false;
     public bool initOnStart = false;
     public int usrDepth = 1;   //用户建议的深度，当三角面数量够多，就会优先用这个浅的深度
     [ReadOnly]
@@ -46,6 +46,7 @@ public class BVHTool : MonoBehaviour
 
     Mesh mesh;
     Vector3[] vertices;
+    Vector3[] normals;
 
     [HideInInspector]
     public int[] tris;
@@ -116,9 +117,8 @@ public class BVHTool : MonoBehaviour
     {
         TimeLogger logger = new TimeLogger("BVHInit",false);
         logger.Start();
-        var meshFiliter = gameObject.GetComponent<MeshFilter>();
-        mesh = meshFiliter.sharedMesh;
-        vertices = mesh.vertices;
+
+        UpdateMeshInfos();
         if (oldRender)
         {
             ToWorldCoord();
@@ -356,6 +356,7 @@ public class BVHTool : MonoBehaviour
             }
             return;
         }
+
         for (int i = 0; i < tree.Length; i++)
         {
             debugLineMat.SetColor("_Color", debugColors[i]);
@@ -363,7 +364,6 @@ public class BVHTool : MonoBehaviour
             GL.Color(new Color(1, 1, 0, 0.8f));
             GL.PushMatrix();
             GL.Begin(GL.LINES);
-
             for (int i1 = 0; i1 < 12; i1++)
             {
                 GL.Vertex(lines[i1+i*12].a+transform.position);
@@ -435,10 +435,7 @@ public class BVHTool : MonoBehaviour
             Debug.LogError("Error in parse:null");
             return;
         }
-        if (vertices == null)
-        {
-            vertices = mesh.vertices;
-        }
+
         reader.Read(ref tris);
 
         int treeLen = reader.ReadInt32();
@@ -502,7 +499,7 @@ public class BVHTool : MonoBehaviour
         //Log.DebugRay(ray);
         HitInfo re = HitInfo.Default();
 
-        TimeLogger logger = new TimeLogger("BVH.Trace",false);
+        TimeLogger logger = new TimeLogger("BVH.TraceLocalRay", false);
         logger.Start();
         //---
         int start = 0, end = tris.Length / 3 - 1;
@@ -582,13 +579,13 @@ public class BVHTool : MonoBehaviour
                     Vertex v2;
                     Vertex v3;
 
-                    v1.p = mesh.vertices[tris[inx]];
-                    v2.p = mesh.vertices[tris[inx + 1]];
-                    v3.p = mesh.vertices[tris[inx + 2]];
+                    v1.p = vertices[tris[inx]];
+                    v2.p = vertices[tris[inx + 1]];
+                    v3.p = vertices[tris[inx + 2]];
 
-                    v1.n = mesh.normals[tris[inx]];
-                    v2.n = mesh.normals[tris[inx + 1]];
-                    v3.n = mesh.normals[tris[inx + 2]];
+                    v1.n = normals[tris[inx]];
+                    v2.n = normals[tris[inx + 1]];
+                    v3.n = normals[tris[inx + 2]];
 
                     HitInfo hit = RayCastTri(ray, v1, v2, v3);
                     if (hit.bHit)
@@ -638,5 +635,14 @@ public class BVHTool : MonoBehaviour
         mesh = meshFiliter.sharedMesh;
         Debug.Log("update bvh mesh: " + mesh);
         vertices = mesh.vertices;
+        normals = mesh.normals;
+        if (importScale100)
+        {
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i] *= 100.0f;
+            }
+            Debug.Log("import scale 100");
+        }
     }
 }

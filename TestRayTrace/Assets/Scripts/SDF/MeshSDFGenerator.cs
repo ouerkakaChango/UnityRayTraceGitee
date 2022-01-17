@@ -209,7 +209,7 @@ public class MeshSDFGenerator : MonoBehaviour
         Debug.Log("TestTrace");
         var visual = GetComponent<RayHitVisualizer>();
 
-        Vector3 pos = ToWorld(startUnitPos);
+        Vector3 pos = ToWorld(startUnitPos + Vec.Mul(unit, new Vector3Int(0, 0, 0)));
         //Vector3 pos = startUnitPos;
         Vector3 dir = (meshBounds.center - startUnitPos).normalized; //旋转不需要model转world，都一样
         Ray ray = new Ray(pos, dir);
@@ -222,17 +222,20 @@ public class MeshSDFGenerator : MonoBehaviour
         }
         bvhComp.UpdateMeshInfos();
 
-        Debug.Log("FF");
-        Debug.Log(startUnitPos);
-        Debug.Log(pos);
+        //Debug.Log("FF");
+        //Debug.Log(startUnitPos+Vec.Mul(unit,new Vector3Int(0,1,0)));
+        //Debug.Log(pos);
         //var hitInfo = bvhComp.TraceWorldRay(ray);
 
-        ray.pos -= transform.position;
+        //ray.pos -= transform.position;
         //var hitInfo = bvhComp.TraceLocalRay(ray);
-        Debug.Log("diff" + Log.VecStr(ray.pos - startUnitPos));
-        //??? -0.8和-0.800002结果不同，可能正好穿过三角形顶点，漏了
-        var hitInfo = bvhComp.TraceLocalRay(new Ray(new Vector3(-0.8002f, startUnitPos.y, startUnitPos.z), ray.dir));
 
+        //??? -0.8和-0.800002结果不同，可能正好穿过三角形顶点，漏了
+        //var hitInfo = bvhComp.TraceLocalRay(new Ray(new Vector3(-0.8002f, startUnitPos.y, startUnitPos.z), ray.dir));
+        TimeLogger logger = new TimeLogger("TraceWorldRay");
+        logger.Start();
+        var hitInfo = bvhComp.TraceWorldRay(ray);
+        logger.Log();
         visual.Add(ray,hitInfo);
     }
 
@@ -304,14 +307,14 @@ public class MeshSDFGenerator : MonoBehaviour
                                 minDis = tDis;
                                 bValid = true;
                             }
-                            visual.hitPnts.Add(hitInfo.P);
+                            //visual.hitPnts.Add(hitInfo.P);
                             //visual.hitPnts.Add(ray.pos);
                         }
                     }
-                    if (!bValid)
-                    {
-                        minDis = 0;
-                    }
+                    //if (!bValid)
+                    //{
+                    //    minDis = 0;
+                    //}
                     //Save minDis to sdfArr
                     sdfArr[i + j * unitCount.x + k * unitCount.x * unitCount.y] = minDis;
                 }

@@ -78,6 +78,11 @@ bool equal(float3 a, float3 b, float tolerance = 0.000001f)
 		equal(a.z, b.z, tolerance);
 }
 
+float3 smooth3(float3 t)
+{
+	return t * t * (3.0 - 2.0 * t);
+}
+
 int GetTreeDepth(int inx,int maxDepth)
 {
 	//depht = 2,  >=2^2-1, <=2^3-2
