@@ -203,14 +203,14 @@ float3 GetMeshSDFColor(in Ray ray)
 	}
 
 	//##############################
-	//HitInfo sysHit;
-	//Init(sysHit);
-	//float3 sysColor;
-	//RaySys(ray, sysHit, sysColor);
-	//if (sysHit.bHit)
-	//{
-	//	re = lerp(re, sysColor, 0.5);
-	//}
+	HitInfo sysHit;
+	Init(sysHit);
+	float3 sysColor;
+	RaySys(ray, sysHit, sysColor);
+	if (sysHit.bHit)
+	{
+		re = lerp(re, sysColor, 0.5);
+	}
 	//##############################
 	return re;
 }

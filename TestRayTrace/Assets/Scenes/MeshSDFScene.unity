@@ -20027,7 +20027,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a260d988da0362e4489b338b40937d1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meshSDFFile: {fileID: 4900000, guid: 6a5fd6e0372d1ae479add528fb7e1b41, type: 3}
+  meshSDFFile: {fileID: 4900000, guid: 242114692a75f7f409208c3649d1089a, type: 3}
   cs: {fileID: 7200000, guid: e2a7b5da8134a1f49872e6206693535a, type: 3}
   envDiffTex: {fileID: 2800000, guid: 4e87347d2e700854c83b1dc31b3fce43, type: 3}
   envSpecTex2DArr: {fileID: 18700000, guid: 0f551ab412a7b6a43adb8fff0951af3f, type: 2}
@@ -20441,19 +20441,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ced892624d0f0134380aa832ecd8b466, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSampleCount: 60
+  maxSampleCount: 120
   showMeshBound: 0
   showGrid: 1
   showSDF: 0
   needFixScale100: 1
   extendType: 1
-  unitDivide: {x: 20, y: 20, z: 20}
-  unitExtend: {x: 1, y: 1, z: 1}
-  startUnitPos: {x: -1.8797373, y: 0.095548995, z: -1.9305438}
+  unitDivide: {x: 25, y: 25, z: 25}
+  unitExtend: {x: 2, y: 2, z: 2}
+  startUnitPos: {x: -2.0069206, y: 0.076439194, z: -2.054627}
   meshBounds:
     m_Center: {x: 0.028012991, y: 1.9109799, z: -0.069295526}
     m_Extent: {x: 1.816905, y: 1.9109799, z: 1.7726175}
-  unitCount: {x: 22, y: 21, z: 22}
+  unitCount: {x: 29, y: 27, z: 29}
   sampleType: 1
   outPath: Assets/treeMeshSDF.bytes
 --- !u!114 &2067387700
@@ -20759,9 +20759,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitPnts:
-  - {x: 1.674625, y: 2.304169, z: 2.2400076}
-  - {x: 2.1318278, y: 2.5088983, z: 0.4813813}
-  - {x: 1.2593802, y: 1.462556, z: 1.8948307}
+  - {x: 2.7517776, y: 2.5454404, z: 4.037315}
+  - {x: 2.0387673, y: 1.529525, z: 3.4054053}
+  - {x: 0.6266036, y: 2.6261268, z: 4.514857}
+  - {x: 1.4495841, y: 2.784297, z: 2.1173475}
+  - {x: 0.68861663, y: 2.6617362, z: 4.43347}
+  - {x: 1.0936089, y: 1.6187519, z: 5.0017204}
 --- !u!1 &2100214130
 GameObject:
   m_ObjectHideFlags: 0

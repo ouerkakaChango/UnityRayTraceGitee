@@ -366,7 +366,7 @@ public class MeshSDFGenerator : MonoBehaviour
         for (int i = 0; i < sdfArr.Length; i++)
         {
             float d = sdfArr[i] < maxDis ? sdfArr[i] : maxDis;
-            debugColor[i] = pow(saturate(1 - d / maxDis), 1);
+            debugColor[i] = pow(saturate(1 - d / maxDis), 5);
         }
     } 
 
