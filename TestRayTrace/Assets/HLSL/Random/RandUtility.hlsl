@@ -1,3 +1,5 @@
+#ifndef RANDUTILITY_H
+#define RANDUTILITY_H
 #include "../Transform/Transform.hlsl"
 float fracNoise(float3 seed ,float3 seedWeight)
 {
@@ -165,3 +167,4 @@ float2 Hammersley(uint i, uint N)
 {
 	return float2(float(i) / float(N), RadicalInverse_VdC(i));
 }
+#endif

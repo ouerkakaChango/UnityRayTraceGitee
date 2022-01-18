@@ -33,10 +33,10 @@ public class MeshSDFGeneratorEditor : Editor
             AssetDatabase.Refresh();
         }
 
-        if (GUILayout.Button("Bake"))
-        {
-            Target.Bake();
-        }
+        //if (GUILayout.Button("Bake"))
+        //{
+        //    Target.Bake();
+        //}
 
         if (GUILayout.Button("BakeGPU"))
         {

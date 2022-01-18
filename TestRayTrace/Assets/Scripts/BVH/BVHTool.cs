@@ -52,8 +52,10 @@ public class BVHTool : MonoBehaviour
     public Material debugLineMat;
 
     Mesh mesh;
-    Vector3[] vertices;
-    Vector3[] normals;
+    [HideInInspector]
+    public Vector3[] vertices;
+    [HideInInspector]
+    public Vector3[] normals;
 
     [HideInInspector]
     public int[] tris;

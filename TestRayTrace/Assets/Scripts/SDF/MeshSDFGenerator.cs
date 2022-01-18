@@ -385,8 +385,8 @@ public class MeshSDFGenerator : MonoBehaviour
 
     void Compute_Bake(ref BVHTool bvhComp)
     {
-        var mf = GetComponent<MeshFilter>();
-        var mesh = mf.sharedMesh;
+        //var mf = GetComponent<MeshFilter>();
+        //var mesh = mf.sharedMesh;
 
         int len = unitCount.x * unitCount.y * unitCount.z;
         sdfArr = new float[len];
@@ -397,8 +397,8 @@ public class MeshSDFGenerator : MonoBehaviour
         ComputeBuffer buffer_bvh = null;
         ComputeBuffer buffer_sdfArr = null;
 
-        PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, mesh.vertices);
-        PreComputeBuffer(ref buffer_normals, sizeof(float) * 3, mesh.normals);
+        PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, bvhComp.vertices);
+        PreComputeBuffer(ref buffer_normals, sizeof(float) * 3, bvhComp.normals);
         PreComputeBuffer(ref buffer_tris, sizeof(int), bvhComp.tris);
         PreComputeBuffer(ref buffer_bvh, BVHNode.GetBVHStride(), bvhComp.tree);
         PreComputeBuffer(ref buffer_sdfArr, sizeof(float), sdfArr);
@@ -418,11 +418,11 @@ public class MeshSDFGenerator : MonoBehaviour
         cs.SetVector("unitCount", (Vector3)unitCount);
         cs.SetVector("unit", unit);
 
-        cs.SetInt("triInxNum", bvhComp.tris.Length);
         cs.SetInt("treeDepth", bvhComp.depth);
+        cs.SetInt("sampleCount", GetSampleCount());
 
         //!!! cs core(1,1,1)
-        cs.Dispatch(kInx, unitCount.x, unitCount.y, unitCount.z);
+        cs.Dispatch(kInx, unitCount.x/4, unitCount.y/4, unitCount.z/4);
         //### compute
         //#####################################;
         buffer_sdfArr.GetData(sdfArr);

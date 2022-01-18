@@ -2,16 +2,9 @@
 #pragma kernel BakeSDF
 
 #include "../../HLSL/RayMath.hlsl"
+#include "../../HLSL/Random/RandUtility.hlsl"
+#include "../../HLSL/BVH/BVHCommonDef.hlsl"
 
-struct BVHNode
-{
-	int start;
-	int end;
-	float3 min;
-	float3 max;
-};
-
-int triInxNum;
 StructuredBuffer<int> tris;
 StructuredBuffer<float3> vertices;
 StructuredBuffer<float3> normals;
@@ -23,15 +16,48 @@ float3 startPos;
 float3 unitCount;
 float3 unit;
 
+int sampleCount;
+
 uint InxSDF(uint3 inx)
 {
 	return inx.x + inx.y * (unitCount.x) + inx.z * (unitCount.x * unitCount.y);
 }
 //#########################################################################################################
-[numthreads(1, 1, 1)]
+[numthreads(4, 4, 4)]
 void BakeSDF(uint3 id : SV_DispatchThreadID)
 {
-	sdfArr[InxSDF(id.xyz)] = 1.0;
+	//sdfArr[InxSDF(id.xyz)] = id.x/unitCount.x;
+	//return;
+
+	float minDis = 1000000.0f;
+	bool bValid = false;
+
+	Ray ray;
+	ray.pos = startPos + id * unit;
+	//???
+	for (int sampleInx = 0; sampleInx < sampleCount; sampleInx++)
+	{
+		ray.dir = randP_round(float3(id.x, id.y, id.z + sampleInx));
+		HitInfo hitInfo = BVHTraceLocalRay(
+			ray,
+			treeDepth, bvh,
+			tris,vertices,normals
+			);
+		if (hitInfo.bHit)
+		{
+			float tDis = length(hitInfo.P - ray.pos);
+			if (tDis < minDis)
+			{
+				minDis = tDis;
+				bValid = true;
+			}
+		}
+	}
+	if (!bValid)
+	{
+		minDis = 0;
+	}
+	sdfArr[InxSDF(id.xyz)] = minDis;
 }
 //#########################################################################################################
 /*
