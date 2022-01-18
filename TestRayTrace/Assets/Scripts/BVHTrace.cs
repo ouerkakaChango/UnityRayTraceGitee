@@ -137,13 +137,6 @@ public class BVHTrace : MonoBehaviour
         int mat44size = sizeof(float) * 16;
         return mat44size*1;
     }
-
-    static public int GetBVHStride()
-    {
-        int vec3Size = sizeof(float) * 3;
-        int intSize = sizeof(int);
-        return vec3Size * 2 + intSize * 2;
-    }
     //################################################################################################################
     void Compute_Render()
     {
@@ -162,7 +155,7 @@ public class BVHTrace : MonoBehaviour
         PreComputeBuffer(ref buffer_normals, sizeof(float) * 3, normals);
         PreComputeBuffer(ref buffer_tris, sizeof(int), tris);
         PreComputeBuffer(ref buffer_meshInfos, GetMeshInfoStride(), meshInfos);
-        PreComputeBuffer(ref buffer_bvh, GetBVHStride(), bvh);
+        PreComputeBuffer(ref buffer_bvh, BVHNode.GetBVHStride(), bvh);
         //##################################
         //### compute
         int kInx = cs.FindKernel("Render");

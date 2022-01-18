@@ -38,6 +38,11 @@ public class MeshSDFGeneratorEditor : Editor
             Target.Bake();
         }
 
+        if (GUILayout.Button("BakeGPU"))
+        {
+            Target.BakeGPU();
+        }
+
         if (GUILayout.Button("Save"))
         {
             Target.Save();

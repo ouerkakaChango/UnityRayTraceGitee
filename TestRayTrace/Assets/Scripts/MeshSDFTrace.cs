@@ -5,16 +5,16 @@ using FastGeo;
 using Ray = FastGeo.Ray;
 using Debugger;
 
+public struct MeshSDFGPUArrData
+{
+    public float sdf;
+}
+
 public struct MeshSDFGrid
 {
     public Vector3 startPos;
     public Vector3Int unitCount;
     public Vector3 unit;
-}
-
-public struct MeshSDFGPUArrData
-{
-    public float sdf;
 }
 
 public class MeshSDFTrace : MonoBehaviour

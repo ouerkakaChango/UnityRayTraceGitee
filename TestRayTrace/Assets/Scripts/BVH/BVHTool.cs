@@ -22,6 +22,13 @@ public struct BVHNode
     {
         Debug.Log("start:" + start + " end:" + end + " min:" + min + " max:" + max);
     }
+
+    public static int GetBVHStride()
+    {
+        int vec3Size = sizeof(float) * 3;
+        int intSize = sizeof(int);
+        return vec3Size * 2 + intSize * 2;
+    }
 }
 
 

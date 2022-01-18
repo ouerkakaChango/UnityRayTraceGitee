@@ -11,6 +11,7 @@ using FastGeo;
 using Ray = FastGeo.Ray;
 using XFileHelper;
 using XUtility;
+using static ComputeShaderHelper;
 
 public enum MeshSDFGenerateSampleType
 {
@@ -29,7 +30,6 @@ public class MeshSDFGenerator : MonoBehaviour
     public bool showGrid = true;
     public bool showSDF = true;
     public bool needFixScale100 = true;
-    Vector3[] vertices;
 
     public MeshSDFExtendType extendType = MeshSDFExtendType.Ground;
     public Vector3Int unitDivide = new Vector3Int(10,10,10);
@@ -156,11 +156,11 @@ public class MeshSDFGenerator : MonoBehaviour
     {
         var mf = GetComponent<MeshFilter>();
         var mesh = mf.sharedMesh;
-        vertices = mesh.vertices;
+        var vertices = mesh.vertices;
 
         if (needFixScale100)
         {
-            FixScale100();
+            FixScale100(ref vertices);
         }
 
         meshBounds = PCL.GetBounds(vertices);
@@ -174,7 +174,7 @@ public class MeshSDFGenerator : MonoBehaviour
         debugColor = null;
     }
 
-    void FixScale100()
+    void FixScale100(ref Vector3[] vertices)
     {
         for (int i = 0; i < vertices.Length; i++)
         {
@@ -360,6 +360,80 @@ public class MeshSDFGenerator : MonoBehaviour
         logger.LogSec();
     }
 
+    public void BakeGPU()
+    {
+        TimeLogger logger = new TimeLogger("GPU Bake Mesh SDF");
+        logger.Start();
+        var bvhComp = GetComponent<BVHTool>();
+        if (!bvhComp.IsInited())
+        {
+            Debug.Log("Bake need bvh has inited");
+            return;
+        }
+        bvhComp.UpdateMeshInfos();
+
+        //bvh = bvhComp.tree;
+        //tris = bvhComp.tris;
+        //vertices = mesh.vertices;
+        //normals = mesh.normals;
+
+        Compute_Bake(ref bvhComp);
+
+        UpdateDebugSDFColor();
+        logger.LogSec();
+    }
+
+    void Compute_Bake(ref BVHTool bvhComp)
+    {
+        var mf = GetComponent<MeshFilter>();
+        var mesh = mf.sharedMesh;
+
+        int len = unitCount.x * unitCount.y * unitCount.z;
+        sdfArr = new float[len];
+
+        ComputeBuffer buffer_vertices = null;
+        ComputeBuffer buffer_normals = null;
+        ComputeBuffer buffer_tris = null;
+        ComputeBuffer buffer_bvh = null;
+        ComputeBuffer buffer_sdfArr = null;
+
+        PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, mesh.vertices);
+        PreComputeBuffer(ref buffer_normals, sizeof(float) * 3, mesh.normals);
+        PreComputeBuffer(ref buffer_tris, sizeof(int), bvhComp.tris);
+        PreComputeBuffer(ref buffer_bvh, BVHNode.GetBVHStride(), bvhComp.tree);
+        PreComputeBuffer(ref buffer_sdfArr, sizeof(float), sdfArr);
+
+        var cs = (ComputeShader)Resources.Load("AccelerateCS/BakeMeshSDF");
+        //##################################
+        //### compute
+        int kInx = cs.FindKernel("BakeSDF");
+
+        cs.SetBuffer(kInx, "tris", buffer_tris);
+        cs.SetBuffer(kInx, "vertices", buffer_vertices);
+        cs.SetBuffer(kInx, "normals", buffer_normals);
+        cs.SetBuffer(kInx, "bvh", buffer_bvh);
+        cs.SetBuffer(kInx, "sdfArr", buffer_sdfArr);
+
+        cs.SetVector("startPos", startUnitPos);
+        cs.SetVector("unitCount", (Vector3)unitCount);
+        cs.SetVector("unit", unit);
+
+        cs.SetInt("triInxNum", bvhComp.tris.Length);
+        cs.SetInt("treeDepth", bvhComp.depth);
+
+        //!!! cs core(1,1,1)
+        cs.Dispatch(kInx, unitCount.x, unitCount.y, unitCount.z);
+        //### compute
+        //#####################################;
+        buffer_sdfArr.GetData(sdfArr);
+
+        SafeDispose(buffer_tris);
+        SafeDispose(buffer_vertices);
+        SafeDispose(buffer_normals);
+        SafeDispose(buffer_bvh);
+        SafeDispose(buffer_sdfArr);
+    }
+
     void UpdateDebugSDFColor()
     {
         float maxDis = meshBounds.extents.magnitude*2.0f;
@@ -367,6 +441,7 @@ public class MeshSDFGenerator : MonoBehaviour
         debugColor = new float[sdfArr.Length];
         for (int i = 0; i < sdfArr.Length; i++)
         {
+            //Debug.Log(sdfArr[i]);
             float d = sdfArr[i] < maxDis ? sdfArr[i] : maxDis;
             debugColor[i] = pow(saturate(1 - d / maxDis), 5);
         }
