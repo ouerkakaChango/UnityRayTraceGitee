@@ -43,11 +43,22 @@ float3 random_in_unit_sphere(inout uint state)
 	return res;
 }
 
+float3 random_on_unit_sphere(inout uint state)
+{
+	float z = random_float_01(state) * 2.0f - 1.0f;
+	float t = random_float_01(state) * 2.0f * 3.1415926f;
+	float r = sqrt(max(0.0, 1.0f - z * z));
+	float x = r * cos(t);
+	float y = r * sin(t);
+	float3 res = float3(x, y, z);
+	return res;
+}
+
 float3 randP_round(float3 seed)
 {
 	uint stat = (uint)(seed.x) * 1973 + (uint)(seed.y) * 9277 + (uint)(seed.z) * 2699 | 1;
 
-	return random_in_unit_sphere(stat);
+	return random_on_unit_sphere(stat);
 }
 
 float3 randP_hemiRound(float3 seed)
