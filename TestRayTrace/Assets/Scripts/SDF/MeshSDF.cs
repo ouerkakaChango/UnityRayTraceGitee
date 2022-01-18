@@ -10,6 +10,13 @@ public enum MeshSDFExtendType
     All,
 };
 
+public struct MeshSDFGrid
+{
+    public Vector3 startPos;
+    public Vector3Int unitCount;
+    public Vector3 unit;
+}
+
 public class MeshSDF : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -34,15 +41,25 @@ public class MeshSDF : MonoBehaviour
 
         int len = reader.ReadInt32();
         sdfArr = new MeshSDFGPUArrData[len];
-        string tt = "";
+
         for (int i = 0; i < len; i++)
         {
             sdfArr[i].sdf = reader.ReadSingle();
-            tt += sdfArr[i].sdf + " ";
         }
-        //Debug.Log(tt);
-        reader.Close();
 
+        reader.Close();
+    }
+
+    public static void Parse(TextAsset file, out MeshSDFGrid grid, out float[] sdfArr)
+    {
+        sdfArr = null;
+        grid = new MeshSDFGrid();
+        var reader = FileHelper.BeginRead(file);
+        reader.Read(ref grid.startPos);
+        reader.Read(ref grid.unitCount);
+        reader.Read(ref grid.unit);
+        reader.Read(ref sdfArr);
+        Debug.Log(sdfArr.Length);
         reader.Close();
     }
 }
