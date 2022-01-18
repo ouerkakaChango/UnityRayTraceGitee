@@ -403,7 +403,7 @@ public class MeshSDFGenerator : MonoBehaviour
         PreComputeBuffer(ref buffer_bvh, BVHNode.GetBVHStride(), bvhComp.tree);
         PreComputeBuffer(ref buffer_sdfArr, sizeof(float), sdfArr);
 
-        var cs = (ComputeShader)Resources.Load("AccelerateCS/BakeMeshSDF");
+        var cs = (ComputeShader)Resources.Load("BakeCS/BakeMeshSDF");
         //##################################
         //### compute
         int kInx = cs.FindKernel("BakeSDF");

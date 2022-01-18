@@ -1,0 +1,229 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel BakeSDF
+
+#include "../../HLSL/RayMath.hlsl"
+#include "../../HLSL/Random/RandUtility.hlsl"
+#include "../../HLSL/BVH/BVHCommonDef.hlsl"
+
+StructuredBuffer<int> tris;
+StructuredBuffer<float3> vertices;
+StructuredBuffer<float3> normals;
+RWStructuredBuffer<float> sdfArr;
+StructuredBuffer<BVHNode> bvh;
+const int treeDepth;
+
+float3 startPos;
+float3 unitCount;
+float3 unit;
+
+int sampleCount;
+
+uint InxSDF(uint3 inx)
+{
+	return inx.x + inx.y * (unitCount.x) + inx.z * (unitCount.x * unitCount.y);
+}
+//#########################################################################################################
+[numthreads(4, 4, 4)]
+void BakeSDF(uint3 id : SV_DispatchThreadID)
+{
+	//sdfArr[InxSDF(id.xyz)] = id.x/unitCount.x;
+	//return;
+
+	float minDis = 1000000.0f;
+	bool bValid = false;
+
+	Ray ray;
+	ray.pos = startPos + id * unit;
+	//???
+	for (int sampleInx = 0; sampleInx < sampleCount; sampleInx++)
+	{
+		ray.dir = randP_round(float3(id.x, id.y, id.z + sampleInx));
+		HitInfo hitInfo = BVHTraceLocalRay(
+			ray,
+			treeDepth, bvh,
+			tris,vertices,normals
+			);
+		if (hitInfo.bHit)
+		{
+			float tDis = length(hitInfo.P - ray.pos);
+			if (tDis < minDis)
+			{
+				minDis = tDis;
+				bValid = true;
+			}
+		}
+	}
+	if (!bValid)
+	{
+		minDis = 0;
+	}
+	sdfArr[InxSDF(id.xyz)] = minDis;
+}
+//#########################################################################################################
+/*
+#define MAXLEAVES 32
+[numthreads(1, 1, 1)]
+void O_BakeSDF(uint3 id : SV_DispatchThreadID)
+{
+	int i = id.x;
+	int j = id.y;
+
+	Ray ray;
+	ray.pos = screenLeftDownPix + screenU * i * pixW + screenV * j * pixH;
+	ray.dir = normalize(ray.pos - eyePos);
+
+	float3 re = 0.1;
+
+	//---Trace
+	HitInfo minHit;
+	Init(minHit);
+	//trace bvh to determin start inx
+	int start = 0, end = triInxNum/3-1;
+
+	int toCheck[MAXLEAVES]; //used as a stack
+	int iter = 0; //used as a stack helper
+
+	int nowInx = 0;
+
+	while(true)
+	{ 
+		bool bLeafDetect = false;
+		bool takeFromCheck = false;
+		int nowDepth = GetTreeDepth(nowInx, treeDepth);
+		{//!!! Error situation
+			if (nowDepth == -1 || nowDepth>treeDepth)
+			{
+				Result[id.xy] = float4(1,0,1,1);
+				return;
+			}
+		}
+		BVHNode node = bvh[nowInx];
+		CastInfo castInfo = CastBBox(ray, node.min, node.max);
+
+		if (!castInfo.bHit)
+		{
+			takeFromCheck = true;
+		}
+		else if(castInfo.bHit && nowDepth!=treeDepth)
+		{
+			int leftInx = 2 * nowInx + 1;
+			int rightInx = 2 * nowInx + 2;
+			CastInfo leftCast = CastBBox(ray, bvh[leftInx].min, bvh[leftInx].max);
+			CastInfo rightCast = CastBBox(ray, bvh[rightInx].min, bvh[rightInx].max);
+			if (leftCast.bHit && !rightCast.bHit)
+			{
+				nowInx = leftInx;
+			}
+			else if (!leftCast.bHit && rightCast.bHit)
+			{
+				nowInx = rightInx;
+			}
+			else if (leftCast.bHit && rightCast.bHit)
+			{
+				if (leftCast.dis <= rightCast.dis)
+				{
+					nowInx = leftInx;
+					toCheck[iter] = rightInx;
+					iter++;
+				}
+				else
+				{
+					nowInx = rightInx;
+					toCheck[iter] = leftInx;
+					iter++;
+				}
+			}
+			else
+			{
+				takeFromCheck = true;
+			}
+		}
+		else if (castInfo.bHit && nowDepth == treeDepth)
+		{
+			bLeafDetect = true;
+			takeFromCheck = true;
+		}
+
+		if(bLeafDetect)
+		{
+			start = bvh[nowInx].start;
+			end = bvh[nowInx].end;
+			start = 3 * start;
+			end = 3 * end + 3;
+
+			//!!! only one mesh now
+			MeshInfo meshObject = meshInfos[0];
+
+			//for loop all triangles in leave to trace
+			for (int inx = start; inx < end; inx += 3)
+			{
+				Vertex v1;
+				Vertex v2;
+				Vertex v3;
+
+				v1.p = vertices[tris[inx]];
+				v2.p = vertices[tris[inx + 1]];
+				v3.p = vertices[tris[inx + 2]];
+
+				v1.n = normals[tris[inx]];
+				v2.n = normals[tris[inx + 1]];
+				v3.n = normals[tris[inx + 2]];
+
+				v1.p = (mul(meshObject.localToWorldMatrix, float4(v1.p, 1.0f))).xyz;
+				v2.p = (mul(meshObject.localToWorldMatrix, float4(v2.p, 1.0f))).xyz;
+				v3.p = (mul(meshObject.localToWorldMatrix, float4(v3.p, 1.0f))).xyz;
+
+				v1.n = normalize(mul(meshObject.localToWorldMatrix, float4(v1.n, 0.0f))).xyz;
+				v2.n = normalize(mul(meshObject.localToWorldMatrix, float4(v2.n, 0.0f))).xyz;
+				v3.n = normalize(mul(meshObject.localToWorldMatrix, float4(v3.n, 0.0f))).xyz;
+
+				HitInfo hit = RayCastTri(ray, v1, v2, v3);
+				if (hit.bHit)
+				{
+					if (!minHit.bHit)
+					{
+						Assgin(minHit, hit);
+					}
+					else if (length(hit.P - ray.pos) < length(minHit.P - ray.pos))
+					{
+						Assgin(minHit, hit);
+					}
+				}
+			}
+			//___循环三角形
+			if (minHit.bHit)
+			{
+				break;
+			}
+		}//___if bLeafDetect
+		if (takeFromCheck)
+		{
+			if (iter == 0)
+			{
+				break;
+			}
+			else
+			{
+				nowInx = toCheck[iter-1];
+				iter--;
+			}
+		}
+	}
+
+	if (minHit.bHit)
+	{//Trace到Mesh了，返回Mesh的颜色 
+		//???
+		minHit.obj = 0;
+
+		Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
+		re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
+	}
+	else
+	{//没Trace到，返回天空盒的颜色
+
+		re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+	}
+
+	Result[id.xy] = float4(re, 1);
+}
+*/

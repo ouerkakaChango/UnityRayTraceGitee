@@ -107,8 +107,8 @@ float3 GetMeshSDFNormal(float3 p)
 		));
 }
 
-#define MAXMeshSDFTrace 160
-#define Thre_MeshSDF 0.05f
+#define MAXMeshSDFTrace 660
+#define Thre_MeshSDF 0.01f
 void TraceSDFMesh(Ray ray, out HitInfo info)
 {
 	Init(info);
@@ -124,24 +124,21 @@ void TraceSDFMesh(Ray ray, out HitInfo info)
 			break;
 		}
 
-		//???
 		//get sdf at now pos
 		float sdf = GetMeshSDF(ray.pos);
 		//float sdf = SDFSphere(ray.pos, float3(0,0,0), 0.5);
 
-		//???
 		if (sdf <= length(unit)*0.5)
 		{
 			info.bHit = true;
 			//!!!
 			info.obj = 0;
-			//???
 			info.N = GetMeshSDFNormal(ray.pos);
 			//info.N = SDFSphereNormal(ray.pos, float3(0, 0, 0));
 			info.P = ray.pos;
 			break;
 		}
-		ray.pos += sdf * 0.5f * ray.dir;
+		ray.pos += sdf * 0.5 * ray.dir;
 		traceCount++;
 	}
 }
