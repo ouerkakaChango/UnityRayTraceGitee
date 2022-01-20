@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static ComputeShaderHelper;
+using Debugger;
+using MathHelper;
+using static MathHelper.Vec;
 
 public class SDFShadowBaker : MonoBehaviour
 {
@@ -12,6 +15,7 @@ public class SDFShadowBaker : MonoBehaviour
     public RenderTexture rt;
 
     float[] sdfArr;
+
     MeshSDFGrid grid;
 
     void Start()
@@ -26,8 +30,8 @@ public class SDFShadowBaker : MonoBehaviour
 
     void CheckRTInited()
     {
-        if (rt == null || 
-            new Vector2Int(rt.width,rt.height) != size)
+        //if (rt == null || 
+        //    new Vector2Int(rt.width,rt.height) != size)
         {
             rt = new RenderTexture(size.x, size.y, 0, RenderTextureFormat.ARGBFloat);
             rt.enableRandomWrite = true;
@@ -37,7 +41,7 @@ public class SDFShadowBaker : MonoBehaviour
 
     void CheckMeshSDFInited()
     {
-        if (sdfArr == null || sdfArr.Length == 0)
+        //if (sdfArr == null || sdfArr.Length == 0)
         {
             MeshSDF.Parse(meshSDFFile, out grid, out sdfArr);
             Debug.Log("file parse");
@@ -48,14 +52,17 @@ public class SDFShadowBaker : MonoBehaviour
     {
         CheckRTInited();
         CheckMeshSDFInited();
+        //Log.DebugVec(grid.startPos);
+        Log.DebugVec(grid.unit);
+        //Log.DebugVec(grid.startPos + Vec.Mul(Vec.Sub(grid.unitCount,1),grid.unit));
         Compute_Bake();
+        SetRTToMaterial();
     }
 
     void Compute_Bake()
     {
         ComputeBuffer buffer_sdfArr = null;
 
-        Debug.Log(sdfArr.Length);
         PreComputeBuffer(ref buffer_sdfArr, sizeof(float), sdfArr);
 
         var cs = (ComputeShader)Resources.Load("BakeCS/BakeSDFShadow");
@@ -76,5 +83,12 @@ public class SDFShadowBaker : MonoBehaviour
         //#####################################;
 
         SafeDispose(buffer_sdfArr);
+    }
+
+    void SetRTToMaterial()
+    {
+        var mr = GetComponent<MeshRenderer>();
+        var mat = mr.sharedMaterial;
+        mat.SetTexture("_MainTex", rt);
     }
 }

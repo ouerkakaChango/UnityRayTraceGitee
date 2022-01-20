@@ -29,6 +29,11 @@ namespace MathHelper
             return new Vector3Int((int)(v1.x * v2.x), (int)(v1.y * v2.y), (int)(v1.z * v2.z));
         }
 
+        public static Vector3 Sub(in Vector3 v, in float k)
+        {
+            return new Vector3(v.x - k, v.y - k, v.z - k);
+        }
+
         public static Vector3Int ToInt(in Vector3 v)
         {
             return new Vector3Int((int)v.x, (int)v.y, (int)v.z);

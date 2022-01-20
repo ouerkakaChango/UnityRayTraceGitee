@@ -29,6 +29,13 @@ struct CastInfo
 	float dis;
 };
 
+struct Grid
+{
+	float3 startPos;
+	float3 unitCount;
+	float3 unit;
+};
+
 void Init(out HitInfo re)
 {
 	re.bHit = 0;

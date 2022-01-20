@@ -1,6 +1,9 @@
 ﻿#ifndef SDFCOMMONDEF_HLSL
 #define SDFCOMMONDEF_HLSL
 
+#define Def_MAXSDFTraceCount 256
+#define Def_SDFTraceThre 0.001
+
 float SDFBox(float3 p, float3 center, float3 bound)
 {
 	float3 q = abs(p - center) - bound;
@@ -15,6 +18,31 @@ float SDFSphere(float3 p, float3 center, float radius)
 float3 SDFSphereNormal(float3 p, float3 center)
 {
 	return normalize(p - center);
+}
+
+void SDFTraceSphere(Ray ray, out HitInfo info
+	, float3 center, float radius)
+{
+	Init(info);
+
+	int traceCount = 0;
+	while (traceCount <= Def_MAXSDFTraceCount)
+	{
+		//get sdf at now pos
+		float sdf = SDFSphere(ray.pos, center, radius);
+
+		if (sdf <= Def_SDFTraceThre)
+		{
+			info.bHit = true;
+			//!!!
+			info.obj = 0;
+			info.N = SDFSphereNormal(ray.pos, center);
+			info.P = ray.pos;
+			break;
+		}
+		ray.pos += sdf * ray.dir;
+		traceCount++;
+	}
 }
 
 float SDFXCylinder(float3 p, float r)

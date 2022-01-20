@@ -57,9 +57,10 @@ public class MeshSDF : MonoBehaviour
         var reader = FileHelper.BeginRead(file);
         reader.Read(ref grid.startPos);
         reader.Read(ref grid.unitCount);
+        
         reader.Read(ref grid.unit);
+        Debug.Log(grid.unit);
         reader.Read(ref sdfArr);
-        Debug.Log(sdfArr.Length);
         reader.Close();
     }
 }
