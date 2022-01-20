@@ -32,8 +32,8 @@ float GetMeshSDF(in float3 p, in Grid grid, in StructuredBuffer<float> sdfArr)
 	uvw = saturate(uvw);
 	float re = lerp3D(arr, uvw);
 
-	//inspired by iq, use 0.5f ,although down the precision, but solve the hole problem
-	return re * 0.5f;
+	//inspired by iq, use 0.4f ,although down the precision, but solve the hole problem
+	return re * 0.4f;
 }
 
 float3 GetMeshSDFNormal(float3 p, in Grid grid, in StructuredBuffer<float> sdfArr)
@@ -108,4 +108,80 @@ void TraceMeshSDFLocal(Ray ray, out HitInfo info,
 	}
 }
 
+//###############################################################################
+float SoftShadow_TraceMeshSDFInBox(Ray ray, out HitInfo info, float softK, float3 ori,
+	in Grid grid, in StructuredBuffer<float> sdfArr) 
+{
+	float sha = 1.0f;
+	float tempDis = 0.01f;
+	Init(info);
+
+	float3 boxMin = grid.startPos;
+	float3 boxMax = grid.startPos + (grid.unitCount - 1) * grid.unit;
+
+	int traceCount = 0;
+	while (traceCount <= MAXMeshSDFTrace)
+	{
+		if (!IsInBBox(ray.pos, boxMin, boxMax))
+		{
+			break;
+		}
+
+		//get sdf at now pos
+		float sdf = GetMeshSDF(ray.pos, grid, sdfArr);
+
+		if (sdf <= 0.01)//length(grid.unit)*0.5)
+		{
+			info.bHit = true;
+			//!!!
+			info.obj = 0;
+			info.N = GetMeshSDFNormal(ray.pos, grid, sdfArr);
+			info.P = ray.pos;
+			break;
+		}
+		sha = min(sha, max(0,(softK*sdf-grid.unit*0.5) / tempDis));
+		//tempDis += sdf;
+		if (sdf < 0.0001)
+		{
+			sha = 0;
+		}
+		ray.pos += sdf * ray.dir;
+		tempDis = length(ori - ray.pos);
+		traceCount++;
+	}
+	return sha;
+}
+float SoftShadow_TraceMeshSDFLocal(Ray ray, out HitInfo info, float softK,
+	in Grid grid, in StructuredBuffer<float> sdfArr)
+{
+	Init(info);
+
+	Ray sampleRay = ray;
+	bool needTrace = true;
+	float3 boxMin = grid.startPos;
+	float3 boxMax = grid.startPos + (grid.unitCount - 1) * grid.unit;
+	if (!IsInBBox(ray.pos, boxMin, boxMax))
+	{
+		CastInfo castInfo = CastBBox(ray, boxMin, boxMax);
+		if (castInfo.bHit)
+		{
+			//!!! offset 0.00..1f is a must!
+			sampleRay.pos += sampleRay.dir * (castInfo.dis + 0.0001f);
+		}
+		else
+		{
+			needTrace = false;
+		}
+	}
+	//盒子内和会打到盒子的ray都需要进行SDFSphereTrace
+	if (needTrace)
+	{
+		return SoftShadow_TraceMeshSDFInBox(sampleRay, info, softK, ray.pos,
+			grid, sdfArr);
+	}
+	else
+	{
+		return 1;
+	}
+}
 #endif
