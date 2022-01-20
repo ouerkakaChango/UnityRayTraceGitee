@@ -108,13 +108,14 @@ void BakeMeshSDFShadow(uint3 id : SV_DispatchThreadID)
 	Ray localRay = ray;
 
 	float3 re = 1;
-	re = SoftShadow_TraceMeshSDFLocal(localRay, minHit, 8, grid, sdfArr);
+	float k = 8;
+	re = SoftShadow_TraceMeshSDFLocal(localRay, minHit, k, grid, sdfArr);
 	//F1(localRay, minHit, grid, sdfArr);
 
-	//if (minHit.bHit)
-	//{
-	//	re = 0;
-	//}
+	if (minHit.bHit)
+	{
+		re = 0;
+	}
 	Result[id.xy] = float4(re, 1);
 }
 //#########################################################################################################

@@ -85,9 +85,23 @@ bool equal(float3 a, float3 b, float tolerance = 0.000001f)
 		equal(a.z, b.z, tolerance);
 }
 
+float smooth3(float t)
+{
+	return t * t * (3.0 - 2.0 * t);
+}
+
 float3 smooth3(float3 t)
 {
 	return t * t * (3.0 - 2.0 * t);
+}
+
+//https://stackoverflow.com/questions/28740544/inverted-smoothstep
+float invSmooth3(float x) {
+	return x + (x - (x * x * (3.0f - 2.0f * x)));
+
+	//if (x <= 0)return 0;
+	//if (x >= 1)return 1;
+	//return 0.5f - sin(asin(1 - 2 * x) / 3);
 }
 
 int GetTreeDepth(int inx,int maxDepth)

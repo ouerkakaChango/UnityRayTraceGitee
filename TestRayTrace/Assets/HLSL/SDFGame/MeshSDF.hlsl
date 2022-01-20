@@ -4,7 +4,7 @@
 #include "../GridMath.hlsl"
 #include "../RayMath.hlsl"
 
-#define MAXMeshSDFTrace 128
+#define MAXMeshSDFTrace 660
 
 float GetMeshSDFByInx(int3 inx, in Grid grid, in StructuredBuffer<float> sdfArr)
 {
@@ -32,8 +32,8 @@ float GetMeshSDF(in float3 p, in Grid grid, in StructuredBuffer<float> sdfArr)
 	uvw = saturate(uvw);
 	float re = lerp3D(arr, uvw);
 
-	//inspired by iq, use 0.4f ,although down the precision, but solve the hole problem
-	return re * 0.4f;
+	//inspired by iq ,although down the precision, but solve the hole problem
+	return re * 0.5f;
 }
 
 float3 GetMeshSDFNormal(float3 p, in Grid grid, in StructuredBuffer<float> sdfArr)
@@ -113,7 +113,7 @@ float SoftShadow_TraceMeshSDFInBox(Ray ray, out HitInfo info, float softK, float
 	in Grid grid, in StructuredBuffer<float> sdfArr) 
 {
 	float sha = 1.0f;
-	float tempDis = 0.01f;
+	float tempDis = 0;
 	Init(info);
 
 	float3 boxMin = grid.startPos;
@@ -123,14 +123,15 @@ float SoftShadow_TraceMeshSDFInBox(Ray ray, out HitInfo info, float softK, float
 	while (traceCount <= MAXMeshSDFTrace)
 	{
 		if (!IsInBBox(ray.pos, boxMin, boxMax))
-		{
+		{ 
+			//sha = 1;
 			break;
 		}
 
 		//get sdf at now pos
 		float sdf = GetMeshSDF(ray.pos, grid, sdfArr);
 
-		if (sdf <= 0.01)//length(grid.unit)*0.5)
+		if (sdf <= length(grid.unit)*0.5)
 		{
 			info.bHit = true;
 			//!!!
@@ -139,18 +140,17 @@ float SoftShadow_TraceMeshSDFInBox(Ray ray, out HitInfo info, float softK, float
 			info.P = ray.pos;
 			break;
 		}
-		sha = min(sha, max(0,(softK*sdf-grid.unit*0.5) / tempDis));
-		//tempDis += sdf;
-		if (sdf < 0.0001)
-		{
-			sha = 0;
-		}
+
+		sha = min(sha, softK * sdf / tempDis);
+		tempDis += sdf;
 		ray.pos += sdf * ray.dir;
-		tempDis = length(ori - ray.pos);
+		//tempDis = length(ori - ray.pos);
 		traceCount++;
 	}
+
 	return sha;
 }
+
 float SoftShadow_TraceMeshSDFLocal(Ray ray, out HitInfo info, float softK,
 	in Grid grid, in StructuredBuffer<float> sdfArr)
 {
@@ -166,7 +166,7 @@ float SoftShadow_TraceMeshSDFLocal(Ray ray, out HitInfo info, float softK,
 		if (castInfo.bHit)
 		{
 			//!!! offset 0.00..1f is a must!
-			sampleRay.pos += sampleRay.dir * (castInfo.dis + 0.0001f);
+			sampleRay.pos += sampleRay.dir * (castInfo.dis + 0.001f);
 		}
 		else
 		{
