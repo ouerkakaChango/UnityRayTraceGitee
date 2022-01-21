@@ -37,7 +37,6 @@ float3 GetSDFGameColor(in Ray ray)
 	HitInfo minHit;
 	Init(minHit);
 	TraceScene(ray, minHit);
-	//SDFScene(ray, minHit);
 	//___Trace
 
 	if (minHit.bHit)
