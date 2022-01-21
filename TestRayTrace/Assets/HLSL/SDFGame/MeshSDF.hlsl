@@ -146,7 +146,8 @@ float SoftShadow_TraceMeshSDFInBox(Ray ray, out HitInfo info, float softK, float
 		{
 			return 0;
 		}
-		ray.pos += sdf * ray.dir;
+		//0.5解决薄处sdf跃过问题
+		ray.pos += sdf * ray.dir*0.5f;
 		//tempDis = length(ori - ray.pos);
 		tempDis += sdf;
 		traceCount++;

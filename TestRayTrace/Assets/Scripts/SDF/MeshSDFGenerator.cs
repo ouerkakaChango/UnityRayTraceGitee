@@ -15,8 +15,8 @@ using static ComputeShaderHelper;
 
 public enum MeshSDFGenerateSampleType
 {
-    unitSphere, //unform distribute 
     lowDiscrepancy, //低差异序列
+    unitSphere, //unform distribute 
     testCenter, //always center
 };
 
@@ -24,16 +24,16 @@ public class MeshSDFGenerator : MonoBehaviour
 {
     bool hasInited = false;
 
-    public int maxSampleCount = 15;
+    public int maxSampleCount = 160;
 
     public bool showMeshBound = true;
     public bool showGrid = true;
     public bool showSDF = true;
     public bool needFixScale100 = true;
 
-    public MeshSDFExtendType extendType = MeshSDFExtendType.Ground;
-    public Vector3Int unitDivide = new Vector3Int(10,10,10);
-    public Vector3Int unitExtend = new Vector3Int(2,2,2);
+    public MeshSDFExtendType extendType = MeshSDFExtendType.Default;
+    public Vector3Int unitDivide = new Vector3Int(60,60,60);
+    public Vector3Int unitExtend = new Vector3Int(16,16,16);
     [ReadOnly]
     public Vector3 unit;
     [ReadOnly]
@@ -191,6 +191,11 @@ public class MeshSDFGenerator : MonoBehaviour
             t1.y = 0;
             startUnitPos -= Vec.Mul(unit, t1);
         }
+        else if (extendType == MeshSDFExtendType.Default)
+        {
+            startUnitPos = meshBounds.min + 0.5f * unit;
+            startUnitPos -= Vec.Mul(unit, unitExtend);
+        }
     }
 
     void InitUnitCount()
@@ -198,6 +203,10 @@ public class MeshSDFGenerator : MonoBehaviour
         if (extendType == MeshSDFExtendType.Ground)
         {
             unitCount = unitDivide + Vec.MulToInt3(unitExtend,new Vector3(2,1,2));
+        }
+        else if (extendType == MeshSDFExtendType.Default)
+        {
+            unitCount = unitDivide + Vec.MulToInt3(unitExtend, new Vector3(2, 2, 2));
         }
     }
 

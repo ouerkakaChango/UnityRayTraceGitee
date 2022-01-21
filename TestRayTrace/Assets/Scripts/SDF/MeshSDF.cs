@@ -5,9 +5,8 @@ using XFileHelper;
 
 public enum MeshSDFExtendType
 {
-    None,
+    Default,
     Ground,
-    All,
 };
 
 public struct MeshSDFGrid
