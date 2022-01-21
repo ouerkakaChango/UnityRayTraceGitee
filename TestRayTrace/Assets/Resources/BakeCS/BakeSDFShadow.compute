@@ -17,6 +17,11 @@ float3 unit;
 float3 shadowStartPos;
 float3 shadowUnit;
 
+float softK;
+float2 quadSize;
+float3 quadPos;
+float3 lightDir;
+
 uint InxSDF(uint3 inx)
 {
 	return inx.x + inx.y * (unitCount.x) + inx.z * (unitCount.x * unitCount.y);
@@ -84,18 +89,15 @@ void F5(Ray ray, out HitInfo info,
 [numthreads(8, 8, 1)]
 void BakeMeshSDFShadow(uint3 id : SV_DispatchThreadID)
 {
-	//Result[id.xy] = float4(id.x/512.0f,id.y/512.0f,0, 1);
-	//return;
-
 	float w, h;
 	Result.GetDimensions(w, h);
-	shadowUnit = float3(5/w, 0, 5/h);
+	shadowUnit = float3(quadSize.x/w, 0, quadSize.y/h);
 	//float3 pos = shadowStartPos + float3(id.x, 0, id.y)*shadowUnit;
-	float3 pos = float3(-5,-0.0,-5) + float3(id.x, 0, id.y)*shadowUnit;
+	float3 pos = quadPos - 0.5f*float3(quadSize.x,0.0, quadSize.y) + float3(id.x, 0, id.y)*shadowUnit;
 
 	HitInfo minHit;
 	Init(minHit);
-	float3 lightDir = normalize(float3(-1, -1, -1));
+
 	Ray ray;
 	ray.pos = pos;
 	ray.dir = -lightDir;
@@ -108,14 +110,10 @@ void BakeMeshSDFShadow(uint3 id : SV_DispatchThreadID)
 	Ray localRay = ray;
 
 	float3 re = 1;
-	float k = 8;
-	re = SoftShadow_TraceMeshSDFLocal(localRay, minHit, k, grid, sdfArr);
-	//F1(localRay, minHit, grid, sdfArr);
+	re = SoftShadow_TraceMeshSDFLocal(localRay, minHit, softK, grid, sdfArr);
 
-	if (minHit.bHit)
-	{
-		re = 0;
-	}
+	//??? indirect direct
+	re = lerp(0.05f, 1, re.x);
 	Result[id.xy] = float4(re, 1);
 }
 //#########################################################################################################

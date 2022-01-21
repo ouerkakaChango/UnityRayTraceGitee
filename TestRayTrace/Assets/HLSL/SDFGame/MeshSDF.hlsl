@@ -114,6 +114,7 @@ float SoftShadow_TraceMeshSDFInBox(Ray ray, out HitInfo info, float softK, float
 {
 	float sha = 1.0f;
 	float tempDis = 0;
+	float last = 10;
 	Init(info);
 
 	float3 boxMin = grid.startPos;
@@ -124,13 +125,12 @@ float SoftShadow_TraceMeshSDFInBox(Ray ray, out HitInfo info, float softK, float
 	{
 		if (!IsInBBox(ray.pos, boxMin, boxMax))
 		{ 
-			//sha = 1;
 			break;
 		}
 
 		//get sdf at now pos
 		float sdf = GetMeshSDF(ray.pos, grid, sdfArr);
-
+		last = sdf;
 		if (sdf <= length(grid.unit)*0.5)
 		{
 			info.bHit = true;
@@ -138,13 +138,17 @@ float SoftShadow_TraceMeshSDFInBox(Ray ray, out HitInfo info, float softK, float
 			info.obj = 0;
 			info.N = GetMeshSDFNormal(ray.pos, grid, sdfArr);
 			info.P = ray.pos;
-			break;
+			return 0;
 		}
 
 		sha = min(sha, softK * sdf / tempDis);
-		tempDis += sdf;
+		if (sdf < 0.001f)
+		{
+			return 0;
+		}
 		ray.pos += sdf * ray.dir;
 		//tempDis = length(ori - ray.pos);
+		tempDis += sdf;
 		traceCount++;
 	}
 

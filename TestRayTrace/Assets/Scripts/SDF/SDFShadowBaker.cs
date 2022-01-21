@@ -5,18 +5,22 @@ using static ComputeShaderHelper;
 using Debugger;
 using MathHelper;
 using static MathHelper.Vec;
+using TextureHelper;
 
 public class SDFShadowBaker : MonoBehaviour
 {
     public TextAsset meshSDFFile;
     public Transform CasterTrans;
+    public Light light;
     public Vector2Int size;
-
+    public float softK = 2;
     public RenderTexture rt;
 
     float[] sdfArr;
 
     MeshSDFGrid grid;
+
+    Texture2D tex;
 
     void Start()
     {
@@ -56,7 +60,9 @@ public class SDFShadowBaker : MonoBehaviour
         Log.DebugVec(grid.unit);
         //Log.DebugVec(grid.startPos + Vec.Mul(Vec.Sub(grid.unitCount,1),grid.unit));
         Compute_Bake();
-        SetRTToMaterial();
+        TexHelper.RT2Tex2D(ref tex,rt);
+        TexHelper.SaveAsset(tex, "Assets/SDFShadow.asset");
+        SetTexToMaterial();
     }
 
     void Compute_Bake()
@@ -78,6 +84,12 @@ public class SDFShadowBaker : MonoBehaviour
         cs.SetVector("unitCount", (Vector3)grid.unitCount);
         cs.SetVector("unit", grid.unit);
 
+        cs.SetFloat("softK", softK);
+        cs.SetVector("quadSize", new Vector3(transform.localScale.x,transform.localScale.y,0));
+        cs.SetVector("quadPos", transform.position - CasterTrans.position);
+        //!!! 目前只支持了dirLight
+        cs.SetVector("lightDir", light.transform.forward);
+
         cs.Dispatch(kInx, size.x / 8, size.y / 8, 1);
         //### compute
         //#####################################;
@@ -85,10 +97,10 @@ public class SDFShadowBaker : MonoBehaviour
         SafeDispose(buffer_sdfArr);
     }
 
-    void SetRTToMaterial()
+    void SetTexToMaterial()
     {
         var mr = GetComponent<MeshRenderer>();
         var mat = mr.sharedMaterial;
-        mat.SetTexture("_MainTex", rt);
+        mat.SetTexture("_MainTex", tex);
     }
 }
