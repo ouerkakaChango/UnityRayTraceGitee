@@ -1,7 +1,13 @@
 ﻿#define OBJNUM 2
 
+#define MaxSDF 100000
+#define MaxTraceDis 100
+#define MaxTraceTime 640
 #define TraceThre 0.0001
 #define TraceStart 0.0005
+#define SceneSDFSoftShadowBias 0.1
+#define SceneSDFShadowNormalBias 0.001
+#define SceneSDFSoftShadowK 4
 
 #include "../PBR/PBRCommonDef.hlsl"
 #include "../HLSL/PBR/PBR_IBL.hlsl"
@@ -43,6 +49,20 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 	}
 	return 0;
 }
+
+float HardShadow_TraceScene(Ray ray, out HitInfo info);
+float SoftShadow_TraceScene(Ray ray, out HitInfo info);
+float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
+{
+	float3 lightDir = normalize(float3(1, -1, 1));
+	ray.pos = minHit.P;
+	ray.dir = -lightDir;
+	ray.pos += SceneSDFShadowNormalBias * minHit.N;
+	HitInfo hitInfo;
+	//return HardShadow_TraceScene(ray, hitInfo);
+	return SoftShadow_TraceScene(ray, hitInfo);
+}
+
 //###################################################################################
 #include "SDFCommonDef.hlsl"
 #include "../Noise/NoiseCommonDef.hlsl"
@@ -79,7 +99,6 @@ float GetObjSDF(int inx, float3 p)
 	if (inx == 0)
 	{
 		//return SDFSphere(p, float3(0, 0.5, 0), 0.5); //球
-		//return SDFSphere(p, float3(0, 0, 0), 0.5); //球
 		return SDFPlanet(p);
 	}
 	else if (inx == 1)
@@ -203,4 +222,154 @@ void SDFScene(in Ray ray,out HitInfo info)
 			info.bHit = -1;
 		}
 	}
+}
+
+float TraceScene(Ray ray, out HitInfo info)
+{
+	Init(info);
+
+	int traceCount = 0;
+	while (traceCount <= MaxTraceTime)
+	{
+		int objInx = -1;
+		float objSDF[OBJNUM];
+		float sdf = MaxSDF;
+		for (int inx = 0; inx < OBJNUM; inx++)
+		{
+			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			if (objSDF[inx] < sdf)
+			{
+				sdf = objSDF[inx];
+				objInx = inx;
+			}
+		}
+
+		if (sdf > MaxTraceDis)
+		{
+			break;
+		}
+
+		if (sdf <= TraceThre)
+		{
+			info.bHit = true;
+			info.obj = objInx;
+			info.N = GetObjNormal(objInx, ray.pos);
+			info.P = ray.pos;
+			break;
+		}
+		ray.pos += sdf * ray.dir;
+		traceCount++;
+	}
+
+	if (info.bHit)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+float HardShadow_TraceScene(Ray ray, out HitInfo info)
+{
+	Init(info);
+
+	int traceCount = 0;
+	while (traceCount <= MaxTraceTime)
+	{
+		int objInx = -1;
+		float objSDF[OBJNUM];
+		float sdf = MaxSDF;
+		for (int inx = 0; inx < OBJNUM; inx++)
+		{
+			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			if (objSDF[inx] < sdf)
+			{
+				sdf = objSDF[inx];
+				objInx = inx;
+			}
+		}
+
+		if (sdf > MaxTraceDis)
+		{
+			break;
+		}
+
+		if (sdf <= TraceThre*0.4f)
+		{
+			info.bHit = true;
+			info.obj = objInx;
+			//info.N = GetObjNormal(objInx, ray.pos);
+			info.P = ray.pos;
+			break;
+		}
+		ray.pos += sdf * ray.dir;
+		traceCount++;
+	}
+
+	if (info.bHit)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+//https://www.shadertoy.com/view/MsfGRr
+float SoftShadow_TraceScene(Ray ray, out HitInfo info)
+{
+	Init(info);
+	float sha = 1.0;
+	float t = TraceStart * 0.1; //一个非0小值，会避免极其细微的多余shadow
+
+	int traceCount = 0;
+	while (traceCount <= MaxTraceTime*0.2)
+	{
+		int objInx = -1;
+		float objSDF[OBJNUM];
+		float sdf = MaxSDF;
+		for (int inx = 0; inx < OBJNUM; inx++)
+		{
+			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			if (objSDF[inx] < sdf)
+			{
+				sdf = objSDF[inx];
+				objInx = inx;
+			}
+		}
+
+		if (sdf <= 0)
+		{
+			sha = 0;
+			break;
+		}
+
+		if (sdf > MaxTraceDis)
+		{
+			break;
+		}
+
+		sha = min(sha, SceneSDFSoftShadowK * sdf / t);
+		if (sha < 0.001) break;
+
+		//*0.1f解决背面漏光问题
+		if (sdf <= TraceThre*0.1f)
+		{
+			info.bHit = true;
+			info.obj = objInx;
+			//info.N = GetObjNormal(objInx, ray.pos);
+			info.P = ray.pos;
+			break;
+		}
+
+		t += clamp(sdf, 0.01*SceneSDFSoftShadowBias, 0.5*SceneSDFSoftShadowBias);
+
+		ray.pos += sdf * ray.dir;
+		traceCount++;
+	}
+
+	return saturate(sha);
 }

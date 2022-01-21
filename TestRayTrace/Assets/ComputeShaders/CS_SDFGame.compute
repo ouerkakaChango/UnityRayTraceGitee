@@ -36,12 +36,14 @@ float3 GetSDFGameColor(in Ray ray)
 	//---Trace
 	HitInfo minHit;
 	Init(minHit);
-	SDFScene(ray, minHit);
+	TraceScene(ray, minHit);
+	//SDFScene(ray, minHit);
 	//___Trace
 
 	if (minHit.bHit)
 	{//Trace到Scene了，返回Mesh的颜色 
 		re = RenderSceneObj(envSpecTex2DArr, ray, minHit);
+		re *= RenderSceneSDFShadow(ray, minHit);
 	}
 	else
 	{//没Trace到，返回背景/天空盒的颜色
