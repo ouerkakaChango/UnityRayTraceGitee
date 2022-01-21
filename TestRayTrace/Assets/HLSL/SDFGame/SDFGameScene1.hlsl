@@ -1,13 +1,13 @@
 ﻿#define OBJNUM 2
 
 #define MaxSDF 100000
-#define MaxTraceDis 100
+#define MaxTraceDis 10
 #define MaxTraceTime 640
 #define TraceThre 0.0001
 #define TraceStart 0.0005
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFShadowNormalBias 0.001
-#define SceneSDFSoftShadowK 32
+#define SceneSDFSoftShadowK 16
 
 #include "../PBR/PBRCommonDef.hlsl"
 #include "../HLSL/PBR/PBR_IBL.hlsl"
