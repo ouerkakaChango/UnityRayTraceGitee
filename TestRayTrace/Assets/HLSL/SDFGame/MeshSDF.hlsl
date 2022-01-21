@@ -113,8 +113,8 @@ float SoftShadow_TraceMeshSDFInBox(Ray ray, out HitInfo info, float softK, float
 	in Grid grid, in StructuredBuffer<float> sdfArr) 
 {
 	float sha = 1.0f;
-	float tempDis = 0;
-	float last = 10;
+	float tempDis = 0.001f;
+
 	Init(info);
 
 	float3 boxMin = grid.startPos;
@@ -130,26 +130,28 @@ float SoftShadow_TraceMeshSDFInBox(Ray ray, out HitInfo info, float softK, float
 
 		//get sdf at now pos
 		float sdf = GetMeshSDF(ray.pos, grid, sdfArr);
-		last = sdf;
+
+		sha = min(sha, softK * sdf / tempDis);
+		if (sdf < 0.001f)
+		{
+			sha = 0;
+			break;
+		}
+
 		if (sdf <= length(grid.unit)*0.5)
 		{
 			info.bHit = true;
 			//!!!
 			info.obj = 0;
-			info.N = GetMeshSDFNormal(ray.pos, grid, sdfArr);
+			//info.N = GetMeshSDFNormal(ray.pos, grid, sdfArr);
 			info.P = ray.pos;
+			//break;
 			return 0;
 		}
 
-		sha = min(sha, softK * sdf / tempDis);
-		if (sdf < 0.001f)
-		{
-			return 0;
-		}
 		//0.5解决薄处sdf跃过问题
 		ray.pos += sdf * ray.dir*0.5f;
-		//tempDis = length(ori - ray.pos);
-		tempDis += sdf;
+		tempDis += clamp(sdf,0.05,0.1);
 		traceCount++;
 	}
 
