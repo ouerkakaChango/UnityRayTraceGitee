@@ -24,6 +24,13 @@ namespace TextureHelper
             File.WriteAllBytes(folder + "/" + name + ".png", tex.EncodeToPNG());
         }
 
+        public static void LoadPNG(ref Texture2D tex, string path)
+        {
+            var fileData = File.ReadAllBytes(path);
+            tex = new Texture2D(2, 2);
+            tex.LoadImage(fileData);
+        }
+
         public static void RT2Tex2D(ref Texture2D tex, RenderTexture rTex, TextureFormat format = TextureFormat.RGBAFloat)
         {
             tex = new Texture2D(rTex.width, rTex.height, format, false, true);

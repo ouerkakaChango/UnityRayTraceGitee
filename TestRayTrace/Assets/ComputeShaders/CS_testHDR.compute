@@ -96,7 +96,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 
 	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, 0, true);
 	//re = IBLBakeSpecMip(envSpecTex2DArr, ray.dir, 0.25*4, true);
-	re = IBLBakeSpecMipByRoughness(envSpecTex2DArr, ray.dir, 0.15f, 4, true);
+	re = IBLBakeSpecMipByRoughness(envSpecTex2DArr, ray.dir, 0.15f, true);
 
 	//float2 uv = EquirectangularToUV(ray.dir, true);
 	//re = float3(uv, 0);

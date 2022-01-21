@@ -203,7 +203,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 		minHit.obj = 0;
 
 		Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
-		re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
+		re = PBR_IBL(envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
 	}
 	else
 	{//没Trace到，返回天空盒的颜色

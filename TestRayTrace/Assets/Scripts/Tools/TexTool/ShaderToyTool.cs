@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using TextureHelper;
 
 public sealed class ShaderToyTool
 {
-    Texture2D noiseRGB;
+    public Texture2D noiseRGB;
+    public Texture2D LUT_BRDF;
     private static readonly ShaderToyTool instance = new ShaderToyTool();
     static ShaderToyTool()
     {
@@ -13,9 +15,10 @@ public sealed class ShaderToyTool
     private ShaderToyTool()
     {
         var fileData = File.ReadAllBytes("Assets/Raw/ShaderToy/shiftTex.png");
-        //var fileData = File.ReadAllBytes("Assets/Raw/ShaderToy/noiseRGB.png");
         noiseRGB = new Texture2D(2, 2);
         noiseRGB.LoadImage(fileData);
+
+        TexHelper.LoadPNG(ref LUT_BRDF, "Assets/Raw/ShaderToy/LUT_BRDF.png");
     }
     public static ShaderToyTool Instance
     {
@@ -23,15 +26,5 @@ public sealed class ShaderToyTool
         {
             return instance;
         }
-    }
-
-    public 
-        Texture2D GetTexture(string name)
-    {
-        if (name == "NoiseRGBTex")
-        {
-            return noiseRGB;
-        }
-        return null;
     }
 }

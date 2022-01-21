@@ -3,8 +3,7 @@
 
 #include "../HLSL/UnityCommonDef.hlsl"
 #include "../HLSL/RayMath.hlsl"
-#include "../HLSL/PBR/PBR_IBL.hlsl"
-#include "../HLSL/PBR/PBR_GGX.hlsl"
+
 #include "../HLSL/SDFGame/SDFCommonSys.hlsl"
 #include "../HLSL/SDFGame/SDFGameScene1.hlsl"
 
@@ -27,7 +26,6 @@ float3 screenV;
 RWTexture2D<float4> Result;
 Texture2D<float4> envDiffTex;
 Texture2DArray envSpecTex2DArr;
-Texture2D<float4> brdfLUT;
 Texture2D<float4> envBgTex;
 
 //#########################################################################################################
@@ -42,21 +40,8 @@ float3 GetSDFGameColor(in Ray ray)
 	//___Trace
 
 	if (minHit.bHit)
-	{//Trace到Mesh了，返回Mesh的颜色 
-		//???
-		minHit.obj = 0;
-
-		Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
-		{
-			re = PBR_IBL(envDiffTex, envSpecTex2DArr, brdfLUT, mat, minHit.N, -ray.dir);
-		}
-		{
-			//mat.metallic = 0.0f;
-			//mat.roughness = 0.8f;
-			//float3 lightDir = normalize(float3(1, -1, 1));
-			//float3 lightColor = float3(1, 1, 1) * 2;
-			//re = PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
-		}
+	{//Trace到Scene了，返回Mesh的颜色 
+		re = RenderSceneObj(envSpecTex2DArr, ray, minHit);
 	}
 	else
 	{//没Trace到，返回背景/天空盒的颜色

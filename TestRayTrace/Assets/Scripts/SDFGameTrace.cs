@@ -18,12 +18,8 @@ public class SDFGameTrace : MonoBehaviour
     RenderTexture rt;
 
     public ComputeShader cs;
-    public Texture2D envDiffTex;
     public Texture2DArray envSpecTex2DArr;
-    public Texture2D brdfLUT;
     public Texture2D envBgTex;
-    //???
-    public Texture2D testTex;
 
     public int w = 1024;
     public int h = 720;
@@ -45,7 +41,6 @@ public class SDFGameTrace : MonoBehaviour
 
     void Start()
     {
-        testTex = ShaderToyTool.Instance.GetTexture("NoiseRGBTex");
         UpdateCamParam();
 
         Co_GoIter = GoIter();
@@ -152,13 +147,12 @@ public class SDFGameTrace : MonoBehaviour
         //####
         //System Value
         cs.SetVector("_Time", Shader.GetGlobalVector("_Time"));
-        cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.GetTexture("NoiseRGBTex"));
+        cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
+        cs.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
         //####
 
         cs.SetTexture(kInx, "Result", rt);
-        cs.SetTexture(kInx, "envDiffTex", envDiffTex);
         cs.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
-        cs.SetTexture(kInx, "brdfLUT", brdfLUT);
         cs.SetTexture(kInx, "envBgTex", envBgTex);
 
         cs.SetInt("w", w);

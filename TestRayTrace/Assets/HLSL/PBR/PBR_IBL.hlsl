@@ -1,4 +1,8 @@
+#ifndef PBR_IBL_HLSL
+#define PBR_IBL_HLSL
+
 #include "../PBR/PBRCommonDef.hlsl"
+Texture2D<float4> LUT_BRDF;
 
 float3 GetEnvIrradiance_equirectangular(Texture2D envTex, float3 dir, bool unityDir)
 {
@@ -25,13 +29,22 @@ float3 IBLBakeSpecMip(Texture2DArray envSpecTex2DArr, float3 dir, float texInx, 
 	return envSpecTex2DArr.SampleLevel(my_point_repeat_sampler, float3(uv, texInx), 0).rgb;
 }
 
-float3 IBLBakeSpecMipByRoughness(Texture2DArray envSpecTex2DArr, float3 dir, float roughness, float maxInx, bool unityDir)
+float3 IBLBakeSpecMipByRoughness(Texture2DArray envSpecTex2DArr, float3 dir, float roughness, bool unityDir)
 {
-	float inx = roughness * maxInx;
+	uint Width;
+	uint Height;
+	uint Elements;
+	envSpecTex2DArr.GetDimensions(Width, Height, Elements);
+
+	float inx = roughness * Elements;
 	float fpart = frac(inx);
 	if (NearZero(fpart))
 	{
 		return IBLBakeSpecMip(envSpecTex2DArr, dir, inx, unityDir);
+	}
+	else if (equal(roughness, 1.0f))
+	{
+		return IBLBakeSpecMip(envSpecTex2DArr, dir, Elements-1, unityDir);
 	}
 	else
 	{
@@ -48,8 +61,13 @@ float3 IBLBakeSpecMipByRoughness(Texture2DArray envSpecTex2DArr, float3 dir, flo
 
 SamplerState my_point_clamp_sampler;
 SamplerState _LinearClamp;
-float3 PBR_IBL(Texture2D envDiffTex, Texture2DArray envSpecTex2DArr, Texture2D brdfLUT, Material_PBR param, float3 N, float3 V)
+float3 PBR_IBL(Texture2DArray envSpecTex2DArr, Texture2D brdfLUT, Material_PBR param, float3 N, float3 V)
 {
+	uint Width;
+	uint Height;
+	uint Elements;
+	envSpecTex2DArr.GetDimensions(Width, Height, Elements);
+
 	//???
 	float ao = 1;
 
@@ -59,26 +77,16 @@ float3 PBR_IBL(Texture2D envDiffTex, Texture2DArray envSpecTex2DArr, Texture2D b
 	//diffuse
 	float3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, param.roughness);
 	float3 kD = 1.0 - kS;
-	float3 irradiance = GetEnvIrradiance_equirectangular(envDiffTex, N, true);
+	float3 irradiance = IBLBakeSpecMip(envSpecTex2DArr, N, Elements-1, true);
 	float3 indirect_diffuse = (kD * irradiance * param.albedo) * ao;
 
 	//spec
 	float3 R = reflect(-V, N);
-	
 	float3 prefilteredColor;
-	{
-		//Unity_ComputeShader里没法用cubemap和它自带的卷积mip功能
-		//得自己用texArr，将预积分的5张图放进去。
-		float Width;
-		float Height;
-		float Elements;
-		envSpecTex2DArr.GetDimensions(Width, Height, Elements);
-		prefilteredColor = IBLBakeSpecMipByRoughness(envSpecTex2DArr, R, param.roughness, Elements, true);
-	}
-	{
-		//??? 临时应付，不正确
-		//prefilteredColor = lerp(irradiance, GetEnvIrradiance_equirectangular(envRefTex, N, true), 1 - param.roughness);
-	}
+	//Unity_ComputeShader里没法用cubemap和它自带的卷积mip功能
+	//得自己用texArr，将预积分的5张图放进去。	
+	prefilteredColor = IBLBakeSpecMipByRoughness(envSpecTex2DArr, R, param.roughness, true);
+
 	float2 envBRDF_UV = 0;
 	envBRDF_UV.x = max(dot(N, V),0);
 	envBRDF_UV.y = param.roughness;
@@ -88,3 +96,9 @@ float3 PBR_IBL(Texture2D envDiffTex, Texture2DArray envSpecTex2DArr, Texture2D b
 
 	return indirect_diffuse + indirect_specular;
 }
+
+float3 PBR_IBL(Texture2DArray envSpecTex2DArr, Material_PBR param, float3 N, float3 V)
+{
+	return PBR_IBL(envSpecTex2DArr, LUT_BRDF, param, N, V);
+}
+#endif

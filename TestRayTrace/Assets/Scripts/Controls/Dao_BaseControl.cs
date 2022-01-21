@@ -24,7 +24,7 @@ public class Dao_BaseControl : MonoBehaviour
     void Update()
     {
         float daoScale = GetDaoScale();
-        Debug.Log(daoScale);
+        //Debug.Log(daoScale);
         float forwardMove = Input.GetAxis("Vertical") * speed * daoScale;  //«∞z
         float rightMove = Input.GetAxis("Horizontal") * speed * daoScale;  //”“x
         forwardMove *= Time.deltaTime;

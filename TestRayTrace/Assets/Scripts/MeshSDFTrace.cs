@@ -157,7 +157,6 @@ public class MeshSDFTrace : MonoBehaviour
         //####
         //System Value
         cs.SetVector("_Time", Shader.GetGlobalVector("_Time"));
-        cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.GetTexture("NoiseRGBTex"));
         //####
 
         cs.SetTexture(kInx, "Result", rt);
