@@ -7,7 +7,7 @@
 #define TraceStart 0.0005
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFShadowNormalBias 0.001
-#define SceneSDFSoftShadowK 4
+#define SceneSDFSoftShadowK 32
 
 #include "../PBR/PBRCommonDef.hlsl"
 #include "../HLSL/PBR/PBR_IBL.hlsl"
