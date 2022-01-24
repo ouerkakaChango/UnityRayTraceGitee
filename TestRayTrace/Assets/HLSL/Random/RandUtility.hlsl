@@ -67,7 +67,7 @@ float3 randP_hemiRound(float3 seed)
 {
 	uint stat = (uint)(seed.x) * 1973 + (uint)(seed.y) * 9277 + (uint)(seed.z) * 2699 | 1;
 
-	float3 re =  random_in_unit_sphere(stat);
+	float3 re =  random_on_unit_sphere(stat);
 	re.z = abs(re.z);
 	return re;
 }

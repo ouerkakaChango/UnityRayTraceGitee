@@ -1,0 +1,68 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel BakeBVHShadow
+
+#include "../../HLSL/RayMath.hlsl"
+#include "../../HLSL/Random/RandUtility.hlsl"
+#include "../../HLSL/BVH/BVHCommonDef.hlsl"
+
+#include "../../HLSL/SDFGame/SDFCommonDef.hlsl"
+
+RWTexture2D<float4> Result;
+
+StructuredBuffer<int> tris;
+StructuredBuffer<float3> vertices;
+StructuredBuffer<float3> normals;
+StructuredBuffer<BVHNode> bvh;
+const int treeDepth;
+
+int SPP;
+
+float2 quadSize;
+float3 quadPos;
+float3 lightDir;
+
+//#########################################################################################################
+[numthreads(8, 8, 1)]
+void BakeBVHShadow(uint3 id : SV_DispatchThreadID)
+{
+	//Result[id.xy] = float4(0,1,0, 1);
+
+	float3 re = 1;
+
+	float w, h;
+	Result.GetDimensions(w, h);
+	float3 shadowUnit = float3(quadSize.x/w, 0, quadSize.y/h);
+	float3 pos = quadPos - 0.5f*float3(quadSize.x,0.0, quadSize.y) + float3(id.x, 0, id.y)*shadowUnit;
+	
+	HitInfo info;
+	
+	Ray ray;
+	ray.pos = pos;
+
+	float sum = 0;
+	int validNum = 0;
+	float3 N = float3(0, 1, 0);
+	float3 L = normalize(-lightDir);
+	for (int i = 0; i < SPP; i++)
+	{
+		float3 seed = float3(id.x, id.y, i);
+		ray.dir = toNormalHemisphere(randP_hemiRound(seed), N);
+		info = BVHTraceLocalRay(ray,
+			treeDepth, bvh,
+			tris,
+			vertices,
+			normals
+		);
+		
+		if (!info.bHit)
+		{
+			float pdf = acos(-dot(N, L)) / PI;
+			sum += saturate(dot(-ray.dir, lightDir)) / pdf ;
+		}
+	}
+	sum /= SPP;
+
+	re = sum;
+	Result[id.xy] = float4(re, 1);
+}
+//#########################################################################################################

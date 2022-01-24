@@ -416,6 +416,8 @@ public class BVHTool : MonoBehaviour
 
     public void Save()
     {
+        //???
+        Debug.Log("!!! tris not serilized");
         if (tree == null)
         {
             return;
@@ -432,6 +434,8 @@ public class BVHTool : MonoBehaviour
 
     public void Parse(string path="")
     {
+        //???
+        Debug.Log("!!! tris not serilized");
         if (path == "")
         {
             path = savePath;
