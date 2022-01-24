@@ -16,6 +16,7 @@ StructuredBuffer<BVHNode> bvh;
 const int treeDepth;
 
 int SPP;
+float sampleRadius;
 
 float2 quadSize;
 float3 quadPos;
@@ -36,29 +37,31 @@ void BakeBVHShadow(uint3 id : SV_DispatchThreadID)
 	
 	HitInfo info;
 	
+	float sum = 0;
+	float3 L = normalize(-lightDir);
+
 	Ray ray;
 	ray.pos = pos;
+	ray.dir = L;
 
-	float sum = 0;
-	int validNum = 0;
-	float3 N = float3(0, 1, 0);
-	float3 L = normalize(-lightDir);
 	for (int i = 0; i < SPP; i++)
 	{
 		float3 seed = float3(id.x, id.y, i);
-		ray.dir = toNormalHemisphere(randP_hemiRound(seed), N);
-		info = BVHTraceLocalRay(ray,
+		Ray sampleRay;
+		float r2 = sampleRadius * rand01(seed);
+		float theta = rand01(seed.yzx);
+		float r = sqrt(r2);
+		//https://www.cnblogs.com/yunlambert/p/10161339.html
+		sampleRay.pos = ray.pos + float3(r*cos(theta),0,r*sin(theta));
+		sampleRay.dir = L;
+		info = BVHTraceLocalRay(sampleRay,
 			treeDepth, bvh,
 			tris,
 			vertices,
 			normals
 		);
 		
-		if (!info.bHit)
-		{
-			float pdf = acos(-dot(N, L)) / PI;
-			sum += saturate(dot(-ray.dir, lightDir)) / pdf ;
-		}
+		sum += 1-info.bHit;
 	}
 	sum /= SPP;
 

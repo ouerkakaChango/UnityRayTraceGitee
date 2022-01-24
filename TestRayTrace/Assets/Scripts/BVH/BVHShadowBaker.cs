@@ -13,7 +13,8 @@ public class BVHShadowBaker : MonoBehaviour
     public Light light;
 
     public Vector2Int size;
-    public int SPP = 120;
+    public int SPP = 10240;
+    public float sampleRadius = 0.01f;
 
     RenderTexture rt;
     Texture2D tex;
@@ -86,6 +87,7 @@ public class BVHShadowBaker : MonoBehaviour
         cs.SetTexture(kInx, "Result", rt);
 
         cs.SetInt("SPP", SPP);
+        cs.SetFloat("sampleRadius", sampleRadius);
 
         cs.SetBuffer(kInx, "tris", buffer_tris);
         cs.SetBuffer(kInx, "vertices", buffer_vertices);
