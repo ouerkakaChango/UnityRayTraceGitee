@@ -57,8 +57,13 @@ public class TestCellInx : MonoBehaviour
         }
 
         var visual = GetComponent<TextVisualizer>();
-        visual.pnts = pos;
-        visual.text = text;
+        //visual.pnts = pos;
+        //visual.text = text;
+        visual.Clear();
+        for (int i = 0; i < pos.Length; i++)
+        {
+            visual.Add(pos[i], text[i]);
+        }
         hasInit = true;
     }
 

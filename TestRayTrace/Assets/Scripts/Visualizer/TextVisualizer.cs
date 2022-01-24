@@ -5,8 +5,8 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class TextVisualizer : MonoBehaviour
 {
-    public Vector3[] pnts;
-    public string[] text;
+     List<Vector3> pnts = new List<Vector3>();
+     List<string> texts = new List<string>();
     // Start is called before the first frame update
     void Start()
     {
@@ -21,18 +21,21 @@ public class TextVisualizer : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (pnts == null || text == null)
+        for (int i = 0; i < pnts.Count; i++)
         {
-            //pnts = new Vector3[2];
-            //pnts[0] = Vector3.zero;
-            //pnts[1] = new Vector3(1, 0, 0);
-            return;
+            UnityEditor.Handles.Label(transform.position + pnts[i], texts[i]);
         }
+    }
 
-        //Debug.Log(pnts.Length);
-        for (int i = 0; i < pnts.Length; i++)
-        {
-            UnityEditor.Handles.Label(transform.position + pnts[i], text[i]);
-        }
+    public void Clear()
+    {
+        pnts.Clear();
+        texts.Clear();
+    }
+
+    public void Add(Vector3 pos, string text)
+    {
+        pnts.Add(pos);
+        texts.Add(text);
     }
 }
