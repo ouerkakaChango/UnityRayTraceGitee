@@ -1,7 +1,7 @@
 # UnityRayTrace
 Use Unity.computeShader to do rayTrace  
-![image](/TestRayTrace/¼ÇÂ¼/41_iter400_spp64_NoF.png)  
-![image](/TestRayTrace/¼ÇÂ¼Ö®_SDFGame/11_noise_computational.png)   
-![image](/TestRayTrace/¼ÇÂ¼2/19.png)  
-![image](/TestRayTrace/¼ÇÂ¼2/23.png)
-![image](/TestRayTrace/¼ÇÂ¼2/24.png)
+![image](/TestRayTrace/è®°å½•/41_iter400_spp64_NoF.png)  
+![image](/TestRayTrace/è®°å½•_SDFGame/11_noise_computational.png)   
+![image](/TestRayTrace/è®°å½•2/19.png)  
+![image](/TestRayTrace/è®°å½•2/23.png)
+![image](/TestRayTrace/è®°å½•2/24.png)
