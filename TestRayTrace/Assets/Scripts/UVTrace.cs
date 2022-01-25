@@ -11,8 +11,9 @@ public class UVTrace : MonoBehaviour
     const int CoreY = 8;
 
     public BVHTool bvhComp;
+    public Texture2D albedoTex;
 
-    RenderTexture rt;
+    public RenderTexture rt;
 
     public ComputeShader cs;
     public Texture2DArray envSpecTex2DArr;
@@ -181,6 +182,8 @@ public class UVTrace : MonoBehaviour
         cs.SetBuffer(kInx, "uvs", buffer_uvs);
         cs.SetBuffer(kInx, "bvh", buffer_bvh);
         cs.SetInt("treeDepth", bvhComp.depth);
+
+        cs.SetTexture(kInx, "albedoTex", albedoTex);
 
         cs.SetVector("meshPos", bvhComp.transform.position);
         cs.SetMatrix("worldToLocalMatrix", bvhComp.transform.worldToLocalMatrix);

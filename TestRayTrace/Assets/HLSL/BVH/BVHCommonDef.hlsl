@@ -167,9 +167,8 @@ VertHitInfo BVHVertTraceLocalRay(in Ray ray,
 
 	uint numStructs, stride;
 	tris.GetDimensions(numStructs, stride);
-	int triInxNum = (int)numStructs;
 
-	int start = 0, end = triInxNum / 3 - 1;
+	int start = 0, end = numStructs / 3 - 1;
 
 	int toCheck[BVHToCheckMaxNum]; //used as a stack
 	int iter = 0; //used as a stack helper

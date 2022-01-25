@@ -33,6 +33,8 @@ const int treeDepth;
 
 float4x4 worldToLocalMatrix;
 
+Texture2D<float4> albedoTex;
+
 RWTexture2D<float4> Result;
 Texture2D<float4> envDiffTex;
 Texture2DArray envSpecTex2DArr;
@@ -58,27 +60,31 @@ float4 GetUVTraceColor(in Ray ray)
 	{//Trace到Scene了，返回Mesh的颜色 
 		//re = RenderSceneObj(envSpecTex2DArr, ray, minHit);
 		//re *= RenderSceneSDFShadow(ray, minHit);
-		re = float4(info.uv, 0, 1);
+		
+		//re = float4(info.uv, 0, 1);
+		uint w, h;
+		albedoTex.GetDimensions(w, h);
+		re = albedoTex[float2(w,h)*info.uv];
 	}
 	else
 	{//没Trace到，返回背景/天空盒的颜色
 	
-		re = 0;//GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+		re = float4(0.1,0.1,0.1,0);//GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
 	}
 	//##############################
-	HitInfo sysHit;
-	Init(sysHit);
-	float3 sysColor;
-	RaySys(ray, sysHit, sysColor);
-	if (sysHit.bHit)
-	{
-		re = lerp(re, float4(sysColor,1), 0.5);
-	}
+	//HitInfo sysHit;
+	//Init(sysHit);
+	//float3 sysColor;
+	//RaySys(ray, sysHit, sysColor);
+	//if (sysHit.bHit)
+	//{
+	//	re = lerp(re, float4(sysColor,0), 0.5);
+	//}
 	//##############################
 	return re;
 }
 
-#define SSAA_num 1
+#define SSAA_num 4
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
 {

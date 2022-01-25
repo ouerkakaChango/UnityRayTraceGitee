@@ -356,7 +356,6 @@ GameObject:
   - component: {fileID: 1238969961}
   - component: {fileID: 1238969963}
   - component: {fileID: 1238969962}
-  - component: {fileID: 1238969964}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -442,6 +441,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bvhComp: {fileID: 507065524}
+  albedoTex: {fileID: 2800000, guid: 39125a0b1f52552498fd8139c377c80b, type: 3}
+  rt: {fileID: 0}
   cs: {fileID: 7200000, guid: ee10907cf86bc4046aed7b15c4a9d94e, type: 3}
   envSpecTex2DArr: {fileID: 18700000, guid: 0f551ab412a7b6a43adb8fff0951af3f, type: 2}
   envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
@@ -473,27 +474,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9784e82922a039147af6e42297a224d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1238969964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1238969957}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ddc31fa1cee46447893cf28b2a73c74, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bvhComp: {fileID: 507065524}
-  cs: {fileID: 7200000, guid: b5c421b027707944cbcf7da25f71eacb, type: 3}
-  envDiffTex: {fileID: 2800000, guid: 4e87347d2e700854c83b1dc31b3fce43, type: 3}
-  envSpecTex2DArr: {fileID: 18700000, guid: 0f551ab412a7b6a43adb8fff0951af3f, type: 2}
-  brdfLUT: {fileID: 2800000, guid: d23d36bf5e9b7b94d88f158d7ed343da, type: 3}
-  envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
-  w: 1024
-  h: 720
-  meshObj: {fileID: 507065523}
 --- !u!1 &1361388251
 GameObject:
   m_ObjectHideFlags: 0
