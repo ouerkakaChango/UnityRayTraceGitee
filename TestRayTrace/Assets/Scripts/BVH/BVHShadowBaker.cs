@@ -105,7 +105,10 @@ public class BVHShadowBaker : MonoBehaviour
         //### compute
         //#####################################;
 
-        //SafeDispose(buffer_sdfArr);
+        SafeDispose(buffer_vertices);
+        SafeDispose(buffer_normals);
+        SafeDispose(buffer_tris);
+        SafeDispose(buffer_bvh);
     }
 
 

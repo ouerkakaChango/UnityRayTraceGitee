@@ -103,6 +103,24 @@ float3 Tri_P1CInterP2P3(float3 c, Vertex v1, Vertex v2, Vertex v3)
 	return c + k * ray.dir;
 }
 
+float3 Tri_P1CInterP2P3(float3 c, float3 p1, float3 p2, float3 p3, float3 guideN)
+{
+	Plane plane1 = FormPlane(p1, p2, p3, guideN);
+	float3 n2 = cross(plane1.n, normalize(p3 - p2));
+	Plane plane2;
+	plane2.n = n2;
+	plane2.p = p2;
+	Ray ray;
+	ray.pos = c;
+	ray.dir = normalize(c - p1);
+	float k = RayCastPlane(ray, plane2);
+	if (k < 0)
+	{
+		return c;
+	}
+	return c + k * ray.dir;
+}
+
 //1. 获取p1c与p2p3的交点c2 https://blog.csdn.net/qq_41524721/article/details/121606678
 //2. 根据相似，CA:C2P2 = P1C:P1C2 , 求出A
 void Tri_ParallelP2P3(out float3 A, out float3 B, float3 c, Vertex v1, Vertex v2, Vertex v3)
@@ -111,6 +129,30 @@ void Tri_ParallelP2P3(out float3 A, out float3 B, float3 c, Vertex v1, Vertex v2
 	float3 p2 = v2.p;
 	float3 p3 = v3.p;
 	float3 c2 = Tri_P1CInterP2P3(c, v1, v2, v3);
+
+	float lenP1C2 = length(p1 - c2);
+
+	if (NearZero(lenP1C2))
+	{
+		A = p2;
+		B = p3;
+		return;
+	}
+
+	float lenCA = length(p1 - c) * length(p2 - c2) / length(p1 - c2);
+	float3 dir1 = normalize(p2 - p3);
+	A = c + dir1 * lenCA;
+
+	float lenCB = length(p1 - c) * length(p3 - c2) / length(p1 - c2);
+	float3 dir2 = -dir1;
+	B = c + dir2 * lenCB;
+}
+
+//1. 获取p1c与p2p3的交点c2 https://blog.csdn.net/qq_41524721/article/details/121606678
+//2. 根据相似，CA:C2P2 = P1C:P1C2 , 求出A
+void Tri_ParallelP2P3(out float3 A, out float3 B, float3 c, float3 p1, float3 p2, float3 p3, float3 guideN)
+{
+	float3 c2 = Tri_P1CInterP2P3(c, p1, p2, p3, guideN);
 
 	float lenP1C2 = length(p1 - c2);
 
@@ -170,6 +212,60 @@ float3 GetTriBlendedNorm(float3 c, Vertex v1, Vertex v2, Vertex v3)
 	}
 	return lerp(nA, nB, kC);
 }
+
+float3 GetTriKForBlend(float3 c, float3 p1, float3 p2, float3 p3, float3 guideN)
+{
+	float lenP2P1 = length(p2 - p1);
+	float lenP3P1 = length(p3 - p1);
+
+	float3 A, B;
+	Tri_ParallelP2P3(A, B, c, p1, p2, p3, guideN);
+
+
+	float kA, kB;
+	if (NearZero(lenP2P1))
+	{
+		kA = 0.5f;
+	}
+	else
+	{
+		kA = length(A - p1) / lenP2P1;
+	}
+	if (NearZero(lenP3P1))
+	{
+		kB = 0.5f;
+	}
+	else
+	{
+		kB = length(B - p1) / lenP3P1;
+	}
+
+	float lenAB = length(B - A);
+	float kC = 0;
+	if (NearZero(lenAB))
+	{
+		kC = 0.5f;
+	}
+	else
+	{
+		kC = length(c - A) / lenAB;
+	}
+	return float3(kA, kB, kC);
+}
+
+float3 GetTriBlended(float3 triK,float3 val1, float3 val2, float3 val3)
+{
+	float3 nA = lerp(val1, val2, triK.x);
+	float3 nB = lerp(val1, val3, triK.y);
+	return lerp(nA, nB, triK.z);
+}
+
+float2 GetTriBlended(float3 triK, float2 val1, float2 val2, float2 val3)
+{
+	float2 nA = lerp(val1, val2, triK.x);
+	float2 nB = lerp(val1, val3, triK.y);
+	return lerp(nA, nB, triK.z);
+}
 //### NormBlend
 
 bool FrontFace(float3 pos, Plane plane)
@@ -215,6 +311,42 @@ HitInfo RayCastTri(Ray ray, Vertex v1, Vertex v2, Vertex v3)
 
 	//Blend三个顶点的Normal
 	re.N = GetTriBlendedNorm(re.P, v1, v2, v3);
+
+	return re;
+}
+
+VertHitInfo RayCastVertTri(Ray ray, Vertex v1, Vertex v2, Vertex v3)
+{
+	VertHitInfo re;
+	Init(re);
+
+	Plane plane = FormPlane(v1.p, v2.p, v3.p, v1.n);
+
+	if (!FrontFace(ray.pos, plane))
+	{
+		return re;
+	}
+
+	float k = RayCastPlane(ray, plane);
+
+	//如果屏幕在射线反方向
+	if (k < 0)
+	{
+		return re;
+	}
+
+	re.p = ray.pos + ray.dir*k;
+	re.bHit = IsPointInsideTri(re.p, v1.p, v2.p, v3.p);
+
+	//如果打点在三角形之外
+	if (!re.bHit)
+	{
+		return re;
+	}
+
+	float3 triK = GetTriKForBlend(re.p, v1.p, v2.p, v3.p, v1.n);
+	re.n = GetTriBlended(triK, v1.p, v2.p, v3.n);
+	re.uv = GetTriBlended(triK, v1.uv, v2.uv, v3.uv);
 
 	return re;
 }

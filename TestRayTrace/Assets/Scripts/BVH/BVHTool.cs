@@ -56,6 +56,8 @@ public class BVHTool : MonoBehaviour
     public Vector3[] vertices;
     [HideInInspector]
     public Vector3[] normals;
+    [HideInInspector]
+    public Vector2[] uvs;
 
     [HideInInspector]
     public int[] tris;
@@ -479,24 +481,6 @@ public class BVHTool : MonoBehaviour
         return tree != null;
     }
 
-    //void InitMeshWorldData()
-    //{
-    //    var l2w = transform.localToWorldMatrix;
-    //    world_vertices = new Vector3[vertices.Length];
-    //    for (int i=0;i<vertices.Length;i++)
-    //    {
-    //        world_vertices[i] = l2w.MultiplyPoint(vertices[i]);//l2w * vertices[i];
-    //    }
-    //
-    //    world_normals = new Vector3[mesh.normals.Length];
-    //    for (int i = 0; i < mesh.normals.Length; i++)
-    //    {
-    //        world_normals[i] = l2w.MultiplyPoint(mesh.normals[i]);
-    //    }
-    //
-    //    hasInitMeshWorldData = true;
-    //}
-
     public HitInfo TraceWorldRay(Ray ray)
     {
         ray.pos -= transform.position;
@@ -507,6 +491,7 @@ public class BVHTool : MonoBehaviour
 
         //!!! ray must be in local space
     const int MAXLEAVES = 32;
+    //[To be Deprecated] CPU BVH Trace
     public HitInfo TraceLocalRay(Ray ray)
     {
         //Log.DebugRay(ray);
@@ -649,6 +634,7 @@ public class BVHTool : MonoBehaviour
         Debug.Log("update bvh mesh: " + mesh);
         vertices = mesh.vertices;
         normals = mesh.normals;
+        uvs = mesh.uv;
         if (importScale100)
         {
             for (int i = 0; i < vertices.Length; i++)

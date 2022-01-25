@@ -13,6 +13,7 @@ struct Vertex
 {
 	float3 p;
 	float3 n;
+	float2 uv;
 };
 
 struct HitInfo
@@ -21,6 +22,15 @@ struct HitInfo
 	int obj;
 	float3 N;
 	float3 P;
+};
+
+struct VertHitInfo
+{
+	int bHit;
+	int obj;
+	float3 n;
+	float3 p;
+	float2 uv;
 };
 
 struct CastInfo
@@ -42,6 +52,15 @@ void Init(out HitInfo re)
 	re.obj = -1;
 	re.N = 0;
 	re.P = 0;
+}
+
+void Init(out VertHitInfo re)
+{
+	re.bHit = 0;
+	re.obj = -1;
+	re.n = 0;
+	re.p = 0;
+	re.uv = 0;
 }
 
 void Init(out CastInfo re)
