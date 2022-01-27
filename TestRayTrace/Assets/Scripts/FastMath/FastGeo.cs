@@ -429,13 +429,13 @@ namespace FastGeo
             Vector3 max = min + 2.0f*bound;
             if (RayMath.IsInBBox(line.a, min, max) || RayMath.IsInBBox(line.b, min, max))
             {
-                Debug.Log("1");
+                //Debug.Log("1");
                 return true;
             }
 
             if (NearZero(line.b - line.a))
             {
-                Debug.Log("2");
+                //Debug.Log("2");
                 return false;
             }
 
@@ -443,19 +443,16 @@ namespace FastGeo
             ray.pos = line.a;
             ray.dir = normalize(line.b - line.a);
 
-            Log.DebugRay(ray);
             CastInfo info = RayMath.CastBBox(ray, min, max);
 
-            Log.DebugVec(min);
-            Log.DebugVec(max);
             if (info.bHit)
             {
-                Debug.Log("3.1");
+                //Debug.Log("3.1");
                 return info.dis <= length(line.b - line.a);
             }
             else
             {
-                Debug.Log("3.2");
+                //Debug.Log("3.2");
                 return false;
             }
         }
