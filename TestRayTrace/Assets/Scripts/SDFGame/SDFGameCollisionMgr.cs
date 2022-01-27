@@ -37,28 +37,21 @@ public class SDFGameCollisionMgr : MonoBehaviour
     //    return IntersectSceneSDF(line);
     //}
 
-    bool IntersectSceneObjectSDF(int inx, Line line)
+    bool IntersectSceneObjectSDF(int inx, Line line, float r)
     {
         if (inx == 0)
         {
-            return LineIntersect_Sphere(line, new Vector3(0, 0.5f, 0), 0.5f);
+            return LineIntersect_Sphere(line, new Vector3(0, 0.5f, 0), 0.5f+r);
         }
         else if (inx == 1)
         {
-            return LineIntersect_BBox(line, new Vector3(0, -0.5f, 0), new Vector3(5, 0.5f, 5));
+            return LineIntersect_BBox(line, new Vector3(0, -0.5f, 0), new Vector3(5, 0.5f, 5)+r*Vector3.one);
         }
         else
         {
             Debug.LogError("error in IntersectSceneObjectSDF");
             return false;
         }
-    }
-
-    bool HitSceneObj(int inx, Vector3 start, Vector3 end)
-    {
-        Line line = new Line(start, end);
-        Log.DebugLine(line);
-        return IntersectSceneObjectSDF(inx, line);
     }
     //##############################################
     float GetSceneObjSDF(int inx, Vector3 p)
@@ -80,7 +73,7 @@ public class SDFGameCollisionMgr : MonoBehaviour
 
     Vector3 GetSceneObjSDFNormal(int inx, Vector3 p)
     {
-        float epsilon = 0.0001f;
+        float epsilon = 0.00001f;
         return normalize(new Vector3(
             GetSceneObjSDF(inx, new Vector3(p.x + epsilon, p.y, p.z)) - GetSceneObjSDF(inx, new Vector3(p.x - epsilon, p.y, p.z)),
             GetSceneObjSDF(inx, new Vector3(p.x, p.y + epsilon, p.z)) - GetSceneObjSDF(inx, new Vector3(p.x, p.y - epsilon, p.z)),
@@ -105,14 +98,9 @@ public class SDFGameCollisionMgr : MonoBehaviour
         }
     }
 
-    public void CheckMovement(SDFShape shape, Vector3 pos , Vector3 right, Vector3 forward, ref float rightMove, ref float forwardMove)
+    //用闵可夫斯基和，将圆柱求交，转化成线段求交
+    public void CheckSphereMovement(SDFSphere shape, Vector3 pos, Vector3 right, Vector3 forward, ref float rightMove, ref float forwardMove)
     {
-        if (shape == null)
-        {
-            Debug.LogError("shape is null");
-            return;
-        }
-
         float r = shape.GetRadiusInDir(right);
 
         Vector3 dMove = right * rightMove + forward * forwardMove;
@@ -124,20 +112,34 @@ public class SDFGameCollisionMgr : MonoBehaviour
 
         for (int i = 0; i < OBJNUM; i++)
         {
-            Vector3 dir = -SceneObjNormal(i, pos);
-            //Debug.Log(dir);
-            pos += r * dir;
-            if (HitSceneObj(i, pos, pos + dMove))
+            if (IntersectSceneObjectSDF(i,new Line(pos, pos+dMove),r))
             {
                 bHit = true;
                 break;
             }
         }
 
-        if(bHit)
+        if (bHit)
         {
             rightMove = 0;
             forwardMove = 0;
         }
+    }
+
+    public void CheckMovement(SDFShape shape, Vector3 pos , Vector3 right, Vector3 forward, ref float rightMove, ref float forwardMove)
+    {
+        if (shape == null)
+        {
+            Debug.LogError("shape is null");
+            return;
+        }
+
+        //Debug.Log(shape.GetType());
+        if (shape.GetType() == typeof(SDFSphere))
+        {
+            CheckSphereMovement((SDFSphere)shape, pos, right, forward, ref rightMove, ref forwardMove);
+        }
+
+        
     }
 }
