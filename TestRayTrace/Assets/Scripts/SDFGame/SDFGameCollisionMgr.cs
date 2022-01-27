@@ -5,9 +5,13 @@ using SDFUtility;
 using static SDFUtility.SDFMath;
 using FastGeo;
 using static FastGeo.LineMath;
+using static MathHelper.XMathFunc;
+using Debugger;
 
 public class SDFGameCollisionMgr : MonoBehaviour
 {
+     int OBJNUM = 2;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,27 +24,85 @@ public class SDFGameCollisionMgr : MonoBehaviour
         
     }
 
-    float SceneSDF(Vector3 p)
+    //bool IntersectSceneSDF(Line line)
+    //{
+    //    //???
+    //    return LineIntersect_Sphere(line, new Vector3(0, 0.5f, 0), 0.5f) ||
+    //        LineIntersect_BBox(line, new Vector3(0, -0.5f, 0), new Vector3(5, 0.5f, 5));
+    //}
+    //
+    //public bool HitInScene(Vector3 start, Vector3 end)
+    //{
+    //    Line line = new Line(start, end);
+    //    return IntersectSceneSDF(line);
+    //}
+
+    bool IntersectSceneObjectSDF(int inx, Line line)
     {
-        //??? 
-        return SDFSphere(p, new Vector3(0, 0.5f, 0), 0.5f);
+        if (inx == 0)
+        {
+            return LineIntersect_Sphere(line, new Vector3(0, 0.5f, 0), 0.5f);
+        }
+        else if (inx == 1)
+        {
+            return LineIntersect_BBox(line, new Vector3(0, -0.5f, 0), new Vector3(5, 0.5f, 5));
+        }
+        else
+        {
+            Debug.LogError("error in IntersectSceneObjectSDF");
+            return false;
+        }
     }
 
-    public bool HitInScene(Vector3 p)
-    {
-        return SceneSDF(p) <= 0;
-    }
-
-    bool IntersectSceneSDF(Line line)
-    {
-        //???
-        return LineIntersect_Sphere(line, new Vector3(0, 0.5f, 0), 0.5f);
-    }
-
-    public bool HitInScene(Vector3 start, Vector3 end)
+    bool HitSceneObj(int inx, Vector3 start, Vector3 end)
     {
         Line line = new Line(start, end);
-        return IntersectSceneSDF(line);
+        Log.DebugLine(line);
+        return IntersectSceneObjectSDF(inx, line);
+    }
+    //##############################################
+    float GetSceneObjSDF(int inx, Vector3 p)
+    {
+        if (inx == 0)
+        {
+            return SDFSphere(p, new Vector3(0, 0.5f, 0), 0.5f);
+        }
+        else if (inx == 1)
+        {
+            return SDFBox(p, new Vector3(0, -0.5f, 0), new Vector3(5, 0.5f, 5));
+        }
+        else
+        {
+            Debug.LogError("error in GetSceneObjSDF");
+            return 1000;
+        }
+    }
+
+    Vector3 GetSceneObjSDFNormal(int inx, Vector3 p)
+    {
+        float epsilon = 0.0001f;
+        return normalize(new Vector3(
+            GetSceneObjSDF(inx, new Vector3(p.x + epsilon, p.y, p.z)) - GetSceneObjSDF(inx, new Vector3(p.x - epsilon, p.y, p.z)),
+            GetSceneObjSDF(inx, new Vector3(p.x, p.y + epsilon, p.z)) - GetSceneObjSDF(inx, new Vector3(p.x, p.y - epsilon, p.z)),
+            GetSceneObjSDF(inx, new Vector3(p.x, p.y, p.z + epsilon)) - GetSceneObjSDF(inx, new Vector3(p.x, p.y, p.z - epsilon))
+            ));
+    }
+
+    Vector3 SceneObjNormal(int inx, Vector3 p)
+    {
+        if (inx == 0)
+        {
+            return SDFSphereNormal(p, new Vector3(0, 0.5f, 0));
+        }
+        else if (inx == 1)
+        {
+            return GetSceneObjSDFNormal(inx, p);
+        }
+        else
+        {
+            Debug.LogError("error in SceneObjNormal");
+            return Vector3.zero;
+        }
     }
 
     public void CheckMovement(SDFShape shape, Vector3 pos , Vector3 right, Vector3 forward, ref float rightMove, ref float forwardMove)
@@ -58,9 +120,21 @@ public class SDFGameCollisionMgr : MonoBehaviour
         {
             return;
         }
-        Vector3 dir = dMove.normalized;
-        pos += r * dir;
-        if (HitInScene(pos, pos + dMove))
+        bool bHit = false;
+
+        for (int i = 0; i < OBJNUM; i++)
+        {
+            Vector3 dir = -SceneObjNormal(i, pos);
+            //Debug.Log(dir);
+            pos += r * dir;
+            if (HitSceneObj(i, pos, pos + dMove))
+            {
+                bHit = true;
+                break;
+            }
+        }
+
+        if(bHit)
         {
             rightMove = 0;
             forwardMove = 0;

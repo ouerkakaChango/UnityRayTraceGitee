@@ -4,6 +4,7 @@ using UnityEngine;
 using MathHelper;
 using static MathHelper.Vec;
 using static MathHelper.XMathFunc;
+using Debugger;
 
 namespace FastGeo
 {
@@ -178,7 +179,7 @@ namespace FastGeo
         {
             CastInfo re = CastInfo.Default();
 
-            if (Vector3.Dot(ray.dir, plane.n) >= 0)
+            if (dot(ray.dir, plane.n) >= 0)
             {
                 return re;
             }
@@ -191,9 +192,14 @@ namespace FastGeo
             Vector3 hitP = ray.pos + re.dis * ray.dir;
             Vector3 center = plane.p + v1 * size.x / 2 + v2 * size.y / 2;
             Vector3 dv = hitP - center;
-            re.bHit = (Mathf.Abs(Vector3.Dot(dv, v1)) <= (size.x / 2)) &&
-                (Mathf.Abs(Vector3.Dot(dv, v2)) <= (size.y / 2));
+            re.bHit = (abs(dot(dv, v1)) <= (size.x / 2)) &&
+                (abs(dot(dv, v2)) <= (size.y / 2));
             return re;
+        }
+
+        public static bool IsInBBox(in Vector3 p, in Vector3 min, in Vector3 max)
+        {
+            return gt(p, min) && lt(p, max);
         }
 
         //1.从x,y,z方向，每两个平面和ray测交点
@@ -415,6 +421,43 @@ namespace FastGeo
             Vector3 pa = line.a - disInfo.p;
             Vector3 pb = line.b - disInfo.p;
             return Vector3.Dot(pa, pb) < 0;
+        }
+
+        public static bool LineIntersect_BBox(Line line, Vector3 center, Vector3 bound)
+        {
+            Vector3 min = center - bound;
+            Vector3 max = min + 2.0f*bound;
+            if (RayMath.IsInBBox(line.a, min, max) || RayMath.IsInBBox(line.b, min, max))
+            {
+                Debug.Log("1");
+                return true;
+            }
+
+            if (NearZero(line.b - line.a))
+            {
+                Debug.Log("2");
+                return false;
+            }
+
+            Ray ray = new Ray();
+            ray.pos = line.a;
+            ray.dir = normalize(line.b - line.a);
+
+            Log.DebugRay(ray);
+            CastInfo info = RayMath.CastBBox(ray, min, max);
+
+            Log.DebugVec(min);
+            Log.DebugVec(max);
+            if (info.bHit)
+            {
+                Debug.Log("3.1");
+                return info.dis <= length(line.b - line.a);
+            }
+            else
+            {
+                Debug.Log("3.2");
+                return false;
+            }
         }
     }
 

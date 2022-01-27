@@ -11,9 +11,29 @@ namespace MathHelper
             return Mathf.Abs(x) < 0.000001f;
         }
 
+        public static bool NearZero(Vector3 v)
+        {
+            return NearZero(v.x) && NearZero(v.y) && NearZero(v.z);
+        }
+
         public static float max(float a, float b)
         {
             return a > b ? a : b;
+        }
+
+        public static float min(float a, float b)
+        {
+            return a < b ? a : b;
+        }
+
+        public static Vector3 max(Vector3 a, Vector3 b)
+        {
+            return new Vector3(max(a.x,b.x), max(a.y,b.y), max(a.z,b.z));
+        }
+
+        public static Vector3 max(Vector3 a, float b)
+        {
+            return new Vector3(max(a.x, b), max(a.y, b), max(a.z, b));
         }
 
         public static float saturate(float x)
@@ -30,7 +50,12 @@ namespace MathHelper
 
         public static float length(in Vector3 v)
         {
-            return Mathf.Sqrt(dot(v, v));
+            return v.magnitude;
+        }
+
+        public static Vector3 normalize(in Vector3 v)
+        {
+            return v.normalized;
         }
 
         public static Vector3 lerp(in Vector3 a, in Vector3 b, float k)
@@ -68,6 +93,11 @@ namespace MathHelper
             return x >= 0 ? x : -x;
         }
 
+        public static Vector3 abs(in Vector3 v)
+        {
+            return new Vector3(abs(v.x), abs(v.y), abs(v.z));
+        }
+
         //#######################################################
         public static bool gt(in Vector3 a, in Vector3 b)
         {
@@ -87,6 +117,11 @@ namespace MathHelper
         public static bool equal(float a, float b)
         {
             return abs(a - b) < 0.000001f;
+        }
+
+        public static float quadrance(in Vector3 v)
+        {
+            return v.sqrMagnitude;
         }
     }
 }

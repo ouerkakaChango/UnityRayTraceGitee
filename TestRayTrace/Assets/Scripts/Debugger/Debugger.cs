@@ -42,5 +42,10 @@ namespace Debugger
         {
             Debug.Log("pos: " + VecStr(ray.pos) + " dir: " + VecStr(ray.dir));
         }
+
+        public static void DebugLine(Line line)
+        {
+            Debug.Log("line a: " + VecStr(line.a) + " line b: " + VecStr(line.b));
+        }
     }
 }

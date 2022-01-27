@@ -2,9 +2,9 @@
 
 #define MaxSDF 100000
 #define MaxTraceDis 10
-#define MaxTraceTime 640
-#define TraceThre 0.0001
-#define TraceStart 0.0005
+#define MaxTraceTime 320
+#define TraceThre 0.001
+#define TraceStart 0.005
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFShadowNormalBias 0.001
 #define SceneSDFSoftShadowK 16
@@ -59,8 +59,8 @@ float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 	ray.dir = -lightDir;
 	ray.pos += SceneSDFShadowNormalBias * minHit.N;
 	HitInfo hitInfo;
-	//return HardShadow_TraceScene(ray, hitInfo);
-	return SoftShadow_TraceScene(ray, hitInfo);
+	return HardShadow_TraceScene(ray, hitInfo);
+	//return 1;
 }
 
 //###################################################################################
@@ -189,7 +189,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	int traceCount = 0;
-	while (traceCount <= MaxTraceTime)
+	while (traceCount <= MaxTraceTime*0.1)
 	{
 		int objInx = -1;
 		float objSDF[OBJNUM];
@@ -209,7 +209,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 			break;
 		}
 
-		if (sdf <= TraceThre*0.4f)
+		if (sdf <= TraceThre*0.5f)
 		{
 			info.bHit = true;
 			info.obj = objInx;
