@@ -118,7 +118,7 @@ public class BVHShadowBaker : MonoBehaviour
         CheckBVHInited();
 
         Compute_Bake();
-        TexHelper.RT2Tex2D(ref tex, rt);
+        TexHelper.RT2Tex2D(ref tex, ref rt);
         TexHelper.SaveAsset(tex, "Assets/SDFShadow.asset");
         SetTexToMaterial();
     }

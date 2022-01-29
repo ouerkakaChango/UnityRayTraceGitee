@@ -60,7 +60,7 @@ public class SDFShadowBaker : MonoBehaviour
         Log.DebugVec(grid.unit);
         //Log.DebugVec(grid.startPos + Vec.Mul(Vec.Sub(grid.unitCount,1),grid.unit));
         Compute_Bake();
-        TexHelper.RT2Tex2D(ref tex,rt);
+        TexHelper.RT2Tex2D(ref tex,ref rt);
         TexHelper.SaveAsset(tex, "Assets/SDFShadow.asset");
         SetTexToMaterial();
     }

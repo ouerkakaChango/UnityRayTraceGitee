@@ -4,6 +4,7 @@ using UnityEngine;
 using FastGeo;
 using Ray = FastGeo.Ray;
 using Debugger;
+using TextureHelper;
 
 public class UVTrace : MonoBehaviour
 {
@@ -13,7 +14,8 @@ public class UVTrace : MonoBehaviour
     public BVHTool bvhComp;
     public Texture2D albedoTex;
 
-    public RenderTexture rt;
+    public RenderTexture rt,finalRT,NextRayRT;
+    public Texture2D NextRayTex;
 
     public ComputeShader cs;
     public Texture2DArray envSpecTex2DArr;
@@ -46,7 +48,6 @@ public class UVTrace : MonoBehaviour
     void Start()
     {
         UpdateCamParam();
-
         Co_GoIter = GoIter();
         StartCoroutine(Co_GoIter);
     }
@@ -76,13 +77,11 @@ public class UVTrace : MonoBehaviour
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        if (rt == null)
+        if (finalRT == null)
         {
-            rt = new RenderTexture(w, h, 24);
-            rt.enableRandomWrite = true;
-            rt.Create();
+            return;
         }
-        Graphics.Blit(rt, destination);
+        Graphics.Blit(finalRT, destination);
     }
 
     private void OnDisable()
@@ -140,13 +139,8 @@ public class UVTrace : MonoBehaviour
         return 2 * vec3Size;
     }
     //################################################################################################################
-    void Compute_Render()
+    void Compute_RenderOneTrace()
     {
-        if(!hasInited)
-        {
-            return;
-        }
-
         PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, bvhComp.vertices);
         PreComputeBuffer(ref buffer_normals, sizeof(float) * 3, bvhComp.normals);
         PreComputeBuffer(ref buffer_uvs, sizeof(float) * 2, bvhComp.uvs);
@@ -164,6 +158,7 @@ public class UVTrace : MonoBehaviour
         //####
 
         cs.SetTexture(kInx, "Result", rt);
+        cs.SetTexture(kInx, "NextRayRT", NextRayRT);
         cs.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
         cs.SetTexture(kInx, "envBgTex", envBgTex);
 
@@ -192,23 +187,64 @@ public class UVTrace : MonoBehaviour
         //### compute
         //#####################################;
     }
-    //####################################################################################
+
+    void Compute_ClearStart()
+    {
+        //##################################
+        //### compute
+        int kInx = cs.FindKernel("ClearStart");
+        cs.SetTexture(kInx, "Final", finalRT);
+        cs.SetTexture(kInx, "NextRayRT", NextRayRT);
+
+        cs.Dispatch(kInx, w / CoreX, h / CoreY, 1);
+        //### compute
+        //#####################################;
+    }
+
+    void Compute_BlendToFinal(ref RenderTexture toBlendTex)
+    {
+        //##################################
+        //### compute
+        int kInx = cs.FindKernel("BlendToFinal");
+        cs.SetTexture(kInx, "toBlendTex", toBlendTex);
+        cs.SetTexture(kInx, "Final", finalRT);
+        cs.Dispatch(kInx, w / CoreX, h / CoreY, 1);
+        //### compute
+        //#####################################;
+    }
 
     void Init()
     {
         if (rt == null)
         {
-            rt = new RenderTexture(w, h, 24);
+            rt = new RenderTexture(w, h, 24, RenderTextureFormat.ARGBFloat);
             rt.enableRandomWrite = true;
             rt.Create();
             bvhComp.Init();
+
+            finalRT = new RenderTexture(w, h, 24, RenderTextureFormat.ARGBFloat);
+            finalRT.enableRandomWrite = true;
+            finalRT.Create();
+
+            NextRayRT = new RenderTexture(w, h, 24, RenderTextureFormat.ARGBFloat);
+            NextRayRT.enableRandomWrite = true;
+            NextRayRT.Create();
         }
         hasInited = true;
     }
 
     void DoRender()
     {
-        Compute_Render();
+        if (!hasInited)
+        {
+            return;
+        }
+        Compute_ClearStart();
+        Compute_RenderOneTrace();
+        Compute_BlendToFinal(ref rt);
+        //???
+        Compute_BlendToFinal(ref NextRayRT);
+        //Compute_RenderOneTrace();
     }
     //####################################################################################
 
@@ -243,6 +279,7 @@ public class UVTrace : MonoBehaviour
     }
     //####################################################################################
     IEnumerator Co_GoIter;
+    int testNum = 0;
     //@@@
     private void OnGUI()
     {
@@ -253,6 +290,25 @@ public class UVTrace : MonoBehaviour
         {
             Co_GoIter = GoIter();
             StartCoroutine(Co_GoIter);
+        }
+
+        if (GUI.Button(new Rect(0, 100, 100, 50), "Test"))
+        {
+            if(testNum==0)
+            {
+                Init();
+                Compute_ClearStart();
+                Compute_RenderOneTrace();
+            }
+            else if(testNum == 1)
+            {
+                Compute_BlendToFinal(ref rt);
+            }
+            else if (testNum == 2)
+            {
+                Compute_BlendToFinal(ref NextRayRT);
+            }
+            testNum++;
         }
     }
 

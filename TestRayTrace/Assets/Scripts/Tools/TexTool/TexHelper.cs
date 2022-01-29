@@ -31,9 +31,12 @@ namespace TextureHelper
             tex.LoadImage(fileData);
         }
 
-        public static void RT2Tex2D(ref Texture2D tex, RenderTexture rTex, TextureFormat format = TextureFormat.RGBAFloat)
+        public static void RT2Tex2D(ref Texture2D tex, ref RenderTexture rTex, TextureFormat format = TextureFormat.RGBAFloat)
         {
-            tex = new Texture2D(rTex.width, rTex.height, format, false, true);
+            if (tex == null || tex.width != rTex.width || tex.height != rTex.height)
+            {
+                tex = new Texture2D(rTex.width, rTex.height, format, false, true);
+            }
             RenderTexture.active = rTex;
             tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
             tex.Apply();

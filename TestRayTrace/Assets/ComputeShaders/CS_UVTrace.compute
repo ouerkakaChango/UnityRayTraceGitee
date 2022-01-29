@@ -1,5 +1,7 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel Render
+#pragma kernel BlendToFinal
+#pragma kernel ClearStart
 
 #include "../HLSL/UnityCommonDef.hlsl"
 #include "../HLSL/RayMath.hlsl"
@@ -36,14 +38,17 @@ float4x4 worldToLocalMatrix;
 Texture2D<float4> albedoTex;
 
 RWTexture2D<float4> Result;
+RWTexture2D<float4> NextRayRT;
+
 Texture2D<float4> envDiffTex;
 Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
 
 //#########################################################################################################
 
-float4 GetUVTraceColor(in Ray ray)
+float4 GetUVTraceColor(in Ray ray, uint3 id, inout float4 nextRayColor)
 {
+
 	Ray sampleRay = ray;
 	sampleRay.pos = mul(worldToLocalMatrix,float4(ray.pos,1)).xyz;
 	sampleRay.dir = mul(worldToLocalMatrix, float4(ray.dir, 0)).xyz;
@@ -65,6 +70,12 @@ float4 GetUVTraceColor(in Ray ray)
 		uint w, h;
 		albedoTex.GetDimensions(w, h);
 		re = albedoTex[float2(w,h)*info.uv];
+		//!!!
+		if (re.a < 0.99)
+		{
+			//保存a通道为nextRay用来blendFinal的alpha
+			nextRayColor += float4(1, 0, 0, saturate(1 - re.a));
+		}
 	}
 	else
 	{//没Trace到，返回背景/天空盒的颜色
@@ -99,29 +110,58 @@ void Render(uint3 id : SV_DispatchThreadID)
 	//Result[id.xy] = float4(re,1);
 	//return;
 
-	int SSAA_edge = (int)sqrt(SSAA_num);
-	float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (idx-0.5) + screenV * pixH * (idy - 0.5);
-	float SSAA_unitDis = 1.0f / SSAA_edge;
-	float4 SSAA_colors[SSAA_num];
-
-	for (int j = 1; j <= SSAA_edge; j++)
+	//如果不允许通过，则不进行trace
+	//（如果SSAA有部分不通过,则认为整个像素不通过）
+	if (NextRayRT[id.xy].r <0.99f)
 	{
-		for (int i = 1; i <= SSAA_edge; i++)
+		re = 0;
+	}
+	else
+	{
+		//因为每个SSAA的子ray是否通过，材质alpha都不一样，所以也要取平均
+		float4 nextRayColor = 0;
+		int SSAA_edge = (int)sqrt(SSAA_num);
+		float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (idx - 0.5) + screenV * pixH * (idy - 0.5);
+		float SSAA_unitDis = 1.0f / SSAA_edge;
+		float4 SSAA_colors[SSAA_num];
+
+		for (int j = 1; j <= SSAA_edge; j++)
 		{
-			Ray ray;
-			ray.pos = pixLeftDownPos + screenU * pixW * i * SSAA_unitDis + screenV * pixH * j * SSAA_unitDis;
-			ray.dir = normalize(ray.pos - eyePos);
+			for (int i = 1; i <= SSAA_edge; i++)
+			{
+				Ray ray;
+				ray.pos = pixLeftDownPos + screenU * pixW * i * SSAA_unitDis + screenV * pixH * j * SSAA_unitDis;
+				ray.dir = normalize(ray.pos - eyePos);
 
-			SSAA_colors[i-1+(j-1)* SSAA_edge] = GetUVTraceColor(ray);
+				SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetUVTraceColor(ray, id, nextRayColor);
+			}
 		}
+
+		for (int i = 0; i < SSAA_num; i++)
+		{
+			re += SSAA_colors[i];
+		}
+
+		re /= (float)SSAA_num;
+		re *= NextRayRT[id.xy].a;
+		nextRayColor /= (float)SSAA_num;
+		NextRayRT[id.xy] = nextRayColor;
 	}
-
-	for (int i = 0; i < SSAA_num; i++)
-	{
-		re += SSAA_colors[i];
-	}
-
-	re /= (float)SSAA_num;
-
 	Result[id.xy] = re;
+}
+
+//################################################################################
+Texture2D<float4> toBlendTex;
+RWTexture2D<float4> Final;
+[numthreads(8, 8, 1)]
+void BlendToFinal(uint3 id : SV_DispatchThreadID)
+{
+	Final[id.xy] += float4(toBlendTex[id.xy].rgb * toBlendTex[id.xy].a,0);
+}
+
+[numthreads(8, 8, 1)]
+void ClearStart(uint3 id : SV_DispatchThreadID)
+{
+	Final[id.xy] = float4(0,0,0,1);
+	NextRayRT[id.xy] = float4(1, 0, 0, 1);
 }
