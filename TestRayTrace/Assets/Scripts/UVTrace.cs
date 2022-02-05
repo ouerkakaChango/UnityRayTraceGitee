@@ -11,10 +11,12 @@ public class UVTrace : MonoBehaviour
     const int CoreX = 8;
     const int CoreY = 8;
 
+    int traceNum = 1;
+
     public BVHTool bvhComp;
     public Texture2D albedoTex;
 
-    public RenderTexture rt,finalRT,NextRayRT;
+    public RenderTexture rt,finalRT,NextRayRT,posRT,dirRT;
     public Texture2D NextRayTex;
 
     public ComputeShader cs;
@@ -48,8 +50,8 @@ public class UVTrace : MonoBehaviour
     void Start()
     {
         UpdateCamParam();
-        Co_GoIter = GoIter();
-        StartCoroutine(Co_GoIter);
+        //Co_GoIter = GoIter();
+        //StartCoroutine(Co_GoIter);
     }
 
     float daoSpeed = 20.0f;
@@ -139,7 +141,7 @@ public class UVTrace : MonoBehaviour
         return 2 * vec3Size;
     }
     //################################################################################################################
-    void Compute_RenderOneTrace()
+    void Compute_RenderOneTrace(int traceTime)
     {
         PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, bvhComp.vertices);
         PreComputeBuffer(ref buffer_normals, sizeof(float) * 3, bvhComp.normals);
@@ -159,9 +161,12 @@ public class UVTrace : MonoBehaviour
 
         cs.SetTexture(kInx, "Result", rt);
         cs.SetTexture(kInx, "NextRayRT", NextRayRT);
+        cs.SetTexture(kInx, "posRT", posRT);
+        cs.SetTexture(kInx, "dirRT", dirRT);
         cs.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
         cs.SetTexture(kInx, "envBgTex", envBgTex);
 
+        cs.SetInt("traceTime", traceTime);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
         cs.SetFloat("pixW", pixW);
@@ -217,18 +222,26 @@ public class UVTrace : MonoBehaviour
     {
         if (rt == null)
         {
-            rt = new RenderTexture(w, h, 24, RenderTextureFormat.ARGBFloat);
+            rt = new RenderTexture(w, h, 0, RenderTextureFormat.ARGBFloat);
             rt.enableRandomWrite = true;
             rt.Create();
             bvhComp.Init();
 
-            finalRT = new RenderTexture(w, h, 24, RenderTextureFormat.ARGBFloat);
+            finalRT = new RenderTexture(w, h, 0, RenderTextureFormat.ARGBFloat);
             finalRT.enableRandomWrite = true;
             finalRT.Create();
 
-            NextRayRT = new RenderTexture(w, h, 24, RenderTextureFormat.ARGBFloat);
+            NextRayRT = new RenderTexture(w, h, 0, RenderTextureFormat.ARGBFloat);
             NextRayRT.enableRandomWrite = true;
             NextRayRT.Create();
+
+            posRT = new RenderTexture(w, h, 0, RenderTextureFormat.RGB111110Float);
+            posRT.enableRandomWrite = true;
+            posRT.Create();
+
+            dirRT = new RenderTexture(w, h, 0, RenderTextureFormat.RGB111110Float);
+            dirRT.enableRandomWrite = true;
+            dirRT.Create();
         }
         hasInited = true;
     }
@@ -240,11 +253,12 @@ public class UVTrace : MonoBehaviour
             return;
         }
         Compute_ClearStart();
-        Compute_RenderOneTrace();
+        Compute_RenderOneTrace(traceNum);
+        traceNum++;
         Compute_BlendToFinal(ref rt);
-        //???
-        Compute_BlendToFinal(ref NextRayRT);
-        //Compute_RenderOneTrace();
+        Compute_RenderOneTrace(traceNum);
+        traceNum++;
+        Compute_BlendToFinal(ref rt);
     }
     //####################################################################################
 
@@ -298,7 +312,8 @@ public class UVTrace : MonoBehaviour
             {
                 Init();
                 Compute_ClearStart();
-                Compute_RenderOneTrace();
+                Compute_RenderOneTrace(traceNum);
+                traceNum++;
             }
             else if(testNum == 1)
             {
@@ -306,7 +321,11 @@ public class UVTrace : MonoBehaviour
             }
             else if (testNum == 2)
             {
-                Compute_BlendToFinal(ref NextRayRT);
+                Compute_RenderOneTrace(traceNum);
+            }
+            else if (testNum == 3)
+            {
+                Compute_BlendToFinal(ref rt);
             }
             testNum++;
         }

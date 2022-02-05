@@ -2,6 +2,7 @@
 #define COMMONDEF_HLSL
 
 #define PI 3.14159f
+#define MAXFLOAT 3.402823e38
 
 struct Ray
 {

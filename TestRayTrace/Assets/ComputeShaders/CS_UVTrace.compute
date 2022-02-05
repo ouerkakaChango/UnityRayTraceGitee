@@ -19,6 +19,7 @@ int Inx2D(int i, int j)
 	return i + w * j;
 }
 //#########################################################################################################
+int traceTime;
 float3 screenLeftDownPix;
 float3 eyePos;
 float pixW;
@@ -39,6 +40,8 @@ Texture2D<float4> albedoTex;
 
 RWTexture2D<float4> Result;
 RWTexture2D<float4> NextRayRT;
+RWTexture2D<float3> posRT;
+RWTexture2D<float3> dirRT;
 
 Texture2D<float4> envDiffTex;
 Texture2DArray envSpecTex2DArr;
@@ -46,7 +49,7 @@ Texture2D<float4> envBgTex;
 
 //#########################################################################################################
 
-float4 GetUVTraceColor(in Ray ray, uint3 id, inout float4 nextRayColor)
+float4 GetUVTraceColor(in Ray ray, uint3 id, inout float4 nextRayColor, inout float minDis)
 {
 
 	Ray sampleRay = ray;
@@ -63,13 +66,15 @@ float4 GetUVTraceColor(in Ray ray, uint3 id, inout float4 nextRayColor)
 
 	if (info.bHit)
 	{//Trace到Scene了，返回Mesh的颜色 
-		//re = RenderSceneObj(envSpecTex2DArr, ray, minHit);
-		//re *= RenderSceneSDFShadow(ray, minHit);
-		
-		//re = float4(info.uv, 0, 1);
+		float nowDis = length(info.p - sampleRay.pos);
+		if (nowDis < minDis)
+		{
+			minDis = nowDis;
+		}
+
 		uint w, h;
 		albedoTex.GetDimensions(w, h);
-		re = albedoTex[float2(w,h)*info.uv];
+		re = albedoTex[float2(w, h)*info.uv];
 		//!!!
 		if (re.a < 0.99)
 		{
@@ -80,7 +85,7 @@ float4 GetUVTraceColor(in Ray ray, uint3 id, inout float4 nextRayColor)
 	else
 	{//没Trace到，返回背景/天空盒的颜色
 	
-		re = float4(0.1,0.1,0.1,0);//GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+		re = 0;// float4(0.1, 0.1, 0.1, 0);//GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
 	}
 	//##############################
 	//HitInfo sysHit;
@@ -120,31 +125,63 @@ void Render(uint3 id : SV_DispatchThreadID)
 	{
 		//因为每个SSAA的子ray是否通过，材质alpha都不一样，所以也要取平均
 		float4 nextRayColor = 0;
-		int SSAA_edge = (int)sqrt(SSAA_num);
-		float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (idx - 0.5) + screenV * pixH * (idy - 0.5);
-		float SSAA_unitDis = 1.0f / SSAA_edge;
-		float4 SSAA_colors[SSAA_num];
+		float minDis = MAXFLOAT;
 
-		for (int j = 1; j <= SSAA_edge; j++)
+		if (traceTime == 1)
 		{
-			for (int i = 1; i <= SSAA_edge; i++)
+			int SSAA_edge = (int)sqrt(SSAA_num);
+			float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (idx - 0.5) + screenV * pixH * (idy - 0.5);
+			float SSAA_unitDis = 1.0f / SSAA_edge;
+			float4 SSAA_colors[SSAA_num];
+
+			for (int j = 1; j <= SSAA_edge; j++)
+			{
+				for (int i = 1; i <= SSAA_edge; i++)
+				{
+					Ray ray;
+					ray.pos = pixLeftDownPos + screenU * pixW * i * SSAA_unitDis + screenV * pixH * j * SSAA_unitDis;
+					ray.dir = normalize(ray.pos - eyePos);
+
+					SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetUVTraceColor(ray, id, nextRayColor, minDis);
+				}
+			}
+
+			for (int i = 0; i < SSAA_num; i++)
+			{
+				re += SSAA_colors[i];
+			}
+
+			re /= (float)SSAA_num;
+			re *= NextRayRT[id.xy].a;	//乘以原始的系数
+			nextRayColor /= (float)SSAA_num;
+			
+			//++ 只有穿透的ray才更新pos,dir
+			//只有全部穿透，才认为穿透，并且取最短的穿透dis
+			if (nextRayColor.r > 0.99)
 			{
 				Ray ray;
-				ray.pos = pixLeftDownPos + screenU * pixW * i * SSAA_unitDis + screenV * pixH * j * SSAA_unitDis;
+				ray.pos = pixLeftDownPos + screenU * pixW + screenV * pixH;
 				ray.dir = normalize(ray.pos - eyePos);
-
-				SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetUVTraceColor(ray, id, nextRayColor);
+				posRT[id.xy] = ray.pos + minDis * ray.dir;
+				dirRT[id.xy] = ray.dir;
+			}
+		}
+		else
+		{
+			Ray ray;
+			ray.pos = posRT[id.xy];
+			ray.dir = dirRT[id.xy];
+			ray.pos += ray.dir*0.1f;
+			re = GetUVTraceColor(ray, id, nextRayColor, minDis);
+			re *= NextRayRT[id.xy].a; //乘以原始的系数
+			nextRayColor = 0;
+			if (nextRayColor.r > 0.99)
+			{
+				posRT[id.xy] = ray.pos + minDis * ray.dir;
+				dirRT[id.xy] = ray.dir;
 			}
 		}
 
-		for (int i = 0; i < SSAA_num; i++)
-		{
-			re += SSAA_colors[i];
-		}
-
-		re /= (float)SSAA_num;
-		re *= NextRayRT[id.xy].a;
-		nextRayColor /= (float)SSAA_num;
 		NextRayRT[id.xy] = nextRayColor;
 	}
 	Result[id.xy] = re;
