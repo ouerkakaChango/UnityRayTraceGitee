@@ -421,8 +421,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1238969957}
-  m_LocalRotation: {x: 0.001061121, y: 0.38766915, z: 0.00055250525, w: -0.9217978}
-  m_LocalPosition: {x: 0.7243502, y: 1.9013004, z: 0.4308138}
+  m_LocalRotation: {x: 0.009951715, y: 0.2061042, z: 0.0022042547, w: -0.978477}
+  m_LocalPosition: {x: 0.57595754, y: 1.8763161, z: 0.27638617}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -440,6 +440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a0f33ddce3ad0949b9d3115009c0d2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MaxTraceTime: 2
   bvhComp: {fileID: 1527632483}
   albedoTex: {fileID: 2800000, guid: 39125a0b1f52552498fd8139c377c80b, type: 3}
   rt: {fileID: 0}

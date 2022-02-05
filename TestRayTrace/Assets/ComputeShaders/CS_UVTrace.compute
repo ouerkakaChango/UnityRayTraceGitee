@@ -20,6 +20,7 @@ int Inx2D(int i, int j)
 }
 //#########################################################################################################
 int traceTime;
+int MaxTraceTime;
 float3 screenLeftDownPix;
 float3 eyePos;
 float pixW;
@@ -76,10 +77,10 @@ float4 GetUVTraceColor(in Ray ray, uint3 id, inout float4 nextRayColor, inout fl
 		albedoTex.GetDimensions(w, h);
 		re = albedoTex[float2(w, h)*info.uv];
 		//!!!
-		if (re.a < 0.99)
+		//if (re.a < 0.99)
 		{
 			//保存a通道为nextRay用来blendFinal的alpha
-			nextRayColor += float4(1, 0, 0, saturate(1 - re.a));
+			nextRayColor += float4(saturate(1 - re.a), 0, 0, saturate(1 - re.a));
 		}
 	}
 	else
@@ -100,7 +101,7 @@ float4 GetUVTraceColor(in Ray ray, uint3 id, inout float4 nextRayColor, inout fl
 	return re;
 }
 
-#define SSAA_num 4
+#define SSAA_num 1
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
 {
@@ -125,7 +126,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 	{
 		//因为每个SSAA的子ray是否通过，材质alpha都不一样，所以也要取平均
 		float4 nextRayColor = 0;
-		float minDis = MAXFLOAT;
+		float minDis = 10000;
 
 		if (traceTime == 1)
 		{
@@ -157,7 +158,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 			
 			//++ 只有穿透的ray才更新pos,dir
 			//只有全部穿透，才认为穿透，并且取最短的穿透dis
-			if (nextRayColor.r > 0.99)
+			if (nextRayColor.r > 0)
 			{
 				Ray ray;
 				ray.pos = pixLeftDownPos + screenU * pixW + screenV * pixH;
@@ -171,11 +172,16 @@ void Render(uint3 id : SV_DispatchThreadID)
 			Ray ray;
 			ray.pos = posRT[id.xy];
 			ray.dir = dirRT[id.xy];
-			ray.pos += ray.dir*0.1f;
+			//???
+			ray.pos += ray.dir*0.01f;
 			re = GetUVTraceColor(ray, id, nextRayColor, minDis);
 			re *= NextRayRT[id.xy].a; //乘以原始的系数
-			nextRayColor = 0;
-			if (nextRayColor.r > 0.99)
+			if (traceTime == MaxTraceTime)
+			{
+				re.rgb *= re.a;
+				re.a = 1;
+			}
+			if (nextRayColor.r > 0)
 			{
 				posRT[id.xy] = ray.pos + minDis * ray.dir;
 				dirRT[id.xy] = ray.dir;

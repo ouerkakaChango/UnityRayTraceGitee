@@ -11,6 +11,7 @@ public class UVTrace : MonoBehaviour
     const int CoreX = 8;
     const int CoreY = 8;
 
+    public int MaxTraceTime = 4;
     int traceNum = 1;
 
     public BVHTool bvhComp;
@@ -166,6 +167,7 @@ public class UVTrace : MonoBehaviour
         cs.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
         cs.SetTexture(kInx, "envBgTex", envBgTex);
 
+        cs.SetInt("MaxTraceTime", MaxTraceTime);
         cs.SetInt("traceTime", traceTime);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
@@ -235,14 +237,15 @@ public class UVTrace : MonoBehaviour
             NextRayRT.enableRandomWrite = true;
             NextRayRT.Create();
 
-            posRT = new RenderTexture(w, h, 0, RenderTextureFormat.RGB111110Float);
+            posRT = new RenderTexture(w, h, 0, RenderTextureFormat.ARGBFloat);
             posRT.enableRandomWrite = true;
             posRT.Create();
 
-            dirRT = new RenderTexture(w, h, 0, RenderTextureFormat.RGB111110Float);
+            dirRT = new RenderTexture(w, h, 0, RenderTextureFormat.ARGBFloat);
             dirRT.enableRandomWrite = true;
             dirRT.Create();
         }
+        traceNum = 1;
         hasInited = true;
     }
 
@@ -253,12 +256,13 @@ public class UVTrace : MonoBehaviour
             return;
         }
         Compute_ClearStart();
-        Compute_RenderOneTrace(traceNum);
-        traceNum++;
-        Compute_BlendToFinal(ref rt);
-        Compute_RenderOneTrace(traceNum);
-        traceNum++;
-        Compute_BlendToFinal(ref rt);
+
+        for (int i = 0; i < MaxTraceTime; i++)
+        {
+            Compute_RenderOneTrace(traceNum);
+            traceNum++;
+            Compute_BlendToFinal(ref rt);
+        }
     }
     //####################################################################################
 
