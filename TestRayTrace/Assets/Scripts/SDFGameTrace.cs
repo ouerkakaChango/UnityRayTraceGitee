@@ -50,23 +50,33 @@ public class SDFGameTrace : MonoBehaviour
     float daoSpeed = 20.0f;
     void Update()
     {
+        //if (Input.GetKeyDown("q"))
+        //{
+        //    //print("q key was pressed");
+        //    float dt = Mathf.Min(0.001f, Time.deltaTime);
+        //    float delDao = -1 * daoSpeed * dt;
+        //    daoScale += delDao;
+        //    daoScale = Mathf.Max(0.00001f, daoScale);
+        //    //print(delDao + " " + daoScale);
+        //}
+        //
+        //if (Input.GetKeyDown("e"))
+        //{
+        //    //print("q key was pressed");
+        //    float dt = Mathf.Min(0.01f, Time.deltaTime);
+        //    float delDao = 1 * daoSpeed * dt;
+        //    daoScale += delDao;
+        //    //print(delDao + " " + daoScale);
+        //}
+
         if (Input.GetKeyDown("q"))
         {
-            //print("q key was pressed");
-            float dt = Mathf.Min(0.001f, Time.deltaTime);
-            float delDao = -1 * daoSpeed * dt;
-            daoScale += delDao;
-            daoScale = Mathf.Max(0.00001f, daoScale);
-            //print(delDao + " " + daoScale);
+            daoScale *= 0.5f;
         }
-
+        
         if (Input.GetKeyDown("e"))
         {
-            //print("q key was pressed");
-            float dt = Mathf.Min(0.01f, Time.deltaTime);
-            float delDao = 1 * daoSpeed * dt;
-            daoScale += delDao;
-            //print(delDao + " " + daoScale);
+            daoScale *= 2.0f;
         }
     }
 
@@ -91,7 +101,8 @@ public class SDFGameTrace : MonoBehaviour
     {
         var cam = gameObject.GetComponent<Camera>();
         var near = cam.nearClipPlane;
-        var far = cam.farClipPlane;
+        near *= daoScale;
+        //var far = cam.farClipPlane;
 
         var camPos = gameObject.transform.position;
         var camForward = gameObject.transform.forward;

@@ -11,7 +11,7 @@ public class Dao_BaseControl : MonoBehaviour
     float minSpeed = 1.0f;
     float deltaSpeed = 500; //1s
 
-    SDFShape characterShape = null;
+    SDFSphere characterShape = null;
 
     // Start is called before the first frame update
     void Start()
@@ -64,6 +64,8 @@ public class Dao_BaseControl : MonoBehaviour
                 speed = Mathf.Max(speed, minSpeed);
             }
         }
+
+        Debug.Log("collisionDebug: "+((transform.position - new Vector3(0, 0.5f, 0)).magnitude-characterShape.r-0.5f).ToString());
     }
 
     float GetDaoScale()
@@ -75,6 +77,7 @@ public class Dao_BaseControl : MonoBehaviour
     void CheckDaoCollision(ref float rightMove, ref float forwardMove)
     {
         var collisionMgr = GetComponent<SDFGameCollisionMgr>();
+        characterShape.r = 0.8f * GetDaoScale();
         collisionMgr.CheckMovement(characterShape, transform.position, transform.right, transform.forward, ref rightMove, ref forwardMove);
         //Log.DebugVec(transform.forward);
     }

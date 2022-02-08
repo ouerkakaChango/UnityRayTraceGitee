@@ -2,9 +2,10 @@
 
 #define MaxSDF 100000
 #define MaxTraceDis 10
-#define MaxTraceTime 320
+#define MaxTraceTime 640
 #define TraceThre 0.001
-#define TraceStart 0.005
+#define NormalEpsilon 0.0001
+
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFShadowNormalBias 0.001
 #define SceneSDFSoftShadowK 16
@@ -82,7 +83,7 @@ float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 float SDFPlanet(float3 p)
 {
 	float re = 0;
-	float r = 0.5;// +0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+	float r = 0.48;// +0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
 	float dis = fbm4(p.zxy*10);
 	r += 0.02*smoothstep(0.5f, 1.0f, dis);
 	float3 center = float3(0, r, 0);
@@ -114,11 +115,10 @@ float GetObjSDF(int inx, float3 p)
 
 float3 GetObjSDFNormal(int inx, float3 p)
 {
-	float epsilon = 0.0001f;
 	return normalize(float3(
-		GetObjSDF(inx, float3(p.x + epsilon, p.y, p.z)) - GetObjSDF(inx, float3(p.x - epsilon, p.y, p.z)),
-		GetObjSDF(inx, float3(p.x, p.y + epsilon, p.z)) - GetObjSDF(inx, float3(p.x, p.y - epsilon, p.z)),
-		GetObjSDF(inx, float3(p.x, p.y, p.z + epsilon)) - GetObjSDF(inx, float3(p.x, p.y, p.z - epsilon))
+		GetObjSDF(inx, float3(p.x + NormalEpsilon, p.y, p.z)) - GetObjSDF(inx, float3(p.x - NormalEpsilon, p.y, p.z)),
+		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon, p.z)) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon, p.z)),
+		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon)) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon))
 		));
 }
 
@@ -209,7 +209,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 			break;
 		}
 
-		if (sdf <= TraceThre*0.5f)
+		if (sdf <= TraceThre*0.5)
 		{
 			info.bHit = true;
 			info.obj = objInx;
@@ -236,7 +236,7 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 {
 	Init(info);
 	float sha = 1.0;
-	float t = TraceStart * 0.1; //一个非0小值，会避免极其细微的多余shadow
+	float t = 0.005 * 0.1; //一个非0小值，会避免极其细微的多余shadow
 
 	int traceCount = 0;
 	while (traceCount <= MaxTraceTime*0.2)
