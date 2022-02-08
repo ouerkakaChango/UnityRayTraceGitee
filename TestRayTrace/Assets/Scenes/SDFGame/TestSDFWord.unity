@@ -436,8 +436,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1622701907}
-  m_LocalRotation: {x: 0.20071918, y: -0.69928735, z: 0.21534832, w: 0.65140927}
-  m_LocalPosition: {x: 2.151782, y: 1.5852821, z: 0.20021993}
+  m_LocalRotation: {x: 0.2389187, y: -0.7592353, z: 0.39704037, w: 0.4569886}
+  m_LocalPosition: {x: 0.5488477, y: 2.1009803, z: 0.35277987}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -456,11 +456,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cs: {fileID: 7200000, guid: 68c1061622ebc184380bfff720a3d710, type: 3}
-  envDiffTex: {fileID: 2800000, guid: 4e87347d2e700854c83b1dc31b3fce43, type: 3}
   envSpecTex2DArr: {fileID: 18700000, guid: 0f551ab412a7b6a43adb8fff0951af3f, type: 2}
-  brdfLUT: {fileID: 2800000, guid: d23d36bf5e9b7b94d88f158d7ed343da, type: 3}
   envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
-  testTex: {fileID: 0}
   w: 1024
   h: 720
 --- !u!114 &1622701912
