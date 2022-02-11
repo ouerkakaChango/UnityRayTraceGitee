@@ -1,0 +1,6 @@
+#ifndef DD_SHADER_VARIABLES_INCLUDED
+#define DD_SHADER_VARIABLES_INCLUDED
+
+half _Cutoff;
+
+#endif
