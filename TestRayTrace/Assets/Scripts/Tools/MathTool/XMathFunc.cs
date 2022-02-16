@@ -98,6 +98,24 @@ namespace MathHelper
             return new Vector3(abs(v.x), abs(v.y), abs(v.z));
         }
 
+        public static float floor(float x)
+        {
+            return Mathf.Floor(x);
+        }
+
+        public static float clamp(float x, float min, float max)
+        {
+            if (x < min)
+            {
+                return min;
+            }
+            if (x > max)
+            {
+                return max;
+            }
+            return x;
+        }
+
         //#######################################################
         public static bool gt(in Vector3 a, in Vector3 b)
         {
