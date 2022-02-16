@@ -55,6 +55,10 @@ public class Signal1D : MonoBehaviour
             {
                 output = ResampleLanczos(input);
             }
+            else if (type == ResampleType.FSRLanczos)
+            {
+                output = ResampleFSRLanczos(input);
+            }
             resampledSigs.Add(new Vector2(input, output)) ;
         }
         CheckVisualize();
@@ -99,6 +103,10 @@ public class Signal1D : MonoBehaviour
     float LanczosFunc(float a, float x)
     {
         a = abs(a);
+        if (equal(x,0))
+        {
+            return 1;
+        }
         if (x > -a && x < a)
         {
             return sinc(x) * sinc(x / a);
@@ -109,10 +117,17 @@ public class Signal1D : MonoBehaviour
         }
     }
 
+    //https://github.com/GPUOpen-Effects/FidelityFX-FSR
+    float LanczosFSRFunc(float a, float x)
+    {
+        a = abs(a);
+        return (pow(x * x * (2.0f / 5) - 1, 2) * (25.0f / 16) - (25.0f / 16 - 1)) * pow(a*x*x-1,2);
+    }
+
     float ResampleLanczos(float input)
     {
         float sum = 0;
-        float a = 2;
+        float a = 2.0f;
         float rawUnit = 1.0f / rawSignalNum;
         int sampleInx = (int)floor(input / rawUnit);
         float s1, s2, s3, s4;
@@ -134,6 +149,31 @@ public class Signal1D : MonoBehaviour
         return sum;
     }
 
+    float ResampleFSRLanczos(float input)
+    {
+        float sum = 0;
+        float a = 0.4f;
+        float rawUnit = 1.0f / rawSignalNum;
+        int sampleInx = (int)floor(input / rawUnit);
+        float s1, s2, s3, s4;
+        s1 = GetSampleAt(sampleInx - 1);
+        s2 = GetSampleAt(sampleInx);
+        s3 = GetSampleAt(sampleInx + 1);
+        s4 = GetSampleAt(sampleInx + 2);
+
+        float x1, x2, x3, x4;
+        x1 = LanczosNormalizeInput(input, GetInputAt(sampleInx - 1));
+        x2 = LanczosNormalizeInput(input, GetInputAt(sampleInx));
+        x3 = LanczosNormalizeInput(input, GetInputAt(sampleInx + 1));
+        x4 = LanczosNormalizeInput(input, GetInputAt(sampleInx + 2));
+        sum += s1 * LanczosFSRFunc(a, x1);
+        sum += s2 * LanczosFSRFunc(a, x2);
+        sum += s3 * LanczosFSRFunc(a, x3);
+        sum += s4 * LanczosFSRFunc(a, x4);
+
+        return sum;
+    }
+
     public void CheckVisualize()
     {
         var visual = gameObject.GetComponent<PntsVisualizer>();
@@ -144,7 +184,7 @@ public class Signal1D : MonoBehaviour
         visual.Clear();
 
         Vector3 start = transform.position;
-        visual.BeginRange(Color.blue);
+        visual.BeginRange(Color.blue, 2.0f);
         for (int i = 0; i < rawSigs.Count; i++)
         {
             visual.Add(start + new Vector3(rawSigs[i].x, v_heightScale * rawSigs[i].y, 0));

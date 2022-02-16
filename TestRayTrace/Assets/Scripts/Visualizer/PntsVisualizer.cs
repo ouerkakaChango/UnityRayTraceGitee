@@ -12,6 +12,7 @@ public struct ColorRangeInfo
 {
     public Color color;
     public int start, end;
+    public float scale;
 }
 
 public class PntsVisualizer : MonoBehaviour
@@ -49,7 +50,7 @@ public class PntsVisualizer : MonoBehaviour
         }
     }
 
-    public void BeginRange(Color color)
+    public void BeginRange(Color color, float scale=1.0f)
     {
         if (rangeType != PntsVisualRangeType.Color)
         {
@@ -62,6 +63,7 @@ public class PntsVisualizer : MonoBehaviour
             info.color = color;
             info.start = pnts.Count;
             info.end = info.start;
+            info.scale = scale;
             colorRanges.Add(info);
         }
     }
@@ -84,7 +86,7 @@ public class PntsVisualizer : MonoBehaviour
                 //Debug.Log(info.start + " " + info.end);
                 for (int i = info.start; i < info.end; i++)
                 {                  
-                    Gizmos.DrawCube(pnts[i], 0.01f * Vector3.one);
+                    Gizmos.DrawCube(pnts[i], info.scale * 0.01f * Vector3.one);
                 }
             }
         }

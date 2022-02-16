@@ -42,6 +42,11 @@ public class Signal1DEditor : Editor
             {
                 Target.Resample(ResampleType.Lanczos);
             }
+
+            if (GUILayout.Button("FSRLanczos"))
+            {
+                Target.Resample(ResampleType.FSRLanczos);
+            }
         }
 
         //########

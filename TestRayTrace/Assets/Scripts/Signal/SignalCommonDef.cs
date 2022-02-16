@@ -6,6 +6,7 @@ public enum ResampleType
 {
     Linear,
     Lanczos,
+    FSRLanczos,
 };
 
 public class SignalCommonDef : MonoBehaviour
