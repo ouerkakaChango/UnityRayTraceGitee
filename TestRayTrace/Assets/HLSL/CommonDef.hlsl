@@ -138,4 +138,36 @@ int GetTreeDepth(int inx,int maxDepth)
 	return -1;
 }
 
+float2 GetUV(RWTexture2D<float4> dst, uint3 id)
+{
+	uint dstW, dstH;
+	dst.GetDimensions(dstW, dstH);
+	return float2(
+		((float)id.x) / dstW,
+		((float)id.y) / dstH);
+}
+
+float2 GetUV(Texture2D<float4> dst, uint3 id)
+{
+	uint dstW, dstH;
+	dst.GetDimensions(dstW, dstH);
+	return float2(
+		((float)id.x) / dstW,
+		((float)id.y) / dstH);
+}
+
+uint2 GetSize(RWTexture2D<float4> dst)
+{
+	uint2 size;
+	dst.GetDimensions(size.x, size.y);
+	return size;
+}
+
+uint2 GetSize(Texture2D<float4> dst)
+{
+	uint2 size;
+	dst.GetDimensions(size.x, size.y);
+	return size;
+}
+
 #endif

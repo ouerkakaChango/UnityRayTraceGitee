@@ -1,0 +1,50 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel SobelEdge
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+Texture2D<float4> inTex;
+
+[numthreads(8, 8, 1)]
+void SobelEdge(uint3 id : SV_DispatchThreadID)
+{
+	// TODO: insert actual code here!
+
+	//Result[id.xy] = inTex[id.xy];
+
+	float core[3][3];
+	int i, j;
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 3; j++) {
+			float4 tem = inTex[id.xy + uint2(-1, -1) + uint2(i, j)];
+			core[i][j] = tem.r*0.299 + tem.g*0.587 + tem.b*0.114;
+		}
+	}
+	float wx[3][3] = {
+	-1,0,1,
+	-2,0,2,
+	-1,0,1
+	};
+	float wy[3][3] = {
+	-1,-2,-1,
+	0,0,0,
+	1,2,1
+	};
+	float gx = 0.0f;
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 3; j++) {
+			gx += wx[i][j] * core[i][j];
+		}
+	}
+
+	float gy = 0.0f;
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 3; j++) {
+			gy += wy[i][j] * core[i][j];
+		}
+	}
+
+	float edge = sqrt(gy*gy + gx * gx);
+	Result[id.xy] = edge;
+}

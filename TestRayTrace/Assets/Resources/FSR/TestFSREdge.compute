@@ -1,15 +1,278 @@
-// Each #kernel tells which function to compile; you can have many kernels
+//https://github.com/GPUOpen-Effects/FidelityFX-FSR
 #pragma kernel CSMain
+
+#include "../../HLSL/CommonDef.hlsl"
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture2D<float4> Result;
 Texture2D<float4> inTex;
 
+#define AU1_AF1(x) asuint(float(x))
+float APrxLoRcpF1(float a) { return asfloat((uint)(0x7ef07ebb) - AU1_AF1(a)); }
+float APrxLoRsqF1(float a) { return asfloat((uint)(0x5f347d74) - (AU1_AF1(a) >> (uint)(1))); }
+
+float FsrL(float3 c)
+{
+	return c.r*0.5f + c.g + c.b*0.5f;
+}
+
+void FsrEasuBilinearGrad(
+	inout float2 dir,
+	inout float len,
+	float2 pp,
+	int cornerID,
+	float la, float lb, float lc, float ld, float le
+);
+
+void FsrEasuTapF(
+	inout float3 aC, // Accumulated color, with negative lobe.
+	inout float aW, // Accumulated weight.
+	float2 off,      // Pixel offset from resolve position to tap.
+	float2 dir,      // Gradient direction.
+	float2 len,      // Length.
+	float lob,      // Negative lobe strength.
+	float clp,      // Clipping point.
+	float3 c);
+
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!
 
-    Result[id.xy] = inTex[id.xy];
+    //Result[id.xy] = inTex[id.xy];
+	 
+	//right uv.u down uv.v
+	//| - - - >
+	//| 
+	//V
+	//attention:not fit unity x,y, but same as AMD FSR src code
+	// coord difference not affect code get correct result
+	// x b c x
+	// e f g h
+	// i j k l
+	// x n o x
+
+	//1.Locate f's pos in inTex
+	float2 uv = GetUV(Result, id);
+	//Result[id.xy] = float4(uv, 0, 1);
+	uint2 srcSize = GetSize(inTex);
+	float2 pos = srcSize * uv;
+	//-----
+	float2 fpos = floor(pos);
+	//Result[id.xy] = inTex[fpos];
+
+	float2 bpos = fpos + float2(0, -1);
+	float2 cpos = fpos + float2(1, -1);
+	float2 epos = fpos + float2(-1, 0);
+	float2 gpos = fpos + float2(1, 0);
+	float2 hpos = fpos + float2(2, 0);
+	float2 ipos = fpos + float2(-1, 1);
+	float2 jpos = fpos + float2(0, 1);
+	float2 kpos = fpos + float2(1, 1);
+	float2 lpos = fpos + float2(2, 1);
+	float2 npos = fpos + float2(0, 2);
+	float2 opos = fpos + float2(1, 2);
+
+	float3 bC = inTex[bpos];
+	float3 cC = inTex[cpos];
+	float3 eC = inTex[epos];
+	float3 fC = inTex[fpos];
+	float3 gC = inTex[gpos];
+	float3 hC = inTex[hpos];
+	float3 iC = inTex[ipos];
+	float3 jC = inTex[jpos];
+	float3 kC = inTex[kpos];
+	float3 lC = inTex[lpos];
+	float3 nC = inTex[npos];
+	float3 oC = inTex[opos];
+
+	float bL = FsrL(bC);
+	float cL = FsrL(cC);
+	float eL = FsrL(eC);
+	float fL = FsrL(fC);
+	float gL = FsrL(gC);
+	float hL = FsrL(hC);
+	float iL = FsrL(iC);
+	float jL = FsrL(jC);
+	float kL = FsrL(kC);
+	float lL = FsrL(lC);
+	float nL = FsrL(nC);
+	float oL = FsrL(oC);
+
+	float2 dir = 0;
+	float len = 0;
+
+	float2 pp = pos - fpos;
+
+	FsrEasuBilinearGrad(dir, len, pp, 0, bL, eL, fL, gL, jL);
+	FsrEasuBilinearGrad(dir, len, pp, 1, cL, fL, gL, hL, kL);
+	FsrEasuBilinearGrad(dir, len, pp, 2, fL, iL, jL, kL, nL);
+	FsrEasuBilinearGrad(dir, len, pp, 3, gL, jL, kL, lL, oL);
+
+	//Result[id.xy] = float4(dir, 0, 1);
+	//Result[id.xy] = len;
+	//return;
+
+	float2 dir2 = dir * dir;
+	float dirR = dir2.x + dir2.y;//dirx^2+dir.y^2
+	bool zro = dirR < (1.0f / 32768.0f);
+	dirR = APrxLoRsqF1(dirR);
+	dirR = zro ? 1.0f : dirR;
+	dir.x = zro ? 1.0f : dir.x;
+	dir *= dirR;
+
+	len = len * 0.5f;
+	len *= len;
+
+	// Stretch kernel {1.0 vert|horz, to sqrt(2.0) on diagonal}.
+	float stretch = (dir.x * dir.x + dir.y * dir.y) * APrxLoRcpF1(max(abs(dir.x), abs(dir.y)));
+	//%%%
+	//stretch = 1;
+	//len = 1;
+	float2 len2 = float2(1.0f + (stretch - 1.0f) * len, 1.0f-0.5f* len);
+	float lob = (0.5f) + ((1.0f / 4.0 - 0.04f) - 0.5f) * len;
+	//%%%
+	//lob = 0.25f; //if lob 0 ,the shape of fsr_lanczo make far pixel weight too neigative
+	float clp = APrxLoRcpF1(lob);
+
+	float3 min4 = min(min(fC, gC), min(jC, kC));
+	float3 max4 = max(max(fC, gC), max(jC, kC));
+
+	float3 aC = 0;
+	float aW = 0;
+	 
+	FsrEasuTapF(aC, aW, float2(0.0, -1.0) - pp, dir, len2, lob, clp, bC);
+	FsrEasuTapF(aC, aW, float2(1.0, -1.0) - pp, dir, len2, lob, clp, cC); // c
+	FsrEasuTapF(aC, aW, float2(-1.0, 1.0) - pp, dir, len2, lob, clp, iC); // i
+	FsrEasuTapF(aC, aW, float2(0.0, 1.0) - pp, dir, len2, lob, clp,  jC);  // j
+	FsrEasuTapF(aC, aW, float2(0.0, 0.0) - pp, dir, len2, lob, clp,  fC);  // f
+	FsrEasuTapF(aC, aW, float2(-1.0, 0.0) - pp, dir, len2, lob, clp, eC); // e
+	FsrEasuTapF(aC, aW, float2(1.0, 1.0) - pp, dir, len2, lob, clp,  kC);  // k
+	FsrEasuTapF(aC, aW, float2(2.0, 1.0) - pp, dir, len2, lob, clp,  lC);  // l
+	FsrEasuTapF(aC, aW, float2(2.0, 0.0) - pp, dir, len2, lob, clp,  hC);  // h
+	FsrEasuTapF(aC, aW, float2(1.0, 0.0) - pp, dir, len2, lob, clp,  gC);  // g
+	FsrEasuTapF(aC, aW, float2(1.0, 2.0) - pp, dir, len2, lob, clp,  oC);  // o
+	FsrEasuTapF(aC, aW, float2(0.0, 2.0) - pp, dir, len2, lob, clp,  nC);  // n
+
+	float3 pix = min(max4, max(min4, aC / aW));
+	//float3 pix = min(max4, max(min4, aC * AF3_(ARcpF1(aW))));
+
+	//Result[id.xy] = lob;
+	//Result[id.xy] = float4(len2, 0, 1);
+	//Result[id.xy] = dirR*0.1f;
+	//Result[id.xy] = float4(dir, 0, 1);
+	Result[id.xy] = float4(pix,1);
+	//Result[id.xy] = float4(1-pp,0,1);
+}
+
+//FsrEasuSetF
+//cornerID
+// 0 1
+// 2 3
+//pixel
+//     la
+//  lb lc ld
+//     le
+void FsrEasuBilinearGrad(
+	inout float2 dir,
+	inout float len,
+	float2 pp,
+	int cornerID,
+	float la, float lb, float lc, float ld, float le
+)
+{
+	float w = 0;
+	if (cornerID == 0)
+	{
+		w = (1 - pp.x)*(1 - pp.y);
+	}
+	else if (cornerID == 1)
+	{
+		w = pp.x*(1 - pp.y);
+	}
+	else if (cornerID == 2)
+	{
+		w = (1 - pp.x)*pp.y;
+	}
+	else
+	{
+		w = pp.x * pp.y;
+	}
+
+	float dc = ld - lc;
+	float cb = lc - lb;
+	float lenX = max(abs(dc), abs(cb));
+	//if (lenX < 0.001f)
+	//{
+	//	lenX = 0;
+	//}
+	//else
+	//{
+	//	lenX = 1.0f / lenX;
+	//}
+	lenX = APrxLoRcpF1(lenX);
+	float dirX = ld - lb;
+	dir.x += dirX * w;
+	lenX = saturate(abs(dirX)*lenX);
+	lenX *= lenX;
+	len += lenX * w;
+	//len += abs(cb - dc)*w;
+
+	float ec = le - lc;
+	float ca = lc - la;
+	float lenY = max(abs(ec),abs(ca));
+	//if (lenY < 0.001f)
+	//{
+	//	lenY = 0;
+	//}
+	//else
+	//{
+	//	lenY = 1.0f / lenY;
+	//}
+	lenY = APrxLoRcpF1(lenY);
+	float dirY = le - la;
+	dir.y += dirY * w;
+	lenY = saturate(abs(dirY)*lenY);
+	lenY *= lenY;
+	len += lenY * w;
+	//len += abs(ca - ec)*w;
+}
+
+void FsrEasuTapF(
+	inout float3 aC, // Accumulated color, with negative lobe.
+	inout float aW, // Accumulated weight.
+	float2 off,      // Pixel offset from resolve position to tap.
+	float2 dir,      // Gradient direction.
+	float2 len,      // Length.
+	float lob,      // Negative lobe strength.
+	float clp,      // Clipping point.
+	float3 c)
+{ // Tap color.
+  // Rotate offset by direction.
+	float2 v;
+	v.x = (off.x * (dir.x)) + (off.y * dir.y);
+	v.y = (off.x * (-dir.y)) + (off.y * dir.x);
+	// Anisotropy.
+	v *= len;
+	// Compute distance^2.
+	float d2 = v.x * v.x + v.y * v.y;
+	// Limit to the window as at corner, 2 taps can easily be outside.
+	d2 = min(d2, clp);
+	// Approximation of lancos2 without sin() or rcp(), or sqrt() to get x.
+	//  (25/16 * (2/5 * x^2 - 1)^2 - (25/16 - 1)) * (1/4 * x^2 - 1)^2
+	//  |_______________________________________|   |_______________|
+	//                   base                             window
+	// The general form of the 'base' is,
+	//  (a*(b*x^2-1)^2-(a-1))
+	// Where 'a=1/(2*b-b^2)' and 'b' moves around the negative lobe.
+	float wB = (2.0f / 5.0) * d2 -1.0f;
+	float wA = lob * d2 -1.0f;
+	wB *= wB;
+	wA *= wA;
+	wB = (25.0f / 16.0) * wB - (25.0f / 16.0 - 1.0f);
+	float w = wB * wA;
+	// Do weighted average.
+	aC += c * w;
+	aW += w;
 }

@@ -6,6 +6,7 @@ using static CopyUtility;
 public class ImgCSProcessor : MonoBehaviour
 {
     public ComputeShader cs;
+    public string kernel = "CSMain";
     public RenderTexture rt;
     public GameObject templateObj;
     // Start is called before the first frame update
@@ -30,13 +31,18 @@ public class ImgCSProcessor : MonoBehaviour
         mat.SetTexture("_MainTex", rt);
     }
 
+    protected virtual void PrepareRT(ref Texture2D tex)
+    {
+        CreateRT(ref rt, ref tex);
+    }
+
     void Compute_Process(ref Texture2D tex)
     {
-        Debug.Log(tex);
-        CreateRT(ref rt, ref tex);
-        int w = tex.width;
-        int h = tex.height;
-        int kInx = cs.FindKernel("CSMain");
+        //Debug.Log(tex);
+        PrepareRT(ref tex);
+        int w = rt.width;
+        int h = rt.height;
+        int kInx = cs.FindKernel(kernel);
         cs.SetTexture(kInx, "inTex", tex);
         cs.SetTexture(kInx, "Result", rt);
         cs.Dispatch(kInx, w/8, h/8, 1);

@@ -6,7 +6,7 @@ using UnityEditor;
 [CustomEditor(typeof(ImgCSProcessor))]
 public class ImgCSProcessorEditor : Editor
 {
-    ImgCSProcessor Target;
+    protected ImgCSProcessor Target;
     void OnEnable()
     {
         Target = (ImgCSProcessor)target;
