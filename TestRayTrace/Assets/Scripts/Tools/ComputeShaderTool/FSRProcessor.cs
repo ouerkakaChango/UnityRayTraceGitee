@@ -24,6 +24,7 @@ public class FSRProcessor : ImgCSProcessor
     {
         Debug.Log("FSR Compute");
         base.Compute_Process(ref tex, ref easuRT);
+        PrepareRT(ref tex, ref rt);
         int w = rt.width;
         int h = rt.height;
         int kInx = cs.FindKernel(kernel2);

@@ -25,6 +25,7 @@ public class ImgCSProcessor : MonoBehaviour
 
     public void Process()
     {
+        DestroyImmediate(rt);
         var mat = SetMaterial(gameObject, templateObj);
         Texture2D tex = (Texture2D)templateObj.GetComponent<MeshRenderer>().sharedMaterial.GetTexture("_MainTex");
         Compute_Process(ref tex, ref rt);
@@ -40,8 +41,8 @@ public class ImgCSProcessor : MonoBehaviour
     {
         //Debug.Log(tex);
         PrepareRT(ref tex, ref rTex);
-        int w = rt.width;
-        int h = rt.height;
+        int w = rTex.width;
+        int h = rTex.height;
         int kInx = cs.FindKernel(kernel);
         cs.SetTexture(kInx, "inTex", tex);
         cs.SetTexture(kInx, "Result", rTex);
