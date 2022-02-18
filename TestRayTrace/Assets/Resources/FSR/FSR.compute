@@ -1,5 +1,6 @@
 //https://github.com/GPUOpen-Effects/FidelityFX-FSR
-#pragma kernel CSMain
+#pragma kernel EASU
+#pragma kernel RCAS
 
 #include "../../HLSL/CommonDef.hlsl"
 
@@ -10,7 +11,11 @@ Texture2D<float4> inTex;
 
 #define AU1_AF1(x) asuint(float(x))
 float APrxLoRcpF1(float a) { return asfloat((uint)(0x7ef07ebb) - AU1_AF1(a)); }
+float APrxMedRcpF1(float a) { float b = asfloat((uint)(0x7ef19fff) - AU1_AF1(a)); return b * (-b * a + 2.0f); }
+
 float APrxLoRsqF1(float a) { return asfloat((uint)(0x5f347d74) - (AU1_AF1(a) >> (uint)(1))); }
+float AMax3F1(float x, float y, float z) { return max(x, max(y, z)); }
+float AMin3F1(float x, float y, float z) { return min(x, min(y, z)); }
 
 float FsrL(float3 c)
 {
@@ -36,7 +41,7 @@ void FsrEasuTapF(
 	float3 c);
 
 [numthreads(8,8,1)]
-void CSMain (uint3 id : SV_DispatchThreadID)
+void EASU(uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!
 
@@ -156,7 +161,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	FsrEasuTapF(aC, aW, float2(0.0, 2.0) - pp, dir, len2, lob, clp,  nC);  // n
 
 	float3 pix = min(max4, max(min4, aC / aW));
-	//float3 pix = min(max4, max(min4, aC * AF3_(ARcpF1(aW))));
 
 	//Result[id.xy] = lob;
 	//Result[id.xy] = float4(len2, 0, 1);
@@ -164,6 +168,53 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	//Result[id.xy] = float4(dir, 0, 1);
 	Result[id.xy] = float4(pix,1);
 	//Result[id.xy] = float4(1-pp,0,1);
+}
+
+#define FSR_RCAS_LIMIT (0.25f - (1.0f / 16.0))
+
+RWTexture2D<float4> easuRT;
+float sharpness;// = 0.9f;
+[numthreads(8, 8, 1)]
+void RCAS(uint3 id : SV_DispatchThreadID)
+{
+	//Result[id.xy] = easuRT[id.xy];
+
+	//    b
+	//  d e f
+	//    h
+	float3 eC = easuRT[id.xy];
+	float3 bC = easuRT[id.xy + int2(0,-1)];
+	float3 dC = easuRT[id.xy + int2(-1, 0)];
+	float3 fC = easuRT[id.xy + int2(1, 0)];
+	float3 hC = easuRT[id.xy + int2(0, 1)];
+
+	float eL = FsrL(eC);
+	float bL = FsrL(bC);
+	float dL = FsrL(dC);
+	float fL = FsrL(fC);
+	float hL = FsrL(hC);
+
+	//!!! %%% no denoise make sharper(clearer)
+	//more noise, nz->0.5f,lobe->*0.5f,less weight, less  to sharp
+	//float nz = 0.25f * bL + 0.25f * dL + 0.25f * fL + 0.25 * hL - eL;
+	//nz = saturate(abs(nz) * APrxMedRcpF1(AMax3F1(AMax3F1(bL, dL, eL), fL, hL) - AMin3F1(AMin3F1(bL, dL, eL), fL, hL)));
+	//nz = -0.5f * nz + 1.0f;
+
+	float3 ringMin = min(min(bC, dC), min(fC, hC));
+	float3 ringMax = max(max(bC, dC), max(fC, hC));
+	float2 peak = float2(1.0f, -4.0f);
+	float3 hitMin = ringMin / (4.0f*ringMax);
+	float3 hitMax = (peak.x - ringMax) / (4.0f * ringMin + peak.y);
+	float3 lobeC = max(-hitMin, hitMax);
+	float lobe = max(-FSR_RCAS_LIMIT, min(AMax3F1(lobeC.x, lobeC.y, lobeC.z), 0.0f) * sharpness);
+
+	//!!! %%% no denoise make sharper
+	//lobe *= nz;
+
+	float rcpL = APrxMedRcpF1(4.0f * lobe + 1.0f);
+
+	float3 pix = (lobe * (bC + dC + hC + fC) + eC)*rcpL;
+	Result[id.xy] = float4(pix,1); 
 }
 
 //FsrEasuSetF
