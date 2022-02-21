@@ -187,7 +187,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     {
         //if (cs == null)
         {
-            autoCS.Generate();
+            //autoCS.Generate();
             //cs = (ComputeShader)Resources.Load("SDFGameCS/CS_SDFGame_" + SceneName);
             //cs = (ComputeShader)Resources.Load(ChopEnd(autoCS.outs[0],".compute"));
         }
@@ -196,6 +196,11 @@ public class SDFGameSceneTrace : MonoBehaviour
             rt = new RenderTexture(w, h, 24);
             rt.enableRandomWrite = true;
             rt.Create();
+            //???
+            autoCS.InitOuts();
+            autoCS.outs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName +".compute");
+            //autoCS.cfgs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName + "_cfg.txt");
+            autoCS.Generate();
         }
         hasInited = true;
     }
