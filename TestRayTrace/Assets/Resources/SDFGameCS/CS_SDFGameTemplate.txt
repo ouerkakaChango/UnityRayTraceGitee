@@ -1,0 +1,88 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Render
+
+#include "../../HLSL/UnityCommonDef.hlsl"
+#include "../../HLSL/RayMath.hlsl"
+
+#include "@(SceneName).hlsl"
+
+int w;
+int h;
+
+//#########################################################################################################
+int Inx2D(int i, int j)
+{
+	return i + w * j;
+}
+//#########################################################################################################
+float3 screenLeftDownPix;
+float3 eyePos;
+float pixW;
+float pixH;
+float3 screenU;
+float3 screenV;
+
+RWTexture2D<float4> Result;
+Texture2D<float4> envDiffTex;
+Texture2DArray envSpecTex2DArr;
+Texture2D<float4> envBgTex;
+
+//#########################################################################################################
+
+float3 GetSDFGameColor(in Ray ray)
+{
+	float3 re = 0;
+	//---Trace
+	HitInfo minHit;
+	Init(minHit);
+	TraceScene(ray, minHit);
+	//___Trace
+
+	if (minHit.bHit)
+	{ 
+		re = RenderSceneObj(envSpecTex2DArr, ray, minHit);
+		re *= RenderSceneSDFShadow(ray, minHit);
+	}
+	else
+	{
+		re = 1;//GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+	}
+
+	return re;
+}
+
+#define SSAA_num 9
+[numthreads(8, 8, 1)]
+void Render(uint3 id : SV_DispatchThreadID)
+{
+	float3 re = 0;
+
+	int idx = id.x;
+	int idy = id.y;
+
+	int SSAA_edge = (int)sqrt(SSAA_num);
+	float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (idx - 0.5) + screenV * pixH * (idy - 0.5);
+	float SSAA_unitDis = 1.0f / SSAA_edge;
+	float3 SSAA_colors[SSAA_num];
+
+	for (int j = 1; j <= SSAA_edge; j++)
+	{
+		for (int i = 1; i <= SSAA_edge; i++)
+		{
+			Ray ray;
+			ray.pos = pixLeftDownPos + screenU * pixW * i * SSAA_unitDis + screenV * pixH * j * SSAA_unitDis;
+			ray.dir = normalize(ray.pos - eyePos);
+
+			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray);
+		}
+	}
+
+	for (int i = 0; i < SSAA_num; i++)
+	{
+		re += SSAA_colors[i];
+	}
+
+	re /= (float)SSAA_num;
+
+	Result[id.xy] = float4(re, 1);
+}

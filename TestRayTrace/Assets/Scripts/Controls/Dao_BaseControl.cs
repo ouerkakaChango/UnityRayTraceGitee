@@ -37,7 +37,7 @@ public class Dao_BaseControl : MonoBehaviour
         float dis = (transform.position - new Vector3(0, 0.5f, 0)).magnitude;
         if (dis <= 0.5f)
         {
-            Debug.Log("In!");
+            //Debug.Log("In!");
         }
         else
         {
@@ -65,7 +65,7 @@ public class Dao_BaseControl : MonoBehaviour
             }
         }
 
-        Debug.Log("collisionDebug: "+((transform.position - new Vector3(0, 0.5f, 0)).magnitude-characterShape.r-0.5f).ToString());
+        //Debug.Log("collisionDebug: "+((transform.position - new Vector3(0, 0.5f, 0)).magnitude-characterShape.r-0.5f).ToString());
     }
 
     float GetDaoScale()
@@ -77,8 +77,10 @@ public class Dao_BaseControl : MonoBehaviour
     void CheckDaoCollision(ref float rightMove, ref float forwardMove)
     {
         var collisionMgr = GetComponent<SDFGameCollisionMgr>();
-        characterShape.r = 0.8f * GetDaoScale();
-        collisionMgr.CheckMovement(characterShape, transform.position, transform.right, transform.forward, ref rightMove, ref forwardMove);
-        //Log.DebugVec(transform.forward);
+        if (collisionMgr)
+        {
+            characterShape.r = 0.8f * GetDaoScale();
+            collisionMgr.CheckMovement(characterShape, transform.position, transform.right, transform.forward, ref rightMove, ref forwardMove);
+        }
     }
 }
