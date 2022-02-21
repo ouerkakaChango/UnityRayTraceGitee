@@ -70,7 +70,7 @@ public class Dao_BaseControl : MonoBehaviour
 
     float GetDaoScale()
     {
-        var daoComp = GetComponent<SDFGameTrace>();
+        var daoComp = GetComponent<SDFGameSceneTrace>();
         return daoComp.GetDaoScale();
     }
 
