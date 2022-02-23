@@ -17,5 +17,10 @@ namespace StringTool
             }
             return str.Substring(0, len);
         }
+
+        public static string ChopBegin(string str, string preFix)
+        {
+            return str.Substring(preFix.Length, str.Length - preFix.Length);
+        }
     }
 }

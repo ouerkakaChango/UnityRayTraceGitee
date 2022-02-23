@@ -4,7 +4,7 @@
 #include "../../HLSL/UnityCommonDef.hlsl"
 #include "../../HLSL/RayMath.hlsl"
 
-#include "SDFGameScene_(@SceneName).hlsl"
+#include "SDFGameScene_Detail1.hlsl"
 
 int w;
 int h;

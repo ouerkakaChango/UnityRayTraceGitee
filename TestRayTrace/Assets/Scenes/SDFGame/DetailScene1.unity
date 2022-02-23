@@ -269,9 +269,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   templates:
   - Resources/SDFGameCS/CS_SDFGameTemplate.txt
+  - Resources/SDFGameCS/SDFGameSceneTemplate.txt
   outs: []
   cfgs:
   - Resources/SDFGameCS/testDetail1_cfg.txt
+  - Resources/SDFGameCS/testDetail1Scene_cfg.txt
   taskFile: Resources/SDFGameCS/Detail1_task.txt
 --- !u!1 &1075272834
 GameObject:

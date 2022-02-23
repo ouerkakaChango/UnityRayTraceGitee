@@ -93,7 +93,7 @@ public class AutoCS : MonoBehaviour
             //myProcess.StartInfo.FileName = Application.dataPath +"/CmdExe/AutoCS.exe";
             myProcess.StartInfo.FileName = "C:\\Personal\\ParticleToy\\x64\\Debug\\ParticleToy.exe";
             myProcess.StartInfo.WorkingDirectory = Application.dataPath + "/CmdExe";
-            //myProcess.StartInfo.Arguments = ;
+            myProcess.StartInfo.Arguments = Application.dataPath + "/" + taskFile;
             myProcess.EnableRaisingEvents = true;
             myProcess.Start();
             myProcess.WaitForExit();

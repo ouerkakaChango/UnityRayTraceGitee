@@ -4,6 +4,7 @@ using UnityEngine;
 using FastGeo;
 using Ray = FastGeo.Ray;
 using Debugger;
+using static StringTool.StringHelper;
 
 public class SDFGameSceneTrace : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     public string SceneName = "Detail1";
     public AutoCS autoCS;
-    public ComputeShader cs;
+    ComputeShader cs;
     public Texture2DArray envSpecTex2DArr;
     public Texture2D envBgTex;
 
@@ -197,12 +198,23 @@ public class SDFGameSceneTrace : MonoBehaviour
             rt.enableRandomWrite = true;
             rt.Create();
             //???
-            autoCS.InitOuts();
-            autoCS.outs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName +".compute");
-            //autoCS.cfgs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName + "_cfg.txt");
-            autoCS.Generate();
+            //autoCS.InitOuts();
+            //autoCS.outs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName +".compute");
+            //autoCS.outs[1] = autoCS.templates[1].Replace("Template.txt", "_" + SceneName + ".hlsl");
+            //autoCS.Generate();
+            var csResourcesPath = ChopEnd(autoCS.outs[0], ".compute");
+            csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
+            cs = (ComputeShader)Resources.Load(csResourcesPath);
         }
         hasInited = true;
+    }
+
+    public void RefreashAutoCS()
+    {
+        autoCS.InitOuts();
+        autoCS.outs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName +".compute");
+        autoCS.outs[1] = autoCS.templates[1].Replace("Template.txt", "_" + SceneName + ".hlsl");
+        autoCS.Generate();
     }
 
     void DoRender()

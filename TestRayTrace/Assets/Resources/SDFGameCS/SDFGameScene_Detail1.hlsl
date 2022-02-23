@@ -1,4 +1,4 @@
-﻿#define OBJNUM (@ObjNum)
+﻿#define OBJNUM 1
 
 #define MaxSDF 100000
 #define MaxTraceDis 10
