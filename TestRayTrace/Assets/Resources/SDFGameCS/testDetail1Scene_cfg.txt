@@ -1,1 +1,90 @@
+valMaps:
 ObjNum 1
+
+Blocks:
+###BLOCK ObjMaterial
+	if (obj == 0)
+	{		
+        re.albedo = float3(0,1,0);
+		re.metallic = 0.1f;
+		re.roughness = 0.8f;
+	}
+###BLOCK
+
+###BLOCK  ObjRender
+if(minHit.obj==0)
+//{
+//	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
+//}
+//else if (minHit.obj == 1)
+{
+	float3 lightDir = normalize(float3(1, -1, 1));
+	float3 lightColor = float3(1, 1, 1) * 3.5;
+	return PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
+}
+###BLOCK
+
+###BLOCK SDFShadow
+//float3 lightDir = normalize(float3(1, -1, 1));
+//ray.pos = minHit.P;
+//ray.dir = -lightDir;
+//ray.pos += SceneSDFShadowNormalBias * minHit.N;
+//HitInfo hitInfo;
+//return HardShadow_TraceScene(ray, hitInfo);
+return 1;
+###BLOCK
+
+###BLOCK ExtraSDF
+//float SDFFoTou(float3 p)
+//{
+//	float re = 0;
+//	float r = 10.45 + 0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+//	float3 center = float3(0, 0.5, 0);
+//	re = length(p - center) - r;
+//	re *= 0.5f;
+//	return re;
+//}
+float SDFPlanet(float3 p)
+{
+	float re = 0;
+	float r = 0.48;// +0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+	float dis = fbm4(p.zxy*10);
+	r += 0.02*smoothstep(0.5f, 1.0f, dis);
+	float3 center = float3(0, r, 0);
+	 
+	re = length(p - center) - r;
+	re *= 0.5f;
+	return re;
+}
+//float3 SDFPlanetNormal(float3 p);
+###BLOCK
+
+###BLOCK ObjSDF
+if (inx == 0)
+{
+	return SDFSphere(p, float3(0, 0.5, 0), 0.5); //球
+	//return SDFPlanet(p);
+}
+//else if (inx == 1)
+//{//地面
+//	//box center(0, -1.2, -5), bound(5, 0.1, 5)
+//	return SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5));
+//}
+else
+{
+	return -1;
+}
+###BLOCK
+
+###BLOCK ObjNormal
+if (inx == 0)
+{
+	//return SDFSphereNormal(p, float3(0, 0.5, 0));
+	//return SDFPlanetNormal(p);
+	return GetObjSDFNormal(inx, p);
+}
+else
+{
+	return GetObjSDFNormal(inx, p);
+}
+###BLOCK

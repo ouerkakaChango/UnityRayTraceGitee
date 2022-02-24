@@ -89,15 +89,17 @@ public class AutoCS : MonoBehaviour
             myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             myProcess.StartInfo.CreateNoWindow = true;
             myProcess.StartInfo.UseShellExecute = false;
-            //???
-            //myProcess.StartInfo.FileName = Application.dataPath +"/CmdExe/AutoCS.exe";
-            myProcess.StartInfo.FileName = "C:\\Personal\\ParticleToy\\x64\\Debug\\ParticleToy.exe";
+            //??? 测试阶段
+            {
+                //myProcess.StartInfo.FileName = Application.dataPath +"/CmdExe/AutoCS.exe";
+                myProcess.StartInfo.FileName = "C:\\Personal\\ParticleToy\\x64\\Debug\\ParticleToy.exe";
+            }
             myProcess.StartInfo.WorkingDirectory = Application.dataPath + "/CmdExe";
             myProcess.StartInfo.Arguments = Application.dataPath + "/" + taskFile;
             myProcess.EnableRaisingEvents = true;
             myProcess.Start();
             myProcess.WaitForExit();
-            UnityEngine.Debug.Log("exe已经运行关闭了");
+            UnityEngine.Debug.Log("AutoCS已经运行关闭了");
             int ExitCode = myProcess.ExitCode;
             print(ExitCode);
         }

@@ -39,9 +39,9 @@ float3 GetSDFGameColor(in Ray ray)
 	//___Trace
 
 	if (minHit.bHit)
-	{ 
+	{
 		re = RenderSceneObj(envSpecTex2DArr, ray, minHit);
-		//re *= RenderSceneSDFShadow(ray, minHit);
+		re *= RenderSceneSDFShadow(ray, minHit);
 	}
 	else
 	{

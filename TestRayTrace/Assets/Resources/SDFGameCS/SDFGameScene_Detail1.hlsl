@@ -22,9 +22,10 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	re.roughness = 0.8f;
 
 	if (obj == 0)
-	{
-		re.metallic = 1.0f;
-		re.roughness = 0.0f;
+	{		
+re.albedo = float3(0,1,0);
+		re.metallic = 0.1f;
+		re.roughness = 0.8f;
 	}
 	return re;
 }
@@ -32,16 +33,17 @@ Material_PBR GetObjMaterial_PBR(int obj)
 float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 {
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
-	if(minHit.obj==0)
-	{
-		return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
-	}
-	//else if (minHit.obj == 1)
-	//{
-	//	float3 lightDir = normalize(float3(1, -1, 1));
-	//	float3 lightColor = float3(1, 1, 1) * 3.5;
-	//	return PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
-	//}
+
+if(minHit.obj==0)
+//{
+//	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
+//}
+//else if (minHit.obj == 1)
+{
+	float3 lightDir = normalize(float3(1, -1, 1));
+	float3 lightColor = float3(1, 1, 1) * 3.5;
+	return PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
+}
 	return 0;
 }
 
@@ -49,13 +51,13 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info);
 float SoftShadow_TraceScene(Ray ray, out HitInfo info);
 float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 {
-	float3 lightDir = normalize(float3(1, -1, 1));
-	ray.pos = minHit.P;
-	ray.dir = -lightDir;
-	ray.pos += SceneSDFShadowNormalBias * minHit.N;
-	HitInfo hitInfo;
-	return HardShadow_TraceScene(ray, hitInfo);
-	//return 1;
+//float3 lightDir = normalize(float3(1, -1, 1));
+//ray.pos = minHit.P;
+//ray.dir = -lightDir;
+//ray.pos += SceneSDFShadowNormalBias * minHit.N;
+//HitInfo hitInfo;
+//return HardShadow_TraceScene(ray, hitInfo);
+return 1;
 }
 
 //###################################################################################
@@ -73,7 +75,6 @@ float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 //	re *= 0.5f;
 //	return re;
 //}
-
 float SDFPlanet(float3 p)
 {
 	float re = 0;
@@ -81,30 +82,29 @@ float SDFPlanet(float3 p)
 	float dis = fbm4(p.zxy*10);
 	r += 0.02*smoothstep(0.5f, 1.0f, dis);
 	float3 center = float3(0, r, 0);
-	 
+	
 	re = length(p - center) - r;
 	re *= 0.5f;
 	return re;
 }
-
 //float3 SDFPlanetNormal(float3 p);
 
 float GetObjSDF(int inx, float3 p)
 {
-	if (inx == 0)
-	{
-		return SDFSphere(p, float3(0, 0.5, 0), 0.5); //球
-		//return SDFPlanet(p);
-	}
-	//else if (inx == 1)
-	//{//地面
-	//	//box center(0, -1.2, -5), bound(5, 0.1, 5)
-	//	return SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5));
-	//}
-	else
-	{
-		return -1;
-	}
+if (inx == 0)
+{
+	return SDFSphere(p, float3(0, 0.5, 0), 0.5); //球
+	//return SDFPlanet(p);
+}
+//else if (inx == 1)
+//{//地面
+//	//box center(0, -1.2, -5), bound(5, 0.1, 5)
+//	return SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5));
+//}
+else
+{
+	return -1;
+}
 }
 
 float3 GetObjSDFNormal(int inx, float3 p)
@@ -118,16 +118,16 @@ float3 GetObjSDFNormal(int inx, float3 p)
 
 float3 GetObjNormal(int inx, float3 p)
 {
-	if (inx == 0)
-	{
-		//return SDFSphereNormal(p, float3(0, 0.5, 0));
-		//return SDFPlanetNormal(p);
-		return GetObjSDFNormal(inx, p);
-	}
-	else
-	{
-		return GetObjSDFNormal(inx, p);
-	}
+if (inx == 0)
+{
+	//return SDFSphereNormal(p, float3(0, 0.5, 0));
+	//return SDFPlanetNormal(p);
+	return GetObjSDFNormal(inx, p);
+}
+else
+{
+	return GetObjSDFNormal(inx, p);
+}
 }
 
 
