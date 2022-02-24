@@ -6,6 +6,7 @@ using Ray = FastGeo.Ray;
 using Debugger;
 using static StringTool.StringHelper;
 
+[ExecuteInEditMode]
 public class SDFGameSceneTrace : MonoBehaviour
 {
     struct MeshInfo
@@ -44,10 +45,17 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     void Start()
     {
-        UpdateCamParam();
-
-        Co_GoIter = GoIter();
-        StartCoroutine(Co_GoIter);
+        if (Application.isEditor && !Application.isPlaying)
+        {
+            //do what you want
+            RefreashAutoCS();
+        }
+        else
+        {
+            UpdateCamParam();
+            Co_GoIter = GoIter();
+            StartCoroutine(Co_GoIter);
+        }
     }
 
     float daoSpeed = 20.0f;

@@ -7,6 +7,7 @@ using UnityEngine;
 using static StringTool.StringHelper;
 using Debug = UnityEngine.Debug;
 
+//[ExecuteInEditMode]
 public class AutoCS : MonoBehaviour
 {
     //public string WorkingDirectory = "CmdExe";
@@ -17,9 +18,15 @@ public class AutoCS : MonoBehaviour
 
     public string taskFile;
 
+    private void Awake()
+    {
+        //Generate();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        //Generate();
     }
 
     // Update is called once per frame
