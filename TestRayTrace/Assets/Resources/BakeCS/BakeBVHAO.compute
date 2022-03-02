@@ -1,0 +1,70 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel BakeBVHShadow
+
+#include "../../HLSL/RayMath.hlsl"
+#include "../../HLSL/Random/RandUtility.hlsl"
+#include "../../HLSL/BVH/BVHCommonDef.hlsl"
+
+#include "../../HLSL/SDFGame/SDFCommonDef.hlsl"
+
+RWTexture2D<float4> Result;
+
+StructuredBuffer<int> tris;
+StructuredBuffer<float3> vertices;
+StructuredBuffer<float3> normals;
+StructuredBuffer<BVHNode> bvh;
+const int treeDepth;
+
+float darkPower;
+int SPP;
+
+float2 quadSize;
+float3 quadPos;
+float3 lightDir;
+
+//#########################################################################################################
+[numthreads(8, 8, 1)]
+void BakeBVHShadow(uint3 id : SV_DispatchThreadID)
+{
+	//Result[id.xy] = float4(0,1,0, 1);
+
+	float3 re = 1;
+
+	float w, h;
+	Result.GetDimensions(w, h);
+	float3 shadowUnit = float3(quadSize.x/w, 0, quadSize.y/h);
+	float3 pos = quadPos - 0.5f*float3(quadSize.x,0.0, quadSize.y) + float3(id.x, 0, id.y)*shadowUnit;
+	
+	HitInfo info;
+	
+	float sum = 0;
+	float3 L = normalize(-lightDir);
+
+	Ray ray;
+	ray.pos = pos;
+	ray.dir = L;
+
+	for (int i = 0; i < SPP; i++)
+	{
+		float3 seed = float3(id.x, id.y, i);
+		Ray sampleRay;
+
+		//https://www.cnblogs.com/yunlambert/p/10161339.html
+		sampleRay.pos = ray.pos;
+		sampleRay.dir = randP_round(seed);
+		info = BVHTraceLocalRay(sampleRay,
+			treeDepth, bvh,
+			tris,
+			vertices,
+			normals
+		);
+		
+		sum += 1-info.bHit;
+	}
+	sum /= SPP;
+
+	re = sum;
+	re = pow(re, darkPower);
+	Result[id.xy] = float4(re, 1);
+}
+//#########################################################################################################

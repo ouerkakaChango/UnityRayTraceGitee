@@ -54,6 +54,7 @@ void BakeBVHShadow(uint3 id : SV_DispatchThreadID)
 		//https://www.cnblogs.com/yunlambert/p/10161339.html
 		sampleRay.pos = ray.pos + float3(r*cos(theta),0,r*sin(theta));
 		sampleRay.dir = L;
+		//sampleRay.dir = randP_round(seed);
 		info = BVHTraceLocalRay(sampleRay,
 			treeDepth, bvh,
 			tris,
@@ -66,6 +67,7 @@ void BakeBVHShadow(uint3 id : SV_DispatchThreadID)
 	sum /= SPP;
 
 	re = sum;
+
 	Result[id.xy] = float4(re, 1);
 }
 //#########################################################################################################
