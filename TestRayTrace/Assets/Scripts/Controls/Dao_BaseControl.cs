@@ -71,7 +71,14 @@ public class Dao_BaseControl : MonoBehaviour
     float GetDaoScale()
     {
         var daoComp = GetComponent<SDFGameSceneTrace>();
-        return daoComp.GetDaoScale();
+        if (daoComp == null)
+        {
+            return GetComponent<SDFGameTrace>().GetDaoScale();
+        }
+        else
+        {
+            return daoComp.GetDaoScale();
+        }
     }
 
     void CheckDaoCollision(ref float rightMove, ref float forwardMove)
