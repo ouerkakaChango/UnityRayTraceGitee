@@ -1,7 +1,8 @@
 #ifndef COMMONDEF_HLSL
 #define COMMONDEF_HLSL
 
-#define PI 3.14159f
+#define PI 3.14159
+#define TWOPI 6.2831853
 #define MAXFLOAT 3.402823e38
 
 struct Ray
@@ -170,4 +171,8 @@ uint2 GetSize(Texture2D<float4> dst)
 	return size;
 }
 
+float Time01()
+{
+	return 0.5*(sin(_Time.y) + 1);
+}
 #endif

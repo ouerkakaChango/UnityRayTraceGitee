@@ -65,7 +65,7 @@ void F3(Ray ray, out HitInfo info,
 	in Grid grid, in StructuredBuffer<float> sdfArr)
 {
 	Init(info);
-	SDFTraceSphere(ray, info, float3(0, 0.5, 0), 0.5);
+	FastSDFTraceSphere(ray, info, float3(0, 0.5, 0), 0.5);
 }
 
 void F4(Ray ray, out HitInfo info,

@@ -1,12 +1,23 @@
 ﻿#ifndef SDFCOMMONDEF_HLSL
 #define SDFCOMMONDEF_HLSL
 
-#define Def_MAXSDFTraceCount 256
-#define Def_SDFTraceThre 0.001
+#define Fast_MAXSDFTraceCount 256
+#define Fast_SDFTraceThre 0.001
+
+#include "../Transform/TransformCommonDef.hlsl"
 
 float SDFBox(float3 p, float3 center, float3 bound)
 {
 	float3 q = abs(p - center) - bound;
+	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+float SDFBoxTransform(float3 p, float3 bound,
+	float3 center, float3 rotEuler, float3 scale)
+{
+	p = p - center;
+	p = RotByEuler(p,rotEuler);
+	float3 q = abs(p) - bound * scale;
 	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
 
@@ -20,18 +31,18 @@ float3 SDFSphereNormal(float3 p, float3 center)
 	return normalize(p - center);
 }
 
-void SDFTraceSphere(Ray ray, out HitInfo info
+void FastSDFTraceSphere(Ray ray, out HitInfo info
 	, float3 center, float radius)
 {
 	Init(info);
 
 	int traceCount = 0;
-	while (traceCount <= Def_MAXSDFTraceCount)
+	while (traceCount <= Fast_MAXSDFTraceCount)
 	{
 		//get sdf at now pos
 		float sdf = SDFSphere(ray.pos, center, radius);
 
-		if (sdf <= Def_SDFTraceThre)
+		if (sdf <= Fast_SDFTraceThre)
 		{
 			info.bHit = true;
 			//!!!

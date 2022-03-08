@@ -1,7 +1,7 @@
-﻿#define OBJNUM 1
+﻿#define OBJNUM 2
 
 #define MaxSDF 100000
-#define MaxTraceDis 10
+#define MaxTraceDis 1000
 #define MaxTraceTime 640
 #define TraceThre 0.001
 #define NormalEpsilon 0.0001
@@ -23,7 +23,13 @@ Material_PBR GetObjMaterial_PBR(int obj)
 
 	if (obj == 0)
 	{		
-re.albedo = float3(0,1,0);
+re.albedo = float3(0, 1 ,0);
+		re.metallic = 0.1f;
+		re.roughness = 0.8f;
+	}
+	else if (obj == 1)
+	{		
+re.albedo = 0.5f;
 		re.metallic = 0.1f;
 		re.roughness = 0.8f;
 	}
@@ -34,7 +40,7 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 {
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
 
-if(minHit.obj==0)
+//if(minHit.obj==0)
 //{
 //	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
 //}
@@ -96,11 +102,13 @@ if (inx == 0)
 	return SDFSphere(p, float3(0, 0.5, 0), 0.5); //球
 	//return SDFPlanet(p);
 }
-//else if (inx == 1)
-//{//地面
-//	//box center(0, -1.2, -5), bound(5, 0.1, 5)
-//	return SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5));
-//}
+else if (inx == 1)
+{//地面
+	//box center(0, -1.2, -5), bound(5, 0.1, 5)
+	//return SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5));
+	return SDFBoxTransform(p, float3(5, 0.5, 5),
+		float3(0, -0.5, 0), float3(0*Time01(),0*Time01(),0*Time01()), float3(1,1,1));
+}
 else
 {
 	return -1;
