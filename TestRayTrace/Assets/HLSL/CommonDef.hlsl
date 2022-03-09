@@ -5,6 +5,8 @@
 #define TWOPI 6.2831853
 #define MAXFLOAT 3.402823e38
 
+#include "UnityCommonDef.hlsl"
+
 struct Ray
 {
 	float3 pos;

@@ -15,4 +15,15 @@ float3 RotByEuler(float3 p, float3 eulerAngle)
 	return mul(rotM, p);
 }
 
+//https://www.gatevidyalay.com/3d-shearing-in-computer-graphics-definition-examples/#:~:text=in%20Computer%20Graphics%2D-,In%20Computer%20graphics%2C,as%20well%20as%20Z%20direction.
+float3 ShearX(float3 p, float shy, float shz)
+{
+	float3x3 m = {
+		1,0,0,
+		shy,1,0,
+		shz,0,1
+	};
+	return mul(m, p);
+}
+
 #endif

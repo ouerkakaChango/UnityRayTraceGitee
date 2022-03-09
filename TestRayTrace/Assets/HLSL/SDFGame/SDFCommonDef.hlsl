@@ -13,10 +13,10 @@ float SDFBox(float3 p, float3 center, float3 bound)
 }
 
 float SDFBoxTransform(float3 p, float3 bound,
-	float3 center, float3 rotEuler, float3 scale)
+	float3 center, float3 rotEuler=0, float3 scale=1)
 {
 	p = p - center;
-	p = RotByEuler(p,rotEuler);
+	p = RotByEuler(p,-rotEuler);
 	float3 q = abs(p) - bound * scale;
 	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
