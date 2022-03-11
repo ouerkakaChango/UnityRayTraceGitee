@@ -31,6 +31,28 @@ float3 SDFSphereNormal(float3 p, float3 center)
 	return normalize(p - center);
 }
 
+float SDFShearXBoxTransform(float3 p, float3 bound,
+	float shy, float shz,
+	float3 center, float3 rotEuler = 0, float3 scale = 1)
+{
+	bound *= scale;
+	float3 vec = p - center;
+	float3 shp = ShearX(vec, -shy, -shz);
+	p = RotByEuler(shp, rotEuler);
+	float3 q = abs(p) - bound;
+	float re = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+	return re * sin(atan(1 / shz))* sin(atan(1 / shy));
+}
+
+float SDFShearXSphere(float3 p, float3 center, float radius,
+	float shy, float shz)
+{
+	p = p - center;
+	p = ShearX(p, -shy, -shz);
+	float re = length(p) - radius;
+	return re * sin(atan(1 / shz))* sin(atan(1 / shy));
+}
+
 void FastSDFTraceSphere(Ray ray, out HitInfo info
 	, float3 center, float radius)
 {

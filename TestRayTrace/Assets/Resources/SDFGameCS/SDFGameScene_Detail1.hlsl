@@ -94,32 +94,11 @@ float SDFPlanet(float3 p)
 	return re;
 }
 
-float SDFShearXBoxTransform(float3 p,float3 bound,
-	float shy,float shz,
-	float3 center, float3 rotEuler=0, float3 scale=1)
-{
-	bound *= scale;
-	float3 vec = p - center;
-	float3 shp = ShearX(vec,-shy,-shz);
-	p = RotByEuler(shp,rotEuler);
-	float3 q = abs(p) - bound;
-	float re = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
-	return re * sin(atan(1/shz))* sin(atan(1/shy));
-}
-
-float SDFShearSphere(float3 p, float3 center, float radius,
-					float shy, float shz)
-{
-	p = p-center;
-	p = ShearX(p,-shy,-shz);
-	return length(p) - radius;
-}
-
 float GetObjSDF(int inx, float3 p)
 {
 if (inx == 0)
 {
-	return SDFSphere(p, float3(3, 0.5, 0), 0.5); //球
+	return SDFSphere(p, float3(0, 0.5, 0), 0.5); //球
 	//return SDFPlanet(p);
 }
 else if (inx == 1)
@@ -129,11 +108,11 @@ else if (inx == 1)
 	//return SDFBoxTransform(p, float3(5, 0.5, 5),
 	//	float3(0, -0.5, 0),float3(0,0,30*Time01()));
 
-	return SDFShearXBoxTransform(p, float3(5, 0.5, 5),
-		0,2,
-		float3(0, -0.5, 0));
+	//return SDFShearXBoxTransform(p, float3(5, 0.5, 5),
+	//	0,0,
+	//	float3(0, -0.5, 0));
 
-	//return SDFShearSphere(p, float3(0, 0, 0), 0.5,
+	//return SDFShearXSphere(p, float3(0, 0, 0), 0.5,
 	//					0,1*Time01());
 }
 else
