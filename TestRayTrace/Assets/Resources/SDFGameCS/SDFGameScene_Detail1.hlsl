@@ -112,8 +112,8 @@ else if (inx == 1)
 	//	0,0,
 	//	float3(0, -0.5, 0));
 
-	//return SDFShearXSphere(p, float3(0, 0, 0), 0.5,
-	//					0,1*Time01());
+	return SDFShearXSphere(p, float3(0, 0, 0), 0.5,
+						0,1*Time01());
 }
 else
 {

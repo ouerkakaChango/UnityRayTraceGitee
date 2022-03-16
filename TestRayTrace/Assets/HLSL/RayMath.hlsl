@@ -76,7 +76,14 @@ float RayCastPlane(Ray ray, Plane plane)
 	float dd = dot(ray.dir, plane.n);
 	if (NearZero(dd))
 	{
-		return -12345.0f;
+		if (NearZero(dot(ray.pos - plane.p, plane.n)))
+		{//rayPos is in plane,consider ray dis is 0
+			return 0;
+		}
+		else 
+		{//not cast,infinite intersection
+			return -12345;
+		}
 	}
 	return -dot(ray.pos - plane.p, plane.n) / dd;
 }
