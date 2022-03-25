@@ -7,10 +7,12 @@ public class MaterialDebugger : MonoBehaviour
 {
     public MaterialReplaceTool replaceTool;
     public MaterialSlotReplaceTool slotReplaceTool;
+    public IterativeMaterialReplaceTool iterReplaceTool;
     List<Material> oriMats = new List<Material>();
     public List<Material> oriSlots = new List<Material>();
     bool bNewMat = false;
     bool bNewMatSlot = false;
+    bool bNewMatIter = false;
     void Start()
     {
         if (replaceTool)
@@ -58,6 +60,14 @@ public class MaterialDebugger : MonoBehaviour
                 ToggleMatSlot();
             }
         }
+
+        if (iterReplaceTool)
+        {
+            if (GUI.Button(new Rect(Screen.width * 0.1f, Screen.height * 0.1f * 3, Screen.width * 0.1f, Screen.height * 0.1f), "toggleMatIterative"))
+            {
+                ToggleMatIterative();
+            }
+        }
     }
     //#################################################################
     void ToggleMat()
@@ -84,5 +94,18 @@ public class MaterialDebugger : MonoBehaviour
             slotReplaceTool.DoReplace();
         }
         bNewMatSlot = !bNewMatSlot;
+    }
+
+    void ToggleMatIterative()
+    {
+        if (bNewMatIter)
+        {
+            iterReplaceTool.DoReverseReplace();
+        }
+        else
+        {
+            iterReplaceTool.DoReplace();
+        }
+        bNewMatIter = !bNewMatIter;
     }
 }

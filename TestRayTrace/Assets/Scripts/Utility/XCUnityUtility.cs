@@ -74,5 +74,17 @@ namespace XCUnityUtility
                 return null;
             }
         }
+
+        public static void SafeReplaceMaterial(GameObject obj, Material oldm, Material newm)
+        {
+            var mr = obj.GetComponent<MeshRenderer>();
+            if (mr)
+            {
+                if(mr.sharedMaterial == oldm)
+                {
+                    mr.sharedMaterial = newm;
+                }
+            }
+        }
     }
 }
