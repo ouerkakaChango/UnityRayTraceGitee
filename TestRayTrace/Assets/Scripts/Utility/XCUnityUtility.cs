@@ -27,5 +27,52 @@ namespace XCUnityUtility
                 return null;
             }
         }
+
+        public static bool CheckSlot(Material[] mats, int slot)
+        {
+            if (slot >= mats.Length)
+            {
+                Debug.LogError("Mat Slot too big");
+                return false;
+            }
+            else if (slot < 0)
+            {
+                Debug.LogError("Mat Slot neg");
+                return false;
+            }
+            return true;
+        }
+
+        public static void SafeSetMaterialSlot(GameObject obj, int slot, Material mat)
+        {
+            var mr = obj.GetComponent<MeshRenderer>();
+            if (mr)
+            {
+                if (!CheckSlot(mr.sharedMaterials,slot))
+                {
+                    return;
+                }
+                var mats = mr.sharedMaterials;
+                mats[slot] = mat;
+                mr.sharedMaterials = mats;
+            }
+        }
+
+        public static Material SafeGetMaterialSlot(GameObject obj, int slot)
+        {
+            var mr = obj.GetComponent<MeshRenderer>();
+            if (mr)
+            {
+                if (!CheckSlot(mr.sharedMaterials, slot))
+                {
+                    return null;
+                }
+                return mr.sharedMaterials[slot];
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

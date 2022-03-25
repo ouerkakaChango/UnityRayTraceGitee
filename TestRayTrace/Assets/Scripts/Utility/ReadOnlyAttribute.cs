@@ -1,13 +1,17 @@
-using UnityEditor;
+
 using UnityEngine;
+#if (UNITY_EDITOR)
+using UnityEditor;
+#endif
 
 namespace XUtility
 {
+
     /// <summary>
     /// 只读特性功能类
     /// </summary>
     public class ReadOnlyAttribute : PropertyAttribute { }
-
+#if (UNITY_EDITOR)
     /// <summary>
     /// 面板绘制
     /// </summary>
@@ -38,4 +42,5 @@ namespace XUtility
             GUI.enabled = true;
         }
     }
+#endif
 }
