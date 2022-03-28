@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static XCUnityUtility.MaterialFuncs;
+using static MaterialUtility.MaterialFuncs;
+using static DebugUtility.DebuggerFuns;
 
 public class MaterialDebugger : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class MaterialDebugger : MonoBehaviour
     public MaterialSlotReplaceTool slotReplaceTool;
     public IterativeMaterialReplaceTool iterReplaceTool;
     List<Material> oriMats = new List<Material>();
-    public List<Material> oriSlots = new List<Material>();
+    List<Material> oriSlots = new List<Material>();
     bool bNewMat = false;
     bool bNewMatSlot = false;
     bool bNewMatIter = false;
@@ -45,9 +46,12 @@ public class MaterialDebugger : MonoBehaviour
 
     private void OnGUI()
     {
+        Vector2Int screenSize = GetRenderSize(gameObject);
+
+        RenderTexture.active = null;
         if (replaceTool)
         {
-            if (GUI.Button(new Rect(Screen.width * 0.1f, Screen.height * 0.1f, Screen.width * 0.1f, Screen.height * 0.1f), "toggleMat"))
+            if (GUI.Button(new Rect(screenSize.x * 0.1f, screenSize.y * 0.1f, screenSize.x * 0.1f, screenSize.y * 0.1f), "toggleMat"))
             {
                 ToggleMat();
             }
@@ -55,7 +59,7 @@ public class MaterialDebugger : MonoBehaviour
 
         if (slotReplaceTool)
         {
-            if (GUI.Button(new Rect(Screen.width * 0.1f, Screen.height * 0.1f*2, Screen.width * 0.1f, Screen.height * 0.1f), "toggleMatSlot"))
+            if (GUI.Button(new Rect(screenSize.x * 0.1f, screenSize.y * 0.1f*2, screenSize.x * 0.1f, screenSize.y * 0.1f), "toggleMatSlot"))
             {
                 ToggleMatSlot();
             }
@@ -63,7 +67,7 @@ public class MaterialDebugger : MonoBehaviour
 
         if (iterReplaceTool)
         {
-            if (GUI.Button(new Rect(Screen.width * 0.1f, Screen.height * 0.1f * 3, Screen.width * 0.1f, Screen.height * 0.1f), "toggleMatIterative"))
+            if (GUI.Button(new Rect(screenSize.x * 0.1f, screenSize.y * 0.1f * 3, screenSize.x * 0.1f, screenSize.y * 0.1f), "toggleMatIterative"))
             {
                 ToggleMatIterative();
             }

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static XCUnityUtility.MaterialFuncs;
+using static MaterialUtility.MaterialFuncs;
 
 [System.Serializable]
 public struct IterMatReplace
