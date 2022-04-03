@@ -1,11 +1,11 @@
 templates:
-C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/CS_SDFGameTemplate.txt
-C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/SDFGameSceneTemplate.txt
+D:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/CS_SDFGameTemplate.txt
+D:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/SDFGameSceneTemplate.txt
 
 outs:
-C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/CS_SDFGame_Detail1.compute
-C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/SDFGameScene_Detail1.hlsl
+D:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/CS_SDFGame_Detail1.compute
+D:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/SDFGameScene_Detail1.hlsl
 
 configs:
-C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/testDetail1_cfg.txt
-C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/testDetail1Scene_cfg.txt
+D:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/testDetail1_cfg.txt
+D:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/testDetail1Scene_cfg.txt

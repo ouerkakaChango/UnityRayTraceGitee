@@ -41,7 +41,26 @@ float SDFShearXBoxTransform(float3 p, float3 bound,
 	p = RotByEuler(shp, rotEuler);
 	float3 q = abs(p) - bound;
 	float re = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
-	return re * sin(atan(1 / shz))* sin(atan(1 / shy));
+	if (NearZero(shz)&& NearZero(shy))
+	{
+		return re;
+	}
+	else if (NearZero(shz))
+	{
+		float tanY = abs(shy > 0 ? (1 / shz) : (shy));
+		return re * sin(atan(tanY));
+	}
+	else if (NearZero(shy))
+	{
+		float tanZ = abs(shz > 0 ? (1 / shz) : (shz));
+		return re * sin(atan(tanZ));
+	}
+	else
+	{
+		float tanY = abs(shy > 0 ? (1 / shz) : (shy));
+		float tanZ = abs(shz > 0 ? (1 / shz) : (shz));
+		return re * sin(atan(tanZ)) * sin(atan(tanY));
+	}
 }
 
 float SDFShearXSphere(float3 p, float3 center, float radius,
