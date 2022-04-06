@@ -94,6 +94,16 @@ float SDFPlanet(float3 p)
 	return re;
 }
 
+float3 opCheapBend( in float3 p )
+{
+const float k = 0.2; // or some other amount
+float c = cos(k*p.x);
+float s = sin(k*p.x);
+float2x2 m = float2x2(c,-s,s,c);
+float3 q = float3(mul(m,p.xz),p.y);
+return q;
+}
+
 float GetObjSDF(int inx, float3 p)
 {
 if (inx == 0)
@@ -115,18 +125,25 @@ else if (inx == 1)
 	//return SDFShearXSphere(p, float3(0, 0, 0), 0.5,
 	//					0,1*Time01());
 
-	float a1 = SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),
-		0, 0.3,
-		float3(0, -0.5, -1.5));
+	//### A
+	//float a1 = SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),
+	//	0, 0.3,
+	//	float3(0, -0.5, -1.5));
+	//
+	//float a2 = SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),
+	//	0, -0.3,
+	//	float3(0, -0.5, 1.5));
+	//
+	//float a3 = SDFBox(p, float3(-1.5, -0.5, 0), float3(0.4, 0.5, 2));
+	//
+	//float re = min(a1,a2);
+	//re = min(re,a3);
 
-	float a2 = SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),
-		0, -0.3,
-		float3(0, -0.5, 1.5));
+	//###
+	float3 q = opCheapBend(p);
+	float a1 = SDFBox(q, float3(0, -0.5, 0), float3(5, 0.5, 1));
 
-	float a3 = SDFBox(p, float3(-1.5, -0.5, 0), float3(0.4, 0.5, 2));
-
-	float re = min(a1,a2);
-	re = min(re,a3);
+	float re = a1;
 	return re;
 }
 else

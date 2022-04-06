@@ -69,7 +69,26 @@ float SDFShearXSphere(float3 p, float3 center, float radius,
 	p = p - center;
 	p = ShearX(p, -shy, -shz);
 	float re = length(p) - radius;
-	return re * sin(atan(1 / shz))* sin(atan(1 / shy));
+	if (NearZero(shz) && NearZero(shy))
+	{
+		return re;
+	}
+	else if (NearZero(shz))
+	{
+		float tanY = abs(shy > 0 ? (1 / shz) : (shy));
+		return re * sin(atan(tanY));
+	}
+	else if (NearZero(shy))
+	{
+		float tanZ = abs(shz > 0 ? (1 / shz) : (shz));
+		return re * sin(atan(tanZ));
+	}
+	else
+	{
+		float tanY = abs(shy > 0 ? (1 / shz) : (shy));
+		float tanZ = abs(shz > 0 ? (1 / shz) : (shz));
+		return re * sin(atan(tanZ)) * sin(atan(tanY));
+	}
 }
 
 void FastSDFTraceSphere(Ray ray, out HitInfo info
