@@ -94,14 +94,40 @@ float SDFPlanet(float3 p)
 	return re;
 }
 
-float3 opCheapBend( in float3 p )
+float dd(float2 x)
 {
-const float k = 0.2; // or some other amount
-float c = cos(k*p.x);
-float s = sin(k*p.x);
-float2x2 m = float2x2(c,-s,s,c);
-float3 q = float3(mul(m,p.xz),p.y);
-return q;
+	return dot(x,x);
+}
+
+float addv(float2 a) { return a.x + a.y; }
+
+float2 solveCubic2(float3 a)
+{
+	float p = a.y-a.x*a.x/3.;
+	float p3 = p*p*p;
+	float q = a.x*(2.*a.x*a.x-9.*a.y)/27.+a.z;
+	float d = q*q+4.*p3/27.;
+	if(d>.0)
+	{
+		float2 x = (float2(1,-1)*sqrt(d)-q)*.5;
+		float tt = addv(sign(x)*pow(abs(x),float2(1/3.0,1/3.0)))-a.x/3.0;
+		return float2(tt,tt);
+	}
+	float v = acos(-sqrt(-27./p3)*q*.5)/3.;
+	float m = cos(v);
+	float n = sin(v)*1.732050808;
+	return float2(m+m,-n-m)*sqrt(-p/3.)-a.x/3.;
+}
+
+float calculateDistanceToQuadraticBezier(float2 p, float2 a, float2 b, float2 c)
+{
+	b += lerp(float2(1e-4,1e-4),float2(0,0),abs(sign(b*2.0-a-c)));
+	float2 A = b-a;
+	float2 B = c-b-A;
+	float2 C = p-a;
+	float2 D = A*2.;
+	float2 T = clamp((solveCubic2(float3(-3.*dot(A,B),dot(C,B)-2.*dd(A),dot(C,A))/-dd(B))),0.,1.);
+	return sqrt(min(dd(C-(D+B*T.x)*T.x),dd(C-(D+B*T.y)*T.y)));
 }
 
 float GetObjSDF(int inx, float3 p)
@@ -140,10 +166,7 @@ else if (inx == 1)
 	//re = min(re,a3);
 
 	//###
-	float3 q = opCheapBend(p);
-	float a1 = SDFBox(q, float3(0, -0.5, 0), float3(5, 0.5, 1));
-
-	float re = a1;
+	float re = -0.1+calculateDistanceToQuadraticBezier(p.xz, float2(1.65,-0.57), float2(1,1.3),float2(0.18,-0.61));
 	return re;
 }
 else
