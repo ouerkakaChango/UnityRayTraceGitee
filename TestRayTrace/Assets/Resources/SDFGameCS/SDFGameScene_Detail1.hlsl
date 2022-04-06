@@ -115,15 +115,19 @@ else if (inx == 1)
 	//return SDFShearXSphere(p, float3(0, 0, 0), 0.5,
 	//					0,1*Time01());
 
-	float a1 = SDFShearXBoxTransform(p, float3(5, 0.5, 1),
-		0, 0.5,
-		float3(0, -0.5, 0));
+	float a1 = SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),
+		0, 0.3,
+		float3(0, -0.5, -1.5));
 
-	float a2 = SDFShearXBoxTransform(p, float3(5, 0.5, 1),
-		0, -0.5,
-		float3(0, -0.5, 0));
+	float a2 = SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),
+		0, -0.3,
+		float3(0, -0.5, 1.5));
 
-	return min(a1,a2);
+	float a3 = SDFBox(p, float3(-1.5, -0.5, 0), float3(0.4, 0.5, 2));
+
+	float re = min(a1,a2);
+	re = min(re,a3);
+	return re;
 }
 else
 {
