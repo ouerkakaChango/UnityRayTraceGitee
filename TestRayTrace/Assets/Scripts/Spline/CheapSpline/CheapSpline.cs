@@ -38,26 +38,54 @@ namespace Spline
         //https://blog.csdn.net/zl908760230/article/details/53967828
         public Vector3 GetPnt(float t)
         {
-            if(type == CheapSplineType.XZ)
+            if(keyPnts.Count<3)
             {
                 //???
-                int segInx1 = 0;
-                return GetPntXZ(t, segInx1);
+                return new Vector3(0, 0, 0);
+            }
+            if(type == CheapSplineType.XZ)
+            {
+                float unit = 1.0f / (keyPnts.Count-1);
+                float twounit = 2.0f * unit;
+                if(t<unit)
+                {//Í·
+                    float t_local = t / twounit;
+                    return GetPntXZ(t_local, 0);
+                }
+                else if (t>1-unit)
+                {//Î²
+                    int segNum = keyPnts.Count - 2;
+                    float t_local = (1 - t) / twounit;
+                    t_local = 1 - t_local;
+                    return GetPntXZ(t_local, segNum - 1);
+                }
+                else
+                {//ÖÐ¼ä
+                    int key2Inx = (int)(t / unit);
+                    float residue = t - unit * key2Inx;
+                    float t_local1 = 0.5f + residue / twounit;
+                    var p1 = GetPntXZ(t_local1, key2Inx - 1);
+                    float t_local2 = residue / twounit;
+                    var p2 = GetPntXZ(t_local2, key2Inx);
+                    float lerpK = residue / unit;
+                    return Vector3.Lerp(p1, p2, lerpK);
+                }
+                
             }
             return new Vector3(0, 0, 0);
         }
 
         Vector3 GetPntXZ(float t, int segInx)
         {
-            Vector3 p1 = keyPnts[3*segInx];
+            Vector3 p1 = keyPnts[segInx];
             float x1 = p1.x;
             float y1 = p1.z;
 
-            Vector3 p2 = keyPnts[3*segInx + 1];
+            Vector3 p2 = keyPnts[segInx + 1];
             float x2 = p2.x;
             float y2 = p2.z;
 
-            Vector3 p3 = keyPnts[3*segInx + 2];
+            Vector3 p3 = keyPnts[segInx + 2];
             float x3 = p3.x;
             float y3 = p3.z;
 
