@@ -23,5 +23,12 @@ public class SpecialTexGeneratorEditor : Editor
             Target.CreateShiftTex();
             TexHelper.SavePNG(Target.outTex, "Assets","shiftTex");
         }
+
+        if (GUILayout.Button("GenerateAlphaMask"))
+        {
+            Debug.Log("Generate");
+            Target.CreateAlphaMask();
+            TexHelper.SavePNG(Target.outTex, "Assets", "alphaMask");
+        }
     }
 }
