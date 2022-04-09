@@ -10,6 +10,7 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
     QuadBezierSpline spline;
 
     public float scale = 1.0f;
+    public int divide = 10;
 
     [ReadOnly]
     public bool bInited = false;
@@ -31,11 +32,11 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
         {
             spline = GetComponent<QuadBezierSpline>();
         }
-        Gizmos.color = Color.red;
 
         if(bInited)
         {
-            for(int i=0;i<spline.GetSegNum();i++)
+            Gizmos.color = Color.red;
+            for (int i=0;i<spline.GetSegNum();i++)
             {
                 if(i==0)
                 {
@@ -51,6 +52,14 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
                     Gizmos.DrawCube(To3D(spline.mids[i-1]), 0.1f * scale * Vector3.one);
                     Gizmos.DrawCube(To3D(spline.segSettings[i - 1].p2), 0.1f * scale * Vector3.one);
                 }
+            }
+            Gizmos.color = Color.black;
+            float divideUnit = 1.0f / divide;
+            for(int i=1;i<divide;i++)
+            {
+                float t = i * divideUnit;
+                Vector2 p = spline.Get(t);
+                Gizmos.DrawCube(To3D(p), 0.05f * scale * Vector3.one);
             }
         }
     }

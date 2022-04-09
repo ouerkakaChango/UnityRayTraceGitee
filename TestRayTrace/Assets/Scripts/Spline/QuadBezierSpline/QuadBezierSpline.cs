@@ -79,7 +79,7 @@ namespace Spline
 
         public Vector2 Get(float globalT)
         {
-            float unit = 1 / (1 + segSettings.Count);
+            float unit = 1.0f / (1 + segSettings.Count);
             int segInx = (int)(globalT / unit);
             float localT = (globalT - segInx * unit) / unit;
 
