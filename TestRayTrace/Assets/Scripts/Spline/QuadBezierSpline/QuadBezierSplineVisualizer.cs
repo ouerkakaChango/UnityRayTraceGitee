@@ -11,6 +11,8 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
 
     public float scale = 1.0f;
     public int divide = 10;
+    [ReadOnly]
+    public List<Vector2> keys = new List<Vector2>();
 
     [ReadOnly]
     public bool bInited = false;
@@ -74,5 +76,22 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
     {
         spline.Init();
         bInited = true;
+    }
+
+    public void ShowKeys()
+    {
+        if(!bInited)
+        {
+            Init();
+        }
+        keys.Clear();
+        keys.Add(spline.pnt0);
+        keys.Add(spline.pnt1);
+        keys.Add(spline.pnt2);
+        for(int i=0;i<spline.mids.Count;i++)
+        {
+            keys.Add(spline.mids[i]);
+            keys.Add(spline.segSettings[i].p2);
+        }
     }
 }

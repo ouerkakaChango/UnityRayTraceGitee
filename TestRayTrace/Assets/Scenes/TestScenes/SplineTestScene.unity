@@ -339,6 +339,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scale: 1.05
   divide: 20
+  keys:
+  - {x: 0, y: 0}
+  - {x: 1.06, y: 0.72}
+  - {x: 1.67, y: 0}
+  - {x: 2.7171957, y: -1.2360344}
+  - {x: 2.89, y: -3}
   bInited: 1
 --- !u!1 &1665964011
 GameObject:

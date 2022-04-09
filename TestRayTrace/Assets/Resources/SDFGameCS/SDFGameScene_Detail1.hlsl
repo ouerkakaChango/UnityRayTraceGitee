@@ -224,6 +224,7 @@ else if (inx == 1)
 	//
 	//float re = min(c1,c2);
 
+	/*
 	//### lerped 2 besizer segment
 	float re = 10000000;
 	float h = 0.1;
@@ -253,6 +254,20 @@ else if (inx == 1)
 	{
 		return 100000000;
 	}
+	*/
+
+	//### 2 quadBesizerSpline segment
+	float h=0.1;
+	
+	float c1 = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(0,0), float2(1.06,0.72),float2(1.67,0));
+	float2 w = float2( c1, abs(p.y) - h );
+c1 = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	
+	float c2 = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(1.67,0), float2(2.717196,-1.236034),float2(2.89,-3));
+	w = float2( c2, abs(p.y) - h );
+c2 = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	
+	float re = min(c1,c2);
 
 	return re;
 }
