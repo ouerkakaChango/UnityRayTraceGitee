@@ -58,6 +58,21 @@ namespace MathHelper
             return v.normalized;
         }
 
+        public static float lerp(in float a, in float b, float k)
+        {
+            return a * (1 - k) + b * k;
+        }
+
+        public static Vector2 lerp(in Vector2 a, in Vector2 b, float k)
+        {
+            return a * (1 - k) + b * k;
+        }
+
+        public static Vector2 lerp(in Vector2 a, in Vector2 b, Vector2 k)
+        {
+            return new Vector2(lerp(a.x, b.x, k.x), lerp(a.y, b.y, k.y));
+        }
+
         public static Vector3 lerp(in Vector3 a, in Vector3 b, float k)
         {
             return a * (1 - k) + b * k;
@@ -68,6 +83,11 @@ namespace MathHelper
             return Mathf.Pow(x, n);
         }
 
+        public static Vector2 pow(Vector2 x, Vector2 n)
+        {
+            return  new Vector2(Mathf.Pow(x.x, n.x), Mathf.Pow(x.y, n.y));
+        }
+
         public static float sqrt(float x)
         {
             return Mathf.Sqrt(x);
@@ -76,6 +96,11 @@ namespace MathHelper
         public static float cos(float x)
         {
             return Mathf.Cos(x);
+        }
+
+        public static float acos(float x)
+        {
+            return Mathf.Acos(x);
         }
 
         public static float sin(float x)
@@ -91,6 +116,11 @@ namespace MathHelper
         public static float abs(float x)
         {
             return x >= 0 ? x : -x;
+        }
+
+        public static Vector2 abs(in Vector2 v)
+        {
+            return new Vector2(abs(v.x), abs(v.y));
         }
 
         public static Vector3 abs(in Vector3 v)
@@ -114,6 +144,16 @@ namespace MathHelper
                 return max;
             }
             return x;
+        }
+
+        public static float sign(float x)
+        {
+            return x >= 0 ? 1.0f : -1.0f;
+        }
+
+        public static Vector2 sign(Vector2 v)
+        {
+            return new Vector2(sign(v.x), sign(v.y));
         }
 
         //#######################################################

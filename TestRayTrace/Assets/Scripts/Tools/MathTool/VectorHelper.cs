@@ -38,5 +38,10 @@ namespace MathHelper
         {
             return new Vector3Int((int)v.x, (int)v.y, (int)v.z);
         }
+
+        public static Vector2 ToVec2(in float x)
+        {
+            return new Vector2(x, x);
+        }
     }
 }

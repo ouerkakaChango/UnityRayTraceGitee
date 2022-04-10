@@ -303,14 +303,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4f2fe8a62935164e9c5d8ac21a9d377, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pnt0: {x: 0, y: 0}
-  pnt1: {x: 1.06, y: 0.72}
-  pnt2: {x: 1.67, y: 0}
+  pnt0: {x: 2, y: 0.44}
+  pnt1: {x: 0, y: -0.1}
+  pnt2: {x: -0.67, y: 0.58}
   segSettings:
-  - len: 1.62
-    p2: {x: 2.89, y: -3}
+  - len: 0.72
+    p2: {x: -1.21, y: 1.54}
   mids:
-  - {x: 2.7171957, y: -1.2360344}
+  - {x: -1.1753318, y: 1.092874}
 --- !u!4 &1259458435
 Transform:
   m_ObjectHideFlags: 0
@@ -337,8 +337,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b62d62ecd19b814a8307c965bbb443c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scale: 1.05
+  scale: 0.66
   divide: 20
+  testP: {x: 1.31, y: 0.97}
   keys:
   - {x: 0, y: 0}
   - {x: 1.06, y: 0.72}

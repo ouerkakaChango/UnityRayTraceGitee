@@ -11,6 +11,7 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
 
     public float scale = 1.0f;
     public int divide = 10;
+    public Vector2 testP;
     [ReadOnly]
     public List<Vector2> keys = new List<Vector2>();
 
@@ -45,6 +46,10 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
                     Gizmos.DrawCube(To3D(spline.pnt0), 0.1f * scale * Vector3.one);
                     Gizmos.DrawCube(To3D(spline.pnt1), 0.1f * scale * Vector3.one);
                     Gizmos.DrawCube(To3D(spline.pnt2), 0.1f * scale * Vector3.one);
+
+                    UnityEditor.Handles.Label(To3D(spline.pnt0), "p0");
+                    UnityEditor.Handles.Label(To3D(spline.pnt1), "p1");
+                    UnityEditor.Handles.Label(To3D(spline.pnt2), "p2");
                 }
                 else
                 {
@@ -53,6 +58,9 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
                     //p1 from mids,p2 from settings
                     Gizmos.DrawCube(To3D(spline.mids[i-1]), 0.1f * scale * Vector3.one);
                     Gizmos.DrawCube(To3D(spline.segSettings[i - 1].p2), 0.1f * scale * Vector3.one);
+
+                    UnityEditor.Handles.Label(To3D(spline.mids[i - 1]), "p" + (2 * i + 1));
+                    UnityEditor.Handles.Label(To3D(spline.segSettings[i - 1].p2), "p" + (2 * i + 2));
                 }
             }
             Gizmos.color = Color.black;
@@ -62,6 +70,20 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
                 float t = i * divideUnit;
                 Vector2 p = spline.Get(t);
                 Gizmos.DrawCube(To3D(p), 0.05f * scale * Vector3.one);
+            }
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawCube(To3D(testP), 0.1f * scale * Vector3.one);
+            Vector2 testTDis = spline.GetProjectTDis(testP);
+            if (testTDis.x > 0)
+            {
+                Gizmos.color = new Color(0.1f, 0.1f, 1);
+                Vector3 testPos = To3D(testP);
+                Vector2 testPro = spline.Get(testTDis.x);
+                Vector3 testProPos = To3D(testPro);
+                Gizmos.DrawCube(testProPos, 0.1f * scale * Vector3.one);
+                Vector3 dir = (testProPos - testPos).normalized;
+                Gizmos.DrawLine(testPos, testPos + dir * testTDis.y);
             }
         }
     }

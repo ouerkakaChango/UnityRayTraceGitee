@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static MathHelper.XMathFunc;
+using static MathHelper.Vec;
 
 //每3个点一段QuadBezierSeg
 //为保证Spline光滑，共线关系为:p0p1-p1p2p3-p3p4p5-...
@@ -127,6 +128,86 @@ namespace Spline
                 p1 = mids[segInx - 1];
                 p2 = segSettings[segInx-1].p2;
             }
+        }
+
+        public Vector2 GetProjectTDis(Vector2 p)
+        {
+            //跟每个seg都算t（local）。选取t>0&&t<1的，并且PT最小的t。最后转化成globalT输出
+            Vector2 p0, p1, p2;
+            Vector2 temTDis, minTDis;
+            minTDis = new Vector2(-1, 10000000);
+            int inx = -1;
+            for (int i = 0; i < GetSegNum(); i++)
+            {
+                GetSegPoints(i, out p0, out p1, out p2);
+                temTDis = TDisToQuadraticBezier(p, p0, p1, p2);
+                if(temTDis.y < minTDis.y && Is01(temTDis.x))
+                {
+                    inx = i;
+                    minTDis = temTDis;
+                }
+            }
+            float unit = 1.0f / GetSegNum();
+
+            minTDis.x = unit * (inx + minTDis.x);
+            return minTDis;
+        }
+
+        bool Is01(float x)
+        {
+            return x > 0 && x < 1;
+        }
+
+        float dd(Vector2 x)
+        {
+            return dot(x, x);
+        }
+
+        float addv(Vector2 a) { return a.x + a.y; }
+
+        Vector2 solveCubic2(Vector3 a)
+        {
+            float p = a.y - a.x * a.x / 3.0f;
+            float p3 = p * p * p;
+            float q = a.x * (2.0f* a.x * a.x - 9.0f * a.y) / 27.0f+ a.z;
+            float d = q * q + 4.0f* p3 / 27.0f;
+            if (d > .0)
+            {
+                Vector2 x = (new Vector2(1, -1) * sqrt(d) - new Vector2(q,q)) * 0.5f;
+                float tt = addv(sign(x) * pow(abs(x), ToVec2(1 / 3.0f))) - a.x / 3.0f;
+                return ToVec2(tt);
+            }
+            float v = acos(-sqrt(-27.0f/ p3) * q * 0.5f) / 3.0f;
+            float m = cos(v);
+            float n = sin(v) * 1.732050808f;
+            return new Vector2(m + m, -n - m) * sqrt(-p / 3.0f) - ToVec2(a.x / 3.0f);
+        }
+        //
+        ////https://www.shadertoy.com/view/XdB3Ww
+        //float calculateDistanceToQuadraticBezier(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
+        //{
+        //    b += lerp(Vector2(1e-4, 1e-4), Vector2(0, 0), abs(sign(b * 2.0 - a - c)));
+        //    Vector2 A = b - a;
+        //    Vector2 B = c - b - A;
+        //    Vector2 C = p - a;
+        //    Vector2 D = A * 2.0f;
+        //    Vector2 T = clamp(solveCubic2(Vector3(-3.* dot(A, B), dot(C, B) - 2.* dd(A), dot(C, A)) / -dd(B)), 0., 1.);
+        //    return sqrt(min(dd(C - (D + B * T.x) * T.x), dd(C - (D + B * T.y) * T.y)));
+        //}
+
+        Vector2 TDisToQuadraticBezier(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
+        {
+            b += lerp(ToVec2(1e-4f), ToVec2(0), abs(sign(b * 2.0f - a - c)));
+            Vector2 A = b - a;
+            Vector2 B = c - b - A;
+            Vector2 C = p - a;
+            Vector2 D = A * 2.0f;
+            Vector2 T = (solveCubic2(new Vector3(-3.0f* dot(A, B), dot(C, B) - 2.0f* dd(A), dot(C, A)) / -dd(B)));
+
+            float d1_square = dd(C - (D + B * T.x) * T.x);
+            float d2_square = dd(C - (D + B * T.y) * T.y);
+
+            return d1_square < d2_square ? new Vector2(T.x,sqrt(d1_square)) : new Vector2(T.y, sqrt(d2_square));
         }
     }
 }
