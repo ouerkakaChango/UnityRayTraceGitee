@@ -21,6 +21,16 @@ float SDFBoxTransform(float3 p, float3 bound,
 	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
 
+float SDFBoxByUVW(float3 p, float3 u, float3 v, float3 w, float3 center, float3 bound)
+{
+	p = p - center;
+	float3 lp;
+	lp.x = dot(p, u);
+	lp.y = dot(p, v);
+	lp.z = dot(p, w);
+	return SDFBox(lp, float3(0, 0, 0), bound);
+}
+
 float SDFSphere(float3 p, float3 center, float radius)
 {
 	return length(p - center) - radius;

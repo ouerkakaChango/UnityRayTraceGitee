@@ -339,7 +339,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scale: 0.66
   divide: 20
-  testP: {x: 1.31, y: 0.97}
+  testP: {x: 1.27, y: 0.97}
   keys:
   - {x: 0, y: 0}
   - {x: 1.06, y: 0.72}

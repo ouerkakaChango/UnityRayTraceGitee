@@ -174,7 +174,7 @@ float GetObjSDF(int inx, float3 p)
 {
 if (inx == 0)
 {
-	return SDFSphere(p, float3(0, 0.5, 0), 0.5); //球
+	return SDFSphere(p, float3(5, 0.5, 0), 0.5); //球
 	//return SDFPlanet(p);
 }
 else if (inx == 1)
@@ -256,19 +256,67 @@ else if (inx == 1)
 	}
 	*/
 
-	//### 2 quadBesizerSpline segment
-	float h=0.1;
-	
-	float c1 = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(0,0), float2(1.06,0.72),float2(1.67,0));
-	float2 w = float2( c1, abs(p.y) - h );
-c1 = min(max(w.x,w.y),0.0) + length(max(w,0.0));
-	
-	float c2 = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(1.67,0), float2(2.717196,-1.236034),float2(2.89,-3));
-	w = float2( c2, abs(p.y) - h );
-c2 = min(max(w.x,w.y),0.0) + length(max(w,0.0));
-	
-	float re = min(c1,c2);
+	//### 2 quadBesizerSpline segment , box side,round end
+	//float h=0.1;
+	//
+	//float c1 = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(0,0), float2(1.06,0.72),float2(1.67,0));
+	//float2 w = float2( c1, abs(p.y) - h );
+//c1 = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	//
+	//float c2 = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(1.67,0), float2(2.717196,-1.236034),float2(2.89,-3));
+	//w = float2( c2, abs(p.y) - h );
+//c2 = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	//
+	//float re = min(c1,c2);
 
+	//### 2 quadBesizerSpline segment, box side
+	float re = 100000;
+	float2 box = float2(0.1, 0.05);
+	
+	float c1 = calculateDistanceToQuadraticBezier(p.xz, float2(0,0), float2(1.06,0.72),float2(1.67,0));	
+	float c2 = calculateDistanceToQuadraticBezier(p.xz, float2(1.67,0), float2(2.717196,-1.236034),float2(2.89,-3));
+	
+	float t1 = projectToQuadraticBezier(p.xz, float2(0,0), float2(1.06,0.72),float2(1.67,0));
+	float t2 = projectToQuadraticBezier(p.xz, float2(1.67,0), float2(2.717196,-1.236034),float2(2.89,-3));
+	
+	if(t1<0 && t2<0)
+	{//head
+		//float2 t = float2(0,0);
+		//re = SDFSphere(p, float3(t.x,0,t.y), 0.2);
+
+		float2 u2d = normalize(float2(0,0) - float2(1.06,0.72));
+		float3 u = float3(u2d.x,0,u2d.y);
+		float3 v = float3(0,1,0);
+		float3 w = cross(u,v);
+		//0.01 as a user set cap thickness
+		re = SDFBoxByUVW(p,u,v,w,float3(0,0,0),float3(0.01f,box.y,box.x));
+	}
+	else if (t1>1 && t2>1)
+	{//tail
+		//float2 t = float2(2.89,-3);
+		//re = SDFSphere(p, float3(t.x,0,t.y), 0.2);
+		
+		float2 u2d = normalize(float2(2.89,-3) - float2(2.717196,-1.236034));
+		float3 u = float3(u2d.x,0,u2d.y);
+		float3 v = float3(0,1,0);
+		float3 w = cross(u,v);
+		//0.01 as a user set cap thickness
+		re = SDFBoxByUVW(p,u,v,w,float3(2.89,0, -3),float3(0.01f,box.y,box.x));
+	}
+	else
+	{
+		float2 w = float2(min(c1,c2),abs(p.y)) - box;
+		re = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	}
+
+	//### Box defined by uvw
+	//float2 u2d = normalize(float2(0,0) - float2(1.06,0.72));
+	//float3 u = float3(u2d.x,0,u2d.y);
+	//float3 v = float3(0,1,0);
+	//float3 w = cross(u,v);
+	//float cap1 = SDFBoxByUVW(p,u,v,w,float3(0,0,0),float3(0.05*Time01(),0.05,0.05));
+	//
+	//re = min(re,cap1);
 	return re;
 }
 else
