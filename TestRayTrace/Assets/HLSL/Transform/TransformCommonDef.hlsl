@@ -44,20 +44,18 @@ void Init(out Transform trans)
 
 float3 WorldToLocal(in Transform trans, float3 world)
 {
-	//float3 p = world - trans.pos;
-	//p /= trans.scale;
-	//p = RotByEuler(p, -trans.rotEuler);
-	//return p;
-	return world;
+	float3 p = world - trans.pos;
+	p /= trans.scale;
+	p = RotByEuler(p, -trans.rotEuler);
+	return p;
 }
 
 float3 LocalToWorld(in Transform trans, float3 local)
 {
-	//float3 p = RotByEuler(local, trans.rotEuler);
-	//p *= trans.scale;
-	//p += trans.pos;
-	//return p;
-	return local;
+	float3 p = RotByEuler(local, trans.rotEuler);
+	p *= trans.scale;
+	p += trans.pos;
+	return p;
 }
 
 //local to world
@@ -71,7 +69,6 @@ float3 To3D(in Transform trans, float2 p2d)
 float3 DirTo3D(in Transform trans, float2 dir)
 {
 	float3 re = float3(dir.x, 0, dir.y);
-	//return RotByEuler(re, trans.rotEuler);
-	return re;
+	return RotByEuler(re, trans.rotEuler);
 }
 #endif

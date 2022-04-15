@@ -87,14 +87,6 @@ SplineProjInfo ProjectQuadBezierBody(float3 p3d, float2 a, float2 b, float2 c, T
 		float2 local2d = QuadBezierGet(T.y, a, b, c);
 		info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));
 	}
-	else
-	{
-		//!!! magically worked if i set flag==0 when T all not [0,1]
-		info.flag = 0;
-		T = saturate(T);
-		info.dis = sqrt(min(length2(C - (D + B * T.x) * T.x), length2(C - (D + B * T.y) * T.y)));
-		// no proj pnt
-	}
 
 	return info; 
 }

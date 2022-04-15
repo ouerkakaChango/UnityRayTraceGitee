@@ -49,9 +49,7 @@ float SDFBoxedSpline(float3 p, in Transform trans, in float2 box,
     float re = 1000000;
     if (bodyInfo.flag == 1)
     {
-        //!!! SDF rectangle
-        float2 w = float2(bodyInfo.dis, abs(p.y)) - box;
-        float d1 = min(max(w.x, w.y), 0.0) + length(max(w, 0.0));
+        float d1 = SDFBox(float2(bodyInfo.dis, p.y), float2(0, 0), box);
         re = min(re, d1);
     }
 
