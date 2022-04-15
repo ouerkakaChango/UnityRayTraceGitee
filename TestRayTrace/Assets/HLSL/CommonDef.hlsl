@@ -177,4 +177,16 @@ float Time01()
 {
 	return 0.5*(sin(_Time.y) + 1);
 }
+ 
+bool Is01(float x)
+{
+	return x > 0 && x < 1;
+}
+
+float length2(float2 x)
+{
+	return dot(x, x);
+}
+
+float addv(float2 a) { return a.x + a.y; }
 #endif

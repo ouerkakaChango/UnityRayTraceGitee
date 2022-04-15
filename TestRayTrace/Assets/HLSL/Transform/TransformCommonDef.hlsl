@@ -2,6 +2,8 @@
 #define TREANDFORMCOMMONDEF_HLSL
 #include "../CommonDef.hlsl"
 
+//Transform logic based on unity coordinate:x-right, y-up, z-in
+
 float3 RotByEuler(float3 p, float3 eulerAngle)
 {
 	float a = eulerAngle.x/180.0f*PI;
@@ -26,4 +28,50 @@ float3 ShearX(float3 p, float shy, float shz)
 	return mul(m, p);
 }
 
+struct Transform
+{
+	float3 pos;
+	float3 rotEuler;
+	float3 scale;
+};
+
+void Init(out Transform trans)
+{
+	trans.pos = float3(0, 0, 0);
+	trans.rotEuler = float3(0, 0, 0);
+	trans.scale = float3(1, 1, 1);
+}
+
+float3 WorldToLocal(in Transform trans, float3 world)
+{
+	//float3 p = world - trans.pos;
+	//p /= trans.scale;
+	//p = RotByEuler(p, -trans.rotEuler);
+	//return p;
+	return world;
+}
+
+float3 LocalToWorld(in Transform trans, float3 local)
+{
+	//float3 p = RotByEuler(local, trans.rotEuler);
+	//p *= trans.scale;
+	//p += trans.pos;
+	//return p;
+	return local;
+}
+
+//local to world
+float3 To3D(in Transform trans, float2 p2d)
+{
+	return LocalToWorld(trans, float3(p2d.x, 0, p2d.y));
+}
+
+//local to world
+//assume dir has normalized
+float3 DirTo3D(in Transform trans, float2 dir)
+{
+	float3 re = float3(dir.x, 0, dir.y);
+	//return RotByEuler(re, trans.rotEuler);
+	return re;
+}
 #endif
