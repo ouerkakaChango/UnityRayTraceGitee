@@ -101,4 +101,18 @@ SplineProjInfo PreProjQuadBezierCap(float3 p3d, int flag, float2 T, float2 G, in
 
 	return info;
 }
+
+#define FUNC_SDFBoxedQuadBezier(re, p, spline, pntNum, trans, box) \
+{\
+	int segNum = (pntNum-1)/2;\
+	SplineProjInfo bodyInfo;\
+	Init(bodyInfo);\
+	for (int i = 0; i < segNum; i++)\
+	{\
+		UpdateInfo(bodyInfo, ProjectQuadBezierBody(p, spline[2 * i], spline[2 * i + 1], spline[2 * i + 2], trans));\
+	}\
+	SplineProjInfo headInfo = PreProjQuadBezierCap(p, 0, spline[0], spline[1], trans);\
+	SplineProjInfo tailInfo = PreProjQuadBezierCap(p, 2, spline[2 * segNum], spline[2 * segNum - 1], trans);\
+	re = SDFBoxedSpline(p, trans, box, bodyInfo, headInfo, tailInfo);\
+}
 #endif

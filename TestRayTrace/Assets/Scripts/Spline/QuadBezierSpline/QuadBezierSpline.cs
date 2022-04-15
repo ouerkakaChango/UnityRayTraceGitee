@@ -71,7 +71,7 @@ namespace Spline
                 else
                 {
                     fp1 = mids[i - 1];
-                    fp2 = segSettings[i].p2;
+                    fp2 = segSettings[i-1].p2;
                 }
 
                 mids.Add( fp2 + (fp2 - fp1).normalized * segSettings[i].len );

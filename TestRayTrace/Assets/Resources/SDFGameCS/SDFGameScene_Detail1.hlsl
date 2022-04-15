@@ -354,16 +354,32 @@ else if (inx == 1)
 	spline[2] = float2(1.67,0);
 	spline[3] = float2(2.717196,-1.236034);
 	spline[4] = float2(2.89,-3);
-	int segNum=2;
-	SplineProjInfo bodyInfo;
-	Init(bodyInfo);
-	for(int i=0;i<segNum;i++)
-	{
-		UpdateInfo(bodyInfo, ProjectQuadBezierBody(p, spline[2*i], spline[2*i+1], spline[2*i+2], trans));
-	}	
-	SplineProjInfo headInfo = PreProjQuadBezierCap(p, 0, spline[0], spline[1], trans);
-	SplineProjInfo tailInfo = PreProjQuadBezierCap(p, 2, spline[2*segNum], spline[2*segNum-1], trans);
-	re = SDFBoxedSpline(p, trans, box, bodyInfo, headInfo, tailInfo);
+
+	float2 sp[9];
+	sp[0] = float2(2, 0.44);
+	sp[1] = float2(0, -0.1);
+	sp[2] = float2(-0.67, 0.58);
+	sp[3] = float2(-1.175332, 1.092874);
+	sp[4] = float2(-1.21, 1.54);
+	sp[5] = float2(-1.247879, 2.028534);
+	sp[6] = float2(-0.64, 2.5);
+	sp[7] = float2(0.2687165, 3.204794);
+	sp[8] = float2(2, 2.5);
+
+	//FUNC_SDFBoxedQuadBezier(re, p, spline, 5, trans, box)
+	FUNC_SDFBoxedQuadBezier(re, p, sp, 9, trans, box)
+
+	//int segNum=2;
+	//SplineProjInfo bodyInfo;
+	//Init(bodyInfo);
+	//for(int i=0;i<segNum;i++)
+	//{
+	//	UpdateInfo(bodyInfo, ProjectQuadBezierBody(p, spline[2*i], spline[2*i+1], spline[2*i+2], trans));
+	//}	
+	//SplineProjInfo headInfo = PreProjQuadBezierCap(p, 0, spline[0], spline[1], trans);
+	//SplineProjInfo tailInfo = PreProjQuadBezierCap(p, 2, spline[2*segNum], spline[2*segNum-1], trans);
+	//re = SDFBoxedSpline(p, trans, box, bodyInfo, headInfo, tailInfo);
+
 
 	//### Test Transform
 	//float re = 100000;

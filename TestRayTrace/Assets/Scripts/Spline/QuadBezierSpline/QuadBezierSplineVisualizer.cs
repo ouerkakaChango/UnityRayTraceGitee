@@ -39,6 +39,7 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
         if(bInited)
         {
             Gizmos.color = Color.red;
+            //Debug.Log(spline.GetSegNum());
             for (int i=0;i<spline.GetSegNum();i++)
             {
                 if(i==0)
