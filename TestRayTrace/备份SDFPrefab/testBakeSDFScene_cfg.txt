@@ -1,0 +1,385 @@
+valMaps:
+ObjNum 2
+
+Blocks:
+
+###BLOCK ExtraInclude
+#include "../../HLSL/Spline/SplineCommonDef.hlsl"
+#include "../../HLSL/Spline/QuadBezier/QuadBezier.hlsl"
+###BLOCK
+
+###BLOCK ObjMaterial
+	if (obj == 0)
+	{		
+        re.albedo = float3(0, 1 ,0);
+		re.metallic = 0.1f;
+		re.roughness = 0.8f;
+	}
+	else if (obj == 1)
+	{		
+        re.albedo = 0.5f;
+		re.metallic = 0.1f;
+		re.roughness = 0.8f;
+	}
+###BLOCK
+
+###BLOCK  ObjRender
+//if(minHit.obj==0)
+//{
+//	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
+//}
+//else if (minHit.obj == 1)
+{
+	float3 lightDir = normalize(float3(1, -1, 1));
+	float3 lightColor = float3(1, 1, 1) * 3.5;
+	return PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
+}
+###BLOCK
+
+###BLOCK SDFShadow
+//float3 lightDir = normalize(float3(1, -1, 1));
+//ray.pos = minHit.P;
+//ray.dir = -lightDir;
+//ray.pos += SceneSDFShadowNormalBias * minHit.N;
+//HitInfo hitInfo;
+//return HardShadow_TraceScene(ray, hitInfo);
+return 1;
+###BLOCK
+
+###BLOCK ExtraSDF
+//float SDFFoTou(float3 p)
+//{
+//	float re = 0;
+//	float r = 10.45 + 0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+//	float3 center = float3(0, 0.5, 0);
+//	re = length(p - center) - r;
+//	re *= 0.5f;
+//	return re;
+//}
+float SDFPlanet(float3 p)
+{
+	float re = 0;
+	float r = 0.48;// +0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+	float dis = fbm4(p.zxy*10);
+	r += 0.02*smoothstep(0.5f, 1.0f, dis);
+	float3 center = float3(0, r, 0);
+	 
+	re = length(p - center) - r;
+	re *= 0.5f;
+	return re;
+}
+
+float dd(float2 x)
+{
+	return dot(x,x);
+}
+
+//float addv(float2 a) { return a.x + a.y; }
+
+//float2 solveCubic2(float3 a)
+//{
+//	float p = a.y-a.x*a.x/3.;
+//	float p3 = p*p*p;
+//	float q = a.x*(2.*a.x*a.x-9.*a.y)/27.+a.z;
+//	float d = q*q+4.*p3/27.;
+//	if(d>.0)
+//	{
+//		float2 x = (float2(1,-1)*sqrt(d)-q)*.5;
+//		float tt = addv(sign(x)*pow(abs(x),float2(1/3.0,1/3.0)))-a.x/3.0;
+//  		return float2(tt,tt);
+//  	}
+// 	float v = acos(-sqrt(-27./p3)*q*.5)/3.;
+// 	float m = cos(v);
+// 	float n = sin(v)*1.732050808;
+//	return float2(m+m,-n-m)*sqrt(-p/3.)-a.x/3.;
+//}
+
+//https://www.shadertoy.com/view/XdB3Ww
+float calculateDistanceToQuadraticBezier(float2 p, float2 a, float2 b, float2 c)
+{
+	b += lerp(float2(1e-4,1e-4),float2(0,0),abs(sign(b*2.0-a-c)));
+	float2 A = b-a;
+	float2 B = c-b-A;
+	float2 C = p-a;
+	float2 D = A*2.;
+	float2 T = clamp(solveCubic2(float3(-3.*dot(A,B),dot(C,B)-2.*dd(A),dot(C,A))/-dd(B)),0.,1.);
+	return sqrt(min(dd(C-(D+B*T.x)*T.x),dd(C-(D+B*T.y)*T.y)));
+}
+
+//if p is 'outside' , 1result; 'inside' ,2result ,choose the one nearer
+float o_projectToQuadraticBezier(float2 p, float2 a, float2 b, float2 c)
+{
+	b += lerp(float2(1e-4,1e-4),float2(0,0),abs(sign(b*2.0-a-c)));
+	float2 A = b-a;
+	float2 B = c-b-A;
+	float2 C = p-a;
+	float2 D = A*2.;
+	float2 T = (solveCubic2(float3(-3.*dot(A,B),dot(C,B)-2.*dd(A),dot(C,A))/-dd(B)));
+
+	float d1_square = dd(C-(D+B*T.x)*T.x);
+	float d2_square = dd(C-(D+B*T.y)*T.y);
+
+	return d1_square < d2_square ? T.x : T.y;
+}
+
+float projectToQuadraticBezier(float2 p, float2 a, float2 b, float2 c)
+{
+	b += lerp(float2(1e-4,1e-4),float2(0,0),abs(sign(b*2.0-a-c)));
+	float2 A = b-a;
+	float2 B = c-b-A;
+	float2 C = p-a;
+	float2 D = A*2.;
+	float2 T = (solveCubic2(float3(-3.*dot(A,B),dot(C,B)-2.*dd(A),dot(C,A))/-dd(B)));
+
+	float d1_square = dd(C-(D+B*T.x)*T.x);
+	float d2_square = dd(C-(D+B*T.y)*T.y);
+
+	if(Is01(T.x)&&Is01(T.y))
+	{
+		return d1_square < d2_square ? T.x : T.y;
+	}
+	else if(Is01(T.x))
+	{
+		return T.x;
+	}
+	else if(Is01(T.y))
+	{
+		return T.y;
+	}
+	return T.x;
+}
+
+float disFromQuadraticBezierT(float2 p, float t, float2 a, float2 b, float2 c)
+{
+	b += lerp(float2(1e-4,1e-4),float2(0,0),abs(sign(b*2.0-a-c)));
+	float2 A = b-a;
+	float2 B = c-b-A;
+	float2 C = p-a;
+	float2 D = A*2.;
+	return sqrt(dd(C-(D+B*t.x)*t.x));
+}
+
+float sdfClip2D(float3 p, float d, float h)
+{
+	float2 w = float2( d, abs(p.y) - h );
+    d = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	return d;
+}
+
+###BLOCK
+
+###BLOCK ObjSDF
+if (inx == 0)
+{
+	return SDFSphere(p, float3(5, 0.5, 0), 0.5); //球
+	//return SDFPlanet(p);
+}
+else if (inx == 1)
+{//地面
+	//box center(0, -1.2, -5), bound(5, 0.1, 5)
+	//return SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5)); 
+	//return SDFBoxTransform(p, float3(5, 0.5, 5),
+	//	float3(0, -0.5, 0),float3(0,0,30*Time01()));
+
+	//return SDFShearXBoxTransform(p, float3(5, 0.5, 5),
+	//	0,-0.5,
+	//	float3(0, -0.5, 0));
+
+	//return SDFShearXSphere(p, float3(0, 0, 0), 0.5,
+	//					0,1*Time01());
+
+	//### A
+	//float a1 =  SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),
+	//	0, 0.3,
+	//	float3(0, -0.5, -1.5));
+	//
+	//float a2 =  SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),
+	//	0, -0.3,
+	//	float3(0, -0.5, 1.5));
+	//
+	//float a3 = SDFBox(p, float3(-1.5, -0.5, 0), float3(0.4, 0.5, 2)); 
+	//
+	//float re =  min(a1,a2);
+	//re = min(re,a3);
+
+	//### (besizer segment)3 point Besizer
+	//float re = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(1.65,-0.57), float2(1,1.3),float2(0.18,-0.61));
+	//float h=0.1;
+	//float2 w = float2( re, abs(p.y) - h );
+    //re = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+
+	//### 2 besizer segment
+	//float h=0.1;
+	//
+	//float c1 = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(0.18,-0.61), float2(0,0),float2(0.5,1.2));
+	//float2 w = float2( c1, abs(p.y) - h );
+    //c1 = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	//
+	//float c2 = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(0,0), float2(0.5,1.2),float2(1,1.3));
+	//w = float2( c2, abs(p.y) - h );
+    //c2 = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	//
+	//float re = min(c1,c2);
+
+	/*
+	//### lerped 2 besizer segment
+	float re = 10000000;
+	float h = 0.1;
+	
+	float t1 = projectToQuadraticBezier(p.xz, float2(0.18,-0.61), float2(0,0),float2(0.5,1.2));
+	float t2 = projectToQuadraticBezier(p.xz, float2(0,0), float2(0.5,1.2),float2(1,1.3));
+	if(Is01(t1) && t2<0)
+	{//head
+		re = -0.1 + disFromQuadraticBezierT(p.xz, t1, float2(0.18,-0.61), float2(0,0),float2(0.5,1.2));
+		re = sdfClip2D(p, re, h);
+	}
+	else if(Is01(t2) && t1<0)
+	{//tail
+		re = -0.1 + disFromQuadraticBezierT(p.xz, t2, float2(0,0), float2(0.5,1.2),float2(1,1.3));
+		re = sdfClip2D(p, re, h);
+	}
+	else if (Is01(t1) && Is01(t2))
+	{//body
+		//like CheapSpline,now t1>0.5,t2<0.5
+		float lerpK = saturate((t1-0.5)/0.5);
+		float d1 = -0.1 + disFromQuadraticBezierT(p.xz, t1, float2(0.18,-0.61), float2(0,0),float2(0.5,1.2));
+		float d2 = -0.1 + disFromQuadraticBezierT(p.xz, t2, float2(0,0), float2(0.5,1.2),float2(1,1.3));
+		re = lerp(d1,d2,lerpK);
+		re = sdfClip2D(p, re, h);
+	}
+	else
+	{
+		return 100000000;
+	}
+	*/
+
+	//### 2 quadBesizerSpline segment , box side,round end
+	//float h=0.1;
+	//
+	//float c1 = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(0,0), float2(1.06,0.72),float2(1.67,0));
+	//float2 w = float2( c1, abs(p.y) - h );
+    //c1 = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	//
+	//float c2 = -0.1 + calculateDistanceToQuadraticBezier(p.xz, float2(1.67,0), float2(2.717196,-1.236034),float2(2.89,-3));
+	//w = float2( c2, abs(p.y) - h );
+    //c2 = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	//
+	//float re = min(c1,c2);
+
+	//### Box defined by uvw
+	//float2 u2d = normalize(float2(0,0) - float2(1.06,0.72));
+	//float3 u = float3(u2d.x,0,u2d.y);
+	//float3 v = float3(0,1,0);
+	//float3 w = cross(u,v);
+	//float cap1 = SDFBoxByUVW(p,u,v,w,float3(0,0,0),float3(0.05*Time01(),0.05,0.05));
+	//
+	//re = min(re,cap1);
+
+	//### 2 quadBesizerSpline segment, box side
+	//float re = 100000;
+	//float2 box = float2(0.1, 0.05);
+	//
+	//float c1 = calculateDistanceToQuadraticBezier(p.xz, float2(0,0), float2(1.06,0.72),float2(1.67,0));	
+	//float c2 = calculateDistanceToQuadraticBezier(p.xz, float2(1.67,0), float2(2.717196,-1.236034),float2(2.89,-3));
+	//
+	//float t1 = projectToQuadraticBezier(p.xz, float2(0,0), float2(1.06,0.72),float2(1.67,0));
+	//float t2 = projectToQuadraticBezier(p.xz, float2(1.67,0), float2(2.717196,-1.236034),float2(2.89,-3));
+	//
+	//if(t1<0 && t2<0)
+	//{//head
+	//	//float2 t = float2(0,0);
+	//	//re = SDFSphere(p, float3(t.x,0,t.y), 0.2);
+	//
+	//	float2 u2d = normalize(float2(0,0) - float2(1.06,0.72));
+	//	float3 u = float3(u2d.x,0,u2d.y);
+	//	float3 v = float3(0,1,0);
+	//	float3 w = cross(u,v);
+	//	//0.01 as a user set cap thickness
+	//	re = SDFBoxByUVW(p,u,v,w,float3(0,0,0),float3(0.01f,box.y,box.x));
+	//}
+	//else if (t1>1 && t2>1)
+	//{//tail
+	//	//float2 t = float2(2.89,-3);
+	//	//re = SDFSphere(p, float3(t.x,0,t.y), 0.2);
+	//	
+	//	float2 u2d = normalize(float2(2.89,-3) - float2(2.717196,-1.236034));
+	//	float3 u = float3(u2d.x,0,u2d.y);
+	//	float3 v = float3(0,1,0);
+	//	float3 w = cross(u,v);
+	//	//0.01 as a user set cap thickness
+	//	re = SDFBoxByUVW(p,u,v,w,float3(2.89,0, -3),float3(0.01f,box.y,box.x));
+	//}
+	//else
+	//{
+	//	float2 w = float2(min(c1,c2),abs(p.y)) - box;
+	//	re = min(max(w.x,w.y),0.0) + length(max(w,0.0));
+	//}
+
+	//### Spline
+	float re = 10000;
+	float2 box = float2(0.1, 0.05);
+	Transform trans;
+	Init(trans);
+	float2 spline[5];
+	spline[0] = float2(0,0);
+	spline[1] = float2(1.06,0.72);
+	spline[2] = float2(1.67,0);
+	spline[3] = float2(2.717196,-1.236034);
+	spline[4] = float2(2.89,-3);
+
+	float2 sp[9];
+	sp[0] = float2(2, 0.44);
+	sp[1] = float2(0, -0.1);
+	sp[2] = float2(-0.67, 0.58);
+	sp[3] = float2(-1.175332, 1.092874);
+	sp[4] = float2(-1.21, 1.54);
+	sp[5] = float2(-1.247879, 2.028534);
+	sp[6] = float2(-0.64, 2.5);
+	sp[7] = float2(0.2687165, 3.204794);
+	sp[8] = float2(2, 2.5);
+
+	//FUNC_SDFBoxedQuadBezier(re, p, spline, 5, trans, box)
+	FUNC_SDFBoxedQuadBezier(re, p, sp, 9, trans, box)
+
+	//int segNum=2;
+	//SplineProjInfo bodyInfo; 
+	//Init(bodyInfo);
+	//for(int i=0;i<segNum;i++)
+	//{
+	//	UpdateInfo(bodyInfo, ProjectQuadBezierBody(p, spline[2*i], spline[2*i+1], spline[2*i+2], trans));
+	//}	
+	//SplineProjInfo headInfo = PreProjQuadBezierCap(p, 0, spline[0], spline[1], trans);
+	//SplineProjInfo tailInfo = PreProjQuadBezierCap(p, 2, spline[2*segNum], spline[2*segNum-1], trans);
+	//re = SDFBoxedSpline(p, trans, box, bodyInfo, headInfo, tailInfo);
+
+
+	//### Test Transform
+	//float re = 100000;
+	//Transform trans;
+	//Init(trans);
+	//trans.pos = float3(0,0,0);
+	//trans.scale = float3(0.1,1,1);
+	//float3 c = float3(0.1,0,0);
+	//c = WorldToLocal(trans, c);
+	//re = SDFSphere(p,c,1 );
+
+	return re;
+}
+else
+{
+	return -1;
+}
+###BLOCK
+
+###BLOCK ObjNormal
+if (inx == 0)
+{
+	//return SDFSphereNormal(p, float3(0, 0.5, 0));
+	//return SDFPlanetNormal(p);
+	return GetObjSDFNormal(inx, p);
+}
+else
+{
+	return GetObjSDFNormal(inx, p);
+}
+###BLOCK

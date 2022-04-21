@@ -6,24 +6,23 @@
 
 #include "../Transform/TransformCommonDef.hlsl"
 
-float SDFBox(float3 p, float3 center, float3 bound)
-{
-	float3 q = abs(p - center) - bound;
-	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
-}
-
 float SDFBox(float2 p, float2 center, float2 bound)
 {
 	float2 q = abs(p - center) - bound;
 	return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0);
 }
 
-float SDFBoxTransform(float3 p, float3 bound,
-	float3 center, float3 rotEuler=0, float3 scale=1)
+float SDFBox(float3 p, float3 center, float3 bound)
+{
+	float3 q = abs(p - center) - bound;
+	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+}
+
+float SDFBox(float3 p, float3 center, float3 bound, float3 rotEuler)
 {
 	p = p - center;
 	p = RotByEuler(p,-rotEuler);
-	float3 q = abs(p) - bound * scale;
+	float3 q = abs(p) - bound;
 	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
 

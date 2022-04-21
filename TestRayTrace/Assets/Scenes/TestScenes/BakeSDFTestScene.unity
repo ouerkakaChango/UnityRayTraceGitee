@@ -214,7 +214,7 @@ Transform:
   m_GameObject: {fileID: 297565919}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -335,6 +335,10 @@ GameObject:
   - component: {fileID: 1666331703}
   - component: {fileID: 1666331702}
   - component: {fileID: 1666331701}
+  - component: {fileID: 1666331705}
+  - component: {fileID: 1666331704}
+  - component: {fileID: 1666331706}
+  - component: {fileID: 1666331707}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -400,13 +404,79 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: -0.31770372, y: -0.40568182, z: 0.15286276, w: -0.8432791}
+  m_LocalPosition: {x: -3.3278546, y: 4.2718186, z: -3.1199567}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1666331704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666331700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d95754c43390834dba2948d6b4f92fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  templates:
+  - Resources/SDFGameCS/CS_SDFGameTemplate.txt
+  - Resources/SDFGameCS/SDFGameSceneTemplate.txt
+  outs:
+  - Resources/SDFGameCS/CS_SDFGame_TestBake.compute
+  - Resources/SDFGameCS/SDFGameScene_TestBake.hlsl
+  cfgs:
+  - Resources/SDFGameCS/testBakeSDF_cfg.txt
+  - Resources/SDFGameCS/testBakeSDFScene_cfg.txt
+  taskFile: Resources/SDFGameCS/TestBake_task.txt
+--- !u!114 &1666331705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666331700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce80f74af5a6108428874d9804bbe084, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SceneName: TestBake
+  autoCS: {fileID: 1666331704}
+  envSpecTex2DArr: {fileID: 18700000, guid: 0f551ab412a7b6a43adb8fff0951af3f, type: 2}
+  envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
+  w: 1024
+  h: 720
+--- !u!114 &1666331706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666331700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d32655854621cac4abd859f2c2ae0f36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1666331707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666331700}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 191fe419a3e75734a905e79ba9b149d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sensitivity: 2
+  smoothing: 2
 --- !u!1 &1928400445
 GameObject:
   m_ObjectHideFlags: 0

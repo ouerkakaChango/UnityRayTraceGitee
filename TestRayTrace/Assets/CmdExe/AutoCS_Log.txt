@@ -1,1 +1,1 @@
-Task File: D:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Detail1_task.txt
+Task File: D:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/TestBake_task.txt
