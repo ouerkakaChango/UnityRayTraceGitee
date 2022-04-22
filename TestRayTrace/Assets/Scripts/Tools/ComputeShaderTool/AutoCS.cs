@@ -10,8 +10,7 @@ using Debug = UnityEngine.Debug;
 //[ExecuteInEditMode]
 public class AutoCS : MonoBehaviour
 {
-    //public string WorkingDirectory = "CmdExe";
-
+    public SDFBakerMgr bakerMgr = null;
     public List<string> templates = new List<string>();
     public List<string> outs = new List<string>();
     public List<string> cfgs = new List<string>();
@@ -83,7 +82,10 @@ public class AutoCS : MonoBehaviour
         //将templates,outs等写入config
         //调用外部控制台程序exe，进行config+templates => outs
 
-        //Debug.Log(ChopEnd("SDFGameCS/CS_SDFGame.compute",".compute"));
+        if(bakerMgr!=null)
+        {
+            PreCompile();
+        }
         MakeTaskFile();
         CallExe();
     }
@@ -114,5 +116,11 @@ public class AutoCS : MonoBehaviour
         {
             print(e);
         }
+    }
+
+    void PreCompile()
+    {
+        Debug.Log("AutoCS PreCompile");
+        //???
     }
 }

@@ -131,8 +131,12 @@ else if (inx == 1)
 	//FUNC_SDFBoxedQuadBezier(re, p, sp, 9, trans, box)
 
 	//### Hand Validate TestBake
-	float re = 10000;
-	re = SDFBox(p, float3(0,0,0), float3(1,1,1)*0.5);
+	float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
+	//re = min(re, SDFBox(p, float3(0,0,0), float3(1,1,1)*0.5));
+
+	//@@@SDFBakerMgr
+	//...
+	//@@@
 
 	return re;
 }

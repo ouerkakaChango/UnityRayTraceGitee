@@ -423,6 +423,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d95754c43390834dba2948d6b4f92fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bakerMgr: {fileID: 1928400447}
   templates:
   - Resources/SDFGameCS/CS_SDFGameTemplate.txt
   - Resources/SDFGameCS/SDFGameSceneTemplate.txt
