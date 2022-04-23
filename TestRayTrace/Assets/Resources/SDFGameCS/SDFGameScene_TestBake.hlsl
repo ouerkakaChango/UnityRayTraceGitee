@@ -160,10 +160,10 @@ else if (inx == 1)
 
 	//### Hand Validate TestBake
 	float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
-	//re = min(re, SDFBox(p, float3(0,0,0), float3(1,1,1)*0.5));
+	//re = min(re, SDFBox(p, float3(0,0,0), float3(3,1,1)*0.5));
 
 	//@@@SDFBakerMgr
-	//...
+re = min(re, SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0, 0.0, 0.0)));
 	//@@@
 
 	return re;

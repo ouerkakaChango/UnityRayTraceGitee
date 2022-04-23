@@ -22,5 +22,14 @@ namespace StringTool
         {
             return str.Substring(preFix.Length, str.Length - preFix.Length);
         }
+
+        //去除多余空格，tab
+        //去除开头结尾的空格，tab
+        public static string NiceLine(string str)
+        {
+            char[] charSeparators = new char[] { ' ', '\t' };
+            string[] words = str.Split(charSeparators, System.StringSplitOptions.RemoveEmptyEntries);
+            return string.Join(" ", words);
+        }
     }
 }

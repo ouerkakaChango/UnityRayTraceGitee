@@ -17,6 +17,9 @@ public class AutoCS : MonoBehaviour
 
     public string taskFile;
 
+    //??? test public
+    public string[] lines;
+    public string[] words;
     private void Awake()
     {
         //Generate();
@@ -34,6 +37,12 @@ public class AutoCS : MonoBehaviour
         
     }
 
+    //##########################################
+    string FullPath(string localPath)
+    {
+        return Application.dataPath + "/" + localPath;
+    }
+
     public void InitOuts()
     {
         outs.Clear();
@@ -49,32 +58,32 @@ public class AutoCS : MonoBehaviour
         re += "templates:\n";
         for (int i = 0; i < templates.Count; i++)
         {
-            re += Application.dataPath + "/" + templates[i] + "\n";
+            re += FullPath(templates[i]) + "\n";
         }
         re += "\n";
         re += "outs:\n";
         for (int i = 0; i < outs.Count; i++)
         {
-            re += Application.dataPath + "/" + outs[i] + "\n";
+            re += FullPath(outs[i]) + "\n";
         }
 
         re += "\n";
         re += "configs:\n";
         for (int i = 0; i < outs.Count; i++)
         {
-            re += Application.dataPath + "/" + cfgs[i] + "\n";
+            re += FullPath(cfgs[i]) + "\n";
         }
         return re;
     }
 
     void MakeTaskFile()
     {
-        string fullPath = Application.dataPath +"/" +taskFile;
-        if (File.Exists(fullPath))
+        string path = FullPath(taskFile);
+        if (File.Exists(path))
         {
-            File.Delete(fullPath);
+            File.Delete(path);
         }
-        File.WriteAllText(fullPath, GetTaskString());
+        File.WriteAllText(path, GetTaskString());
     }
 
     public void Generate()
@@ -84,6 +93,7 @@ public class AutoCS : MonoBehaviour
 
         if(bakerMgr!=null)
         {
+            bakerMgr.Bake();
             PreCompile();
         }
         MakeTaskFile();
@@ -104,7 +114,7 @@ public class AutoCS : MonoBehaviour
                 myProcess.StartInfo.FileName = "C:\\Personal\\ParticleToy\\x64\\Debug\\ParticleToy.exe";
             }
             myProcess.StartInfo.WorkingDirectory = Application.dataPath + "/CmdExe";
-            myProcess.StartInfo.Arguments = Application.dataPath + "/" + taskFile;
+            myProcess.StartInfo.Arguments = FullPath(taskFile);
             myProcess.EnableRaisingEvents = true;
             myProcess.Start();
             myProcess.WaitForExit();
@@ -121,6 +131,69 @@ public class AutoCS : MonoBehaviour
     void PreCompile()
     {
         Debug.Log("AutoCS PreCompile");
-        //???
+        for(int i=0;i<cfgs.Count;i++)
+        {
+            PreCompile(FullPath(cfgs[i]), i);
+        }
+        
+    }
+
+    void PreCompile(string path, int fileInx)
+    {
+        //1.Load Files to string[]
+        lines = File.ReadAllLines(path);
+        //if (fileInx == 1)
+        //{
+        //    char[] charSeparators = new char[] { ' ' };
+        //    words = lines[136].Split(charSeparators, System.StringSplitOptions.RemoveEmptyEntries);
+        //}
+
+        Vector2Int bakerMgrRange = new Vector2Int(-1,-1);
+
+        for(int i=0;i<lines.Length;i++)
+        {
+            string line = lines[i];
+            line = NiceLine(line);
+            
+            int inx = line.IndexOf("//@@@SDFBakerMgr");
+            if (inx ==0)
+            {
+                //Debug.Log(inx + " " + line);
+                bakerMgrRange.x = i;
+                continue;
+            }
+
+            inx = line.IndexOf("//@@@");
+            if (inx ==0 && NeedEnd(bakerMgrRange))
+            {
+                bakerMgrRange.y = i;
+                //Debug.Log(i + " " + line);
+                continue;
+            }
+        }
+
+        if (ValidRange(bakerMgrRange))
+        {
+            //Debug.Log(bakerMgrRange);
+
+            List<string> newLines = new List<string>(lines);
+
+            //É¾È¥[range.x,range.y]£¬²åÈë bakerMgr.bakedLines
+            //newLines.RemoveRange(bakerMgrRange.x, bakerMgrRange.y - bakerMgrRange.x + 1);
+            newLines.RemoveAt(bakerMgrRange.x + 1);
+            newLines.InsertRange(bakerMgrRange.x + 1, bakerMgr.bakedLines);
+            //lines = newLines.ToArray();
+            File.WriteAllLines(path, newLines);
+        }
+    }
+
+    bool NeedEnd(Vector2Int range)
+    {
+        return range.x >= 0 && range.y == -1;
+    }
+
+    bool ValidRange(Vector2Int range)
+    {
+        return range.x >= 0 && range.y >= range.x;
     }
 }

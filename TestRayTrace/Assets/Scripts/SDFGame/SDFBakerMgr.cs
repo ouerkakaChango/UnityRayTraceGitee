@@ -22,6 +22,7 @@ public class SDFBakerMgr : MonoBehaviour
     //###
     public void Bake()
     {
+        Debug.Log("BakerMgr Bake");
         bakedLines.Clear();
         SDFBakerTag[] tags = (SDFBakerTag[])GameObject.FindObjectsOfType(typeof(SDFBakerTag));
         foreach(var tag in tags)
@@ -37,7 +38,7 @@ public class SDFBakerMgr : MonoBehaviour
         if(mf&&mr)
         {
             var meshName = mf.sharedMesh.name;
-            Debug.Log(meshName);
+            //Debug.Log(meshName);
             if(meshName == "Cube")
             {
                 AddBakeCube(obj);
@@ -47,7 +48,9 @@ public class SDFBakerMgr : MonoBehaviour
 
     void AddBakeCube(GameObject obj)
     {
-        bakedLines.Add("SDFBox(p, " + obj.transform.position + ", " + obj.transform.localScale + ", " + obj.transform.rotation.eulerAngles);
+        string line = "SDFBox(p, " + Bake(obj.transform.position) + ", " + Bake(obj.transform.localScale*0.5f) + ", " + Bake(obj.transform.rotation.eulerAngles)+")";
+        line = "re = min(re, " + line + ");";
+        bakedLines.Add(line);
     }
 
     public void ToggleHideTransform()
@@ -61,5 +64,10 @@ public class SDFBakerMgr : MonoBehaviour
         {
             transform.hideFlags = HideFlags.None;
         }
+    }
+
+    string Bake(Vector3 v)
+    {
+        return "float3" + v;
     }
 }
