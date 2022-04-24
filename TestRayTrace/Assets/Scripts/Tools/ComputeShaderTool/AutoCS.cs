@@ -180,7 +180,7 @@ public class AutoCS : MonoBehaviour
 
             //…æ»•[range.x,range.y]£¨≤Â»Î bakerMgr.bakedLines
             //newLines.RemoveRange(bakerMgrRange.x, bakerMgrRange.y - bakerMgrRange.x + 1);
-            newLines.RemoveAt(bakerMgrRange.x + 1);
+            newLines.RemoveRange(bakerMgrRange.x + 1, bakerMgrRange.y - bakerMgrRange.x-1);
             newLines.InsertRange(bakerMgrRange.x + 1, bakerMgr.bakedLines);
             //lines = newLines.ToArray();
             File.WriteAllLines(path, newLines);
