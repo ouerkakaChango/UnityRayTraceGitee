@@ -512,8 +512,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_LocalRotation: {x: -0.20298028, y: -0.6577356, z: 0.19079572, w: -0.6998428}
-  m_LocalPosition: {x: -4.81796, y: 2.8139052, z: -1.0687159}
+  m_LocalRotation: {x: 0.20507325, y: -0.74122036, z: 0.26035583, w: 0.58373994}
+  m_LocalPosition: {x: 4.0741053, y: 2.895412, z: 0.43863863}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -544,21 +544,22 @@ MonoBehaviour:
   taskFile: Resources/SDFGameCS/TestBake_task.txt
   lines:
   - 'valMaps:'
+  - //@@@SDFBakerMgr ValMaps
   - ObjNum 2
+  - //@@@
   - 
   - 'Blocks:'
   - 
   - '###BLOCK ExtraInclude'
   - '#include "../../HLSL/Spline/SplineCommonDef.hlsl"'
-  - '#include "../../HLSL/Spline/QuadBezier/QuadBezier.hlsl"'
   - '###BLOCK'
   - 
   - '###BLOCK ObjMaterial'
   - "\tif (obj == 0)"
   - "\t{\t\t"
-  - '        re.albedo = float3(0, 1 ,0);'
-  - "\t\tre.metallic = 0.1f;"
-  - "\t\tre.roughness = 0.8f;"
+  - '        re.albedo = float3(1,1,1);'
+  - "\t\tre.metallic = 0.9f;"
+  - "\t\tre.roughness = 0.1f;"
   - "\t}"
   - "\telse if (obj == 1)"
   - "\t{\t\t"
@@ -569,11 +570,11 @@ MonoBehaviour:
   - '###BLOCK'
   - 
   - '###BLOCK  ObjRender'
-  - //if(minHit.obj==0)
-  - //{
-  - "//\treturn PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);"
-  - //}
-  - //else if (minHit.obj == 1)
+  - if(minHit.obj==0)
+  - '{'
+  - "\treturn PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);"
+  - '}'
+  - else if (minHit.obj == 1)
   - '{'
   - "\tfloat3 lightDir = normalize(float3(1, -1, 1));"
   - "\tfloat3 lightColor = float3(1, 1, 1) * 3.5;"
@@ -618,13 +619,13 @@ MonoBehaviour:
   - '###BLOCK'
   - 
   - '###BLOCK ObjSDF'
-  - if (inx == 0)
-  - '{'
-  - "\treturn SDFSphere(p, float3(5, 0.5, 0), 0.5); //\u7403"
-  - "\t//return SDFPlanet(p);"
-  - '}'
-  - else if (inx == 1)
-  - "{//\u5730\u9762"
+  - "\t//if (inx == 0)"
+  - "\t//{"
+  - "\t//\treturn SDFSphere(p, float3(5, 0.5, 0), 0.5); //\u7403"
+  - "\t//\t//return SDFPlanet(p);"
+  - "\t//}"
+  - "\t//else if (inx == 1)"
+  - "\t//{//\u5730\u9762"
   - "\t//box center(0, -1.2, -5), bound(5, 0.1, 5)"
   - "\t//return SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5)); "
   - "\t//return SDFBoxTransform(p, float3(5, 0.5, 5),"
@@ -681,19 +682,32 @@ MonoBehaviour:
   - "\tfloat re = MaxTraceDis + 1; //Make sure default is an invalid SDF"
   - "\t//re = min(re, SDFBox(p, float3(0,0,0), float3(3,1,1)*0.5));"
   - 
-  - "\t//@@@SDFBakerMgr"
-  - re = min(re, SDFBox(p, float3(0.0, 0.0, -1.9), float3(1.5, 0.5, 0.5), float3(0.0,
-    0.0, 0.0)));
+  - "\t//### template"
+  - "\t//if(inx==0)"
+  - "\t//{"
+  - "\t//\tre = min(re, SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0,
+    0.0, 0.0)));"
+  - "\t//}"
+  - "\t//else if(inx == 1)"
+  - "\t//{"
+  - "\t//\tre = min(re, SDFBox(p, float3(0.0, 0.0, -1.9), float3(1.5, 0.5, 0.5),
+    float3(0.0, 0.0, 0.0)));"
+  - "\t//}"
+  - 
+  - "\t//@@@SDFBakerMgr ObjSDF"
+  - if(inx==0)
+  - '{'
   - re = min(re, SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0,
     0.0, 0.0)));
-  - "\t//@@@"
-  - 
-  - "\treturn re;"
   - '}'
-  - else
+  - else if (inx == 1 )
   - '{'
-  - "\treturn -1;"
+  - re = min(re, SDFBox(p, float3(0.0, 0.0, -1.9), float3(1.5, 0.5, 0.5), float3(0.0,
+    0.0, 0.0)));
   - '}'
+  - "\t//@@@"
+  - return re;
+  - 
   - '###BLOCK'
   - 
   - '###BLOCK ObjNormal'
@@ -797,8 +811,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1f5d13b1d98fa4ca18ee249cef77d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objNum: 2
   bakedLines:
-  - re = min(re, SDFBox(p, float3(0.0, 0.0, -1.9), float3(1.5, 0.5, 0.5), float3(0.0,
-    0.0, 0.0)));
+  - if(inx==0)
+  - '{'
   - re = min(re, SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0,
     0.0, 0.0)));
+  - '}'
+  - else if (inx == 1 )
+  - '{'
+  - re = min(re, SDFBox(p, float3(0.0, 0.0, -1.9), float3(1.5, 0.5, 0.5), float3(0.0,
+    0.0, 0.0)));
+  - '}'

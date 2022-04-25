@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using static StringTool.StringHelper;
 using Debug = UnityEngine.Debug;
@@ -130,7 +131,7 @@ public class AutoCS : MonoBehaviour
 
     void PreCompile()
     {
-        Debug.Log("AutoCS PreCompile");
+        //Debug.Log("AutoCS PreCompile");
         for(int i=0;i<cfgs.Count;i++)
         {
             PreCompile(FullPath(cfgs[i]), i);
@@ -140,51 +141,80 @@ public class AutoCS : MonoBehaviour
 
     void PreCompile(string path, int fileInx)
     {
+        Debug.Log("###Precompile File: "+ path);
         //1.Load Files to string[]
         lines = File.ReadAllLines(path);
-        //if (fileInx == 1)
-        //{
-        //    char[] charSeparators = new char[] { ' ' };
-        //    words = lines[136].Split(charSeparators, System.StringSplitOptions.RemoveEmptyEntries);
-        //}
 
-        Vector2Int bakerMgrRange = new Vector2Int(-1,-1);
+        Dictionary<string, Vector2Int> rangeMap = new Dictionary<string, Vector2Int>();
+        rangeMap.Add("ObjSDF", new Vector2Int(-1, -1));
+        rangeMap.Add("ValMaps", new Vector2Int(-1, -1));
 
-        for(int i=0;i<lines.Length;i++)
+        for (int i=0;i<lines.Length;i++)
         {
             string line = lines[i];
             line = NiceLine(line);
-            
-            int inx = line.IndexOf("//@@@SDFBakerMgr");
-            if (inx ==0)
+
+            bool bDone = false;
+            foreach(var key in rangeMap.Keys.ToList())
             {
-                //Debug.Log(inx + " " + line);
-                bakerMgrRange.x = i;
+                if (line == "//@@@SDFBakerMgr " + key)
+                {
+                    rangeMap[key] = new Vector2Int(i,-1);
+                    bDone = true;
+                    break;
+                }
+            }
+            if(bDone)
+            {
                 continue;
             }
 
-            inx = line.IndexOf("//@@@");
-            if (inx ==0 && NeedEnd(bakerMgrRange))
+            foreach (var key in rangeMap.Keys.ToList())
             {
-                bakerMgrRange.y = i;
-                //Debug.Log(i + " " + line);
-                continue;
+                if (line == "//@@@" && NeedEnd(rangeMap[key]))
+                {
+                    var tt = rangeMap[key];
+                    tt.y = i;
+                    rangeMap[key] = tt;
+                    //bDone = true;
+                    break;
+                }
             }
+            //if (bDone)
+            //{
+            //    continue;
+            //}
         }
 
-        if (ValidRange(bakerMgrRange))
+        List<string> newLines = new List<string>(lines);
+        int offset = 0;
+        
+        foreach (var iter in rangeMap)
         {
-            //Debug.Log(bakerMgrRange);
+            //Debug.Log(offset);
+            //Debug.Log(iter.Key + " " + iter.Value);
+            int oricount = 0, newcount = 0;
 
-            List<string> newLines = new List<string>(lines);
-
-            //删去[range.x,range.y]，插入 bakerMgr.bakedLines
-            //newLines.RemoveRange(bakerMgrRange.x, bakerMgrRange.y - bakerMgrRange.x + 1);
-            newLines.RemoveRange(bakerMgrRange.x + 1, bakerMgrRange.y - bakerMgrRange.x-1);
-            newLines.InsertRange(bakerMgrRange.x + 1, bakerMgr.bakedLines);
-            //lines = newLines.ToArray();
-            File.WriteAllLines(path, newLines);
+            if (iter.Key == "ObjSDF" && ValidRange(iter.Value))
+            {
+                oricount = iter.Value.y - iter.Value.x - 1;
+                //删去(range.x,range.y)，插入 bakerMgr.bakedLines
+                newcount = bakerMgr.bakedLines.Count;
+                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
+                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedLines);
+            }
+            else if (iter.Key == "ValMaps" && ValidRange(iter.Value))
+            {
+                oricount = iter.Value.y - iter.Value.x - 1;
+                newcount = 1;
+                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
+                string[] newlines = new string[1];
+                newlines[0] = "ObjNum " + bakerMgr.objNum;
+                newLines.InsertRange(offset + iter.Value.x + 1, newlines);
+            }
+            offset += newcount - oricount;
         }
+        File.WriteAllLines(path, newLines);
     }
 
     bool NeedEnd(Vector2Int range)

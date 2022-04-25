@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SDFBakerMgr : MonoBehaviour
 {
+    public int objNum = -1;
     public List<string> bakedLines = new List<string>();
 
     bool hide = false;
@@ -25,10 +26,37 @@ public class SDFBakerMgr : MonoBehaviour
         Debug.Log("BakerMgr Bake");
         bakedLines.Clear();
         SDFBakerTag[] tags = (SDFBakerTag[])GameObject.FindObjectsOfType(typeof(SDFBakerTag));
-        foreach(var tag in tags)
+        objNum = tags.Length;
+        //foreach (var tag in tags)
+        //{
+        //    AddBake(tag.gameObject);
+        //}
+        for(int i=0;i<tags.Length;i++)
         {
+            var tag = tags[i];
+            PreAdd(i);
             AddBake(tag.gameObject);
+            PostAdd(i);
         }
+    }
+
+    void PreAdd(int inx)
+    {
+        if(inx==0)
+        {
+            bakedLines.Add("if(inx==0)");
+            bakedLines.Add("{");
+        }
+        else if(inx > 0)
+        {
+            bakedLines.Add("else if (inx == "+inx+" )");
+            bakedLines.Add("{");
+        }
+    }
+
+    void PostAdd(int inx)
+    {
+        bakedLines.Add("}");
     }
 
     void AddBake(GameObject obj)

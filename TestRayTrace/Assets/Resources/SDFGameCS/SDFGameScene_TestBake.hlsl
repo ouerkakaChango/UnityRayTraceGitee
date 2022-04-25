@@ -15,7 +15,6 @@
 #include "../../HLSL/PBR/PBR_GGX.hlsl"
 
 #include "../../HLSL/Spline/SplineCommonDef.hlsl"
-#include "../../HLSL/Spline/QuadBezier/QuadBezier.hlsl"
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -26,9 +25,9 @@ Material_PBR GetObjMaterial_PBR(int obj)
 
 	if (obj == 0)
 	{		
-re.albedo = float3(0, 1 ,0);
-		re.metallic = 0.1f;
-		re.roughness = 0.8f;
+re.albedo = float3(1,1,1);
+		re.metallic = 0.9f;
+		re.roughness = 0.1f;
 	}
 	else if (obj == 1)
 	{		
@@ -43,11 +42,11 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 {
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
 
-//if(minHit.obj==0)
-//{
-//	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
-//}
-//else if (minHit.obj == 1)
+if(minHit.obj==0)
+{
+	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
+}
+else if (minHit.obj == 1)
 {
 	float3 lightDir = normalize(float3(1, -1, 1));
 	float3 lightColor = float3(1, 1, 1) * 3.5;
@@ -99,13 +98,13 @@ float SDFPlanet(float3 p)
 
 float GetObjSDF(int inx, float3 p)
 {
-if (inx == 0)
-{
-	return SDFSphere(p, float3(5, 0.5, 0), 0.5); //球
-	//return SDFPlanet(p);
-}
-else if (inx == 1)
-{//地面
+	//if (inx == 0)
+	//{
+	//	return SDFSphere(p, float3(5, 0.5, 0), 0.5); //球
+	//	//return SDFPlanet(p);
+	//}
+	//else if (inx == 1)
+	//{//地面
 	//box center(0, -1.2, -5), bound(5, 0.1, 5)
 	//return SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5));
 	//return SDFBoxTransform(p, float3(5, 0.5, 5),
@@ -162,17 +161,28 @@ else if (inx == 1)
 	float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 	//re = min(re, SDFBox(p, float3(0,0,0), float3(3,1,1)*0.5));
 
-	//@@@SDFBakerMgr
-re = min(re, SDFBox(p, float3(0.0, 0.0, -1.9), float3(1.5, 0.5, 0.5), float3(0.0, 0.0, 0.0)));
-re = min(re, SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0, 0.0, 0.0)));
-	//@@@
+	//### template
+	//if(inx==0)
+	//{
+	//	re = min(re, SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0, 0.0, 0.0)));
+	//}
+	//else if(inx == 1)
+	//{
+	//	re = min(re, SDFBox(p, float3(0.0, 0.0, -1.9), float3(1.5, 0.5, 0.5), float3(0.0, 0.0, 0.0)));
+	//}
 
-	return re;
-}
-else
+	//@@@SDFBakerMgr ObjSDF
+if(inx==0)
 {
-	return -1;
+re = min(re, SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0, 0.0, 0.0)));
 }
+else if (inx == 1 )
+{
+re = min(re, SDFBox(p, float3(0.0, 0.0, -1.9), float3(1.5, 0.5, 0.5), float3(0.0, 0.0, 0.0)));
+}
+	//@@@
+return re;
+
 }
 
 float3 GetObjSDFNormal(int inx, float3 p)
