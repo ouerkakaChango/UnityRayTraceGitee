@@ -5,7 +5,8 @@ using UnityEngine;
 public class SDFBakerMgr : MonoBehaviour
 {
     public int objNum = -1;
-    public List<string> bakedLines = new List<string>();
+    public List<string> bakedSDFs = new List<string>();
+    public List<string> bakedMaterials = new List<string>();
 
     bool hide = false;
     // Start is called before the first frame update
@@ -24,7 +25,7 @@ public class SDFBakerMgr : MonoBehaviour
     public void Bake()
     {
         Debug.Log("BakerMgr Bake");
-        bakedLines.Clear();
+        ClearBake();
         SDFBakerTag[] tags = (SDFBakerTag[])GameObject.FindObjectsOfType(typeof(SDFBakerTag));
         objNum = tags.Length;
         //foreach (var tag in tags)
@@ -34,29 +35,40 @@ public class SDFBakerMgr : MonoBehaviour
         for(int i=0;i<tags.Length;i++)
         {
             var tag = tags[i];
-            PreAdd(i);
+            PreAdd(i, ref bakedSDFs);
+            PreAdd(i, ref bakedMaterials, "obj");
+
             AddBake(tag.gameObject);
-            PostAdd(i);
+            AddBakeMaterial(tag);
+
+            PostAdd(i, ref bakedSDFs);
+            PostAdd(i, ref bakedMaterials);
         }
     }
 
-    void PreAdd(int inx)
+    void ClearBake()
+    {
+        bakedSDFs.Clear();
+        bakedMaterials.Clear();
+    }
+
+    void PreAdd(int inx, ref List<string> lines, string inxName = "inx")
     {
         if(inx==0)
         {
-            bakedLines.Add("if(inx==0)");
-            bakedLines.Add("{");
+            lines.Add("if("+ inxName + " == 0 )");
+            lines.Add("{");
         }
         else if(inx > 0)
         {
-            bakedLines.Add("else if (inx == "+inx+" )");
-            bakedLines.Add("{");
+            lines.Add("else if ("+ inxName + " == "+inx+" )");
+            lines.Add("{");
         }
     }
 
-    void PostAdd(int inx)
+    void PostAdd(int inx, ref List<string> lines)
     {
-        bakedLines.Add("}");
+        lines.Add("}");
     }
 
     void AddBake(GameObject obj)
@@ -76,9 +88,17 @@ public class SDFBakerMgr : MonoBehaviour
 
     void AddBakeCube(GameObject obj)
     {
-        string line = "SDFBox(p, " + Bake(obj.transform.position) + ", " + Bake(obj.transform.localScale*0.5f) + ", " + Bake(obj.transform.rotation.eulerAngles)+")";
+        float offset = obj.GetComponent<SDFBakerTag>().SDFoffset;
+        string line = offset + " + SDFBox(p, " + Bake(obj.transform.position) + ", " + Bake(obj.transform.localScale*0.5f) + ", " + Bake(obj.transform.rotation.eulerAngles)+")";
         line = "re = min(re, " + line + ");";
-        bakedLines.Add(line);
+        bakedSDFs.Add(line);
+    }
+
+    void AddBakeMaterial(SDFBakerTag tag)
+    {
+        bakedMaterials.Add("re.albedo = float3" + tag.mat_PBR.albedo + ";");
+        bakedMaterials.Add("re.metallic = " + tag.mat_PBR.metallic + ";");
+        bakedMaterials.Add("re.roughness = " + tag.mat_PBR.roughness + ";");
     }
 
     public void ToggleHideTransform()

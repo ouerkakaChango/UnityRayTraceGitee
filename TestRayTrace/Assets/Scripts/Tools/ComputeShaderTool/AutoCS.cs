@@ -148,6 +148,7 @@ public class AutoCS : MonoBehaviour
         Dictionary<string, Vector2Int> rangeMap = new Dictionary<string, Vector2Int>();
         rangeMap.Add("ObjSDF", new Vector2Int(-1, -1));
         rangeMap.Add("ValMaps", new Vector2Int(-1, -1));
+        rangeMap.Add("ObjMaterial", new Vector2Int(-1, -1));
 
         for (int i=0;i<lines.Length;i++)
         {
@@ -199,9 +200,17 @@ public class AutoCS : MonoBehaviour
             {
                 oricount = iter.Value.y - iter.Value.x - 1;
                 //删去(range.x,range.y)，插入 bakerMgr.bakedLines
-                newcount = bakerMgr.bakedLines.Count;
+                newcount = bakerMgr.bakedSDFs.Count;
                 newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
-                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedLines);
+                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedSDFs);
+            }
+            else if (iter.Key == "ObjMaterial" && ValidRange(iter.Value))
+            {
+                oricount = iter.Value.y - iter.Value.x - 1;
+                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
+                newcount = bakerMgr.bakedMaterials.Count;
+                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
+                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedMaterials);
             }
             else if (iter.Key == "ValMaps" && ValidRange(iter.Value))
             {

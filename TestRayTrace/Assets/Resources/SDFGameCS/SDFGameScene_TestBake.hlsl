@@ -23,18 +23,20 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	re.metallic = 0.0f;
 	re.roughness = 0.8f;
 
-	if (obj == 0)
-	{		
-re.albedo = float3(1,1,1);
-		re.metallic = 0.9f;
-		re.roughness = 0.1f;
-	}
-	else if (obj == 1)
-	{		
-re.albedo = 0.5f;
-		re.metallic = 0.1f;
-		re.roughness = 0.8f;
-	}
+	//@@@SDFBakerMgr ObjMaterial
+if(obj == 0 )
+{
+re.albedo = float3(1.0, 1.0, 1.0);
+re.metallic = 0.9;
+re.roughness = 0.1;
+}
+else if (obj == 1 )
+{
+re.albedo = float3(0.5, 0.5, 0.5);
+re.metallic = 0.1;
+re.roughness = 0.8;
+}
+	//@@@
 	return re;
 }
 
@@ -157,28 +159,17 @@ float GetObjSDF(int inx, float3 p)
 	//FUNC_SDFBoxedQuadBezier(re, p, spline, 5, trans, box)
 	//FUNC_SDFBoxedQuadBezier(re, p, sp, 9, trans, box)
 
-	//### Hand Validate TestBake
+	//###
 	float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
-	//re = min(re, SDFBox(p, float3(0,0,0), float3(3,1,1)*0.5));
-
-	//### template
-	//if(inx==0)
-	//{
-	//	re = min(re, SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0, 0.0, 0.0)));
-	//}
-	//else if(inx == 1)
-	//{
-	//	re = min(re, SDFBox(p, float3(0.0, 0.0, -1.9), float3(1.5, 0.5, 0.5), float3(0.0, 0.0, 0.0)));
-	//}
 
 	//@@@SDFBakerMgr ObjSDF
-if(inx==0)
+if(inx == 0 )
 {
-re = min(re, SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0, 0.0, 0.0)));
+re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0, 0.0, 0.0)));
 }
 else if (inx == 1 )
 {
-re = min(re, SDFBox(p, float3(0.0, 0.0, -1.9), float3(1.5, 0.5, 0.5), float3(0.0, 0.0, 0.0)));
+re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, -1.9), float3(4.0, 0.5, 0.5), float3(0.0, 89.9, 0.0)));
 }
 	//@@@
 return re;

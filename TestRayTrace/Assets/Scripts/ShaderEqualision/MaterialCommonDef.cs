@@ -1,0 +1,41 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace ShaderEqualision
+{
+    public static class MaterialCommonDef
+    {
+    }
+
+    [System.Serializable]
+    public struct Material_PBR
+    {
+        public Vector3 albedo;
+        public float metallic;
+        public float roughness;
+
+        public static Material_PBR DefaultMeta {
+            get
+            {
+                Material_PBR re;
+                re.albedo = new Vector3(1, 1, 1);
+                re.metallic = 0.9f;
+                re.roughness = 0.1f;
+                return re;
+            }
+        }
+
+        public static Material_PBR Default
+        {
+            get
+            {
+                Material_PBR re;
+                re.albedo = new Vector3(1, 1, 1);
+                re.metallic = 0.0f;
+                re.roughness = 1.0f;
+                return re;
+            }
+        }
+    }
+}
