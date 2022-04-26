@@ -6,7 +6,8 @@ using ShaderEqualision;
 public class SDFBakerTag : MonoBehaviour
 {
     public Material_PBR mat_PBR = Material_PBR.Default;
-    public float SDFoffset = 0.0f;
+    public float SDF_offset = 0.0f;
+    public int renderMode = 0;
     // Start is called before the first frame update
     void Start()
     {

@@ -235,7 +235,8 @@ MonoBehaviour:
     albedo: {x: 1, y: 1, z: 1}
     metallic: 0.9
     roughness: 0.1
-  SDFoffset: 0
+  SDF_offset: 0
+  renderMode: 0
 --- !u!1 &1008065616
 GameObject:
   m_ObjectHideFlags: 0
@@ -363,9 +364,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mat_PBR:
     albedo: {x: 0.5, y: 0.5, z: 0.5}
-    metallic: 0.1
-    roughness: 0.8
-  SDFoffset: 0
+    metallic: 0
+    roughness: 1
+  SDF_offset: 0
+  renderMode: 1
 --- !u!65 &1161070114
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -575,18 +577,25 @@ MonoBehaviour:
   - else if (obj == 1 )
   - '{'
   - re.albedo = float3(0.5, 0.5, 0.5);
-  - re.metallic = 0.1;
-  - re.roughness = 0.8;
+  - re.metallic = 0;
+  - re.roughness = 1;
   - '}'
   - "\t//@@@"
   - '###BLOCK'
   - 
   - '###BLOCK  ObjRender'
-  - if(minHit.obj==0)
+  - //@@@SDFBakerMgr ObjRender
+  - int renderMode[2];
+  - renderMode[0] = 0;
+  - renderMode[1] = 1;
+  - //@@@
+  - 
+  - int mode = renderMode[minHit.obj];
+  - if(mode==0)
   - '{'
   - "\treturn PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);"
   - '}'
-  - else if (minHit.obj == 1)
+  - else if (mode == 1)
   - '{'
   - "\tfloat3 lightDir = normalize(float3(1, -1, 1));"
   - "\tfloat3 lightColor = float3(1, 1, 1) * 3.5;"
@@ -696,7 +705,7 @@ MonoBehaviour:
   - "\t//@@@SDFBakerMgr ObjSDF"
   - if(inx == 0 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0,
+  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(0.0,
     0.0, 0.0)));
   - '}'
   - else if (inx == 1 )
@@ -814,7 +823,7 @@ MonoBehaviour:
   bakedSDFs:
   - if(inx == 0 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0,
+  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(0.0,
     0.0, 0.0)));
   - '}'
   - else if (inx == 1 )
@@ -832,6 +841,10 @@ MonoBehaviour:
   - else if (obj == 1 )
   - '{'
   - re.albedo = float3(0.5, 0.5, 0.5);
-  - re.metallic = 0.1;
-  - re.roughness = 0.8;
+  - re.metallic = 0;
+  - re.roughness = 1;
   - '}'
+  bakedRenders:
+  - int renderMode[2];
+  - renderMode[0] = 0;
+  - renderMode[1] = 1;

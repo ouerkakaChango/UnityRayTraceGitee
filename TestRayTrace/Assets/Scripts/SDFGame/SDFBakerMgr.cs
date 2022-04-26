@@ -7,6 +7,7 @@ public class SDFBakerMgr : MonoBehaviour
     public int objNum = -1;
     public List<string> bakedSDFs = new List<string>();
     public List<string> bakedMaterials = new List<string>();
+    public List<string> bakedRenders = new List<string>();
 
     bool hide = false;
     // Start is called before the first frame update
@@ -25,14 +26,10 @@ public class SDFBakerMgr : MonoBehaviour
     public void Bake()
     {
         Debug.Log("BakerMgr Bake");
-        ClearBake();
         SDFBakerTag[] tags = (SDFBakerTag[])GameObject.FindObjectsOfType(typeof(SDFBakerTag));
         objNum = tags.Length;
-        //foreach (var tag in tags)
-        //{
-        //    AddBake(tag.gameObject);
-        //}
-        for(int i=0;i<tags.Length;i++)
+        ClearBake();
+        for (int i=0;i<tags.Length;i++)
         {
             var tag = tags[i];
             PreAdd(i, ref bakedSDFs);
@@ -40,6 +37,7 @@ public class SDFBakerMgr : MonoBehaviour
 
             AddBake(tag.gameObject);
             AddBakeMaterial(tag);
+            AddBakeRender(i, tag);
 
             PostAdd(i, ref bakedSDFs);
             PostAdd(i, ref bakedMaterials);
@@ -50,6 +48,10 @@ public class SDFBakerMgr : MonoBehaviour
     {
         bakedSDFs.Clear();
         bakedMaterials.Clear();
+
+        bakedRenders.Clear();
+        bakedRenders.Add("int renderMode[" + objNum + "];");
+
     }
 
     void PreAdd(int inx, ref List<string> lines, string inxName = "inx")
@@ -88,7 +90,7 @@ public class SDFBakerMgr : MonoBehaviour
 
     void AddBakeCube(GameObject obj)
     {
-        float offset = obj.GetComponent<SDFBakerTag>().SDFoffset;
+        float offset = obj.GetComponent<SDFBakerTag>().SDF_offset;
         string line = offset + " + SDFBox(p, " + Bake(obj.transform.position) + ", " + Bake(obj.transform.localScale*0.5f) + ", " + Bake(obj.transform.rotation.eulerAngles)+")";
         line = "re = min(re, " + line + ");";
         bakedSDFs.Add(line);
@@ -99,6 +101,11 @@ public class SDFBakerMgr : MonoBehaviour
         bakedMaterials.Add("re.albedo = float3" + tag.mat_PBR.albedo + ";");
         bakedMaterials.Add("re.metallic = " + tag.mat_PBR.metallic + ";");
         bakedMaterials.Add("re.roughness = " + tag.mat_PBR.roughness + ";");
+    }
+
+    void AddBakeRender(int inx, SDFBakerTag tag)
+    {
+        bakedRenders.Add("renderMode["+inx+"] = " + tag.renderMode+";");
     }
 
     public void ToggleHideTransform()

@@ -33,8 +33,8 @@ re.roughness = 0.1;
 else if (obj == 1 )
 {
 re.albedo = float3(0.5, 0.5, 0.5);
-re.metallic = 0.1;
-re.roughness = 0.8;
+re.metallic = 0;
+re.roughness = 1;
 }
 	//@@@
 	return re;
@@ -44,11 +44,18 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 {
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
 
-if(minHit.obj==0)
+//@@@SDFBakerMgr ObjRender
+int renderMode[2];
+renderMode[0] = 0;
+renderMode[1] = 1;
+//@@@
+
+int mode = renderMode[minHit.obj];
+if(mode==0)
 {
 	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
 }
-else if (minHit.obj == 1)
+else if (mode == 1)
 {
 	float3 lightDir = normalize(float3(1, -1, 1));
 	float3 lightColor = float3(1, 1, 1) * 3.5;

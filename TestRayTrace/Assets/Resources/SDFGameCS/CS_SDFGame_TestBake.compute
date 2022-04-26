@@ -45,7 +45,7 @@ float3 GetSDFGameColor(in Ray ray)
 	}
 	else
 	{
-		re = 1;//GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+		re = float3(1,1,1);//GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
 	}
 
 	return re;
