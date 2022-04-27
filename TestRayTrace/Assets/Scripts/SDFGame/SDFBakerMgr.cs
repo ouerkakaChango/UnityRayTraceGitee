@@ -91,7 +91,8 @@ public class SDFBakerMgr : MonoBehaviour
     void AddBakeCube(GameObject obj)
     {
         float offset = obj.GetComponent<SDFBakerTag>().SDF_offset;
-        string line = offset + " + SDFBox(p, " + Bake(obj.transform.position) + ", " + Bake(obj.transform.localScale*0.5f) + ", " + Bake(obj.transform.rotation.eulerAngles)+")";
+        Vector3 bakeRot = obj.transform.rotation.eulerAngles;
+        string line = offset + " + SDFBox(p, " + Bake(obj.transform.position) + ", " + Bake(obj.transform.localScale*0.5f) + ", " + Bake(bakeRot) +")";
         line = "re = min(re, " + line + ");";
         bakedSDFs.Add(line);
     }

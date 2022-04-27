@@ -21,6 +21,7 @@ public class AutoCS : MonoBehaviour
     //??? test public
     public string[] lines;
     public string[] words;
+    public Dictionary<string, Vector2Int> rangeMap = new Dictionary<string, Vector2Int>();
     private void Awake()
     {
         //Generate();
@@ -145,11 +146,12 @@ public class AutoCS : MonoBehaviour
         //1.Load Files to string[]
         lines = File.ReadAllLines(path);
 
-        Dictionary<string, Vector2Int> rangeMap = new Dictionary<string, Vector2Int>();
-        rangeMap.Add("ObjSDF", new Vector2Int(-1, -1));
+        rangeMap.Clear();
+        //!!! 顺序必须对应cgf
         rangeMap.Add("ValMaps", new Vector2Int(-1, -1));
         rangeMap.Add("ObjMaterial", new Vector2Int(-1, -1));
         rangeMap.Add("ObjRender", new Vector2Int(-1, -1));
+        rangeMap.Add("ObjSDF", new Vector2Int(-1, -1));
 
         for (int i=0;i<lines.Length;i++)
         {
@@ -190,7 +192,8 @@ public class AutoCS : MonoBehaviour
 
         List<string> newLines = new List<string>(lines);
         int offset = 0;
-        
+
+        //!!! 顺序必须对应cgf
         foreach (var iter in rangeMap)
         {
             //Debug.Log(offset);
@@ -229,7 +232,9 @@ public class AutoCS : MonoBehaviour
                 string[] newlines = new string[1];
                 newlines[0] = "ObjNum " + bakerMgr.objNum;
                 newLines.InsertRange(offset + iter.Value.x + 1, newlines);
+
             }
+            
             offset += newcount - oricount;
         }
         File.WriteAllLines(path, newLines);

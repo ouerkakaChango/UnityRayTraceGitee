@@ -1,4 +1,4 @@
-﻿#define OBJNUM 2
+﻿#define OBJNUM 3
 
 #define MaxSDF 100000
 #define MaxTraceDis 1000
@@ -26,11 +26,17 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
+re.albedo = float3(0.7, 0.7, 0.7);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 1 )
+{
 re.albedo = float3(1.0, 1.0, 1.0);
 re.metallic = 0.9;
 re.roughness = 0.1;
 }
-else if (obj == 1 )
+else if (obj == 2 )
 {
 re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0;
@@ -45,9 +51,10 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
 
 //@@@SDFBakerMgr ObjRender
-int renderMode[2];
-renderMode[0] = 0;
-renderMode[1] = 1;
+int renderMode[3];
+renderMode[0] = 1;
+renderMode[1] = 0;
+renderMode[2] = 1;
 //@@@
 
 int mode = renderMode[minHit.obj];
@@ -172,9 +179,13 @@ float GetObjSDF(int inx, float3 p)
 	//@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0, 0.0, 0.0)));
+re = min(re, 0 + SDFBox(p, float3(-3.5, 0.0, 10.0), float3(5.2, 5.8, 0.2), float3(0.0, 90.0, 0.0)));
 }
 else if (inx == 1 )
+{
+re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0, 0.0, 0.0)));
+}
+else if (inx == 2 )
 {
 re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, -1.9), float3(4.0, 0.5, 0.5), float3(0.0, 89.9, 0.0)));
 }
