@@ -3,18 +3,34 @@
 #include "../CommonDef.hlsl"
 
 //Transform logic based on unity coordinate:x-right, y-up, z-in
-
 float3 RotByEuler(float3 p, float3 eulerAngle)
 {
-	float a = eulerAngle.x/180.0f*PI;
-	float b = eulerAngle.y/180.0f*PI;
-	float c = eulerAngle.z/180.0f*PI;
-	float3x3 rotM = {
-	cos(b)*cos(c), sin(a)*sin(b)*cos(c)-cos(a)*sin(c), cos(a)*sin(b)*cos(c)+sin(a)*sin(c),
-	cos(b)*sin(c), sin(a)*sin(b)*sin(c)+cos(a)*cos(c), cos(a)*sin(b)*sin(c)-sin(a)*cos(c),
-	-sin(b), sin(a)*cos(b), cos(a)*cos(b)
+	float a = eulerAngle.x / 180.0f * PI;
+	float b = eulerAngle.y / 180.0f * PI;
+	float c = eulerAngle.z / 180.0f * PI;
+	float3x3 rotx = {
+		1,0,0,
+		0,cos(a),sin(a),
+		0,-sin(a),cos(a)
 	};
-	return mul(rotM, p);
+
+	float3x3 roty = {
+		cos(b),0,-sin(b),
+		0,1,0,
+		sin(b),0,cos(b)
+	};
+
+	float3x3 rotz =
+	{
+		cos(c),sin(c),0,
+		-sin(c),cos(c),0,
+		0,0,1
+	};
+	//[ZXY][p]
+	p = mul(roty, p);
+	p = mul(rotx, p);
+	p = mul(rotz, p);
+	return p;
 }
 
 //https://www.gatevidyalay.com/3d-shearing-in-computer-graphics-definition-examples/#:~:text=in%20Computer%20Graphics%2D-,In%20Computer%20graphics%2C,as%20well%20as%20Z%20direction.
