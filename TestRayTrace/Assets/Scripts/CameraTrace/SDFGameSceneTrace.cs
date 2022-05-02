@@ -48,7 +48,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         if (Application.isEditor && !Application.isPlaying)
         {
             //do what you want
-            RefreashAutoCS();
+            //RefreashAutoCS();
         }
         else
         {

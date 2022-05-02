@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18210752, g: 0.22780521, b: 0.30738643, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -123,7 +123,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &297565919
+--- !u!1 &356814462
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -131,38 +131,70 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 297565923}
-  - component: {fileID: 297565922}
-  - component: {fileID: 297565921}
-  - component: {fileID: 297565920}
-  - component: {fileID: 297565924}
+  - component: {fileID: 356814463}
+  - component: {fileID: 356814467}
+  - component: {fileID: 356814466}
+  - component: {fileID: 356814465}
+  - component: {fileID: 356814464}
   m_Layer: 0
-  m_Name: Cube1
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!65 &297565920
+--- !u!4 &356814463
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356814462}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.50091505, y: -0.7134091, z: 3.455119}
+  m_LocalScale: {x: 20, y: 1, z: 20}
+  m_Children: []
+  m_Father: {fileID: 1085768379}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &356814464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356814462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {x: 1, y: 1, z: 1}
+    metallic: 0
+    roughness: 1
+  SDF_offset: 0
+  renderMode: 1
+--- !u!65 &356814465
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 297565919}
+  m_GameObject: {fileID: 356814462}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &297565921
+--- !u!23 &356814466
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 297565919}
+  m_GameObject: {fileID: 356814462}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -197,46 +229,14 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &297565922
+--- !u!33 &356814467
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 297565919}
+  m_GameObject: {fileID: 356814462}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &297565923
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 297565919}
-  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
---- !u!114 &297565924
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 297565919}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mat_PBR:
-    albedo: {x: 1, y: 1, z: 1}
-    metallic: 0.9
-    roughness: 0.1
-  SDF_offset: 0
-  renderMode: 0
 --- !u!1 &1008065616
 GameObject:
   m_ObjectHideFlags: 0
@@ -323,14 +323,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1008065616}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.49636844, y: -0.77335703, z: 0.23291896, w: 0.3182546}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1 &1161070112
+  m_LocalEulerAnglesHint: {x: 42.548, y: -159.249, z: -57.232}
+--- !u!1 &1085768378
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -338,112 +338,30 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1161070117}
-  - component: {fileID: 1161070116}
-  - component: {fileID: 1161070115}
-  - component: {fileID: 1161070114}
-  - component: {fileID: 1161070113}
+  - component: {fileID: 1085768379}
   m_Layer: 0
-  m_Name: Cube2
+  m_Name: SDFMeshes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1161070113
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161070112}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mat_PBR:
-    albedo: {x: 0.5, y: 0.5, z: 0.5}
-    metallic: 0
-    roughness: 1
-  SDF_offset: 0
-  renderMode: 1
---- !u!65 &1161070114
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161070112}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &1161070115
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161070112}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1161070116
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161070112}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &1161070117
+--- !u!4 &1085768379
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161070112}
-  m_LocalRotation: {x: -0, y: 0.7063957, z: -0, w: 0.7078172}
-  m_LocalPosition: {x: 0, y: 0, z: -1.893}
-  m_LocalScale: {x: 7.9784994, y: 1, z: 1}
-  m_Children: []
+  m_GameObject: {fileID: 1085768378}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.50091505, y: 0.7134091, z: -3.455119}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 356814463}
+  - {fileID: 1491667013}
   m_Father: {fileID: 0}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 89.885, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1491667009
 GameObject:
   m_ObjectHideFlags: 0
@@ -458,7 +376,7 @@ GameObject:
   - component: {fileID: 1491667010}
   - component: {fileID: 1491667014}
   m_Layer: 0
-  m_Name: Cube3
+  m_Name: BoardMain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -533,13 +451,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1491667009}
-  m_LocalRotation: {x: 0.0020138472, y: -0.4593598, z: -0.37224227, w: 0.80648637}
-  m_LocalPosition: {x: -3.53, y: 0, z: 10.02}
-  m_LocalScale: {x: 10.429494, y: 11.527, z: 0.3106}
+  m_LocalRotation: {x: -0.15383968, y: 0.5729748, z: 0.11054502, w: 0.7973789}
+  m_LocalPosition: {x: 0.50091505, y: 1.3015909, z: -0.35488105}
+  m_LocalScale: {x: 1.42949, y: 1.8900001, z: 0.031059999}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: -19.8, y: -52.1, z: -39.8}
+  m_Father: {fileID: 1085768379}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: -21.84, y: 71.4, z: 0}
 --- !u!114 &1491667014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -553,9 +471,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {x: 0.7, y: 0.7, z: 0.7}
-    metallic: 0
-    roughness: 1
+    albedo: {x: 1, y: 1, z: 1}
+    metallic: 0.8
+    roughness: 0.1
   SDF_offset: 0
   renderMode: 1
 --- !u!1 &1666331700
@@ -638,8 +556,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_LocalRotation: {x: 0.15395135, y: -0.6692602, z: 0.14459296, w: 0.71237814}
-  m_LocalPosition: {x: 9.846946, y: 5.93038, z: 7.4579453}
+  m_LocalRotation: {x: 0.12798771, y: -0.6173545, z: 0.10264591, w: 0.769387}
+  m_LocalPosition: {x: 3.6996357, y: 2.8831718, z: -2.794197}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -671,7 +589,7 @@ MonoBehaviour:
   lines:
   - 'valMaps:'
   - //@@@SDFBakerMgr ValMaps
-  - ObjNum 3
+  - ObjNum 2
   - //@@@
   - 
   - 'Blocks:'
@@ -685,18 +603,12 @@ MonoBehaviour:
   - if(obj == 0 )
   - '{'
   - re.albedo = float3(1.0, 1.0, 1.0);
-  - re.metallic = 0.9;
-  - re.roughness = 0.1;
-  - '}'
-  - else if (obj == 1 )
-  - '{'
-  - re.albedo = float3(0.5, 0.5, 0.5);
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
-  - else if (obj == 2 )
+  - else if (obj == 1 )
   - '{'
-  - re.albedo = float3(0.7, 0.7, 0.7);
+  - re.albedo = float3(1.0, 1.0, 1.0);
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
@@ -705,10 +617,9 @@ MonoBehaviour:
   - 
   - '###BLOCK  ObjRender'
   - //@@@SDFBakerMgr ObjRender
-  - int renderMode[3];
-  - renderMode[0] = 0;
+  - int renderMode[2];
+  - renderMode[0] = 1;
   - renderMode[1] = 1;
-  - renderMode[2] = 1;
   - //@@@
   - 
   - int mode = renderMode[minHit.obj];
@@ -718,7 +629,7 @@ MonoBehaviour:
   - '}'
   - else if (mode == 1)
   - '{'
-  - "\tfloat3 lightDir = normalize(float3(1, -1, 1));"
+  - "\tfloat3 lightDir = normalize(float3(-1, -1, -1));"
   - "\tfloat3 lightColor = float3(1, 1, 1) * 3.5;"
   - "\treturn PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;"
   - '}'
@@ -826,18 +737,13 @@ MonoBehaviour:
   - "\t//@@@SDFBakerMgr ObjSDF"
   - if(inx == 0 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0,
+  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(10.0, 0.5, 10.0), float3(0.0,
     0.0, 0.0)));
   - '}'
   - else if (inx == 1 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, -1.9), float3(4.0, 0.5, 0.5), float3(0.0,
-    89.9, 0.0)));
-  - '}'
-  - else if (inx == 2 )
-  - '{'
-  - re = min(re, 0 + SDFBox(p, float3(-3.5, 0.0, 10.0), float3(5.2, 5.8, 0.2), float3(340.2,
-    307.9, 320.2)));
+  - re = min(re, 0 + SDFBox(p, float3(0.0, 2.0, -3.8), float3(0.7, 0.9, 0.0), float3(338.2,
+    71.4, 0.0)));
   - '}'
   - "\t//@@@"
   - return re;
@@ -931,7 +837,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1928400447
 MonoBehaviour:
@@ -945,44 +851,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1f5d13b1d98fa4ca18ee249cef77d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objNum: 3
+  objNum: 2
   bakedSDFs:
   - if(inx == 0 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(1.5, 0.5, 0.5), float3(30.0,
+  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(10.0, 0.5, 10.0), float3(0.0,
     0.0, 0.0)));
   - '}'
   - else if (inx == 1 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, -1.9), float3(4.0, 0.5, 0.5), float3(0.0,
-    89.9, 0.0)));
-  - '}'
-  - else if (inx == 2 )
-  - '{'
-  - re = min(re, 0 + SDFBox(p, float3(-3.5, 0.0, 10.0), float3(5.2, 5.8, 0.2), float3(340.2,
-    307.9, 320.2)));
+  - re = min(re, 0 + SDFBox(p, float3(0.0, 2.0, -3.8), float3(0.7, 0.9, 0.0), float3(338.2,
+    71.4, 0.0)));
   - '}'
   bakedMaterials:
   - if(obj == 0 )
   - '{'
   - re.albedo = float3(1.0, 1.0, 1.0);
-  - re.metallic = 0.9;
-  - re.roughness = 0.1;
-  - '}'
-  - else if (obj == 1 )
-  - '{'
-  - re.albedo = float3(0.5, 0.5, 0.5);
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
-  - else if (obj == 2 )
+  - else if (obj == 1 )
   - '{'
-  - re.albedo = float3(0.7, 0.7, 0.7);
+  - re.albedo = float3(1.0, 1.0, 1.0);
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
   bakedRenders:
-  - int renderMode[3];
-  - renderMode[0] = 0;
+  - int renderMode[2];
+  - renderMode[0] = 1;
   - renderMode[1] = 1;
-  - renderMode[2] = 1;
