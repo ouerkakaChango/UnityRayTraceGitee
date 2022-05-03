@@ -151,8 +151,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 356814462}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.50091505, y: -0.7134091, z: 3.455119}
-  m_LocalScale: {x: 20, y: 1, z: 20}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 40, y: 1, z: 40}
   m_Children: []
   m_Father: {fileID: 1085768379}
   m_RootOrder: 0
@@ -174,7 +174,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
   SDF_offset: 0
-  renderMode: 1
+  renderMode: 0
 --- !u!65 &356814465
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -247,6 +247,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1008065618}
   - component: {fileID: 1008065617}
+  - component: {fileID: 1008065619}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -330,6 +331,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 42.548, y: -159.249, z: -57.232}
+--- !u!114 &1008065619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008065616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1085768378
 GameObject:
   m_ObjectHideFlags: 0
@@ -354,7 +367,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1085768378}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.50091505, y: 0.7134091, z: -3.455119}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 356814463}
@@ -452,8 +465,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1491667009}
   m_LocalRotation: {x: -0.15383968, y: 0.5729748, z: 0.11054502, w: 0.7973789}
-  m_LocalPosition: {x: 0.50091505, y: 1.3015909, z: -0.35488105}
-  m_LocalScale: {x: 1.42949, y: 1.8900001, z: 0.031059999}
+  m_LocalPosition: {x: 0.50091505, y: 2.27, z: -4.9}
+  m_LocalScale: {x: 1.49, y: 2.22, z: 0.05}
   m_Children: []
   m_Father: {fileID: 1085768379}
   m_RootOrder: 1
@@ -471,11 +484,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {x: 1, y: 1, z: 1}
-    metallic: 0.8
-    roughness: 0.1
+    albedo: {x: 1, y: 0, z: 0}
+    metallic: 0
+    roughness: 1
   SDF_offset: 0
-  renderMode: 1
+  renderMode: 0
 --- !u!1 &1666331700
 GameObject:
   m_ObjectHideFlags: 0
@@ -556,8 +569,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_LocalRotation: {x: 0.12798771, y: -0.6173545, z: 0.10264591, w: 0.769387}
-  m_LocalPosition: {x: 3.6996357, y: 2.8831718, z: -2.794197}
+  m_LocalRotation: {x: 0.09539526, y: -0.50303394, z: 0.055929523, w: 0.857163}
+  m_LocalPosition: {x: 5.29253, y: 3.0845633, z: -6.4522834}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -609,8 +622,8 @@ MonoBehaviour:
   - else if (obj == 1 )
   - '{'
   - re.albedo = float3(1.0, 1.0, 1.0);
-  - re.metallic = 0;
-  - re.roughness = 1;
+  - re.metallic = 1;
+  - re.roughness = 0.2;
   - '}'
   - "\t//@@@"
   - '###BLOCK'
@@ -618,31 +631,38 @@ MonoBehaviour:
   - '###BLOCK  ObjRender'
   - //@@@SDFBakerMgr ObjRender
   - int renderMode[2];
-  - renderMode[0] = 1;
-  - renderMode[1] = 1;
-  - //@@@
-  - 
+  - renderMode[0] = 0;
+  - renderMode[1] = 0;
   - int mode = renderMode[minHit.obj];
   - if(mode==0)
   - '{'
-  - "\treturn PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);"
+  - '  float3 lightDirs[1];'
+  - '  float3 lightColors[1];'
+  - '  lightDirs[0] = float3(-0.2610216, -0.6762021, -0.6889255);'
+  - '  lightColors[0] = float3(1, 0.9568627, 0.8392157);'
+  - '  float3 re = 0.3 * mat.albedo;'
+  - '  for(int i=0;i<1;i++)'
+  - '  {'
+  - '      re += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);'
+  - '  }'
+  - '  return re;'
   - '}'
+  - //@@@
   - else if (mode == 1)
   - '{'
-  - "\tfloat3 lightDir = normalize(float3(-1, -1, -1));"
-  - "\tfloat3 lightColor = float3(1, 1, 1) * 3.5;"
-  - "\treturn PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;"
+  - "\treturn PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);"
   - '}'
   - '###BLOCK'
   - 
   - '###BLOCK SDFShadow'
-  - //float3 lightDir = normalize(float3(1, -1, 1));
-  - //ray.pos = minHit.P;
-  - //ray.dir = -lightDir;
-  - //ray.pos += SceneSDFShadowNormalBias * minHit.N;
-  - //HitInfo hitInfo;
-  - //return HardShadow_TraceScene(ray, hitInfo);
-  - return 1;
+  - float3 lightDir = normalize(float3(-1, -1, -1));
+  - ray.pos = minHit.P;
+  - ray.dir = -lightDir;
+  - ray.pos += SceneSDFShadowNormalBias * minHit.N;
+  - HitInfo hitInfo;
+  - return HardShadow_TraceScene(ray, hitInfo);
+  - 
+  - //return 1;
   - '###BLOCK'
   - 
   - '###BLOCK ExtraSDF'
@@ -737,13 +757,13 @@ MonoBehaviour:
   - "\t//@@@SDFBakerMgr ObjSDF"
   - if(inx == 0 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(10.0, 0.5, 10.0), float3(0.0,
-    0.0, 0.0)));
+  - re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(20, 0.5, 20), float3(0, 0,
+    0)));
   - '}'
   - else if (inx == 1 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.0, 2.0, -3.8), float3(0.7, 0.9, 0.0), float3(338.2,
-    71.4, 0.0)));
+  - re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.745, 1.11,
+    0.025), float3(338.16, 71.39999, 0)));
   - '}'
   - "\t//@@@"
   - return re;
@@ -851,17 +871,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1f5d13b1d98fa4ca18ee249cef77d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ambientIntensity: 0.3
   objNum: 2
   bakedSDFs:
   - if(inx == 0 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.0, 0.0, 0.0), float3(10.0, 0.5, 10.0), float3(0.0,
-    0.0, 0.0)));
+  - re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(20, 0.5, 20), float3(0, 0,
+    0)));
   - '}'
   - else if (inx == 1 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.0, 2.0, -3.8), float3(0.7, 0.9, 0.0), float3(338.2,
-    71.4, 0.0)));
+  - re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.745, 1.11,
+    0.025), float3(338.16, 71.39999, 0)));
   - '}'
   bakedMaterials:
   - if(obj == 0 )
@@ -872,11 +893,30 @@ MonoBehaviour:
   - '}'
   - else if (obj == 1 )
   - '{'
-  - re.albedo = float3(1.0, 1.0, 1.0);
+  - re.albedo = float3(1.0, 0.0, 0.0);
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
   bakedRenders:
   - int renderMode[2];
-  - renderMode[0] = 1;
-  - renderMode[1] = 1;
+  - renderMode[0] = 0;
+  - renderMode[1] = 0;
+  - int mode = renderMode[minHit.obj];
+  - if(mode==0)
+  - '{'
+  - '  float3 lightDirs[1];'
+  - '  float3 lightColors[1];'
+  - '  lightDirs[0] = float3(-0.2610216, -0.6762021, -0.6889255);'
+  - '  lightColors[0] = float3(1, 0.9568627, 0.8392157);'
+  - '  float3 re = 0.3 * mat.albedo;'
+  - '  for(int i=0;i<1;i++)'
+  - '  {'
+  - '      re += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);'
+  - '  }'
+  - '  return re;'
+  - '}'
+  tags:
+  - {fileID: 356814464}
+  - {fileID: 1491667014}
+  dirLightTags:
+  - {fileID: 1008065619}
