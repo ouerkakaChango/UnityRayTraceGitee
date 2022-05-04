@@ -15,6 +15,7 @@
 #include "../../HLSL/PBR/PBR_GGX.hlsl"
 
 #include "../../HLSL/Spline/SplineCommonDef.hlsl"
+#include "../../HLSL/Noise/WoodNoise.hlsl"
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -64,7 +65,7 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 
 //@@@SDFBakerMgr ObjRender
 int renderMode[5];
-renderMode[0] = 0;
+renderMode[0] = 2;
 renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
@@ -87,6 +88,10 @@ return re;
 else if (mode == 1)
 {
 	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
+}
+else if (mode == 2)
+{
+return WoodColor(5*minHit.P);
 }
 	return 0;
 }
@@ -135,24 +140,6 @@ float SDFPlanet(float3 p)
 
 float GetObjSDF(int inx, float3 p)
 {
-	//if (inx == 0)
-	//{
-	//	return SDFSphere(p, float3(5, 0.5, 0), 0.5); //球
-	//	//return SDFPlanet(p);
-	//}
-	//else if (inx == 1)
-	//{//地面
-	//box center(0, -1.2, -5), bound(5, 0.1, 5)
-	//return SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5));
-	//return SDFBoxTransform(p, float3(5, 0.5, 5),
-	//	float3(0, -0.5, 0),float3(0,0,30*Time01()));
-
-	//return SDFShearXBoxTransform(p, float3(5, 0.5, 5),
-	//	0,-0.5,
-	//	float3(0, -0.5, 0));
-
-	//return SDFShearXSphere(p, float3(0, 0, 0), 0.5,
-	//					0,1*Time01());
 
 	//### A
 	//float a1 = SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),

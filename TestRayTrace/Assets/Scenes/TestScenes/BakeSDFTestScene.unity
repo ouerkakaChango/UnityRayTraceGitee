@@ -160,7 +160,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
   SDF_offset: 0
-  renderMode: 0
+  renderMode: 2
   shapeType: 1
   specialID: -1
 --- !u!135 &45438425
@@ -847,6 +847,7 @@ MonoBehaviour:
   - 
   - '###BLOCK ExtraInclude'
   - '#include "../../HLSL/Spline/SplineCommonDef.hlsl"'
+  - '#include "../../HLSL/Noise/WoodNoise.hlsl"'
   - '###BLOCK'
   - 
   - '###BLOCK ObjMaterial'
@@ -887,7 +888,7 @@ MonoBehaviour:
   - '###BLOCK  ObjRender'
   - //@@@SDFBakerMgr ObjRender
   - int renderMode[5];
-  - renderMode[0] = 0;
+  - renderMode[0] = 2;
   - renderMode[1] = 0;
   - renderMode[2] = 0;
   - renderMode[3] = 0;
@@ -910,6 +911,10 @@ MonoBehaviour:
   - else if (mode == 1)
   - '{'
   - "\treturn PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);"
+  - '}'
+  - else if (mode == 2)
+  - '{'
+  - '    return WoodColor(5*minHit.P);'
   - '}'
   - '###BLOCK'
   - 
@@ -951,24 +956,6 @@ MonoBehaviour:
   - '###BLOCK'
   - 
   - '###BLOCK ObjSDF'
-  - "\t//if (inx == 0)"
-  - "\t//{"
-  - "\t//\treturn SDFSphere(p, float3(5, 0.5, 0), 0.5); //\u7403"
-  - "\t//\t//return SDFPlanet(p);"
-  - "\t//}"
-  - "\t//else if (inx == 1)"
-  - "\t//{//\u5730\u9762"
-  - "\t//box center(0, -1.2, -5), bound(5, 0.1, 5)"
-  - "\t//return SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5)); "
-  - "\t//return SDFBoxTransform(p, float3(5, 0.5, 5),"
-  - "\t//\tfloat3(0, -0.5, 0),float3(0,0,30*Time01()));"
-  - 
-  - "\t//return SDFShearXBoxTransform(p, float3(5, 0.5, 5),"
-  - "\t//\t0,-0.5,"
-  - "\t//\tfloat3(0, -0.5, 0));"
-  - 
-  - "\t//return SDFShearXSphere(p, float3(0, 0, 0), 0.5,"
-  - "\t//\t\t\t\t\t0,1*Time01());"
   - 
   - "\t//### A"
   - "\t//float a1 =  SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),"
@@ -1041,9 +1028,9 @@ MonoBehaviour:
   - "\t//@@@"
   - "\tif(inx == -1)"
   - "\t{"
-  - "\t\tre = SDFShearXBoxTransform(p, float3(1, 1, 1),"
-  - "\t\t\t0, -0.3,"
-  - "\t\t\tfloat3(0, 2, 0));"
+  - "\t\tfloat trunkBox = SDFBox(p, float3(0, 2, 0), float3(0.2, 2, 0.2), float3(0,
+    0, 0));"
+  - "\t\tre = min(re, trunkBox );"
   - "\t}"
   - return re;
   - 
@@ -1326,7 +1313,7 @@ MonoBehaviour:
   - '}'
   bakedRenders:
   - int renderMode[5];
-  - renderMode[0] = 0;
+  - renderMode[0] = 2;
   - renderMode[1] = 0;
   - renderMode[2] = 0;
   - renderMode[3] = 0;
@@ -1338,7 +1325,7 @@ MonoBehaviour:
   - '  float3 lightColors[1];'
   - '  lightDirs[0] = float3(-0.2610216, -0.6762021, -0.6889255);'
   - '  lightColors[0] = float3(1, 1, 1);'
-  - '  float3 re = 0 * mat.albedo;'
+  - '  float3 re = 0.3 * mat.albedo;'
   - '  for(int i=0;i<1;i++)'
   - '  {'
   - '      re += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);'
