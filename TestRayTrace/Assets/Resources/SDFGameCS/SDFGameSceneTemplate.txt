@@ -3,7 +3,7 @@
 #define MaxSDF 100000
 #define MaxTraceDis 1000
 #define MaxTraceTime 640
-#define TraceThre 0.001
+#define TraceThre 0.0001
 #define NormalEpsilon 0.01
 
 #define SceneSDFSoftShadowBias 0.1

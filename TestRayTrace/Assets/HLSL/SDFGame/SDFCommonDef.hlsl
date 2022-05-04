@@ -6,6 +6,24 @@
 
 #include "../Transform/TransformCommonDef.hlsl"
 
+//https://www.shadertoy.com/view/4sSSW3
+//http://orbit.dtu.dk/fedora/objects/orbit:113874/datastreams/file_75b66578-222e-4c7d-abdf-f7e255100209/content
+void basis(in float3 n, out float3 f, out float3 r)
+{
+	if (n.z < -0.999999)
+	{
+		f = float3(0, -1, 0);
+		r = float3(-1, 0, 0);
+	}
+	else
+	{
+		float a = 1. / (1. + n.z);
+		float b = -n.x * n.y * a;
+		f = float3(1. - n.x * n.x * a, b, -n.x);
+		r = float3(b, 1. - n.y * n.y * a, -n.y);
+	}
+}
+
 float SDFBox(float2 p, float2 center, float2 bound)
 {
 	float2 q = abs(p - center) - bound;

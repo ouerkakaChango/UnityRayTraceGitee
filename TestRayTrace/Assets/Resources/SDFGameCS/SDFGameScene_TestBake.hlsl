@@ -1,9 +1,9 @@
-﻿#define OBJNUM 5
+﻿#define OBJNUM 8
 
 #define MaxSDF 100000
 #define MaxTraceDis 1000
 #define MaxTraceTime 640
-#define TraceThre 0.001
+#define TraceThre 0.0001
 #define NormalEpsilon 0.01
 
 #define SceneSDFSoftShadowBias 0.1
@@ -47,9 +47,27 @@ else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.2;
+re.roughness = 1;
 }
 else if (obj == 4 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 0.2;
+}
+else if (obj == 5 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 6 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 7 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -62,12 +80,15 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[5];
+int renderMode[8];
 renderMode[0] = 2;
 renderMode[1] = 2;
 renderMode[2] = 0;
-renderMode[3] = 0;
-renderMode[4] = 2;
+renderMode[3] = 2;
+renderMode[4] = 0;
+renderMode[5] = 2;
+renderMode[6] = 2;
+renderMode[7] = 2;
 return renderMode[obj];
 //@@@
 }
@@ -76,7 +97,33 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 if(mode == 2)
 {
-	mat.albedo *= WoodColor(5*minHit.P);
+	//mat.albedo *= WoodColor(5*minHit.P);
+	//minHit.N += float3(100,0,0);//WoodDisplacement(minHit.P);
+	//minHit.N = float3(0,0,0);//normalize(minHit.N);
+	//mat.albedo = WoodDisplacement(5*minHit.P);
+
+	float3 pos = minHit.P;
+	float3 tile = float3(1,1,1);
+	float woodNEpsilon = NormalEpsilon;
+	float3 T = float3(1,0,0);
+	float3 B = float3(0,1,0);
+	float3 N = float3(0,0,1);
+
+	float3 woodN = normalize(float3(
+		WoodDisplacement(tile * pos + woodNEpsilon*T) - WoodDisplacement(tile * pos - woodNEpsilon*T),
+		WoodDisplacement(tile * pos + woodNEpsilon*B) - WoodDisplacement(tile * pos - woodNEpsilon*B),
+		WoodDisplacement(tile * pos + woodNEpsilon*N) - WoodDisplacement(tile * pos - woodNEpsilon*N)
+		));
+
+	float normalIntensity = 0.2;
+	woodN = normalize(normalIntensity * woodN + minHit.N);
+
+	//mat.albedo = woodN;
+	//mat.albedo = WoodDisplacement(tile*pos);
+
+	mat.albedo *= WoodColor(tile*pos);
+	minHit.N = woodN;
+
 	mode = 0;
 }
 }
@@ -211,17 +258,30 @@ re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(20, 0.5, 20), float3(0, 0, 0)
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11, 0.025), float3(338.16, 71.39999, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 1.71, 1.7), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 else if (inx == 4 )
 {
+re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11, 0.025), float3(338.16, 71.39999, 0)));
+}
+else if (inx == 5 )
+{
 re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+}
+else if (inx == 6 )
+{
+re = min(re, 0 + SDFBox(p, float3(-0.291, 1.734, -4.366), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
+}
+else if (inx == 7 )
+{
+re = min(re, 0 + SDFBox(p, float3(0.17, 1.734, -5.736), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
 }
 	//@@@
 	if(inx == -1)
 	{
-		float trunkBox = SDFBox(p, float3(0, 2, 0), float3(0.2, 2, 0.2), float3(0, 0, 0));
-		re = min(re, trunkBox );
+		//float trunkBox = SDFBox(p, float3(0, 2, 0), float3(0.2, 2, 0.2), float3(0, 0, 0));
+		//re = min(re, trunkBox );
+		re = min(re, SDFSphere(p, float3(0, 2, 0), 1) );
 	}
 return re;
 

@@ -5,7 +5,7 @@
 
 // Noise generator from https://otaviogood.github.io/noisegen/
 // Params: 3D, Seed 1, Waves 128, Octaves 7, Smooth 1
-float WoodNoiseGen(float3 p) {
+float WoodNoiseGen128(float3 p) {
     // This is a bit faster if we use 2 accumulators instead of 1.
     // Timed on Linux/Chrome/TitanX Pascal
     float wave0 = 0.0;
@@ -141,6 +141,39 @@ float WoodNoiseGen(float3 p) {
     return wave0 + wave1;
 }
 
+float WoodNoiseGen_8_2(float3 p) {
+    // This is a bit faster if we use 2 accumulators instead of 1.
+    // Timed on Linux/Chrome/TitanX Pascal
+    float wave0 = 0.0;
+    float wave1 = 0.0;
+    wave0 += sin(dot(p, float3(-1.490, -1.508, -0.788))) * 0.2643742568;
+    wave1 += sin(dot(p, float3(1.932, -0.258, -1.358))) * 0.2372959116;
+    wave0 += sin(dot(p, float3(2.637, -0.121, 0.524))) * 0.1833495728;
+    wave1 += sin(dot(p, float3(2.349, 2.032, -1.499))) * 0.1154264791;
+    wave0 += sin(dot(p, float3(0.246, 1.119, 3.271))) * 0.1144396416;
+    wave1 += sin(dot(p, float3(-3.138, 0.351, 1.478))) * 0.1132573719;
+    wave0 += sin(dot(p, float3(2.792, -1.067, -2.501))) * 0.0935422664;
+    wave1 += sin(dot(p, float3(-3.272, -2.771, 0.610))) * 0.0785511933;
+    return wave0 + wave1;
+}
+
+//8_7
+float WoodNoiseGen(float3 p) {
+    // This is a bit faster if we use 2 accumulators instead of 1.
+    // Timed on Linux/Chrome/TitanX Pascal
+    float wave0 = 0.0;
+    float wave1 = 0.0;
+    wave0 += sin(dot(p, float3(-2.146, -2.171, -1.135))) * 0.1278290488;
+    wave1 += sin(dot(p, float3(3.297, -0.440, -2.317))) * 0.0875746437;
+    wave0 += sin(dot(p, float3(7.141, -0.327, 1.420))) * 0.0355093026;
+    wave1 += sin(dot(p, float3(16.330, 14.123, -10.420))) * 0.0070296152;
+    wave0 += sin(dot(p, float3(1.744, 7.922, 23.152))) * 0.0068215049;
+    wave1 += sin(dot(p, float3(-22.705, 2.543, 10.695))) * 0.0065780196;
+    wave0 += sin(dot(p, float3(30.364, -11.608, -27.199))) * 0.0033681397;
+    wave1 += sin(dot(p, float3(-51.745, -43.821, 9.651))) * 0.0018276677;
+    return wave0 + wave1;
+}
+
 float WoodRepramp(float x) {
     return pow(sin(x) * 0.5 + 0.5, 8.0) + cos(x) * 0.7 + 0.7;
 }
@@ -156,5 +189,12 @@ float3 WoodColor(float3 pos)
     texColor *= rough;
     texColor = saturate(texColor);
     return texColor;
+}
+
+float WoodDisplacement(float3 pos)
+{
+    float rings = WoodRepramp(length(pos.xz + float2(WoodNoiseGen(pos * float3(8.0, 1.5, 8.0)), WoodNoiseGen(-pos * float3(8.0, 1.5, 8.0) + 4.5678)) * 0.05) * 64.0) / 1.8;
+    rings -= WoodNoiseGen(pos * 1.0) * 0.75;
+    return rings;
 }
 #endif
