@@ -40,11 +40,18 @@ public class SDFBakerMgr : MonoBehaviour
         StartBake();
         for (int i=0;i<tags.Length;i++)
         {
-            var tag = tags[i];
+            SDFBakerTag tag = tags[i];
             PreAdd(i, ref bakedSDFs);
             PreAdd(i, ref bakedMaterials, "obj");
 
-            AddBake(tag.gameObject);
+            if (tag.shapeType == SDFShapeType.Special)
+            {
+                AddBakeSpecial(tag);
+            }
+            else
+            {
+                AddBake(tag.gameObject);
+            }
             AddBakeMaterial(tag);
             AddBakeRender(i, tag);
 
@@ -142,6 +149,11 @@ public class SDFBakerMgr : MonoBehaviour
     void PostAdd(int inx, ref List<string> lines)
     {
         lines.Add("}");
+    }
+
+    void AddBakeSpecial(SDFBakerTag tag)
+    {
+        bakedSDFs.Add("inx = " + tag.specialID+";");
     }
 
     void AddBake(GameObject obj)

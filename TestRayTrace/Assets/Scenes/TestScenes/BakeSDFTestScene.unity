@@ -123,6 +123,122 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &45438423
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 45438428}
+  - component: {fileID: 45438427}
+  - component: {fileID: 45438426}
+  - component: {fileID: 45438425}
+  - component: {fileID: 45438424}
+  m_Layer: 0
+  m_Name: Sphere
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &45438424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 45438423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 1
+  specialID: -1
+--- !u!135 &45438425
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 45438423}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &45438426
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 45438423}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &45438427
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 45438423}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &45438428
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 45438423}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.79, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &348777196
 GameObject:
   m_ObjectHideFlags: 0
@@ -175,6 +291,8 @@ MonoBehaviour:
     roughness: 1
   SDF_offset: 0
   renderMode: 0
+  shapeType: 0
+  specialID: -1
 --- !u!65 &348777199
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -289,6 +407,8 @@ MonoBehaviour:
     roughness: 1
   SDF_offset: 0
   renderMode: 0
+  shapeType: 0
+  specialID: -1
 --- !u!65 &356814465
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -605,6 +725,8 @@ MonoBehaviour:
     roughness: 0.2
   SDF_offset: 0
   renderMode: 0
+  shapeType: 0
+  specialID: -1
 --- !u!1 &1666331700
 GameObject:
   m_ObjectHideFlags: 0
@@ -718,7 +840,7 @@ MonoBehaviour:
   lines:
   - 'valMaps:'
   - //@@@SDFBakerMgr ValMaps
-  - ObjNum 4
+  - ObjNum 5
   - //@@@
   - 
   - 'Blocks:'
@@ -731,7 +853,7 @@ MonoBehaviour:
   - "\t//@@@SDFBakerMgr ObjMaterial"
   - if(obj == 0 )
   - '{'
-  - re.albedo = float3(0.945098, 0.6352941, 0.1137255);
+  - re.albedo = float3(1, 1, 1);
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
@@ -753,16 +875,23 @@ MonoBehaviour:
   - re.metallic = 0;
   - re.roughness = 0.2;
   - '}'
+  - else if (obj == 4 )
+  - '{'
+  - re.albedo = float3(0.945098, 0.6352941, 0.1137255);
+  - re.metallic = 0;
+  - re.roughness = 1;
+  - '}'
   - "\t//@@@"
   - '###BLOCK'
   - 
   - '###BLOCK  ObjRender'
   - //@@@SDFBakerMgr ObjRender
-  - int renderMode[4];
+  - int renderMode[5];
   - renderMode[0] = 0;
   - renderMode[1] = 0;
   - renderMode[2] = 0;
   - renderMode[3] = 0;
+  - renderMode[4] = 0;
   - int mode = renderMode[minHit.obj];
   - if(mode==0)
   - '{'
@@ -790,7 +919,7 @@ MonoBehaviour:
   - ray.dir = -lightDir;
   - ray.pos += SceneSDFShadowNormalBias * minHit.N;
   - HitInfo hitInfo;
-  - return HardShadow_TraceScene(ray, hitInfo);
+  - return saturate(0.2 + HardShadow_TraceScene(ray, hitInfo));
   - 
   - //return 1;
   - '###BLOCK'
@@ -887,8 +1016,7 @@ MonoBehaviour:
   - "\t//@@@SDFBakerMgr ObjSDF"
   - if(inx == 0 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168,
-    1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+  - inx = -1;
   - '}'
   - else if (inx == 1 )
   - '{'
@@ -905,7 +1033,18 @@ MonoBehaviour:
   - re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11,
     0.025), float3(338.16, 71.39999, 0)));
   - '}'
+  - else if (inx == 4 )
+  - '{'
+  - re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168,
+    1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+  - '}'
   - "\t//@@@"
+  - "\tif(inx == -1)"
+  - "\t{"
+  - "\t\tre = SDFShearXBoxTransform(p, float3(1, 1, 1),"
+  - "\t\t\t0, -0.3,"
+  - "\t\t\tfloat3(0, 2, 0));"
+  - "\t}"
   - return re;
   - 
   - '###BLOCK'
@@ -1020,6 +1159,8 @@ MonoBehaviour:
     roughness: 1
   SDF_offset: 0
   renderMode: 0
+  shapeType: 0
+  specialID: -1
 --- !u!65 &1758613633
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1126,12 +1267,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ambientIntensity: 0.3
-  objNum: 4
+  objNum: 5
   bakedSDFs:
   - if(inx == 0 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168,
-    1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+  - inx = -1;
   - '}'
   - else if (inx == 1 )
   - '{'
@@ -1148,10 +1288,15 @@ MonoBehaviour:
   - re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11,
     0.025), float3(338.16, 71.39999, 0)));
   - '}'
+  - else if (inx == 4 )
+  - '{'
+  - re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168,
+    1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+  - '}'
   bakedMaterials:
   - if(obj == 0 )
   - '{'
-  - re.albedo = float3(0.945098, 0.6352941, 0.1137255);
+  - re.albedo = float3(1, 1, 1);
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
@@ -1173,12 +1318,19 @@ MonoBehaviour:
   - re.metallic = 0;
   - re.roughness = 0.2;
   - '}'
+  - else if (obj == 4 )
+  - '{'
+  - re.albedo = float3(0.945098, 0.6352941, 0.1137255);
+  - re.metallic = 0;
+  - re.roughness = 1;
+  - '}'
   bakedRenders:
-  - int renderMode[4];
+  - int renderMode[5];
   - renderMode[0] = 0;
   - renderMode[1] = 0;
   - renderMode[2] = 0;
   - renderMode[3] = 0;
+  - renderMode[4] = 0;
   - int mode = renderMode[minHit.obj];
   - if(mode==0)
   - '{'
@@ -1186,7 +1338,7 @@ MonoBehaviour:
   - '  float3 lightColors[1];'
   - '  lightDirs[0] = float3(-0.2610216, -0.6762021, -0.6889255);'
   - '  lightColors[0] = float3(1, 1, 1);'
-  - '  float3 re = 0.3 * mat.albedo;'
+  - '  float3 re = 0 * mat.albedo;'
   - '  for(int i=0;i<1;i++)'
   - '  {'
   - '      re += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);'
