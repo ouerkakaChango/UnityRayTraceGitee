@@ -2,17 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static LightUtility.LightFuncs;
+using XUtility;
 
 public class SDFBakerMgr : MonoBehaviour
 {
     public float ambientIntensity = 0.3f;
+    [ReadOnly]
     public int objNum = -1;
+    [ReadOnly]
     public List<string> bakedSDFs = new List<string>();
+    [ReadOnly]
     public List<string> bakedMaterials = new List<string>();
+    [ReadOnly]
     public List<string> bakedRenders = new List<string>();
 
-    public SDFBakerTag[] tags;
-    public SDFLightTag[] dirLightTags;
+    SDFBakerTag[] tags;
+    SDFLightTag[] dirLightTags;
 
     bool hide = false;
     // Start is called before the first frame update
@@ -158,14 +163,14 @@ public class SDFBakerMgr : MonoBehaviour
     {
         float offset = obj.GetComponent<SDFBakerTag>().SDF_offset;
         Vector3 bakeRot = obj.transform.rotation.eulerAngles;
-        string line = offset + " + SDFBox(p, " + Bake(obj.transform.position) + ", " + Bake(obj.transform.localScale*0.5f) + ", " + Bake(bakeRot) +")";
+        string line = offset + " + SDFBox(p, " + Bake(obj.transform.position) + ", " + Bake(obj.transform.lossyScale*0.5f) + ", " + Bake(bakeRot) +")";
         line = "re = min(re, " + line + ");";
         bakedSDFs.Add(line);
     }
 
     void AddBakeMaterial(SDFBakerTag tag)
     {
-        bakedMaterials.Add("re.albedo = float3" + tag.mat_PBR.albedo + ";");
+        bakedMaterials.Add("re.albedo = " + BakeColor3(tag.mat_PBR.albedo) + ";");
         bakedMaterials.Add("re.metallic = " + tag.mat_PBR.metallic + ";");
         bakedMaterials.Add("re.roughness = " + tag.mat_PBR.roughness + ";");
     }
@@ -192,5 +197,10 @@ public class SDFBakerMgr : MonoBehaviour
     string Bake(Vector3 v)
     {
         return "float3(" + v.x+", "+v.y+", "+v.z+")";
+    }
+
+    string BakeColor3(Color c)
+    {
+        return "float3(" + c.r + ", " + c.g + ", " + c.b + ")";
     }
 }

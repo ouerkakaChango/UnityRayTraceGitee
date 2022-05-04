@@ -1,4 +1,4 @@
-﻿#define OBJNUM 2
+﻿#define OBJNUM 4
 
 #define MaxSDF 100000
 #define MaxTraceDis 1000
@@ -26,15 +26,27 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1.0, 1.0, 1.0);
+re.albedo = float3(0.945098, 0.6352941, 0.1137255);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(1.0, 0.0, 0.0);
+re.albedo = float3(0.9433962, 0.6346852, 0.1127328);
 re.metallic = 0;
 re.roughness = 1;
+}
+else if (obj == 2 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 3 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 0.2;
 }
 	//@@@
 	return re;
@@ -45,16 +57,18 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
 
 //@@@SDFBakerMgr ObjRender
-int renderMode[2];
+int renderMode[4];
 renderMode[0] = 0;
 renderMode[1] = 0;
+renderMode[2] = 0;
+renderMode[3] = 0;
 int mode = renderMode[minHit.obj];
 if(mode==0)
 {
 float3 lightDirs[1];
 float3 lightColors[1];
 lightDirs[0] = float3(-0.2610216, -0.6762021, -0.6889255);
-lightColors[0] = float3(1, 0.9568627, 0.8392157);
+lightColors[0] = float3(1, 1, 1);
 float3 re = 0.3 * mat.albedo;
 for(int i=0;i<1;i++)
 {
@@ -179,11 +193,19 @@ float GetObjSDF(int inx, float3 p)
 	//@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(20, 0.5, 20), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.745, 1.11, 0.025), float3(338.16, 71.39999, 0)));
+re = min(re, 0 + SDFBox(p, float3(0.861513, 1.894959, -5.500246), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+}
+else if (inx == 2 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(20, 0.5, 20), float3(0, 0, 0)));
+}
+else if (inx == 3 )
+{
+re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11, 0.025), float3(338.16, 71.39999, 0)));
 }
 	//@@@
 return re;

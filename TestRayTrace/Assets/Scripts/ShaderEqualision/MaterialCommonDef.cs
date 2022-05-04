@@ -11,7 +11,7 @@ namespace ShaderEqualision
     [System.Serializable]
     public struct Material_PBR
     {
-        public Vector3 albedo;
+        public Color albedo;
         public float metallic;
         public float roughness;
 
@@ -19,7 +19,7 @@ namespace ShaderEqualision
             get
             {
                 Material_PBR re;
-                re.albedo = new Vector3(1, 1, 1);
+                re.albedo = new Color(1, 1, 1);
                 re.metallic = 0.9f;
                 re.roughness = 0.1f;
                 return re;
@@ -31,7 +31,7 @@ namespace ShaderEqualision
             get
             {
                 Material_PBR re;
-                re.albedo = new Vector3(1, 1, 1);
+                re.albedo = new Color(1, 1, 1);
                 re.metallic = 0.0f;
                 re.roughness = 1.0f;
                 return re;
