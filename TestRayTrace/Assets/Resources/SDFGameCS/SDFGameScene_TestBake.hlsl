@@ -33,7 +33,7 @@ re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0.9433962, 0.6346852, 0.1127328);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -51,7 +51,7 @@ re.roughness = 0.2;
 }
 else if (obj == 4 )
 {
-re.albedo = float3(0.945098, 0.6352941, 0.1137255);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -59,18 +59,34 @@ re.roughness = 1;
 	return re;
 }
 
+int GetObjRenderMode(int obj)
+{
+//@@@SDFBakerMgr ObjRenderMode
+int renderMode[5];
+renderMode[0] = 2;
+renderMode[1] = 2;
+renderMode[2] = 0;
+renderMode[3] = 0;
+renderMode[4] = 2;
+return renderMode[obj];
+//@@@
+}
+
+void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
+{
+if(mode == 2)
+{
+	mat.albedo *= WoodColor(5*minHit.P);
+	mode = 0;
+}
+}
+
 float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 {
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
-
+	int mode = GetObjRenderMode(minHit.obj);
+	ObjPreRender(mode, mat, ray, minHit);
 //@@@SDFBakerMgr ObjRender
-int renderMode[5];
-renderMode[0] = 2;
-renderMode[1] = 0;
-renderMode[2] = 0;
-renderMode[3] = 0;
-renderMode[4] = 0;
-int mode = renderMode[minHit.obj];
 if(mode==0)
 {
 float3 lightDirs[1];
@@ -88,10 +104,6 @@ return re;
 else if (mode == 1)
 {
 	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
-}
-else if (mode == 2)
-{
-return WoodColor(5*minHit.P);
 }
 	return 0;
 }

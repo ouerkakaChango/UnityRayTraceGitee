@@ -150,6 +150,7 @@ public class AutoCS : MonoBehaviour
         //!!! 顺序必须对应cgf
         rangeMap.Add("ValMaps", new Vector2Int(-1, -1));
         rangeMap.Add("ObjMaterial", new Vector2Int(-1, -1));
+        rangeMap.Add("ObjRenderMode", new Vector2Int(-1, -1));
         rangeMap.Add("ObjRender", new Vector2Int(-1, -1));
         rangeMap.Add("ObjSDF", new Vector2Int(-1, -1));
 
@@ -215,6 +216,14 @@ public class AutoCS : MonoBehaviour
                 newcount = bakerMgr.bakedMaterials.Count;
                 newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
                 newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedMaterials);
+            }
+            else if (iter.Key == "ObjRenderMode" && ValidRange(iter.Value))
+            {
+                oricount = iter.Value.y - iter.Value.x - 1;
+                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
+                newcount = bakerMgr.bakedRenderModes.Count;
+                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
+                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedRenderModes);
             }
             else if (iter.Key == "ObjRender" && ValidRange(iter.Value))
             {

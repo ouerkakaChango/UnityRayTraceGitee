@@ -14,6 +14,8 @@ public class SDFBakerMgr : MonoBehaviour
     [ReadOnly]
     public List<string> bakedMaterials = new List<string>();
     [ReadOnly]
+    public List<string> bakedRenderModes = new List<string>();
+    [ReadOnly]
     public List<string> bakedRenders = new List<string>();
 
     SDFBakerTag[] tags;
@@ -53,7 +55,7 @@ public class SDFBakerMgr : MonoBehaviour
                 AddBake(tag.gameObject);
             }
             AddBakeMaterial(tag);
-            AddBakeRender(i, tag);
+            AddBakeRenderMode(i, tag);
 
             PostAdd(i, ref bakedSDFs);
             PostAdd(i, ref bakedMaterials);
@@ -84,13 +86,16 @@ public class SDFBakerMgr : MonoBehaviour
 
         bakedMaterials.Clear();
 
+        bakedRenderModes.Clear();
+        bakedRenderModes.Add("int renderMode[" + objNum + "];");
+
         bakedRenders.Clear();
-        bakedRenders.Add("int renderMode[" + objNum + "];");
     }
 
     void EndBake()
     {
-        //int mode = renderMode[minHit.obj];
+        bakedRenderModes.Add("return renderMode[obj];");
+
         //if(mode==0)
         //{
         //  float3 lightDirs[16];
@@ -108,7 +113,6 @@ public class SDFBakerMgr : MonoBehaviour
         //  return re;
         //}
 
-        bakedRenders.Add("int mode = renderMode[minHit.obj];");
         bakedRenders.Add("if(mode==0)");
         bakedRenders.Add("{");
         int dirLightNum = dirLightTags.Length;
@@ -187,10 +191,9 @@ public class SDFBakerMgr : MonoBehaviour
         bakedMaterials.Add("re.roughness = " + tag.mat_PBR.roughness + ";");
     }
 
-    void AddBakeRender(int inx, SDFBakerTag tag)
+    void AddBakeRenderMode(int inx, SDFBakerTag tag)
     {
-        Debug.Log("RRR");
-        bakedRenders.Add("renderMode["+inx+"] = " + tag.renderMode+";");
+        bakedRenderModes.Add("renderMode["+inx+"] = " + tag.renderMode+";");
     }
 
     public void ToggleHideTransform()

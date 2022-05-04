@@ -31,10 +31,25 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	return re;
 }
 
+int GetObjRenderMode(int obj)
+{
+	###BLOCK ObjRenderMode
+	... 
+	###BLOCK
+}
+
+void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
+{
+	###BLOCK ObjPreRender
+	... 
+	###BLOCK
+}
+
 float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 {
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
-
+	int mode = GetObjRenderMode(minHit.obj);
+	ObjPreRender(mode, mat, ray, minHit);
 	###BLOCK ObjRender
 	... 
 	###BLOCK

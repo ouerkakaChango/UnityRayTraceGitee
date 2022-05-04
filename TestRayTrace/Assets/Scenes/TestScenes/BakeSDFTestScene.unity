@@ -286,11 +286,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {r: 0.9433962, g: 0.63468516, b: 0.11273279, a: 1}
+    albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
   SDF_offset: 0
-  renderMode: 0
+  renderMode: 2
   shapeType: 0
   specialID: -1
 --- !u!65 &348777199
@@ -885,15 +885,28 @@ MonoBehaviour:
   - "\t//@@@"
   - '###BLOCK'
   - 
-  - '###BLOCK  ObjRender'
-  - //@@@SDFBakerMgr ObjRender
+  - '###BLOCK ObjRenderMode'
+  - //@@@SDFBakerMgr ObjRenderMode
   - int renderMode[5];
   - renderMode[0] = 2;
   - renderMode[1] = 0;
   - renderMode[2] = 0;
   - renderMode[3] = 0;
   - renderMode[4] = 0;
-  - int mode = renderMode[minHit.obj];
+  - return renderMode[obj];
+  - //@@@
+  - '###BLOCK'
+  - 
+  - '###BLOCK  ObjPreRender'
+  - if(mode == 2)
+  - '{'
+  - "\tmat.albedo *= WoodColor(5*minHit.P);"
+  - "\tmode = 0;"
+  - '}'
+  - '###BLOCK'
+  - 
+  - '###BLOCK ObjRender'
+  - //@@@SDFBakerMgr ObjRender
   - if(mode==0)
   - '{'
   - '  float3 lightDirs[1];'
@@ -911,10 +924,6 @@ MonoBehaviour:
   - else if (mode == 1)
   - '{'
   - "\treturn PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);"
-  - '}'
-  - else if (mode == 2)
-  - '{'
-  - '    return WoodColor(5*minHit.P);'
   - '}'
   - '###BLOCK'
   - 
@@ -1141,11 +1150,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {r: 0.94509804, g: 0.63529414, b: 0.11372549, a: 1}
+    albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
   SDF_offset: 0
-  renderMode: 0
+  renderMode: 2
   shapeType: 0
   specialID: -1
 --- !u!65 &1758613633
@@ -1283,7 +1292,7 @@ MonoBehaviour:
   bakedMaterials:
   - if(obj == 0 )
   - '{'
-  - re.albedo = float3(1, 1, 1);
+  - re.albedo = float3(1, 0, 0);
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
@@ -1311,14 +1320,15 @@ MonoBehaviour:
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
-  bakedRenders:
+  bakedRenderModes:
   - int renderMode[5];
   - renderMode[0] = 2;
   - renderMode[1] = 0;
   - renderMode[2] = 0;
   - renderMode[3] = 0;
   - renderMode[4] = 0;
-  - int mode = renderMode[minHit.obj];
+  - return renderMode[obj];
+  bakedRenders:
   - if(mode==0)
   - '{'
   - '  float3 lightDirs[1];'
