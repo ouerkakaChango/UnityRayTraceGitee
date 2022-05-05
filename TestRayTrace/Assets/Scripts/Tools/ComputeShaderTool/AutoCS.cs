@@ -239,7 +239,7 @@ public class AutoCS : MonoBehaviour
                 newcount = 1;
                 newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
                 string[] newlines = new string[1];
-                newlines[0] = "ObjNum " + bakerMgr.objNum;
+                newlines[0] = "ObjNum " + bakerMgr.tags.Length;
                 newLines.InsertRange(offset + iter.Value.x + 1, newlines);
 
             }

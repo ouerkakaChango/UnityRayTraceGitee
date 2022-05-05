@@ -8,8 +8,6 @@ public class SDFBakerMgr : MonoBehaviour
 {
     public float ambientIntensity = 0.3f;
     [ReadOnly]
-    public int objNum = -1;
-    [ReadOnly]
     public List<string> bakedSDFs = new List<string>();
     [ReadOnly]
     public List<string> bakedMaterials = new List<string>();
@@ -18,7 +16,7 @@ public class SDFBakerMgr : MonoBehaviour
     [ReadOnly]
     public List<string> bakedRenders = new List<string>();
 
-    SDFBakerTag[] tags;
+    public SDFBakerTag[] tags;
     SDFLightTag[] dirLightTags;
 
     bool hide = false;
@@ -65,8 +63,16 @@ public class SDFBakerMgr : MonoBehaviour
 
     void PrepareBake()
     {
-        tags = (SDFBakerTag[])GameObject.FindObjectsOfType(typeof(SDFBakerTag));
-        objNum = tags.Length;
+        var allTags = (SDFBakerTag[])GameObject.FindObjectsOfType(typeof(SDFBakerTag));
+        List<SDFBakerTag> tagList = new List<SDFBakerTag>();
+        for(int i=0;i<allTags.Length;i++)
+        {
+            if(allTags[i].active)
+            {
+                tagList.Add(allTags[i]);
+            }
+        }
+        tags = tagList.ToArray();
 
         SDFLightTag[] lightTags = (SDFLightTag[])GameObject.FindObjectsOfType(typeof(SDFLightTag));
         List<SDFLightTag> dirlightList = new List<SDFLightTag>();
@@ -87,7 +93,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedMaterials.Clear();
 
         bakedRenderModes.Clear();
-        bakedRenderModes.Add("int renderMode[" + objNum + "];");
+        bakedRenderModes.Add("int renderMode[" + tags.Length + "];");
 
         bakedRenders.Clear();
     }
