@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 45438425}
   - component: {fileID: 45438424}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: Special
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -161,7 +161,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
   SDF_offset: 0
-  renderMode: 2
+  renderMode: 3
   shapeType: 1
   specialID: -1
 --- !u!135 &45438425
@@ -963,7 +963,7 @@ MonoBehaviour:
   lines:
   - 'valMaps:'
   - //@@@SDFBakerMgr ValMaps
-  - ObjNum 8
+  - ObjNum 7
   - //@@@
   - 
   - 'Blocks:'
@@ -997,13 +997,13 @@ MonoBehaviour:
   - '{'
   - re.albedo = float3(1, 1, 1);
   - re.metallic = 0;
-  - re.roughness = 1;
+  - re.roughness = 0.2;
   - '}'
   - else if (obj == 4 )
   - '{'
   - re.albedo = float3(1, 1, 1);
   - re.metallic = 0;
-  - re.roughness = 0.2;
+  - re.roughness = 1;
   - '}'
   - else if (obj == 5 )
   - '{'
@@ -1017,26 +1017,19 @@ MonoBehaviour:
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
-  - else if (obj == 7 )
-  - '{'
-  - re.albedo = float3(1, 1, 1);
-  - re.metallic = 0;
-  - re.roughness = 1;
-  - '}'
   - "\t//@@@"
   - '###BLOCK'
   - 
   - '###BLOCK ObjRenderMode'
   - //@@@SDFBakerMgr ObjRenderMode
-  - int renderMode[8];
+  - int renderMode[7];
   - renderMode[0] = 2;
   - renderMode[1] = 2;
   - renderMode[2] = 0;
-  - renderMode[3] = 2;
-  - renderMode[4] = 0;
+  - renderMode[3] = 0;
+  - renderMode[4] = 2;
   - renderMode[5] = 2;
   - renderMode[6] = 2;
-  - renderMode[7] = 2;
   - return renderMode[obj];
   - //@@@
   - '###BLOCK'
@@ -1055,7 +1048,7 @@ MonoBehaviour:
   - "\tfloat3 T = float3(1,0,0);"
   - "\tfloat3 B = float3(0,1,0);"
   - "\tfloat3 N = float3(0,0,1);"
-  - 
+  - "\t"
   - "\tfloat3 woodN = normalize(float3("
   - "\t\tWoodDisplacement(tile * pos + woodNEpsilon*T) - WoodDisplacement(tile *
     pos - woodNEpsilon*T),"
@@ -1068,11 +1061,20 @@ MonoBehaviour:
   - "\tfloat normalIntensity = 0.2;"
   - "\twoodN = normalize(normalIntensity * woodN + minHit.N);"
   - 
-  - "\t//mat.albedo = woodN;"
-  - "\t//mat.albedo = WoodDisplacement(tile*pos);"
-  - 
   - "\tmat.albedo *= WoodColor(tile*pos);"
   - "\tminHit.N = woodN;"
+  - 
+  - "\tmode = 0;"
+  - '}'
+  - else if(mode == 3)
+  - '{'
+  - "\tfloat3 pos = minHit.P;"
+  - "\t////float sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0,
+    0));"
+  - "\t//float2 uv = BoxedUV(pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));"
+  - "\t//mat.albedo = float3(uv,0);"
+  - 
+  - "\tmat.albedo = float3(1,0,1);"
   - 
   - "\tmode = 0;"
   - '}'
@@ -1199,25 +1201,20 @@ MonoBehaviour:
   - '}'
   - else if (inx == 3 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0, 1.71, 1.7), float3(0.5, 0.5, 0.5), float3(0,
-    0, 0)));
-  - '}'
-  - else if (inx == 4 )
-  - '{'
   - re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11,
     0.025), float3(338.16, 71.39999, 0)));
   - '}'
-  - else if (inx == 5 )
+  - else if (inx == 4 )
   - '{'
   - re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168,
     1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
   - '}'
-  - else if (inx == 6 )
+  - else if (inx == 5 )
   - '{'
   - re = min(re, 0 + SDFBox(p, float3(-0.291, 1.734, -4.366), float3(0.07071167,
     1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
   - '}'
-  - else if (inx == 7 )
+  - else if (inx == 6 )
   - '{'
   - re = min(re, 0 + SDFBox(p, float3(0.17, 1.734, -5.736), float3(0.07071167, 1.511707,
     0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
@@ -1227,8 +1224,10 @@ MonoBehaviour:
   - "\t{"
   - "\t\t//float trunkBox = SDFBox(p, float3(0, 2, 0), float3(0.2, 2, 0.2), float3(0,
     0, 0));"
+  - "\t\tfloat sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));"
+  - "\t\tre = min(re, sbox );"
   - "\t\t//re = min(re, trunkBox );"
-  - "\t\tre = min(re, SDFSphere(p, float3(0, 2, 0), 1) );"
+  - "\t\t//re = min(re, SDFSphere(p, float3(0, 2, 0), 1) );"
   - "\t}"
   - return re;
   - 
@@ -1533,7 +1532,7 @@ MonoBehaviour:
   - '}'
   bakedRenderModes:
   - int renderMode[7];
-  - renderMode[0] = 2;
+  - renderMode[0] = 3;
   - renderMode[1] = 2;
   - renderMode[2] = 0;
   - renderMode[3] = 0;

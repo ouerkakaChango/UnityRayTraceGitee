@@ -60,7 +60,7 @@ re.roughness = 1;
 ###BLOCK ObjRenderMode
 //@@@SDFBakerMgr ObjRenderMode
 int renderMode[7];
-renderMode[0] = 2;
+renderMode[0] = 3;
 renderMode[1] = 2;
 renderMode[2] = 0;
 renderMode[3] = 0;
@@ -85,7 +85,7 @@ if(mode == 2)
 	float3 T = float3(1,0,0);
 	float3 B = float3(0,1,0);
 	float3 N = float3(0,0,1);
-
+	
 	float3 woodN = normalize(float3(
 		WoodDisplacement(tile * pos + woodNEpsilon*T) - WoodDisplacement(tile * pos - woodNEpsilon*T),
 		WoodDisplacement(tile * pos + woodNEpsilon*B) - WoodDisplacement(tile * pos - woodNEpsilon*B),
@@ -95,11 +95,19 @@ if(mode == 2)
 	float normalIntensity = 0.2;
 	woodN = normalize(normalIntensity * woodN + minHit.N);
 
-	//mat.albedo = woodN;
-	//mat.albedo = WoodDisplacement(tile*pos);
-
 	mat.albedo *= WoodColor(tile*pos);
 	minHit.N = woodN;
+
+	mode = 0;
+}
+else if(mode == 3)
+{
+	float3 pos = minHit.P;
+	////float sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
+	//float2 uv = BoxedUV(pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
+	//mat.albedo = float3(uv,0);
+
+	mat.albedo = float3(1,0,1);
 
 	mode = 0;
 }
@@ -240,8 +248,10 @@ re = min(re, 0 + SDFBox(p, float3(0.17, 1.734, -5.736), float3(0.07071167, 1.511
 	if(inx == -1)
 	{
 		//float trunkBox = SDFBox(p, float3(0, 2, 0), float3(0.2, 2, 0.2), float3(0, 0, 0));
+		float sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
+		re = min(re, sbox );
 		//re = min(re, trunkBox );
-		re = min(re, SDFSphere(p, float3(0, 2, 0), 1) );
+		//re = min(re, SDFSphere(p, float3(0, 2, 0), 1) );
 	}
 return re;
 
