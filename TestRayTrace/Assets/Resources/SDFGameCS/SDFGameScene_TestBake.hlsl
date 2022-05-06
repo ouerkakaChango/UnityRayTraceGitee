@@ -16,6 +16,7 @@
 
 #include "../../HLSL/Spline/SplineCommonDef.hlsl"
 #include "../../HLSL/Noise/WoodNoise.hlsl"
+#include "../../HLSL/UV/UVCommonDef.hlsl"
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -119,11 +120,11 @@ if(mode == 2)
 else if(mode == 3)
 {
 	float3 pos = minHit.P;
-	////float sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
-	//float2 uv = BoxedUV(pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
-	//mat.albedo = float3(uv,0);
+	//float sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
+	float2 uv = BoxedUV(pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
+	mat.albedo = float3(uv,0);
 
-	mat.albedo = float3(1,0,1);
+	//mat.albedo = float3(1,0,1);
 
 	mode = 0;
 }
@@ -160,14 +161,14 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info);
 float SoftShadow_TraceScene(Ray ray, out HitInfo info);
 float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 {
-float3 lightDir = normalize(float3(-1, -1, -1));
-ray.pos = minHit.P;
-ray.dir = -lightDir;
-ray.pos += SceneSDFShadowNormalBias * minHit.N;
-HitInfo hitInfo;
-return saturate(0.2 + HardShadow_TraceScene(ray, hitInfo));
+//float3 lightDir = normalize(float3(-1, -1, -1));
+//ray.pos = minHit.P;
+//ray.dir = -lightDir;
+//ray.pos += SceneSDFShadowNormalBias * minHit.N;
+//HitInfo hitInfo;
+//return saturate(0.2 + HardShadow_TraceScene(ray, hitInfo));
 
-//return 1;
+return 1;
 }
 
 //###################################################################################
