@@ -1,4 +1,4 @@
-﻿#define OBJNUM 7
+﻿#define OBJNUM 8
 
 #define MaxSDF 100000
 #define MaxTraceDis 1000
@@ -48,13 +48,13 @@ else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.2;
+re.roughness = 1;
 }
 else if (obj == 4 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.2;
 }
 else if (obj == 5 )
 {
@@ -68,6 +68,12 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
+else if (obj == 7 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
 	//@@@
 	return re;
 }
@@ -75,14 +81,15 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[7];
+int renderMode[8];
 renderMode[0] = 3;
 renderMode[1] = 2;
 renderMode[2] = 0;
-renderMode[3] = 0;
-renderMode[4] = 2;
+renderMode[3] = 2;
+renderMode[4] = 0;
 renderMode[5] = 2;
 renderMode[6] = 2;
+renderMode[7] = 2;
 return renderMode[obj];
 //@@@
 }
@@ -260,17 +267,21 @@ re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(20, 0.5, 20), float3(0, 0, 0)
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11, 0.025), float3(338.16, 71.39999, 0)));
+re = min(re, -0.3 + SDFBox(p, float3(1.626, 1.65, -2.18), float3(0.25, 0.25, 0.25), float3(0, 0, 0)));
 }
 else if (inx == 4 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11, 0.025), float3(338.16, 71.39999, 0)));
 }
 else if (inx == 5 )
 {
-re = min(re, 0 + SDFBox(p, float3(-0.291, 1.734, -4.366), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
+re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
 }
 else if (inx == 6 )
+{
+re = min(re, 0 + SDFBox(p, float3(-0.291, 1.734, -4.366), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
+}
+else if (inx == 7 )
 {
 re = min(re, 0 + SDFBox(p, float3(0.17, 1.734, -5.736), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
 }
