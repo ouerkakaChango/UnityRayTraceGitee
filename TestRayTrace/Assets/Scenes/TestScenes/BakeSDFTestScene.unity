@@ -506,7 +506,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
@@ -585,7 +585,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1004293003}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.49, y: 2, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
@@ -679,7 +679,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1008065616}
   m_LocalRotation: {x: 0.5086129, y: 0.14271739, z: -0.49123544, w: 0.692555}
-  m_LocalPosition: {x: 0, y: 4.85, z: 0}
+  m_LocalPosition: {x: 0, y: 4.85, z: -2.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -930,8 +930,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_LocalRotation: {x: 0.09837256, y: -0.62576944, z: 0.08026578, w: 0.7696056}
-  m_LocalPosition: {x: 5.5589046, y: 3.4644108, z: -3.725717}
+  m_LocalRotation: {x: 0.00013889372, y: -0.99622416, z: 0.08669683, w: 0.00459978}
+  m_LocalPosition: {x: 0.23969306, y: 3.378509, z: 1.7733412}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -963,7 +963,7 @@ MonoBehaviour:
   lines:
   - 'valMaps:'
   - //@@@SDFBakerMgr ValMaps
-  - ObjNum 8
+  - ObjNum 7
   - //@@@
   - 
   - 'Blocks:'
@@ -1004,13 +1004,13 @@ MonoBehaviour:
   - '{'
   - re.albedo = float3(1, 1, 1);
   - re.metallic = 0;
-  - re.roughness = 1;
+  - re.roughness = 0.2;
   - '}'
   - else if (obj == 4 )
   - '{'
   - re.albedo = float3(1, 1, 1);
   - re.metallic = 0;
-  - re.roughness = 0.2;
+  - re.roughness = 1;
   - '}'
   - else if (obj == 5 )
   - '{'
@@ -1024,26 +1024,19 @@ MonoBehaviour:
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
-  - else if (obj == 7 )
-  - '{'
-  - re.albedo = float3(1, 1, 1);
-  - re.metallic = 0;
-  - re.roughness = 1;
-  - '}'
   - "\t//@@@"
   - '###BLOCK'
   - 
   - '###BLOCK ObjRenderMode'
   - //@@@SDFBakerMgr ObjRenderMode
-  - int renderMode[8];
+  - int renderMode[7];
   - renderMode[0] = 3;
   - renderMode[1] = 2;
   - renderMode[2] = 0;
-  - renderMode[3] = 2;
-  - renderMode[4] = 0;
+  - renderMode[3] = 0;
+  - renderMode[4] = 2;
   - renderMode[5] = 2;
   - renderMode[6] = 2;
-  - renderMode[7] = 2;
   - return renderMode[obj];
   - //@@@
   - '###BLOCK'
@@ -1238,25 +1231,20 @@ MonoBehaviour:
   - '}'
   - else if (inx == 3 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(3.49, 2, 0), float3(1, 1, 1), float3(0, 0,
-    0)));
-  - '}'
-  - else if (inx == 4 )
-  - '{'
   - re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11,
     0.025), float3(338.16, 71.39999, 0)));
   - '}'
-  - else if (inx == 5 )
+  - else if (inx == 4 )
   - '{'
   - re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168,
     1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
   - '}'
-  - else if (inx == 6 )
+  - else if (inx == 5 )
   - '{'
   - re = min(re, 0 + SDFBox(p, float3(-0.321, 1.74, -4.38), float3(0.07071167, 1.511707,
     0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
   - '}'
-  - else if (inx == 7 )
+  - else if (inx == 6 )
   - '{'
   - re = min(re, 0 + SDFBox(p, float3(0.14, 1.74, -5.75), float3(0.07071167, 1.511707,
     0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
@@ -1513,25 +1501,20 @@ MonoBehaviour:
   - '}'
   - else if (inx == 3 )
   - '{'
-  - re = min(re, -0.2 + SDFBox(p, float3(3.49, 2, 0), float3(1, 1, 1), float3(0,
-    0, 0)));
-  - '}'
-  - else if (inx == 4 )
-  - '{'
   - re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11,
     0.025), float3(338.16, 71.39999, 0)));
   - '}'
-  - else if (inx == 5 )
+  - else if (inx == 4 )
   - '{'
   - re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168,
     1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
   - '}'
-  - else if (inx == 6 )
+  - else if (inx == 5 )
   - '{'
   - re = min(re, 0 + SDFBox(p, float3(-0.321, 1.74, -4.38), float3(0.07071167, 1.511707,
     0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
   - '}'
-  - else if (inx == 7 )
+  - else if (inx == 6 )
   - '{'
   - re = min(re, 0 + SDFBox(p, float3(0.14, 1.74, -5.75), float3(0.07071167, 1.511707,
     0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
@@ -1559,13 +1542,13 @@ MonoBehaviour:
   - '{'
   - re.albedo = float3(1, 1, 1);
   - re.metallic = 0;
-  - re.roughness = 1;
+  - re.roughness = 0.2;
   - '}'
   - else if (obj == 4 )
   - '{'
   - re.albedo = float3(1, 1, 1);
   - re.metallic = 0;
-  - re.roughness = 0.2;
+  - re.roughness = 1;
   - '}'
   - else if (obj == 5 )
   - '{'
@@ -1579,22 +1562,15 @@ MonoBehaviour:
   - re.metallic = 0;
   - re.roughness = 1;
   - '}'
-  - else if (obj == 7 )
-  - '{'
-  - re.albedo = float3(1, 1, 1);
-  - re.metallic = 0;
-  - re.roughness = 1;
-  - '}'
   bakedRenderModes:
-  - int renderMode[8];
+  - int renderMode[7];
   - renderMode[0] = 3;
   - renderMode[1] = 2;
   - renderMode[2] = 0;
-  - renderMode[3] = 2;
-  - renderMode[4] = 0;
+  - renderMode[3] = 0;
+  - renderMode[4] = 2;
   - renderMode[5] = 2;
   - renderMode[6] = 2;
-  - renderMode[7] = 2;
   - return renderMode[obj];
   bakedRenders:
   - if(mode==0)
@@ -1620,7 +1596,6 @@ MonoBehaviour:
   - {fileID: 45438424}
   - {fileID: 348777198}
   - {fileID: 356814464}
-  - {fileID: 1004293004}
   - {fileID: 1491667014}
   - {fileID: 1758613632}
   - {fileID: 2051386105}

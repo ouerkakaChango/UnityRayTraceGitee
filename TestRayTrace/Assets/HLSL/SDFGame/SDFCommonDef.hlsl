@@ -8,7 +8,8 @@
 
 //https://www.shadertoy.com/view/4sSSW3
 //http://orbit.dtu.dk/fedora/objects/orbit:113874/datastreams/file_75b66578-222e-4c7d-abdf-f7e255100209/content
-void basis(in float3 n, out float3 f, out float3 r)
+//by my personal verify,not very useful in most case.
+void basis_unstable(in float3 n, out float3 f, out float3 r)
 {
 	if (n.z < -0.999999)
 	{
