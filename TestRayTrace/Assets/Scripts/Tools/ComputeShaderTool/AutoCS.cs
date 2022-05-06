@@ -152,6 +152,7 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("ObjMaterial", new Vector2Int(-1, -1));
         rangeMap.Add("ObjRenderMode", new Vector2Int(-1, -1));
         rangeMap.Add("ObjRender", new Vector2Int(-1, -1));
+        rangeMap.Add("DirShadow", new Vector2Int(-1, -1));
         rangeMap.Add("ObjSDF", new Vector2Int(-1, -1));
 
         for (int i=0;i<lines.Length;i++)
@@ -232,6 +233,14 @@ public class AutoCS : MonoBehaviour
                 newcount = bakerMgr.bakedRenders.Count;
                 newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
                 newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedRenders);
+            }
+            else if (iter.Key == "DirShadow" && ValidRange(iter.Value))
+            {
+                oricount = iter.Value.y - iter.Value.x - 1;
+                //É¾È¥(range.x,range.y)£¬²åÈë bakerMgr.bakedxxx
+                newcount = bakerMgr.bakedDirShadows.Count;
+                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
+                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedDirShadows);
             }
             else if (iter.Key == "ValMaps" && ValidRange(iter.Value))
             {

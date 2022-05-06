@@ -68,8 +68,19 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info);
 float SoftShadow_TraceScene(Ray ray, out HitInfo info);
+
+float GetDirHardShadow(Ray ray, float3 lightDir, in HitInfo minHit)
+{
+	ray.pos = minHit.P;
+	ray.dir = -lightDir;
+	ray.pos += SceneSDFShadowNormalBias * minHit.N;
+	HitInfo hitInfo;
+	return HardShadow_TraceScene(ray, hitInfo);
+}
+
 float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 {
+	float sha = 1;
 	###BLOCK SDFShadow
 	... 
 	###BLOCK
@@ -161,7 +172,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	int traceCount = 0;
-	while (traceCount <= MaxTraceTime*0.1)
+	while (traceCount <= MaxTraceTime*0.25)
 	{
 		int objInx = -1;
 		float objSDF[OBJNUM];
@@ -181,7 +192,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 			break;
 		}
 
-		if (sdf <= TraceThre*0.5)
+		if (sdf <= TraceThre)
 		{
 			info.bHit = true;
 			info.obj = objInx;

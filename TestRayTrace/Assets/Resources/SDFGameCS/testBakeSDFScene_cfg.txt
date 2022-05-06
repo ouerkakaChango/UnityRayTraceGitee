@@ -23,7 +23,7 @@ if(obj == 0 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 1;
-re.roughness = 1;
+re.roughness = 0.4;
 }
 else if (obj == 1 )
 {
@@ -117,19 +117,19 @@ if(mode == 2)
 else if(mode == 3)
 {
 	float3 pos = minHit.P;
-	//float sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
 	float2 uv = BoxedUV(pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
+	//uv = frac(uv*5);
 
 	mat.albedo *= pbrTex0albedo[4096*uv].rgb;
-	minHit.N = NormalLocalToWorld(pbrTex0normal[4096*uv].rgb,minHit.N);
+	float3 N = minHit.N;
+	float3 T,B;
+	//basis(N,T,B);
+	BoxedTB(T,B, pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
+	minHit.N = NormalMapToWorld(pbrTex0normal[4096*uv].rgb,T,B,N);
+	//mat.albedo = minHit.N;
 	mat.metallic *= pbrTex0metallic[4096*uv].r;
 	mat.roughness *= pbrTex0roughness[4096*uv].r;
 	mat.ao = pbrTex0ao[4096*uv].r; 
-
-	//mat.albedo = float3(uv,0);
-	//mat.albedo = float3(1,0,1);
-	//minHit.N = NormalLocalToWorld(pbrTex0normal[2048*uv].rgb,minHit.N);
-	//mat.albedo = minHit.N;
 
 	mode = 0;
 }
@@ -141,9 +141,9 @@ if(mode==0)
 {
   float3 lightDirs[1];
   float3 lightColors[1];
-  lightDirs[0] = float3(0, -0.7071068, 0.7071068);
+  lightDirs[0] = float3(-0.302018, -0.8447005, 0.4418894);
   lightColors[0] = float3(1, 1, 1);
-  result = 0.3 * mat.albedo * mat.ao;
+  result = 0.03 * mat.albedo * mat.ao;
   for(int i=0;i<1;i++)
   {
       result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
@@ -154,6 +154,13 @@ else if (mode == 1)
 {
 	result = PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
 }
+else if (mode == 3)
+{
+	float3 lightPos = float3(0,4,0);
+	float3 lightColor = float3(1,1,1);
+	float3 l = normalize(lightPos - minHit.P);
+	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
+}
 ###BLOCK
 
 ###BLOCK  ObjPostRender
@@ -162,14 +169,19 @@ result = pow(result, 1/2.2);
 ###BLOCK
 
 ###BLOCK SDFShadow
-float3 lightDir = normalize(float3(-1, -1, -1));
-ray.pos = minHit.P;
-ray.dir = -lightDir;
-ray.pos += SceneSDFShadowNormalBias * minHit.N;
-HitInfo hitInfo;
-return saturate(0.2 + HardShadow_TraceScene(ray, hitInfo));
-
-//return 1;
+if(false)
+{
+//@@@SDFBakerMgr DirShadow
+float3 lightDirs[1];
+lightDirs[0] = float3(-0.302018, -0.8447005, 0.4418894);
+for(int i=0;i<1;i++)
+{
+	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
+}
+//@@@
+}
+sha = saturate(0.2 + sha);
+return sha;
 ###BLOCK
 
 ###BLOCK ExtraSDF
@@ -256,7 +268,7 @@ re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(20, 0.5, 20), float3(0, 0, 0)
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0)));
+re = min(re, -0.2 + SDFBox(p, float3(3.49, 2, 0), float3(1, 1, 1), float3(0, 0, 0)));
 }
 else if (inx == 4 )
 {
@@ -268,11 +280,11 @@ re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.0707
 }
 else if (inx == 6 )
 {
-re = min(re, 0 + SDFBox(p, float3(-0.291, 1.734, -4.366), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
+re = min(re, 0 + SDFBox(p, float3(-0.321, 1.74, -4.38), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
 }
 else if (inx == 7 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.17, 1.734, -5.736), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
+re = min(re, 0 + SDFBox(p, float3(0.14, 1.74, -5.75), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
 }
 	//@@@
 	if(inx == -1)

@@ -17,6 +17,8 @@ public class SDFBakerMgr : MonoBehaviour
     public List<string> bakedRenderModes = new List<string>();
     [ReadOnly]
     public List<string> bakedRenders = new List<string>();
+    [ReadOnly]
+    public List<string> bakedDirShadows = new List<string>();
 
     public SDFBakerTag[] tags;
     SDFLightTag[] dirLightTags;
@@ -98,35 +100,68 @@ public class SDFBakerMgr : MonoBehaviour
         bakedRenderModes.Add("int renderMode[" + tags.Length + "];");
 
         bakedRenders.Clear();
+        bakedDirShadows.Clear();
     }
 
     void EndBake()
     {
-        bakedRenderModes.Add("return renderMode[obj];");
+        EndBakeRenderModes();
 
+        EndBakeRenders();
+
+        EndBakeShadows();
+    }
+
+    void EndBakeRenderModes()
+    {
+        bakedRenderModes.Add("return renderMode[obj];");
+    }
+
+    void EndBakeRenders()
+    {
         //https://learnopengl-cn.github.io/07%20PBR/02%20Lighting/
         //内置PBR光照模型，参考LearnOGL
 
         bakedRenders.Add("if(mode==0)");
         bakedRenders.Add("{");
         int dirLightNum = dirLightTags.Length;
-        bakedRenders.Add("  float3 lightDirs["+ dirLightNum + "];");
+        bakedRenders.Add("  float3 lightDirs[" + dirLightNum + "];");
         bakedRenders.Add("  float3 lightColors[" + dirLightNum + "];");
         //###
-        for(int i=0;i<dirLightNum;i++)
+        for (int i = 0; i < dirLightNum; i++)
         {
             Vector3 lightDir = GetLightDir(dirLightTags[i].gameObject);
             Vector3 lightColor = GetLightColor(dirLightTags[i].gameObject);
-            bakedRenders.Add("  lightDirs[" + i + "] = " + Bake(lightDir)+";");
+            bakedRenders.Add("  lightDirs[" + i + "] = " + Bake(lightDir) + ";");
             bakedRenders.Add("  lightColors[" + i + "] = " + Bake(lightColor) + ";");
         }
         //###
         bakedRenders.Add("  result = " + ambientIntensity + " * mat.albedo * mat.ao;");
-        bakedRenders.Add("  for(int i=0;i<"+ dirLightNum + ";i++)");
+        bakedRenders.Add("  for(int i=0;i<" + dirLightNum + ";i++)");
         bakedRenders.Add("  {");
         bakedRenders.Add("      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);");
         bakedRenders.Add("  }");
         bakedRenders.Add("}");
+    }
+
+    void EndBakeShadows()
+    {
+        //float3 lightDirs[1];
+        //lightDirs[0] = float3(0, -0.7071068, 0.7071068);
+        //for(int i=0;i<1;i++)
+        //{
+        //	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
+        //}
+        bakedDirShadows.Add("float3 lightDirs[" + dirLightTags.Length + "];");
+        for(int i=0;i< dirLightTags.Length;i++)
+        {
+            Vector3 lightDir = GetLightDir(dirLightTags[i].gameObject);
+            bakedDirShadows.Add("lightDirs["+i+"] = "+Bake(lightDir) +";");
+        }
+        bakedDirShadows.Add("for(int i=0;i<"+ dirLightTags.Length + ";i++)");
+        bakedDirShadows.Add("{");
+        bakedDirShadows.Add("	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);");
+        bakedDirShadows.Add("}");
     }
 
     void PreAdd(int inx, ref List<string> lines, string inxName = "inx")

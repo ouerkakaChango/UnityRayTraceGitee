@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.1815468, g: 0.22718757, b: 0.30740595, a: 1}
+  m_IndirectSpecularColor: {r: 0.17821571, g: 0.22314309, b: 0.3052043, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -159,7 +159,7 @@ MonoBehaviour:
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 1
-    roughness: 1
+    roughness: 0.4
   SDF_offset: 0
   renderMode: 3
   shapeType: 1
@@ -511,7 +511,7 @@ MonoBehaviour:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
-  SDF_offset: 0
+  SDF_offset: -0.2
   renderMode: 2
   shapeType: 0
   specialID: -1
@@ -585,7 +585,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1004293003}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalPosition: {x: 3.49, y: 2, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
@@ -678,13 +678,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1008065616}
-  m_LocalRotation: {x: 0.38268343, y: 0, z: 0, w: 0.92387956}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: 0.5086129, y: 0.14271739, z: -0.49123544, w: 0.692555}
+  m_LocalPosition: {x: 0, y: 4.85, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 57.64, y: -34.351, z: -90}
 --- !u!114 &1008065619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -930,8 +930,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_LocalRotation: {x: 0.16214204, y: -0.7050423, z: 0.17089152, w: 0.6688957}
-  m_LocalPosition: {x: 4.9002304, y: 4.7526197, z: -0.0972268}
+  m_LocalRotation: {x: 0.09837256, y: -0.62576944, z: 0.08026578, w: 0.7696056}
+  m_LocalPosition: {x: 5.5589046, y: 3.4644108, z: -3.725717}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -986,7 +986,7 @@ MonoBehaviour:
   - '{'
   - re.albedo = float3(1, 1, 1);
   - re.metallic = 1;
-  - re.roughness = 1;
+  - re.roughness = 0.4;
   - '}'
   - else if (obj == 1 )
   - '{'
@@ -1083,19 +1083,19 @@ MonoBehaviour:
   - else if(mode == 3)
   - '{'
   - "\tfloat3 pos = minHit.P;"
-  - "\t//float sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));"
   - "\tfloat2 uv = BoxedUV(pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));"
+  - "\t//uv = frac(uv*5);"
   - 
   - "\tmat.albedo *= pbrTex0albedo[4096*uv].rgb;"
-  - "\tminHit.N = NormalLocalToWorld(pbrTex0normal[4096*uv].rgb,minHit.N);"
+  - "\tfloat3 N = minHit.N;"
+  - "\tfloat3 T,B;"
+  - "\t//basis(N,T,B);"
+  - "\tBoxedTB(T,B, pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));"
+  - "\tminHit.N = NormalMapToWorld(pbrTex0normal[4096*uv].rgb,T,B,N);"
+  - "\t//mat.albedo = minHit.N;"
   - "\tmat.metallic *= pbrTex0metallic[4096*uv].r;"
   - "\tmat.roughness *= pbrTex0roughness[4096*uv].r;"
   - "\tmat.ao = pbrTex0ao[4096*uv].r; "
-  - 
-  - "\t//mat.albedo = float3(uv,0);"
-  - "\t//mat.albedo = float3(1,0,1);"
-  - "\t//minHit.N = NormalLocalToWorld(pbrTex0normal[2048*uv].rgb,minHit.N);"
-  - "\t//mat.albedo = minHit.N;"
   - 
   - "\tmode = 0;"
   - '}'
@@ -1107,9 +1107,9 @@ MonoBehaviour:
   - '{'
   - '  float3 lightDirs[1];'
   - '  float3 lightColors[1];'
-  - '  lightDirs[0] = float3(0, -0.7071068, 0.7071068);'
+  - '  lightDirs[0] = float3(-0.302018, -0.8447005, 0.4418894);'
   - '  lightColors[0] = float3(1, 1, 1);'
-  - '  result = 0.3 * mat.albedo * mat.ao;'
+  - '  result = 0.03 * mat.albedo * mat.ao;'
   - '  for(int i=0;i<1;i++)'
   - '  {'
   - '      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);'
@@ -1120,6 +1120,13 @@ MonoBehaviour:
   - '{'
   - "\tresult = PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);"
   - '}'
+  - else if (mode == 3)
+  - '{'
+  - "\tfloat3 lightPos = float3(0,4,0);"
+  - "\tfloat3 lightColor = float3(1,1,1);"
+  - "\tfloat3 l = normalize(lightPos - minHit.P);"
+  - "\tresult = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);"
+  - '}'
   - '###BLOCK'
   - 
   - '###BLOCK  ObjPostRender'
@@ -1128,14 +1135,19 @@ MonoBehaviour:
   - '###BLOCK'
   - 
   - '###BLOCK SDFShadow'
-  - float3 lightDir = normalize(float3(-1, -1, -1));
-  - ray.pos = minHit.P;
-  - ray.dir = -lightDir;
-  - ray.pos += SceneSDFShadowNormalBias * minHit.N;
-  - HitInfo hitInfo;
-  - return saturate(0.2 + HardShadow_TraceScene(ray, hitInfo));
-  - 
-  - //return 1;
+  - if(false)
+  - '{'
+  - //@@@SDFBakerMgr DirShadow
+  - float3 lightDirs[1];
+  - lightDirs[0] = float3(-0.302018, -0.8447005, 0.4418894);
+  - for(int i=0;i<1;i++)
+  - '{'
+  - "\tsha *= GetDirHardShadow(ray, lightDirs[i], minHit);"
+  - '}'
+  - //@@@
+  - '}'
+  - sha = saturate(0.2 + sha);
+  - return sha;
   - '###BLOCK'
   - 
   - '###BLOCK ExtraSDF'
@@ -1226,7 +1238,8 @@ MonoBehaviour:
   - '}'
   - else if (inx == 3 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0)));
+  - re = min(re, 0 + SDFBox(p, float3(3.49, 2, 0), float3(1, 1, 1), float3(0, 0,
+    0)));
   - '}'
   - else if (inx == 4 )
   - '{'
@@ -1240,12 +1253,12 @@ MonoBehaviour:
   - '}'
   - else if (inx == 6 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(-0.291, 1.734, -4.366), float3(0.07071167,
-    1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
+  - re = min(re, 0 + SDFBox(p, float3(-0.321, 1.74, -4.38), float3(0.07071167, 1.511707,
+    0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
   - '}'
   - else if (inx == 7 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.17, 1.734, -5.736), float3(0.07071167, 1.511707,
+  - re = min(re, 0 + SDFBox(p, float3(0.14, 1.74, -5.75), float3(0.07071167, 1.511707,
     0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
   - '}'
   - "\t//@@@"
@@ -1482,7 +1495,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1f5d13b1d98fa4ca18ee249cef77d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ambientIntensity: 0.3
+  ambientIntensity: 0.03
   bakedSDFs:
   - if(inx == 0 )
   - '{'
@@ -1500,7 +1513,8 @@ MonoBehaviour:
   - '}'
   - else if (inx == 3 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0)));
+  - re = min(re, -0.2 + SDFBox(p, float3(3.49, 2, 0), float3(1, 1, 1), float3(0,
+    0, 0)));
   - '}'
   - else if (inx == 4 )
   - '{'
@@ -1514,12 +1528,12 @@ MonoBehaviour:
   - '}'
   - else if (inx == 6 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(-0.291, 1.734, -4.366), float3(0.07071167,
-    1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
+  - re = min(re, 0 + SDFBox(p, float3(-0.321, 1.74, -4.38), float3(0.07071167, 1.511707,
+    0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
   - '}'
   - else if (inx == 7 )
   - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0.17, 1.734, -5.736), float3(0.07071167, 1.511707,
+  - re = min(re, 0 + SDFBox(p, float3(0.14, 1.74, -5.75), float3(0.07071167, 1.511707,
     0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
   - '}'
   bakedMaterials:
@@ -1527,7 +1541,7 @@ MonoBehaviour:
   - '{'
   - re.albedo = float3(1, 1, 1);
   - re.metallic = 1;
-  - re.roughness = 1;
+  - re.roughness = 0.4;
   - '}'
   - else if (obj == 1 )
   - '{'
@@ -1587,13 +1601,20 @@ MonoBehaviour:
   - '{'
   - '  float3 lightDirs[1];'
   - '  float3 lightColors[1];'
-  - '  lightDirs[0] = float3(0, -0.7071068, 0.7071068);'
+  - '  lightDirs[0] = float3(-0.302018, -0.8447005, 0.4418894);'
   - '  lightColors[0] = float3(1, 1, 1);'
-  - '  result = 0.3 * mat.albedo * mat.ao;'
+  - '  result = 0.03 * mat.albedo * mat.ao;'
   - '  for(int i=0;i<1;i++)'
   - '  {'
   - '      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);'
   - '  }'
+  - '}'
+  bakedDirShadows:
+  - float3 lightDirs[1];
+  - lightDirs[0] = float3(-0.302018, -0.8447005, 0.4418894);
+  - for(int i=0;i<1;i++)
+  - '{'
+  - "\tsha *= GetDirHardShadow(ray, lightDirs[i], minHit);"
   - '}'
   tags:
   - {fileID: 45438424}
@@ -1636,7 +1657,7 @@ GameObject:
   - component: {fileID: 2051386106}
   - component: {fileID: 2051386105}
   m_Layer: 0
-  m_Name: Leg3 (1)
+  m_Name: Leg4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1650,7 +1671,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2051386103}
   m_LocalRotation: {x: 0.05535871, y: 0.5821837, z: -0.03977928, w: 0.81019455}
-  m_LocalPosition: {x: -0.291, y: 1.734, z: -4.366}
+  m_LocalPosition: {x: -0.321, y: 1.74, z: -4.38}
   m_LocalScale: {x: 0.14142334, y: 3.0234134, z: 0.129255}
   m_Children: []
   m_Father: {fileID: 1085768379}
@@ -1767,7 +1788,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2108127475}
   m_LocalRotation: {x: 0.05535871, y: 0.5821837, z: -0.03977928, w: 0.81019455}
-  m_LocalPosition: {x: 0.17, y: 1.734, z: -5.736}
+  m_LocalPosition: {x: 0.14, y: 1.74, z: -5.75}
   m_LocalScale: {x: 0.14142334, y: 3.0234134, z: 0.129255}
   m_Children: []
   m_Father: {fileID: 1085768379}
