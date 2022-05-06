@@ -7,6 +7,7 @@ struct Material_PBR
 	float3 albedo;
 	float metallic;
 	float roughness;
+	float ao;
 };
 
 //#######################################################################################

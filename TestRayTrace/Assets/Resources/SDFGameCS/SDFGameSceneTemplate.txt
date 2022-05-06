@@ -24,6 +24,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	re.albedo = float3(1, 1, 1);
 	re.metallic = 0.0f;
 	re.roughness = 0.8f;
+	re.ao = 1;
 
 	###BLOCK ObjMaterial
 	... 
@@ -45,15 +46,24 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 	###BLOCK
 }
 
+void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
+{
+	###BLOCK ObjPostRender
+	... 
+	###BLOCK
+}
+
 float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 {
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
 	int mode = GetObjRenderMode(minHit.obj);
 	ObjPreRender(mode, mat, ray, minHit);
+	float3 result = 0;
 	###BLOCK ObjRender
 	... 
 	###BLOCK
-	return 0;
+	ObjPostRender(result, mode, mat, ray, minHit);
+	return result;
 }
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info);

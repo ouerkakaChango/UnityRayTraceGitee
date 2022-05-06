@@ -21,6 +21,7 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     public string SceneName = "Detail1";
     public AutoCS autoCS;
+    public TextureSystem texSys;
     ComputeShader cs;
     public Texture2DArray envSpecTex2DArr;
     public Texture2D envBgTex;
@@ -171,6 +172,15 @@ public class SDFGameSceneTrace : MonoBehaviour
         cs.SetVector("_Time", Shader.GetGlobalVector("_Time"));
         cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
         cs.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
+
+        for(int i=0;i<texSys.pbrTextures.Count;i++)
+        {
+            cs.SetTexture(kInx, "pbrTex"+i+"albedo", texSys.pbrTextures[i].albedo);
+            cs.SetTexture(kInx, "pbrTex" + i + "normal", texSys.pbrTextures[i].normal);
+            cs.SetTexture(kInx, "pbrTex" + i + "metallic", texSys.pbrTextures[i].metallic);
+            cs.SetTexture(kInx, "pbrTex" + i + "roughness", texSys.pbrTextures[i].roughness);
+            cs.SetTexture(kInx, "pbrTex" + i + "ao", texSys.pbrTextures[i].ao);
+        }
         //####
 
         cs.SetTexture(kInx, "Result", rt);

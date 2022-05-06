@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public struct PBRTexture
 {
-    public Texture2D albedo,normal,metallic,roughness;
+    public Texture2D albedo,normal,metallic,roughness,ao;
 }
 
 //用于收集所有所需Texture，传给CameraTrace，以供computeShader.SetTexture进去

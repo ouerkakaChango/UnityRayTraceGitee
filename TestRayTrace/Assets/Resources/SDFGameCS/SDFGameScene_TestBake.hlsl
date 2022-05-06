@@ -17,6 +17,12 @@
 #include "../../HLSL/Spline/SplineCommonDef.hlsl"
 #include "../../HLSL/Noise/WoodNoise.hlsl"
 #include "../../HLSL/UV/UVCommonDef.hlsl"
+#include "../../HLSL/TransferMath/TransferMath.hlsl"
+Texture2D pbrTex0albedo;
+Texture2D pbrTex0normal;
+Texture2D pbrTex0metallic;
+Texture2D pbrTex0roughness;
+Texture2D pbrTex0ao;
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -24,12 +30,13 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	re.albedo = float3(1, 1, 1);
 	re.metallic = 0.0f;
 	re.roughness = 0.8f;
+	re.ao = 1;
 
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
 re.albedo = float3(1, 1, 1);
-re.metallic = 0;
+re.metallic = 1;
 re.roughness = 1;
 }
 else if (obj == 1 )
@@ -129,12 +136,26 @@ else if(mode == 3)
 	float3 pos = minHit.P;
 	//float sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
 	float2 uv = BoxedUV(pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
-	mat.albedo = float3(uv,0);
 
+	mat.albedo *= pbrTex0albedo[4096*uv].rgb;
+	minHit.N = NormalLocalToWorld(pbrTex0normal[4096*uv].rgb,minHit.N);
+	mat.metallic *= pbrTex0metallic[4096*uv].r;
+	mat.roughness *= pbrTex0roughness[4096*uv].r;
+	mat.ao = pbrTex0ao[4096*uv].r;
+
+	//mat.albedo = float3(uv,0);
 	//mat.albedo = float3(1,0,1);
+	//minHit.N = NormalLocalToWorld(pbrTex0normal[2048*uv].rgb,minHit.N);
+	//mat.albedo = minHit.N;
 
 	mode = 0;
 }
+}
+
+void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
+{
+result = result / (result + 1.0);
+result = pow(result, 1/2.2);
 }
 
 float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
@@ -142,40 +163,41 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
 	int mode = GetObjRenderMode(minHit.obj);
 	ObjPreRender(mode, mat, ray, minHit);
+	float3 result = 0;
 //@@@SDFBakerMgr ObjRender
 if(mode==0)
 {
 float3 lightDirs[1];
 float3 lightColors[1];
-lightDirs[0] = float3(-0.2610216, -0.6762021, -0.6889255);
+lightDirs[0] = float3(0, -0.7071068, 0.7071068);
 lightColors[0] = float3(1, 1, 1);
-float3 re = 0.3 * mat.albedo;
+result = 0.3 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
 {
-re += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
 }
-return re;
 }
 //@@@
 else if (mode == 1)
 {
-	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
+	result = PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
 }
-	return 0;
+	ObjPostRender(result, mode, mat, ray, minHit);
+	return result;
 }
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info);
 float SoftShadow_TraceScene(Ray ray, out HitInfo info);
 float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 {
-//float3 lightDir = normalize(float3(-1, -1, -1));
-//ray.pos = minHit.P;
-//ray.dir = -lightDir;
-//ray.pos += SceneSDFShadowNormalBias * minHit.N;
-//HitInfo hitInfo;
-//return saturate(0.2 + HardShadow_TraceScene(ray, hitInfo));
+float3 lightDir = normalize(float3(-1, -1, -1));
+ray.pos = minHit.P;
+ray.dir = -lightDir;
+ray.pos += SceneSDFShadowNormalBias * minHit.N;
+HitInfo hitInfo;
+return saturate(0.2 + HardShadow_TraceScene(ray, hitInfo));
 
-return 1;
+//return 1;
 }
 
 //###################################################################################
@@ -267,7 +289,7 @@ re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(20, 0.5, 20), float3(0, 0, 0)
 }
 else if (inx == 3 )
 {
-re = min(re, -0.3 + SDFBox(p, float3(1.626, 1.65, -2.18), float3(0.25, 0.25, 0.25), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0)));
 }
 else if (inx == 4 )
 {

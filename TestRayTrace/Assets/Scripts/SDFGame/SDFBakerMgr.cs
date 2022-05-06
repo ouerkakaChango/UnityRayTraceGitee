@@ -6,7 +6,9 @@ using XUtility;
 
 public class SDFBakerMgr : MonoBehaviour
 {
-    public float ambientIntensity = 0.3f;
+    //https://learnopengl-cn.github.io/07%20PBR/02%20Lighting/
+    //参考LearnOGL,默认0.03
+    public float ambientIntensity = 0.03f;
     [ReadOnly]
     public List<string> bakedSDFs = new List<string>();
     [ReadOnly]
@@ -102,22 +104,8 @@ public class SDFBakerMgr : MonoBehaviour
     {
         bakedRenderModes.Add("return renderMode[obj];");
 
-        //if(mode==0)
-        //{
-        //  float3 lightDirs[16];
-        //  float3 lightColors[16];
-        //###
-        //  lightDirs[0]=...;
-        //  lightColors[0]=...;
-        //  ...
-        //###
-        //  float3 re= ambientIntensity * mat.albedo;
-        //  for(int i=0;i<16;i++)
-        //  {
-        //      re += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
-        //  }
-        //  return re;
-        //}
+        //https://learnopengl-cn.github.io/07%20PBR/02%20Lighting/
+        //内置PBR光照模型，参考LearnOGL
 
         bakedRenders.Add("if(mode==0)");
         bakedRenders.Add("{");
@@ -133,12 +121,11 @@ public class SDFBakerMgr : MonoBehaviour
             bakedRenders.Add("  lightColors[" + i + "] = " + Bake(lightColor) + ";");
         }
         //###
-        bakedRenders.Add("  float3 re = " + ambientIntensity + " * mat.albedo;");
+        bakedRenders.Add("  result = " + ambientIntensity + " * mat.albedo * mat.ao;");
         bakedRenders.Add("  for(int i=0;i<"+ dirLightNum + ";i++)");
         bakedRenders.Add("  {");
-        bakedRenders.Add("      re += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);");
+        bakedRenders.Add("      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);");
         bakedRenders.Add("  }");
-        bakedRenders.Add("  return re;");
         bakedRenders.Add("}");
     }
 
