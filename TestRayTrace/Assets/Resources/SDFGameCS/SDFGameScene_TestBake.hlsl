@@ -35,13 +35,13 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0.7254902, 0.4784314, 0.3411765);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.7254902, 0.4784314, 0.3411765);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -77,8 +77,8 @@ int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
 int renderMode[6];
-renderMode[0] = 0;
-renderMode[1] = 2;
+renderMode[0] = 2;
+renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 2;
 renderMode[4] = 2;
@@ -194,7 +194,7 @@ float GetDirHardShadow(Ray ray, float3 lightDir, in HitInfo minHit)
 float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 {
 	float sha = 1;
-if(false)
+if(true)
 {
 //@@@SDFBakerMgr DirShadow
 float3 lightDirs[1];
@@ -286,11 +286,11 @@ float GetObjSDF(int inx, float3 p)
 	//@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -2;
+re = min(re, 0 + SDFBox(p, float3(0.861513, 1.414959, -5.500246), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.861513, 1.414959, -5.500246), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+inx = -2;
 }
 else if (inx == 2 )
 {
@@ -327,13 +327,18 @@ re = min(re, 0 + SDFBox(p, float3(0.14, 1.26, -5.75), float3(0.07071167, 1.51170
 			//float dis = fbm4(p.zxy*10);
 			//r += 0.02*smoothstep(0.5f, 1.0f, dis);
 			//float3 center = float3(0, r, 0);
-			//
-			//re = length(p - center) - r;
-			//re *= 0.5f;
+
 			//terrain = 5 * fbm4(float3(0.1*p.xz,0));
-			terrain = 0.1 * sin(2*PI/3.0f * dot(normalize(float2(1,0)),float2(p.x,p.z)));
-			terrain = abs(p.y - terrain);
-			terrain *= 0.5;
+			//terrain = 0.1 * sin(2*PI/3.0f * dot(normalize(float2(1,0)),float2(p.x,p.z)));
+			//terrain = abs(p.y - terrain);
+			//terrain *= 0.5;
+
+			//### fbm flaw effect.###
+			//###can only used for low height effect,and no sdf shadow, because trace it by height func is not right.
+			//###but for low height effect, this flaw may be accepted
+			//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(p.xz+0.3,0)));
+
+			terrain = abs(p.y);
 		}
 		re = min(re, terrain );
 	}
