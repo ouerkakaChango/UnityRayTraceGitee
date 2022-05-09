@@ -1,4 +1,4 @@
-﻿#define OBJNUM 7
+﻿#define OBJNUM 6
 
 #define MaxSDF 100000
 #define MaxTraceDis 1000
@@ -35,9 +35,9 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 1, 1);
-re.metallic = 1;
-re.roughness = 0.4;
+re.albedo = float3(0.7254902, 0.4784314, 0.3411765);
+re.metallic = 0;
+re.roughness = 1;
 }
 else if (obj == 1 )
 {
@@ -49,13 +49,13 @@ else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.2;
 }
 else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.2;
+re.roughness = 1;
 }
 else if (obj == 4 )
 {
@@ -69,12 +69,6 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
-else if (obj == 6 )
-{
-re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
-}
 	//@@@
 	return re;
 }
@@ -82,14 +76,13 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[7];
-renderMode[0] = 3;
+int renderMode[6];
+renderMode[0] = 0;
 renderMode[1] = 2;
 renderMode[2] = 0;
-renderMode[3] = 0;
+renderMode[3] = 2;
 renderMode[4] = 2;
 renderMode[5] = 2;
-renderMode[6] = 2;
 return renderMode[obj];
 //@@@
 }
@@ -162,7 +155,7 @@ if(mode==0)
 {
 float3 lightDirs[1];
 float3 lightColors[1];
-lightDirs[0] = float3(-0.302018, -0.8447005, 0.4418894);
+lightDirs[0] = float3(-0.2900424, -0.8007796, -0.5240492);
 lightColors[0] = float3(1, 1, 1);
 result = 0.03 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
@@ -205,7 +198,7 @@ if(false)
 {
 //@@@SDFBakerMgr DirShadow
 float3 lightDirs[1];
-lightDirs[0] = float3(-0.302018, -0.8447005, 0.4418894);
+lightDirs[0] = float3(-0.2900424, -0.8007796, -0.5240492);
 for(int i=0;i<1;i++)
 {
 	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
@@ -293,31 +286,27 @@ float GetObjSDF(int inx, float3 p)
 	//@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.861513, 1.894959, -5.500246), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+re = min(re, 0 + SDFBox(p, float3(0.861513, 1.414959, -5.500246), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(20, 0.5, 20), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0.5009151, 1.79, -4.9), float3(0.7450001, 1.11, 0.025), float3(338.16, 71.39999, 0)));
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.5009151, 2.27, -4.9), float3(0.7450001, 1.11, 0.025), float3(338.16, 71.39999, 0)));
+re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.414959, -4.188335), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
 }
 else if (inx == 4 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.894959, -4.188335), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+re = min(re, 0 + SDFBox(p, float3(-0.321, 1.26, -4.38), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
 }
 else if (inx == 5 )
 {
-re = min(re, 0 + SDFBox(p, float3(-0.321, 1.74, -4.38), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
-}
-else if (inx == 6 )
-{
-re = min(re, 0 + SDFBox(p, float3(0.14, 1.74, -5.75), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
+re = min(re, 0 + SDFBox(p, float3(0.14, 1.26, -5.75), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
 }
 	//@@@
 	if(inx == -1)
@@ -327,6 +316,26 @@ re = min(re, 0 + SDFBox(p, float3(0.14, 1.74, -5.75), float3(0.07071167, 1.51170
 		re = min(re, sbox );
 		//re = min(re, trunkBox );
 		//re = min(re, SDFSphere(p, float3(0, 2, 0), 1) );
+	}
+	else if(inx == -2)
+	{
+		float terrain = 100000;
+		if(abs(p.x)<300 && abs(p.z)<300)
+		{
+			//float re = 0;
+			//float r = 0.48;// +0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+			//float dis = fbm4(p.zxy*10);
+			//r += 0.02*smoothstep(0.5f, 1.0f, dis);
+			//float3 center = float3(0, r, 0);
+			//
+			//re = length(p - center) - r;
+			//re *= 0.5f;
+			//terrain = 5 * fbm4(float3(0.1*p.xz,0));
+			terrain = 0.1 * sin(2*PI/3.0f * dot(normalize(float2(1,0)),float2(p.x,p.z)));
+			terrain = abs(p.y - terrain);
+			terrain *= 0.5;
+		}
+		re = min(re, terrain );
 	}
 return re;
 
