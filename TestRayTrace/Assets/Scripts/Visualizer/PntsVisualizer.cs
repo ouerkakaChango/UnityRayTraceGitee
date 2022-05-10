@@ -17,6 +17,7 @@ public struct ColorRangeInfo
 
 public class PntsVisualizer : MonoBehaviour
 {
+    public float pntScale = 1.0f;
     public List<Vector3> pnts = new List<Vector3>();
     List<ColorRangeInfo> colorRanges = new List<ColorRangeInfo>();
     public PntsVisualRangeType rangeType = PntsVisualRangeType.None;
@@ -75,7 +76,7 @@ public class PntsVisualizer : MonoBehaviour
             Gizmos.color = Color.red;
             for (int i = 0; i < pnts.Count; i++)
             {
-                Gizmos.DrawCube(pnts[i], 0.01f * Vector3.one);
+                Gizmos.DrawCube(pnts[i], pntScale * 0.01f * Vector3.one);
             }
         }
         else if (rangeType == PntsVisualRangeType.Color)

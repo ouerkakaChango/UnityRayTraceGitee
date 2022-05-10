@@ -43,5 +43,10 @@ namespace MathHelper
         {
             return new Vector2(x, x);
         }
+
+        public static Vector2 VecXZ(in Vector3 v)
+        {
+            return new Vector2(v.x, v.z);
+        }
     }
 }

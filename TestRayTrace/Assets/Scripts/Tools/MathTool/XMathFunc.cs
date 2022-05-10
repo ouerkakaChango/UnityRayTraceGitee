@@ -43,6 +43,11 @@ namespace MathHelper
             return x;
         }
 
+        public static float dot(in Vector2 a, in Vector2 b)
+        {
+            return a.x * b.x + a.y * b.y;
+        }
+
         public static float dot(in Vector3 a, in Vector3 b)
         {
             return a.x * b.x + a.y * b.y + a.z * b.z;

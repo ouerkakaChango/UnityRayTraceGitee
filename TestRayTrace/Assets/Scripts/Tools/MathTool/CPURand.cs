@@ -27,6 +27,12 @@ namespace MathHelper
             //res *= pow(Random.Range(0.0f, 1.0f), 1.0f / 3.0f);
             return res;
         }
+
+        public static Vector2 RandDir2D()
+        {
+            float rad = 2 * Mathf.PI * Random.Range(0.0f, 1.0f);
+            return new Vector2(cos(rad), sin(rad));
+        }
     }
 
     public static class LDRand
