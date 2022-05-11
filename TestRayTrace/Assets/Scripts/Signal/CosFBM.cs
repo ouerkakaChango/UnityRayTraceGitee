@@ -51,12 +51,32 @@ public class CosFBM : MonoBehaviour
 
     float GetVal(Vector3 pos)
     {
+        return GetVal(Vec.VecXZ(pos));
+    }
+
+    float GetVal(Vector2 p)
+    {
         float a = startAmplitude;
         float f = startFrequency;
         float re = 0;
-        for(uint i=0;i<octaves;i++)
+        for (uint i = 0; i < octaves; i++)
         {
-            re += a * CosFunc((int)i,f * Vec.VecXZ(pos));
+            re += a * CosFunc((int)i, f * p);
+            a *= gain;
+            f *= lacunarity;
+        }
+        return re;
+    }
+
+    Vector2 GetDxy(Vector2 p)
+    {
+        Vector2 re = Vector2.zero;
+        float a = startAmplitude;
+        float f = startFrequency;
+        for (int i = 0; i < octaves; i++)
+        {
+            re.x += DxOfCos(i, a, f, p);
+            re.y += DyOfCos(i, a, f, p);
             a *= gain;
             f *= lacunarity;
         }
@@ -74,25 +94,31 @@ public class CosFBM : MonoBehaviour
 
     Vector2 SDF_GradDecent(Vector2 p, Vector3 target)
     {
+        //### octave0 form
+        //float a = startAmplitude;
+        //float f = startFrequency;
+        //float h = a*CosFunc(0, f * p);
+        //float gradX = 2 * (p.x - target.x) + 2 * (h - target.y) * DxOfCos(0, a, f, p);
+        //float gradZ = 2 * (p.y - target.z) + 2 * (h - target.y) * DyOfCos(0, a, f, p);
+        //return new Vector2(gradX, gradZ);
+
         float a = startAmplitude;
         float f = startFrequency;
-        float h = a*CosFunc(0, f * p);
-        float gradX = 2 * (p.x - target.x) + 2 * (h - target.y) * DxOfCos(0, a, f, p);
-        float gradZ = 2 * (p.y - target.z) + 2 * (h - target.y) * DyOfCos(0, a, f, p);
-        return new Vector2(a*gradX, a*gradZ);
+        float h = GetVal(p);
+
+        Vector2 re = 2.0f * (p - Vec.VecXZ(target)) + 2*(h-target.y)*GetDxy(p);
+        return re;
     }
 
     public Vector3 NearestPoint(Vector3 target, int loopNum, float step)
     {
-        float a = startAmplitude;
-        float f = startFrequency;
         Vector2 p = Vec.VecXZ(target);
         for(int i=0;i< loopNum; i++)
         {
             Vector2 grad = SDF_GradDecent(p, target);
             p -= grad * step;
         }
-        float finalH = a * CosFunc(0, f * p);
+        float finalH = GetVal(p);
         return new Vector3(p.x, finalH, p.y);
     }
     
