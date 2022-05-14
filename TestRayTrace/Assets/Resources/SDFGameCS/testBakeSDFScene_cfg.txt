@@ -8,6 +8,7 @@ Blocks:
 ###BLOCK ExtraInclude
 #include "../../HLSL/Spline/SplineCommonDef.hlsl"
 #include "../../HLSL/Noise/WoodNoise.hlsl"
+#include "../../HLSL/Noise/TerrainNoise.hlsl"
 #include "../../HLSL/UV/UVCommonDef.hlsl"
 #include "../../HLSL/TransferMath/TransferMath.hlsl"
 Texture2D pbrTex0albedo;
@@ -155,7 +156,7 @@ result = pow(result, 1/2.2);
 ###BLOCK
 
 ###BLOCK SDFShadow
-if(true)
+if(false)
 {
 //@@@SDFBakerMgr DirShadow
 float3 lightDirs[1];
@@ -294,7 +295,10 @@ re = min(re, 0 + SDFBox(p, float3(0.14, 1.26, -5.75), float3(0.07071167, 1.51170
 			//###but for low height effect, this flaw may be accepted
 			//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(p.xz+0.3,0)));
 
-			terrain = abs(p.y);
+			//terrain = abs(p.y);
+
+			float3 np = CosFBM_NearestPoint(p, 10, 0.1f);
+			terrain = length(np-p)*0.5;
 		}
 		re = min(re, terrain );
 	}

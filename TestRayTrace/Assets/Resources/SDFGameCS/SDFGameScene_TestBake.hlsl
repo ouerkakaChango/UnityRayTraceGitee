@@ -4,7 +4,7 @@
 #define MaxTraceDis 1000
 #define MaxTraceTime 640
 #define TraceThre 0.0001
-#define NormalEpsilon 0.01
+#define NormalEpsilon 0.0001
 
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFShadowNormalBias 0.001
@@ -16,6 +16,7 @@
 
 #include "../../HLSL/Spline/SplineCommonDef.hlsl"
 #include "../../HLSL/Noise/WoodNoise.hlsl"
+#include "../../HLSL/Noise/TerrainNoise.hlsl"
 #include "../../HLSL/UV/UVCommonDef.hlsl"
 #include "../../HLSL/TransferMath/TransferMath.hlsl"
 Texture2D pbrTex0albedo;
@@ -194,7 +195,7 @@ float GetDirHardShadow(Ray ray, float3 lightDir, in HitInfo minHit)
 float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 {
 	float sha = 1;
-if(true)
+if(false)
 {
 //@@@SDFBakerMgr DirShadow
 float3 lightDirs[1];
@@ -338,7 +339,10 @@ re = min(re, 0 + SDFBox(p, float3(0.14, 1.26, -5.75), float3(0.07071167, 1.51170
 			//###but for low height effect, this flaw may be accepted
 			//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(p.xz+0.3,0)));
 
-			terrain = abs(p.y);
+			//terrain = abs(p.y);
+
+			float3 np = CosFBM_NearestPoint(p, 10, 0.1f);
+			terrain = length(np-p)*0.5;
 		}
 		re = min(re, terrain );
 	}

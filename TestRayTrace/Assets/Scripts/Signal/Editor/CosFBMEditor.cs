@@ -8,11 +8,12 @@ public class CosFBMEditor : Editor
 {
     CosFBM Target;
 
-    protected bool showGenerateFoldout = true;
-    protected bool showResampleFoldout = true;
+    //protected bool showGenerateFoldout = true;
+    //protected bool showResampleFoldout = true;
     protected bool showVisualizeFoldout = true;
+    protected bool showBakeFoldout = true;
 
-    Vector2 bound = new Vector2(0,0);
+    Vector2 bound = new Vector2(50,50);
     float delta = 0.1f;
 
     void OnEnable()
@@ -65,6 +66,16 @@ public class CosFBMEditor : Editor
                 Target.VisualizeByBound(bound, delta);
             }
             //Target.v_heightScale = EditorGUILayout.FloatField("heightScale", Target.v_heightScale);
+        }
+
+        showBakeFoldout = EditorGUILayout.Foldout(showBakeFoldout, "Bake");
+        if (showBakeFoldout)
+        {
+            if (GUILayout.Button("BakeHLSLCode"))
+            {
+                Target.BakeHLSLCode();
+            }
+            GUILayout.TextArea(Target.GetBakedHLSLString());
         }
     }
 }
