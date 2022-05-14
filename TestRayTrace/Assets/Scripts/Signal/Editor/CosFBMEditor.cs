@@ -13,9 +13,6 @@ public class CosFBMEditor : Editor
     protected bool showVisualizeFoldout = true;
     protected bool showBakeFoldout = true;
 
-    Vector2 bound = new Vector2(50,50);
-    float delta = 0.1f;
-
     void OnEnable()
     {
         Target = (CosFBM)target;
@@ -59,13 +56,10 @@ public class CosFBMEditor : Editor
         showVisualizeFoldout = EditorGUILayout.Foldout(showVisualizeFoldout, "Visualize");
         if (showVisualizeFoldout)
         {
-            bound = EditorGUILayout.Vector2Field("bound", bound);
-            delta = EditorGUILayout.FloatField("delta", delta);
             if (GUILayout.Button("VisualizeByBound"))
             {
-                Target.VisualizeByBound(bound, delta);
+                Target.VisualizeByBound();
             }
-            //Target.v_heightScale = EditorGUILayout.FloatField("heightScale", Target.v_heightScale);
         }
 
         showBakeFoldout = EditorGUILayout.Foldout(showBakeFoldout, "Bake");
@@ -74,6 +68,11 @@ public class CosFBMEditor : Editor
             if (GUILayout.Button("BakeHLSLCode"))
             {
                 Target.BakeHLSLCode();
+            }
+            if (GUILayout.Button("BakeHLSLCodeWithTexture"))
+            {
+                Target.BakeHeightTex();
+                Target.BakeHLSLCode(true);
             }
             GUILayout.TextArea(Target.GetBakedHLSLString());
         }
