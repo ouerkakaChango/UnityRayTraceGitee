@@ -1,13 +1,14 @@
 ﻿#define OBJNUM (@ObjNum)
 
 #define MaxSDF 100000
-#define MaxTraceDis 1000
-#define MaxTraceTime 640
-#define TraceThre 0.0001
-#define NormalEpsilon 0.0001
+#define MaxTraceDis 100
+#define MaxTraceTime 6400
+#define TraceThre 0.01
+#define NormalEpsilon 0.01
+
+#define SceneSDFShadowNormalBias 0.1
 
 #define SceneSDFSoftShadowBias 0.1
-#define SceneSDFShadowNormalBias 0.001
 #define SceneSDFSoftShadowK 16
 
 #include "../../HLSL/PBR/PBRCommonDef.hlsl"
@@ -172,7 +173,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	int traceCount = 0;
-	while (traceCount <= MaxTraceTime*0.25)
+	while (traceCount <= MaxTraceTime*0.05)
 	{
 		int objInx = -1;
 		float objSDF[OBJNUM];
@@ -192,7 +193,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 			break;
 		}
 
-		if (sdf <= TraceThre)
+		if (sdf <= TraceThre*2)
 		{
 			info.bHit = true;
 			info.obj = objInx;

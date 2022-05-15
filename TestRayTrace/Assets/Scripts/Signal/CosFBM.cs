@@ -23,6 +23,8 @@ public class CosFBM : MonoBehaviour
     public List<string> bakedHLSLCode;
     public Vector2Int texSize = new Vector2Int(1024, 1024);
     public HeightTexture heightTex;
+    //???
+    public SDFGameSceneTrace testTrace;
     // Start is called before the first frame update
     void Start()
     {
@@ -145,9 +147,9 @@ public class CosFBM : MonoBehaviour
 
     public void BakeHeightTex()
     {
-        Texture2D height = new Texture2D(texSize.x, texSize.y);
-        Texture2D grad = new Texture2D(texSize.x, texSize.y);
-        Vector3 hBound = new Vector3(bound.x*delta, startAmplitude, bound.y * delta);
+        Texture2D height = new Texture2D(texSize.x, texSize.y,TextureFormat.RGBA32,false,true);
+        Texture2D grad = new Texture2D(texSize.x, texSize.y, TextureFormat.RGBA32, false, true);
+        Vector3 hBound = new Vector3(bound.x*delta, startAmplitude*2, bound.y * delta);
         //1.outHeight = (TexSample[height].r-0.5)*2*hBound.y
         //2.outGrad = normalize(TexSample[grad].xy)
 
@@ -161,10 +163,11 @@ public class CosFBM : MonoBehaviour
                 ndc = (ndc - Vec.ToVec2(0.5f)) * 2;
                 Vector2 p2d = ndc * bound*delta;
                 float h = GetVal(p2d);
-                float hr = saturate((h + hBound.y) * 0.5f);
+                float hr = 0.5f + h / hBound.y * 0.5f;
                 Vector2 Dxy = GetDxy(p2d);
+                Vector2 packedDxy = PackDir(Dxy);
                 hColors[i + texSize.x * j] = new Color(hr, 0, 0);
-                gColors[i + texSize.x * j] = new Color(Dxy.x, Dxy.y, 0);
+                gColors[i + texSize.x * j] = new Color(packedDxy.x, packedDxy.y, 0);
             }
         }
 
@@ -175,6 +178,9 @@ public class CosFBM : MonoBehaviour
         heightTex.bound = hBound;
         heightTex.height = height;
         heightTex.grad = grad;
+
+        testTrace.testTex1 = height;
+        testTrace.testTex2 = grad;
     }
 
     public void BakeHLSLCode(bool bakeHeightTex = false)
@@ -187,7 +193,7 @@ public class CosFBM : MonoBehaviour
         }
 
         //@@@ Textures
-        if(bakeHeightTex)
+        //if(bakeHeightTex)
         {
             bakedHLSLCode.Add("Texture2D " + funcName + "_height;");
             bakedHLSLCode.Add("Texture2D " + funcName + "_grad;");
@@ -224,14 +230,12 @@ public class CosFBM : MonoBehaviour
         }
         else
         {
-            ////float CosFBM(float2 p)
+            ///float CosFBM(float2 p)
             ////{
-            ////    float3 hBound = float3(...);
+            ////    float3 hBound = float3(300, 25 * 2, 300);
             ////    float2 ndc = p / hBound.xz;
             ////    float2 uv = (1 + ndc) * 0.5;
-            ////    uint2 texSize = GetSize(CosFBM_height);
-            ////    float2 texPos = texSize * uv;
-            ////    float hr = CosFBM_height[texPos].r;
+            ////    float hr = CosFBM_height.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;
             ////    hr = 2 * (hr - 0.5);
             ////    return hr * hBound.y;
             ////}
@@ -240,9 +244,7 @@ public class CosFBM : MonoBehaviour
             bakedHLSLCode.Add(" float3 hBound = "+Bake(heightTex.bound)+";");
             bakedHLSLCode.Add(" float2 ndc = p / hBound.xz;");
             bakedHLSLCode.Add(" float2 uv = (1 + ndc) * 0.5;");
-            bakedHLSLCode.Add(" uint2 texSize = GetSize("+funcName+"_height);");
-            bakedHLSLCode.Add(" float2 texPos = texSize * uv");
-            bakedHLSLCode.Add(" float hr = "+funcName+"_height[texPos].");
+            bakedHLSLCode.Add(" float hr = "+funcName+ "_height.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;");
             bakedHLSLCode.Add(" hr = 2 * (hr - 0.5);");
             bakedHLSLCode.Add(" return hr * hBound.y;");
             bakedHLSLCode.Add("}");
@@ -279,23 +281,21 @@ public class CosFBM : MonoBehaviour
         }
         else
         {
-            ////float2 CosFBM_Dxy(float2 p)
+            ////float CosFBM_Dxy(float2 p)
             ////{
-            ////    float3 hBound = float3();
+            ////    float3 hBound = float3(300, 25 * 2, 300);
             ////    float2 ndc = p / hBound.xz;
             ////    float2 uv = (1 + ndc) * 0.5;
-            ////    uint2 texSize = GetSize(CosFBM_height);
-            ////    float2 texPos = texSize * uv;
-            ////    return normalize(CosFBM_height[texPos].xy);
+            ////    float2 packedDir = CosFBM_grad.SampleLevel(noise_linear_repeat_sampler, uv, 0).xy;
+            ////    return normalize(packedDir * 2 - 1);
             ////}
             bakedHLSLCode.Add("float " + funcName + "_Dxy(float2 p)");
             bakedHLSLCode.Add("{");
             bakedHLSLCode.Add(" float3 hBound = " + Bake(heightTex.bound) + ";");
             bakedHLSLCode.Add(" float2 ndc = p / hBound.xz;");
             bakedHLSLCode.Add(" float2 uv = (1 + ndc) * 0.5;");
-            bakedHLSLCode.Add(" uint2 texSize = GetSize(" + funcName + "_height);");
-            bakedHLSLCode.Add(" float2 texPos = texSize * uv");
-            bakedHLSLCode.Add(" return normalize("+funcName+"_height[texPos].xy);");
+            bakedHLSLCode.Add(" float2 packedDir = "+funcName+"_grad.SampleLevel(noise_linear_repeat_sampler, uv, 0).xy;");
+            bakedHLSLCode.Add(" return normalize(packedDir * 2 - 1);");
             bakedHLSLCode.Add("}");
 
         }
@@ -348,5 +348,14 @@ public class CosFBM : MonoBehaviour
     string Bake(Vector3 v)
     {
         return "float3(" + v.x + "," + v.y + "," + v.z + ")";
+    }
+
+    //½«Dir×ªµ½[0,1]
+    Vector2 PackDir(Vector2 v)
+    {
+        v = normalize(v);
+        v.x = (v.x + 1) * 0.5f;
+        v.y = (v.y + 1) * 0.5f;
+        return v;
     }
 }

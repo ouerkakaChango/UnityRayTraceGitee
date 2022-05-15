@@ -22,6 +22,8 @@ public class SDFGameSceneTrace : MonoBehaviour
     public string SceneName = "Detail1";
     public AutoCS autoCS;
     public TextureSystem texSys;
+    //???
+    public Texture2D testTex1,testTex2;
     ComputeShader cs;
     public Texture2DArray envSpecTex2DArr;
     public Texture2D envBgTex;
@@ -53,6 +55,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         }
         else
         {
+            QualitySettings.vSyncCount = 1;
             UpdateCamParam();
             Co_GoIter = GoIter();
             StartCoroutine(Co_GoIter);
@@ -181,6 +184,10 @@ public class SDFGameSceneTrace : MonoBehaviour
             cs.SetTexture(kInx, "pbrTex" + i + "roughness", texSys.pbrTextures[i].roughness);
             cs.SetTexture(kInx, "pbrTex" + i + "ao", texSys.pbrTextures[i].ao);
         }
+        //@@@
+        //???
+        cs.SetTexture(kInx, "CosFBM_height", testTex1);
+        cs.SetTexture(kInx, "CosFBM_grad", testTex2);
         //####
 
         cs.SetTexture(kInx, "Result", rt);

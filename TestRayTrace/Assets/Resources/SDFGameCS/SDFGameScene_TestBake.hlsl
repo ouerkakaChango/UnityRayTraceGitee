@@ -1,13 +1,14 @@
 ﻿#define OBJNUM 6
 
 #define MaxSDF 100000
-#define MaxTraceDis 1000
-#define MaxTraceTime 640
-#define TraceThre 0.0001
-#define NormalEpsilon 0.0001
+#define MaxTraceDis 100
+#define MaxTraceTime 6400
+#define TraceThre 0.01
+#define NormalEpsilon 0.01
+
+#define SceneSDFShadowNormalBias 0.1
 
 #define SceneSDFSoftShadowBias 0.1
-#define SceneSDFShadowNormalBias 0.001
 #define SceneSDFSoftShadowK 16
 
 #include "../../HLSL/PBR/PBRCommonDef.hlsl"
@@ -50,7 +51,7 @@ else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.2;
+re.roughness = 1;
 }
 else if (obj == 3 )
 {
@@ -62,7 +63,7 @@ else if (obj == 4 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.2;
 }
 else if (obj == 5 )
 {
@@ -80,9 +81,9 @@ int GetObjRenderMode(int obj)
 int renderMode[6];
 renderMode[0] = 2;
 renderMode[1] = 0;
-renderMode[2] = 0;
+renderMode[2] = 2;
 renderMode[3] = 2;
-renderMode[4] = 2;
+renderMode[4] = 0;
 renderMode[5] = 2;
 return renderMode[obj];
 //@@@
@@ -156,7 +157,7 @@ if(mode==0)
 {
 float3 lightDirs[1];
 float3 lightColors[1];
-lightDirs[0] = float3(-0.2900424, -0.8007796, -0.5240492);
+lightDirs[0] = float3(0.3534208, -0.4141579, -0.8387889);
 lightColors[0] = float3(1, 1, 1);
 result = 0.03 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
@@ -195,11 +196,11 @@ float GetDirHardShadow(Ray ray, float3 lightDir, in HitInfo minHit)
 float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 {
 	float sha = 1;
-if(false)
+if(true)
 {
 //@@@SDFBakerMgr DirShadow
 float3 lightDirs[1];
-lightDirs[0] = float3(-0.2900424, -0.8007796, -0.5240492);
+lightDirs[0] = float3(0.3534208, -0.4141579, -0.8387889);
 for(int i=0;i<1;i++)
 {
 	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
@@ -287,7 +288,7 @@ float GetObjSDF(int inx, float3 p)
 	//@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.861513, 1.414959, -5.500246), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+re = min(re, 0 + SDFBox(p, float3(-53.40586, -0.02504057, -55.8854), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
 else if (inx == 1 )
 {
@@ -295,19 +296,19 @@ inx = -2;
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.5009151, 1.79, -4.9), float3(0.7450001, 1.11, 0.025), float3(338.16, 71.39999, 0)));
+re = min(re, 0 + SDFBox(p, float3(-53.255, -0.1510001, -56.684), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.4200063, 1.414959, -4.188335), float3(0.07071168, 1.511707, 0.06462751), float3(338.16, 71.39999, 0)));
+re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
 }
 else if (inx == 4 )
 {
-re = min(re, 0 + SDFBox(p, float3(-0.321, 1.26, -4.38), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
+re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
 }
 else if (inx == 5 )
 {
-re = min(re, 0 + SDFBox(p, float3(0.14, 1.26, -5.75), float3(0.07071167, 1.511707, 0.06462751), float3(7.817626, 71.39999, -1.723566E-06)));
+re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
 	//@@@
 	if(inx == -1)
@@ -341,8 +342,12 @@ re = min(re, 0 + SDFBox(p, float3(0.14, 1.26, -5.75), float3(0.07071167, 1.51170
 
 			//terrain = abs(p.y);
 
-			float3 np = CosFBM_NearestPoint(p, 10, 0.1f);
-			terrain = length(np-p)*0.5;
+			//???
+			//float3 np = CosFBM_NearestPoint(p, 5, 0.1f);
+			//terrain = length(np-p);
+
+			terrain = abs(p.y - CosFBM(p.xz));
+			terrain *= 0.5;
 		}
 		re = min(re, terrain );
 	}
@@ -426,7 +431,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	int traceCount = 0;
-	while (traceCount <= MaxTraceTime*0.25)
+	while (traceCount <= MaxTraceTime*0.05)
 	{
 		int objInx = -1;
 		float objSDF[OBJNUM];
@@ -446,7 +451,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 			break;
 		}
 
-		if (sdf <= TraceThre)
+		if (sdf <= TraceThre*2)
 		{
 			info.bHit = true;
 			info.obj = objInx;

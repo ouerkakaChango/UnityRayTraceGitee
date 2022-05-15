@@ -58,6 +58,11 @@ namespace MathHelper
             return v.magnitude;
         }
 
+        public static Vector2 normalize(in Vector2 v)
+        {
+            return v.normalized;
+        }
+
         public static Vector3 normalize(in Vector3 v)
         {
             return v.normalized;

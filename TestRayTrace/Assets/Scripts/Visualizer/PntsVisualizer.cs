@@ -17,6 +17,7 @@ public struct ColorRangeInfo
 
 public class PntsVisualizer : MonoBehaviour
 {
+    public bool always = false;
     public float pntScale = 1.0f;
     public List<Vector3> pnts = new List<Vector3>();
     List<ColorRangeInfo> colorRanges = new List<ColorRangeInfo>();
@@ -32,6 +33,48 @@ public class PntsVisualizer : MonoBehaviour
     void Update()
     {
 
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if(!always)
+        {
+            Draw();
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (always)
+        {
+            Draw();
+        }
+    }
+
+    //##############################################################
+
+    void Draw()
+    {
+        if (rangeType == PntsVisualRangeType.None)
+        {
+            Gizmos.color = Color.red;
+            for (int i = 0; i < pnts.Count; i++)
+            {
+                Gizmos.DrawCube(pnts[i], pntScale * 0.01f * Vector3.one);
+            }
+        }
+        else if (rangeType == PntsVisualRangeType.Color)
+        {
+            foreach (var info in colorRanges)
+            {
+                Gizmos.color = info.color;
+                //Debug.Log(info.start + " " + info.end);
+                for (int i = info.start; i < info.end; i++)
+                {
+                    Gizmos.DrawCube(pnts[i], info.scale * 0.01f * Vector3.one);
+                }
+            }
+        }
     }
 
     public void Clear()
@@ -66,30 +109,6 @@ public class PntsVisualizer : MonoBehaviour
             info.end = info.start;
             info.scale = scale;
             colorRanges.Add(info);
-        }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        if (rangeType == PntsVisualRangeType.None)
-        {
-            Gizmos.color = Color.red;
-            for (int i = 0; i < pnts.Count; i++)
-            {
-                Gizmos.DrawCube(pnts[i], pntScale * 0.01f * Vector3.one);
-            }
-        }
-        else if (rangeType == PntsVisualRangeType.Color)
-        {
-            foreach (var info in colorRanges)
-            {
-                Gizmos.color = info.color;
-                //Debug.Log(info.start + " " + info.end);
-                for (int i = info.start; i < info.end; i++)
-                {                  
-                    Gizmos.DrawCube(pnts[i], info.scale * 0.01f * Vector3.one);
-                }
-            }
         }
     }
 }
