@@ -147,8 +147,8 @@ public class CosFBM : MonoBehaviour
 
     public void BakeHeightTex()
     {
-        Texture2D height = new Texture2D(texSize.x, texSize.y,TextureFormat.RGBA32,false,true);
-        Texture2D grad = new Texture2D(texSize.x, texSize.y, TextureFormat.RGBA32, false, true);
+        Texture2D height = new Texture2D(texSize.x, texSize.y,TextureFormat.RGBAFloat,false,true);
+        Texture2D grad = new Texture2D(texSize.x, texSize.y, TextureFormat.RGBAFloat, false, true);
         Vector3 hBound = new Vector3(bound.x*delta, startAmplitude*2, bound.y * delta);
         //1.outHeight = (TexSample[height].r-0.5)*2*hBound.y
         //2.outGrad = normalize(TexSample[grad].xy)
