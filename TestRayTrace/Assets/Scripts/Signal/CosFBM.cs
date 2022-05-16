@@ -290,6 +290,27 @@ public class CosFBM : MonoBehaviour
 
         }
 
+        //@@@ H,H'float3 type, prevent hidden-transfer use of float3->float2
+        ////float CosFBM(float3 pos)
+        ////{
+        ////    return CosFBM(pos.xz);
+        ////}
+        ////
+        ////float2 CosFBM_Dxy(float3 pos)
+        ////{
+        ////    return CosFBM_Dxy(pos.xz);
+        ////}
+        bakedHLSLCode.Add("");
+        bakedHLSLCode.Add("float "+funcName+"(float3 pos)");
+        bakedHLSLCode.Add("{");
+        bakedHLSLCode.Add(" return "+funcName+"(pos.xz);");
+        bakedHLSLCode.Add("}");
+        bakedHLSLCode.Add("");
+        bakedHLSLCode.Add("float " + funcName + "_Dxy(float3 pos)");
+        bakedHLSLCode.Add("{");
+        bakedHLSLCode.Add(" return " + funcName + "_Dxy(pos.xz);");
+        bakedHLSLCode.Add("}");
+
         //@@@ DisSquareGrad
         ////Vector2 re = 2.0f * (p - Vec.VecXZ(target)) + 2*(GetVal(p) - target.y)*GetDxy(p);
         bakedHLSLCode.Add("");

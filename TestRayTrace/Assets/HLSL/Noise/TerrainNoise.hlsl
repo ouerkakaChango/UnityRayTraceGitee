@@ -21,6 +21,16 @@ float2 CosFBM_Dxy(float2 p)
     return CosFBM_grad.SampleLevel(noise_linear_repeat_sampler, uv, 0).xy;
 }
 
+float CosFBM(float3 pos)
+{
+    return CosFBM(pos.xz);
+}
+
+float CosFBM_Dxy(float3 pos)
+{
+    return CosFBM_Dxy(pos.xz);
+}
+
 float2 CosFBM_DisSquareGrad(float2 p, float3 target)
 {
     return 2 * (p - target.xz) + 2 * (CosFBM(p) - target.y) * CosFBM_Dxy(p);
@@ -35,7 +45,5 @@ float3 CosFBM_NearestPoint(float3 target, int loopNum, float step)
     }
     return float3(p.x, CosFBM(p), p.y);
 }
-
-
 
 #endif
