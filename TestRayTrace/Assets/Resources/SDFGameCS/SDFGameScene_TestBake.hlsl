@@ -20,11 +20,11 @@
 #include "../../HLSL/Noise/TerrainNoise.hlsl"
 #include "../../HLSL/UV/UVCommonDef.hlsl"
 #include "../../HLSL/TransferMath/TransferMath.hlsl"
-Texture2D pbrTex0albedo;
-Texture2D pbrTex0normal;
-Texture2D pbrTex0metallic;
-Texture2D pbrTex0roughness;
-Texture2D pbrTex0ao;
+Texture2D woodPBR_albedo;
+Texture2D woodPBR_normal;
+Texture2D woodPBR_metallic;
+Texture2D woodPBR_roughness;
+Texture2D woodPBR_ao;
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -120,23 +120,36 @@ if(mode == 2)
 	mode = 0;
 }
 else if(mode == 3)
-{
+{//???
 	float3 pos = minHit.P;
-	float2 uv = BoxedUV(pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
-	//uv = frac(uv*5);
+	float3 boxPos = float3(-55,0.6,-52);
+	float3 boxBound = 0.5;
+	//float3 boxPos = float3(0,2,0);
+	float2 uv = BoxedUV(pos,boxPos, boxBound, float3(0, 0, 0));
 
-	mat.albedo *= pbrTex0albedo[4096*uv].rgb;
+	//mat.albedo = minHit.N;
+	mat.albedo *= woodPBR_albedo[4096*uv].rgb;
 	float3 N = minHit.N;
 	float3 T,B;
-	//basis(N,T,B);
-	BoxedTB(T,B, pos,float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
-	minHit.N = NormalMapToWorld(pbrTex0normal[4096*uv].rgb,T,B,N);
-	//mat.albedo = minHit.N;
-	mat.metallic *= pbrTex0metallic[4096*uv].r;
-	mat.roughness *= pbrTex0roughness[4096*uv].r;
-	mat.ao = pbrTex0ao[4096*uv].r;
+	BoxedTB(T,B, pos,boxPos, boxBound, float3(0, 0, 0));
+	minHit.N = NormalMapToWorld(woodPBR_normal[4096*uv].rgb*2-1,T,B,N);
+	//minHit.N = NormalMapToWorld(float3(0,0,1),T,B,N);
+
+	//mat.albedo = woodPBR_normal[4096*uv].rgb;
+	mat.metallic *= woodPBR_metallic[4096*uv].r;
+	mat.roughness *= woodPBR_roughness[4096*uv].r;
+	mat.ao = woodPBR_ao[4096*uv].r;
 
 	mode = 0;
+}
+
+//???
+if(minHit.obj==2)
+{
+	//float2 dxy = CosFBM_Dxy(minHit.P.xz);
+	//float3 N = normalize(float3(-dxy.x,1,-dxy.y));
+	//mat.albedo = float3(saturate(dxy),0);
+	//mat.albedo = float3(CosFBM(minHit.P.xz)>0?1:0,0,0);
 }
 }
 
@@ -366,11 +379,10 @@ float3 GetObjSDFNormal(int inx, float3 p)
 
 float3 GetObjNormal(int inx, float3 p)
 {
-if (inx == 0)
-{
-	//return SDFSphereNormal(p, float3(0, 0.5, 0));
-	//return SDFPlanetNormal(p);
-	return GetObjSDFNormal(inx, p);
+if (inx == 1)
+{//???
+	float2 dxy = CosFBM_Dxy(p.xz);
+	return normalize(float3(-dxy.x,1,-dxy.y));
 }
 else
 {
@@ -431,7 +443,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	int traceCount = 0;
-	while (traceCount <= MaxTraceTime*0.05)
+	while (traceCount <= MaxTraceTime*0.01)
 	{
 		int objInx = -1;
 		float objSDF[OBJNUM];
@@ -446,7 +458,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 			}
 		}
 
-		if (sdf > MaxTraceDis)
+		if (sdf > MaxTraceDis*0.05)
 		{
 			break;
 		}

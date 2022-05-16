@@ -10,18 +10,15 @@ float CosFBM(float2 p)
     float3 hBound = float3(300, 50, 300);
     float2 ndc = p / hBound.xz;
     float2 uv = (1 + ndc) * 0.5;
-    float hr = CosFBM_height.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;
-    hr = 2 * (hr - 0.5);
-    return hr * hBound.y;
+    return CosFBM_height.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;
 }
 
-float CosFBM_Dxy(float2 p)
+float2 CosFBM_Dxy(float2 p)
 {
     float3 hBound = float3(300, 50, 300);
     float2 ndc = p / hBound.xz;
     float2 uv = (1 + ndc) * 0.5;
-    float2 packedDir = CosFBM_grad.SampleLevel(noise_linear_repeat_sampler, uv, 0).xy;
-    return normalize(packedDir * 2 - 1);
+    return CosFBM_grad.SampleLevel(noise_linear_repeat_sampler, uv, 0).xy;
 }
 
 float2 CosFBM_DisSquareGrad(float2 p, float3 target)
@@ -38,5 +35,7 @@ float3 CosFBM_NearestPoint(float3 target, int loopNum, float step)
     }
     return float3(p.x, CosFBM(p), p.y);
 }
+
+
 
 #endif

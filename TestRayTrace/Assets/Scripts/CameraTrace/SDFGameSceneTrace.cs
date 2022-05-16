@@ -51,7 +51,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         if (Application.isEditor && !Application.isPlaying)
         {
             //do what you want
-            //RefreashAutoCS();
+            //RefreshAutoCS();
         }
         else
         {
@@ -176,18 +176,23 @@ public class SDFGameSceneTrace : MonoBehaviour
         cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
         cs.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
 
-        for(int i=0;i<texSys.pbrTextures.Count;i++)
-        {
-            cs.SetTexture(kInx, "pbrTex"+i+"albedo", texSys.pbrTextures[i].albedo);
-            cs.SetTexture(kInx, "pbrTex" + i + "normal", texSys.pbrTextures[i].normal);
-            cs.SetTexture(kInx, "pbrTex" + i + "metallic", texSys.pbrTextures[i].metallic);
-            cs.SetTexture(kInx, "pbrTex" + i + "roughness", texSys.pbrTextures[i].roughness);
-            cs.SetTexture(kInx, "pbrTex" + i + "ao", texSys.pbrTextures[i].ao);
-        }
-        //@@@
+        //for(int i=0;i<texSys.pbrTextures.Count;i++)
+        //{
+        //    cs.SetTexture(kInx, "pbrTex"+i+"albedo", texSys.pbrTextures[i].albedo);
+        //    cs.SetTexture(kInx, "pbrTex" + i + "normal", texSys.pbrTextures[i].normal);
+        //    cs.SetTexture(kInx, "pbrTex" + i + "metallic", texSys.pbrTextures[i].metallic);
+        //    cs.SetTexture(kInx, "pbrTex" + i + "roughness", texSys.pbrTextures[i].roughness);
+        //    cs.SetTexture(kInx, "pbrTex" + i + "ao", texSys.pbrTextures[i].ao);
+        //}
+        ////@@@
         //???
         cs.SetTexture(kInx, "CosFBM_height", testTex1);
         cs.SetTexture(kInx, "CosFBM_grad", testTex2);
+        //___
+        for(int i=0;i<texSys.outTextures.Count;i++)
+        {
+            cs.SetTexture(kInx, texSys.outTextures[i].name, texSys.outTextures[i].tex);
+        }
         //####
 
         cs.SetTexture(kInx, "Result", rt);
@@ -234,7 +239,13 @@ public class SDFGameSceneTrace : MonoBehaviour
         hasInited = true;
     }
 
-    public void RefreashAutoCS()
+    public void RefreshTextureSystem()
+    {
+        texSys.Refresh();
+        autoCS.texSys = texSys;
+    }
+
+    public void RefreshAutoCS()
     {
         autoCS.InitOuts();
         autoCS.outs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName +".compute");

@@ -147,11 +147,9 @@ public class CosFBM : MonoBehaviour
 
     public void BakeHeightTex()
     {
-        Texture2D height = new Texture2D(texSize.x, texSize.y,TextureFormat.RGBAFloat,false,true);
+        Texture2D height = new Texture2D(texSize.x, texSize.y, TextureFormat.RGBAFloat, false, true);
         Texture2D grad = new Texture2D(texSize.x, texSize.y, TextureFormat.RGBAFloat, false, true);
         Vector3 hBound = new Vector3(bound.x*delta, startAmplitude*2, bound.y * delta);
-        //1.outHeight = (TexSample[height].r-0.5)*2*hBound.y
-        //2.outGrad = normalize(TexSample[grad].xy)
 
         Color[] hColors = new Color[texSize.x * texSize.y];
         Color[] gColors = new Color[texSize.x * texSize.y];
@@ -163,11 +161,9 @@ public class CosFBM : MonoBehaviour
                 ndc = (ndc - Vec.ToVec2(0.5f)) * 2;
                 Vector2 p2d = ndc * bound*delta;
                 float h = GetVal(p2d);
-                float hr = 0.5f + h / hBound.y * 0.5f;
                 Vector2 Dxy = GetDxy(p2d);
-                Vector2 packedDxy = PackDir(Dxy);
-                hColors[i + texSize.x * j] = new Color(hr, 0, 0);
-                gColors[i + texSize.x * j] = new Color(packedDxy.x, packedDxy.y, 0);
+                hColors[i + texSize.x * j] = new Color(h, 0, 0);
+                gColors[i + texSize.x * j] = new Color(Dxy.x, Dxy.y, 0);
             }
         }
 
@@ -230,23 +226,19 @@ public class CosFBM : MonoBehaviour
         }
         else
         {
-            ///float CosFBM(float2 p)
+            ////float CosFBM(float2 p)
             ////{
-            ////    float3 hBound = float3(300, 25 * 2, 300);
+            ////    float3 hBound = float3(300, 50, 300);
             ////    float2 ndc = p / hBound.xz;
             ////    float2 uv = (1 + ndc) * 0.5;
-            ////    float hr = CosFBM_height.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;
-            ////    hr = 2 * (hr - 0.5);
-            ////    return hr * hBound.y;
+            ////    return CosFBM_height.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;
             ////}
             bakedHLSLCode.Add("float " + funcName + "(float2 p)");
             bakedHLSLCode.Add("{");
             bakedHLSLCode.Add(" float3 hBound = "+Bake(heightTex.bound)+";");
             bakedHLSLCode.Add(" float2 ndc = p / hBound.xz;");
             bakedHLSLCode.Add(" float2 uv = (1 + ndc) * 0.5;");
-            bakedHLSLCode.Add(" float hr = "+funcName+ "_height.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;");
-            bakedHLSLCode.Add(" hr = 2 * (hr - 0.5);");
-            bakedHLSLCode.Add(" return hr * hBound.y;");
+            bakedHLSLCode.Add(" return "+funcName+ "_height.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;");
             bakedHLSLCode.Add("}");
         }
 
@@ -281,21 +273,19 @@ public class CosFBM : MonoBehaviour
         }
         else
         {
-            ////float CosFBM_Dxy(float2 p)
+            ////float2 CosFBM_Dxy(float2 p)
             ////{
-            ////    float3 hBound = float3(300, 25 * 2, 300);
+            ////    float3 hBound = float3(300, 50, 300);
             ////    float2 ndc = p / hBound.xz;
             ////    float2 uv = (1 + ndc) * 0.5;
-            ////    float2 packedDir = CosFBM_grad.SampleLevel(noise_linear_repeat_sampler, uv, 0).xy;
-            ////    return normalize(packedDir * 2 - 1);
+            ////    return CosFBM_grad.SampleLevel(noise_linear_repeat_sampler, uv, 0).xy;
             ////}
-            bakedHLSLCode.Add("float " + funcName + "_Dxy(float2 p)");
+            bakedHLSLCode.Add("float2 " + funcName + "_Dxy(float2 p)");
             bakedHLSLCode.Add("{");
             bakedHLSLCode.Add(" float3 hBound = " + Bake(heightTex.bound) + ";");
             bakedHLSLCode.Add(" float2 ndc = p / hBound.xz;");
             bakedHLSLCode.Add(" float2 uv = (1 + ndc) * 0.5;");
-            bakedHLSLCode.Add(" float2 packedDir = "+funcName+"_grad.SampleLevel(noise_linear_repeat_sampler, uv, 0).xy;");
-            bakedHLSLCode.Add(" return normalize(packedDir * 2 - 1);");
+            bakedHLSLCode.Add(" return " + funcName+"_grad.SampleLevel(noise_linear_repeat_sampler, uv, 0).xy;");
             bakedHLSLCode.Add("}");
 
         }
@@ -350,12 +340,4 @@ public class CosFBM : MonoBehaviour
         return "float3(" + v.x + "," + v.y + "," + v.z + ")";
     }
 
-    //½«Dir×ªµ½[0,1]
-    Vector2 PackDir(Vector2 v)
-    {
-        v = normalize(v);
-        v.x = (v.x + 1) * 0.5f;
-        v.y = (v.y + 1) * 0.5f;
-        return v;
-    }
 }

@@ -18,10 +18,11 @@ public class AutoCS : MonoBehaviour
 
     public string taskFile;
 
-    //??? test public
     public string[] lines;
     public string[] words;
     public Dictionary<string, Vector2Int> rangeMap = new Dictionary<string, Vector2Int>();
+
+    public TextureSystem texSys;
     private void Awake()
     {
         //Generate();

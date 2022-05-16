@@ -173,7 +173,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	int traceCount = 0;
-	while (traceCount <= MaxTraceTime*0.05)
+	while (traceCount <= MaxTraceTime*0.01)
 	{
 		int objInx = -1;
 		float objSDF[OBJNUM];
@@ -188,7 +188,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 			}
 		}
 
-		if (sdf > MaxTraceDis)
+		if (sdf > MaxTraceDis*0.05)
 		{
 			break;
 		}
