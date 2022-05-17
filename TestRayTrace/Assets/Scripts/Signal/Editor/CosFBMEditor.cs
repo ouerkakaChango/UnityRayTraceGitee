@@ -71,8 +71,10 @@ public class CosFBMEditor : Editor
             }
             if (GUILayout.Button("BakeHLSLCodeWithTexture"))
             {
-                Target.BakeHeightTex();
-                Target.BakeHLSLCode(true);
+                if (Target.BakeHeightTex())
+                {
+                    Target.BakeHLSLCode(true);
+                }
             }
             GUILayout.TextArea(Target.GetBakedHLSLString());
         }

@@ -22,9 +22,9 @@ public class CosFBM : MonoBehaviour
     //[ReadOnly]
     public List<string> bakedHLSLCode;
     public Vector2Int texSize = new Vector2Int(1024, 1024);
+    public TexSysTag targetTag = null;
+    [ReadOnly]
     public HeightTexture heightTex;
-    //???
-    public SDFGameSceneTrace testTrace;
     // Start is called before the first frame update
     void Start()
     {
@@ -145,8 +145,14 @@ public class CosFBM : MonoBehaviour
         }
     }
 
-    public void BakeHeightTex()
+    public bool BakeHeightTex()
     {
+        if(!targetTag)
+        {
+            Debug.LogError("CosFBM: bake texture targetTag null");
+            return false;
+        }
+
         Texture2D height = new Texture2D(texSize.x, texSize.y, TextureFormat.RGBAFloat, false, true);
         Texture2D grad = new Texture2D(texSize.x, texSize.y, TextureFormat.RGBAFloat, false, true);
         Vector3 hBound = new Vector3(bound.x*delta, startAmplitude*2, bound.y * delta);
@@ -171,12 +177,17 @@ public class CosFBM : MonoBehaviour
         grad.SetPixels(gColors);
         height.Apply();
         grad.Apply();
+
+        heightTex.name = funcName;
         heightTex.bound = hBound;
         heightTex.height = height;
         heightTex.grad = grad;
 
-        testTrace.testTex1 = height;
-        testTrace.testTex2 = grad;
+        //!!! maybe substitude
+        targetTag.heightTextures.Clear();
+        targetTag.heightTextures.Add(heightTex);
+
+        return true;
     }
 
     public void BakeHLSLCode(bool bakeHeightTex = false)

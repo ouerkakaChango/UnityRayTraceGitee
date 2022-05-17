@@ -23,7 +23,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     public AutoCS autoCS;
     public TextureSystem texSys;
     //???
-    public Texture2D testTex1,testTex2;
+    //public Texture2D testTex1,testTex2;
     ComputeShader cs;
     public Texture2DArray envSpecTex2DArr;
     public Texture2D envBgTex;
@@ -186,8 +186,8 @@ public class SDFGameSceneTrace : MonoBehaviour
         //}
         ////@@@
         //???
-        cs.SetTexture(kInx, "CosFBM_height", testTex1);
-        cs.SetTexture(kInx, "CosFBM_grad", testTex2);
+        //cs.SetTexture(kInx, "CosFBM_height", testTex1);
+        //cs.SetTexture(kInx, "CosFBM_grad", testTex2);
         //___
         for(int i=0;i<texSys.outTextures.Count;i++)
         {

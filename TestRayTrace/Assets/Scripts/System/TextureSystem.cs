@@ -14,7 +14,9 @@ public struct PBRTexture
 [System.Serializable]
 public struct HeightTexture
 {
+    public string name;
     public Texture2D height, grad;
+    //??? (deprecated?)
     public Vector3 bound;
 }
 
@@ -52,6 +54,10 @@ public class TextureSystem : MonoBehaviour
             if(tag.type == TexTagType.pbrTexture)
             {
                 AddPBRTexture(tag.pbrTextures);
+            }
+            else if (tag.type == TexTagType.heightTextue)
+            {
+                AddHeightTexture(tag.heightTextures);
             }
         }
     }
@@ -93,6 +99,22 @@ public class TextureSystem : MonoBehaviour
             outTextures.Add(metallic);
             outTextures.Add(roughness);
             outTextures.Add(ao);
+        }
+    }
+
+    void AddHeightTexture(in List<HeightTexture> heightTextures)
+    {
+        for (int i = 0; i < heightTextures.Count; i++)
+        {
+            var heightTex = heightTextures[i];
+            NamedTexture height,grad;
+            height.name = heightTex.name + "_height";
+            height.tex = heightTex.height;
+            grad.name = heightTex.name + "_grad";
+            grad.tex = heightTex.grad;
+
+            outTextures.Add(height);
+            outTextures.Add(grad);
         }
     }
 }

@@ -18,16 +18,31 @@ public class TexSysTagEditor : Editor
     {
         base.OnInspectorGUI();
 
-        //1.原生listGUI,不显示内部元素
-        var list = serializedObject.FindProperty("pbrTextures");
-        EditorGUILayout.PropertyField(list, new GUIContent("pbrTextures"), true);
-
-        showDetailFoldout = EditorGUILayout.Foldout(showDetailFoldout, "Detail");
-        if (showDetailFoldout)
+        if (Target.type == TexTagType.pbrTexture)
         {
-            //2 手动显示内部元素
-            SerializedProperty pbrSP = serializedObject.FindProperty("pbrTextures");
-            EditorShowPBRTextureList(serializedObject, Target.pbrTextures.Count, pbrSP);
+            //1.原生listGUI,不显示内部元素
+            var list = serializedObject.FindProperty("pbrTextures");
+            EditorGUILayout.PropertyField(list, new GUIContent("pbrTextures"), true);
+
+            showDetailFoldout = EditorGUILayout.Foldout(showDetailFoldout, "Detail");
+            if (showDetailFoldout)
+            {
+                //2 手动显示内部元素
+                SerializedProperty listSP = serializedObject.FindProperty("pbrTextures");
+                EditorShowPBRTextureList(serializedObject, Target.pbrTextures.Count, listSP);
+            }
+        }
+        else if (Target.type == TexTagType.heightTextue)
+        {
+            var list = serializedObject.FindProperty("heightTextures");
+            EditorGUILayout.PropertyField(list, new GUIContent("heightTextures"), true);
+
+            showDetailFoldout = EditorGUILayout.Foldout(showDetailFoldout, "Detail");
+            if(showDetailFoldout)
+            {
+                SerializedProperty listSP = serializedObject.FindProperty("heightTextures");
+                EditorShowHeightTextureList(serializedObject, Target.heightTextures.Count, listSP);
+            }
         }
     }
 
@@ -50,6 +65,28 @@ public class TexSysTagEditor : Editor
             EditorGUILayout.PropertyField(metallicSP, true);
             EditorGUILayout.PropertyField(roughnessSP, true);
             EditorGUILayout.PropertyField(aoSP, true);
+
+            EditorGUILayout.Space();
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+            }
+        }
+    }
+
+    public static void EditorShowHeightTextureList(SerializedObject serializedObject, int listCount, SerializedProperty listSP)
+    {//name,height,grad,(bound?)
+        for (int i = 0; i < listCount; i++)
+        {
+            SerializedProperty nameSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("name");
+            SerializedProperty heightSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("height");
+            SerializedProperty gradSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("grad");
+
+            EditorGUI.BeginChangeCheck();
+
+            EditorGUILayout.PropertyField(nameSP, true);
+            EditorGUILayout.PropertyField(heightSP, true);
+            EditorGUILayout.PropertyField(gradSP, true);
 
             EditorGUILayout.Space();
             if (EditorGUI.EndChangeCheck())
