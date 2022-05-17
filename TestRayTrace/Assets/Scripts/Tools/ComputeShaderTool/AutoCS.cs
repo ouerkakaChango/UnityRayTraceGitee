@@ -155,6 +155,7 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("ObjRender", new Vector2Int(-1, -1));
         rangeMap.Add("DirShadow", new Vector2Int(-1, -1));
         rangeMap.Add("ObjSDF", new Vector2Int(-1, -1));
+        rangeMap.Add("ObjNormal", new Vector2Int(-1, -1));
 
         for (int i=0;i<lines.Length;i++)
         {
@@ -183,20 +184,14 @@ public class AutoCS : MonoBehaviour
                     var tt = rangeMap[key];
                     tt.y = i;
                     rangeMap[key] = tt;
-                    //bDone = true;
                     break;
                 }
             }
-            //if (bDone)
-            //{
-            //    continue;
-            //}
         }
 
         List<string> newLines = new List<string>(lines);
         int offset = 0;
 
-        //!!! 顺序必须对应cgf
         foreach (var iter in rangeMap)
         {
             //Debug.Log(offset);
@@ -210,6 +205,14 @@ public class AutoCS : MonoBehaviour
                 newcount = bakerMgr.bakedSDFs.Count;
                 newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
                 newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedSDFs);
+            }
+            else if (iter.Key == "ObjNormal" && ValidRange(iter.Value))
+            {
+                oricount = iter.Value.y - iter.Value.x - 1;
+                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
+                newcount = bakerMgr.bakedMaterials.Count;
+                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
+                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedNormals);
             }
             else if (iter.Key == "ObjMaterial" && ValidRange(iter.Value))
             {
