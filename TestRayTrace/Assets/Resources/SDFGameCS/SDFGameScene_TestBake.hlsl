@@ -1,4 +1,4 @@
-﻿#define OBJNUM 6
+﻿#define OBJNUM 7
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -6,7 +6,7 @@
 #define TraceThre 0.01
 #define NormalEpsilon 0.01
 
-#define SceneSDFShadowNormalBias 0.1
+#define SceneSDFShadowNormalBias 0.2
 
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFSoftShadowK 16
@@ -20,6 +20,7 @@
 #include "../../HLSL/Noise/TerrainNoise.hlsl"
 #include "../../HLSL/UV/UVCommonDef.hlsl"
 #include "../../HLSL/TransferMath/TransferMath.hlsl"
+#include "../../HLSL/Random/RandUtility.hlsl"
 Texture2D woodPBR_albedo;
 Texture2D woodPBR_normal;
 Texture2D woodPBR_metallic;
@@ -61,11 +62,17 @@ re.roughness = 1;
 }
 else if (obj == 4 )
 {
+re.albedo = float3(0.05636634, 0.8962264, 0.2993254);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 5 )
+{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.2;
 }
-else if (obj == 5 )
+else if (obj == 6 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -78,13 +85,14 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[6];
+int renderMode[7];
 renderMode[0] = 2;
 renderMode[1] = 0;
 renderMode[2] = 2;
 renderMode[3] = 2;
 renderMode[4] = 0;
-renderMode[5] = 2;
+renderMode[5] = 0;
+renderMode[6] = 2;
 return renderMode[obj];
 //@@@
 }
@@ -317,9 +325,13 @@ re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.070711
 }
 else if (inx == 4 )
 {
-re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
+inx = -3;
 }
 else if (inx == 5 )
+{
+re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
+}
+else if (inx == 6 )
 {
 re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
@@ -364,6 +376,21 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 		}
 		re = min(re, terrain );
 	}
+	else if(inx == -3)
+	{
+		if(abs(p.x)<300 && abs(p.z)<300)
+		{
+			float grid = 3.0;
+			float2 m = floor(p.xz/grid);
+			float2 c = grid*m+grid*0.5;
+			float3 center = float3(c.x,CosFBM(c),c.y);
+			float3 ori = center;
+			center.y += noise(float3(34,23,123)+ori*0.1)*2 * Time01(5,ori.y);
+			float r =0.5;
+			float d = max(length(p-center)- r, 0);
+			re = min(re,d);
+		}
+	}
 return re;
 
 }
@@ -395,137 +422,12 @@ else if (inx == 3 )
 }
 else if (inx == 4 )
 {
-}
-else if (inx == 5 )
-{
-}
-if(inx == 0 )
-{
-}
-else if (inx == 1 )
-{
-}
-else if (inx == 2 )
-{
-inx = -2;
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
+inx = -3;
 }
 else if (inx == 5 )
 {
 }
 else if (inx == 6 )
-{
-}
-if(inx == 0 )
-{
-}
-else if (inx == 1 )
-{
-}
-else if (inx == 2 )
-{
-inx = -2;
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
-}
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-if(inx == 0 )
-{
-}
-else if (inx == 1 )
-{
-}
-else if (inx == 2 )
-{
-inx = -2;
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
-}
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-if(inx == 0 )
-{
-}
-else if (inx == 1 )
-{
-}
-else if (inx == 2 )
-{
-inx = -2;
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
-}
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-if(inx == 0 )
-{
-}
-else if (inx == 1 )
-{
-}
-else if (inx == 2 )
-{
-inx = -2;
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
-}
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-if(inx == 0 )
-{
-}
-else if (inx == 1 )
-{
-inx = -2;
-}
-else if (inx == 2 )
-{
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
-}
-else if (inx == 5 )
 {
 }
 //@@@
@@ -533,6 +435,17 @@ if (inx == -2)
 {//???
 	float2 dxy = CosFBM_Dxy(p.xz);
 	return normalize(float3(-dxy.x,1,-dxy.y));
+}
+else if (inx == -3)
+{
+			float grid = 3.0;
+			float2 m = floor(p.xz/grid);
+			float2 c = grid*m+grid*0.5;
+			float3 center = float3(c.x,CosFBM(c),c.y);
+			float3 ori = center;
+			center.y += noise(float3(34,23,123)+ori*0.1)*2 * Time01(5,ori.y);
+			return normalize(p-center);
+			//return GetObjSDFNormal(inx, p);
 }
 else
 {

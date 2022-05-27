@@ -173,9 +173,9 @@ uint2 GetSize(Texture2D<float4> dst)
 	return size;
 }
 
-float Time01()
+float Time01(float frequency=1.0f,float phi = 0.0f)
 {
-	return 0.5*(sin(_Time.y) + 1);
+	return 0.5*(sin(frequency * _Time.y+phi) + 1);
 }
  
 bool Is01(float x)

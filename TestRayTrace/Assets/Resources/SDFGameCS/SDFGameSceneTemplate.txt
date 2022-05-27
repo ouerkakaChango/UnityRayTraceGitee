@@ -6,7 +6,7 @@
 #define TraceThre 0.01
 #define NormalEpsilon 0.01
 
-#define SceneSDFShadowNormalBias 0.1
+#define SceneSDFShadowNormalBias 0.2
 
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFSoftShadowK 16

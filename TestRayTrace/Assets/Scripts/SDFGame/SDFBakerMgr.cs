@@ -106,6 +106,8 @@ public class SDFBakerMgr : MonoBehaviour
 
         bakedRenders.Clear();
         bakedDirShadows.Clear();
+
+        bakedNormals.Clear();
     }
 
     void EndBake()
