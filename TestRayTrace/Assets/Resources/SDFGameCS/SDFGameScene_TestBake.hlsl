@@ -370,8 +370,9 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			//???
 			//float3 np = CosFBM_NearestPoint(p, 10, 0.1f);
 			//terrain = length(np-p);
-
-			terrain = abs(p.y - CosFBM(p.xz));
+			terrain = CosFBM(p.xz);
+			terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+			terrain = abs(p.y - terrain);
 			terrain *= 0.5;
 		}
 		re = min(re, terrain );
@@ -380,14 +381,37 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 	{
 		if(abs(p.x)<300 && abs(p.z)<300)
 		{
-			float grid = 3.0;
+			float grid = 2.0;
 			float2 m = floor(p.xz/grid);
-			float2 c = grid*m+grid*0.5;
+			float2 c = grid*(m+0.5);
 			float3 center = float3(c.x,CosFBM(c),c.y);
-			float3 ori = center;
-			center.y += noise(float3(34,23,123)+ori*0.1)*2 * Time01(5,ori.y);
+			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
 			float r =0.5;
 			float d = max(length(p-center)- r, 0);
+			re = min(re,d);
+
+			float2 c2 = c+grid*float2(1,0);
+			center = float3(c2.x,CosFBM(c2),c2.y);
+			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			d = max(length(p-center)- r, 0);
+			re = min(re,d);
+
+			c2 = c+grid*float2(-1,0);
+			center = float3(c2.x,CosFBM(c2),c2.y);
+			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			d = max(length(p-center)- r, 0);
+			re = min(re,d);
+
+			c2 = c+grid*float2(0,1);
+			center = float3(c2.x,CosFBM(c2),c2.y);
+			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			d = max(length(p-center)- r, 0);
+			re = min(re,d);
+
+			c2 = c+grid*float2(0,-1);
+			center = float3(c2.x,CosFBM(c2),c2.y);
+			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			d = max(length(p-center)- r, 0);
 			re = min(re,d);
 		}
 	}
@@ -433,17 +457,18 @@ else if (inx == 6 )
 //@@@
 if (inx == -2)
 {//???
+	return GetObjSDFNormal(inx, p);
 	float2 dxy = CosFBM_Dxy(p.xz);
 	return normalize(float3(-dxy.x,1,-dxy.y));
 }
 else if (inx == -3)
 {
-			float grid = 3.0;
+			float grid = 2.0;
 			float2 m = floor(p.xz/grid);
 			float2 c = grid*m+grid*0.5;
 			float3 center = float3(c.x,CosFBM(c),c.y);
 			float3 ori = center;
-			center.y += noise(float3(34,23,123)+ori*0.1)*2 * Time01(5,ori.y);
+			center.y += rand01(float3(34,23,123)+ori*0.1)*2 * Time01(5,ori.y);
 			return normalize(p-center);
 			//return GetObjSDFNormal(inx, p);
 }
