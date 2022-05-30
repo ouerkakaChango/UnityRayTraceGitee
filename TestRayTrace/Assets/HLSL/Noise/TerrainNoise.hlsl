@@ -46,4 +46,12 @@ float3 CosFBM_NearestPoint(float3 target, int loopNum, float step)
     return float3(p.x, CosFBM(p), p.y);
 }
 
+Texture2D terrainDetail;
+float TerrainDetailNoise(float2 p)
+{
+    float3 hBound = float3(300, 50, 300);
+    float2 ndc = p / hBound.xz;
+    float2 uv = (1 + ndc) * 0.5;
+    return terrainDetail.SampleLevel(noise_linear_repeat_sampler, uv, 0).x;
+}
 #endif

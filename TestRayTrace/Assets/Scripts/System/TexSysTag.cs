@@ -6,6 +6,7 @@ public enum TexTagType
 {
     pbrTexture,
     heightTextue,
+    plainTexture,
 };
 
 public class TexSysTag : MonoBehaviour
@@ -13,9 +14,11 @@ public class TexSysTag : MonoBehaviour
     public bool active = true;
     public TexTagType type = TexTagType.pbrTexture;
     [HideInInspector]
-    [SerializeField]  public List<PBRTexture> pbrTextures;
+    [SerializeField]  public List<PBRTexture> pbrTextures = new List<PBRTexture>();
     [HideInInspector]
-    public List<HeightTexture> heightTextures;
+    public List<HeightTexture> heightTextures = new List<HeightTexture>();
+    [HideInInspector]
+    public List<NamedTexture> plainTextures = new List<NamedTexture>();
     // Start is called before the first frame update
     void Start()
     {

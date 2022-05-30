@@ -59,6 +59,13 @@ public class TextureSystem : MonoBehaviour
             {
                 AddHeightTexture(tag.heightTextures);
             }
+            else if (tag.type == TexTagType.plainTexture)
+            {
+                for(int i1=0;i1<tag.plainTextures.Count;i1++)
+                {
+                    outTextures.Add(tag.plainTextures[i1]);
+                }
+            }
         }
     }
 

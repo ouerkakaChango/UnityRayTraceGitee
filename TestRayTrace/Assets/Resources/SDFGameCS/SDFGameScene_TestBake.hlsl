@@ -371,7 +371,9 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			//float3 np = CosFBM_NearestPoint(p, 10, 0.1f);
 			//terrain = length(np-p);
 			terrain = CosFBM(p.xz);
-			terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+			//terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+			//terrain -= 0.0001 * CosFBM(1000 * p.xz);
+			terrain -= 0.1 * TerrainDetailNoise(1000 * p.xz);
 			terrain = abs(p.y - terrain);
 			terrain *= 0.5;
 		}

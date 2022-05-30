@@ -44,6 +44,17 @@ public class TexSysTagEditor : Editor
                 EditorShowHeightTextureList(serializedObject, Target.heightTextures.Count, listSP);
             }
         }
+        else if (Target.type == TexTagType.plainTexture)
+        {
+            var list = serializedObject.FindProperty("plainTextures");
+            EditorGUILayout.PropertyField(list, new GUIContent("plainTextures"), true);
+            showDetailFoldout = EditorGUILayout.Foldout(showDetailFoldout, "Detail");
+            if (showDetailFoldout)
+            {
+                SerializedProperty listSP = serializedObject.FindProperty("plainTextures");
+                EditorShowPlainTextureList(serializedObject, Target.plainTextures.Count, listSP);
+            }
+        }
     }
 
     //###############################################################
@@ -95,4 +106,25 @@ public class TexSysTagEditor : Editor
             }
         }
     }
+
+    public static void EditorShowPlainTextureList(SerializedObject serializedObject, int listCount, SerializedProperty listSP)
+    {//name,height,grad,(bound?)
+        for (int i = 0; i < listCount; i++)
+        {
+            SerializedProperty nameSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("name");
+            SerializedProperty texSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("tex");
+
+            EditorGUI.BeginChangeCheck();
+
+            EditorGUILayout.PropertyField(nameSP, true);
+            EditorGUILayout.PropertyField(texSP, true);
+
+            EditorGUILayout.Space();
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+            }
+        }
+    }
+
 }
