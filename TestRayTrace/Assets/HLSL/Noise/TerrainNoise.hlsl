@@ -47,6 +47,7 @@ float3 CosFBM_NearestPoint(float3 target, int loopNum, float step)
 }
 
 Texture2D terrainDetail;
+SamplerState noise_point_repeat_sampler;
 float TerrainDetailNoise(float2 p)
 {
     float3 hBound = float3(300, 50, 300);

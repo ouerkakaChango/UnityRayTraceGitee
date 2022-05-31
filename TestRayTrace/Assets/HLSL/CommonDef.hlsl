@@ -189,4 +189,45 @@ float length2(float2 x)
 }
 
 float addv(float2 a) { return a.x + a.y; }
+
+float2 TexSafePos(float2 pos, uint2 size)
+{
+	float2 re = pos;
+	if (re.x < 0)
+	{
+		re.x = 0;
+	}
+	else if (re.x >= size.x)
+	{
+		re.x = size.x - 1;
+	}
+
+	if (re.y < 0)
+	{
+		re.y = 0;
+	}
+	else if (re.y > size.y)
+	{
+		re.y = size.y - 1;
+	}
+	return re;
+}
+
+SamplerState common_point_repeat_sampler;
+SamplerState common_linear_repeat_sampler;
+float BilinearR(Texture2D tex, float2 floorPos, float2 fracPart)
+{
+	uint2 size = GetSize(tex);
+	//float x00 = tex[floorPos].r;
+	//float x10 = tex[TexSafePos(floorPos + int2(1, 0), size)].r;
+	//float x01 = tex[TexSafePos(floorPos + int2(0, 1), size)].r;
+	//float x11 = tex[TexSafePos(floorPos + int2(1, 1), size)].r;
+	float x00 = tex.SampleLevel(common_point_repeat_sampler, floorPos/size, 0).x;
+	float x10 = tex.SampleLevel(common_point_repeat_sampler, TexSafePos(floorPos + int2(1, 0), size) / size, 0).x;
+	float x01 = tex.SampleLevel(common_point_repeat_sampler, TexSafePos(floorPos + int2(0, 1), size) / size, 0).x;
+	float x11 = tex.SampleLevel(common_point_repeat_sampler, TexSafePos(floorPos + int2(1, 1), size) / size, 0).x;
+	float x0 = lerp(x00, x10, fracPart.x);
+	float x1 = lerp(x01, x11, fracPart.x);
+	return lerp(x0, x1, fracPart.y);
+}
 #endif

@@ -1,4 +1,4 @@
-﻿#define OBJNUM 7
+﻿#define OBJNUM 6
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -62,17 +62,11 @@ re.roughness = 1;
 }
 else if (obj == 4 )
 {
-re.albedo = float3(0.05636634, 0.8962264, 0.2993254);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 5 )
-{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.2;
 }
-else if (obj == 6 )
+else if (obj == 5 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -85,14 +79,13 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[7];
+int renderMode[6];
 renderMode[0] = 2;
 renderMode[1] = 0;
 renderMode[2] = 2;
 renderMode[3] = 2;
 renderMode[4] = 0;
-renderMode[5] = 0;
-renderMode[6] = 2;
+renderMode[5] = 2;
 return renderMode[obj];
 //@@@
 }
@@ -260,7 +253,7 @@ float SDFPlanet(float3 p)
 	return re;
 }
 
-float GetObjSDF(int inx, float3 p)
+float GetObjSDF(int inx, float3 p, int traceCount, float traceSum)
 {
 
 	//### A
@@ -325,13 +318,9 @@ re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.070711
 }
 else if (inx == 4 )
 {
-inx = -3;
-}
-else if (inx == 5 )
-{
 re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
 }
-else if (inx == 6 )
+else if (inx == 5 )
 {
 re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
@@ -349,17 +338,6 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 		float terrain = 100000;
 		if(abs(p.x)<300 && abs(p.z)<300)
 		{
-			//float re = 0;
-			//float r = 0.48;// +0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
-			//float dis = fbm4(p.zxy*10);
-			//r += 0.02*smoothstep(0.5f, 1.0f, dis);
-			//float3 center = float3(0, r, 0);
-
-			//terrain = 5 * fbm4(float3(0.1*p.xz,0));
-			//terrain = 0.1 * sin(2*PI/3.0f * dot(normalize(float2(1,0)),float2(p.x,p.z)));
-			//terrain = abs(p.y - terrain);
-			//terrain *= 0.5;
-
 			//### fbm flaw effect.###
 			//###can only used for low height effect,and no sdf shadow, because trace it by height func is not right.
 			//###but for low height effect, this flaw may be accepted
@@ -367,15 +345,21 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 
 			//terrain = abs(p.y);
 
-			//???
-			//float3 np = CosFBM_NearestPoint(p, 10, 0.1f);
-			//terrain = length(np-p);
+			//Terrain Main
 			terrain = CosFBM(p.xz);
-			//terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+
+			//Detail
+			terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+			//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(5 * p.xz,0)));
 			//terrain -= 0.0001 * CosFBM(1000 * p.xz);
-			terrain -= 0.1 * TerrainDetailNoise(1000 * p.xz);
+			//terrain -= 25 * TerrainDetailNoise(p.xz);
+			//terrain -= 0.01 * TerrainDetailNoise(1000*p.xz);
+
 			terrain = abs(p.y - terrain);
+
 			terrain *= 0.5;
+			//terrain *= lerp(0.5,1,pow(traceCount/(MaxTraceTime),1));
+			//terrain *= saturate(lerp(0.5,1,pow(traceSum/(800.0f),1)));
 		}
 		re = min(re, terrain );
 	}
@@ -415,22 +399,46 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
 			d = max(length(p-center)- r, 0);
 			re = min(re,d);
+
+			//c2 = c+grid*float2(-1,-1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			//d = max(length(p-center)- r, 0);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(1,-1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			//d = max(length(p-center)- r, 0);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(-1,1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			//d = max(length(p-center)- r, 0);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(1,1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			//d = max(length(p-center)- r, 0);
+			//re = min(re,d);
 		}
 	}
 return re;
 
 }
 
-float3 GetObjSDFNormal(int inx, float3 p)
+float3 GetObjSDFNormal(int inx, float3 p, int traceCount, float traceSum)
 {
 	return normalize(float3(
-		GetObjSDF(inx, float3(p.x + NormalEpsilon, p.y, p.z)) - GetObjSDF(inx, float3(p.x - NormalEpsilon, p.y, p.z)),
-		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon, p.z)) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon, p.z)),
-		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon)) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon))
+		GetObjSDF(inx, float3(p.x + NormalEpsilon, p.y, p.z), traceCount, traceSum) - GetObjSDF(inx, float3(p.x - NormalEpsilon, p.y, p.z), traceCount, traceSum),
+		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon, p.z), traceCount, traceSum) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon, p.z), traceCount, traceSum),
+		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon), traceCount, traceSum) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon), traceCount, traceSum)
 		));
 }
 
-float3 GetObjNormal(int inx, float3 p)
+float3 GetObjNormal(int inx, float3 p, int traceCount, float traceSum)
 {
 //@@@SDFBakerMgr ObjNormal
 if(inx == 0 )
@@ -448,18 +456,14 @@ else if (inx == 3 )
 }
 else if (inx == 4 )
 {
-inx = -3;
 }
 else if (inx == 5 )
-{
-}
-else if (inx == 6 )
 {
 }
 //@@@
 if (inx == -2)
 {//???
-	return GetObjSDFNormal(inx, p);
+	return GetObjSDFNormal(inx, p, traceCount, traceSum);
 	float2 dxy = CosFBM_Dxy(p.xz);
 	return normalize(float3(-dxy.x,1,-dxy.y));
 }
@@ -476,7 +480,7 @@ else if (inx == -3)
 }
 else
 {
-	return GetObjSDFNormal(inx, p);
+	return GetObjSDFNormal(inx, p, traceCount, traceSum);
 }
 }
 
@@ -486,6 +490,7 @@ float TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	int traceCount = 0;
+	float traceSum = 0;
 	while (traceCount <= MaxTraceTime)
 	{
 		int objInx = -1;
@@ -493,7 +498,7 @@ float TraceScene(Ray ray, out HitInfo info)
 		float sdf = MaxSDF;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			objSDF[inx] = GetObjSDF(inx, ray.pos, traceCount, traceSum);
 			if (objSDF[inx] < sdf)
 			{
 				sdf = objSDF[inx];
@@ -510,11 +515,12 @@ float TraceScene(Ray ray, out HitInfo info)
 		{
 			info.bHit = true;
 			info.obj = objInx;
-			info.N = GetObjNormal(objInx, ray.pos);
+			info.N = GetObjNormal(objInx, ray.pos, traceCount, traceSum);
 			info.P = ray.pos;
 			break;
 		}
 		ray.pos += sdf * ray.dir;
+		traceSum += sdf;
 		traceCount++;
 	}
 
@@ -533,6 +539,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	int traceCount = 0;
+	float traceSum = 0;
 	while (traceCount <= MaxTraceTime*0.01)
 	{
 		int objInx = -1;
@@ -540,7 +547,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 		float sdf = MaxSDF;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			objSDF[inx] = GetObjSDF(inx, ray.pos, traceCount, traceSum);
 			if (objSDF[inx] < sdf)
 			{
 				sdf = objSDF[inx];
@@ -557,11 +564,11 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 		{
 			info.bHit = true;
 			info.obj = objInx;
-			//info.N = GetObjNormal(objInx, ray.pos);
 			info.P = ray.pos;
 			break;
 		}
 		ray.pos += sdf * ray.dir;
+		traceSum += sdf;
 		traceCount++;
 	}
 
@@ -583,6 +590,7 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 	float t = 0.005 * 0.1; //一个非0小值，会避免极其细微的多余shadow
 
 	int traceCount = 0;
+	float traceSum = 0;
 	while (traceCount <= MaxTraceTime*0.2)
 	{
 		int objInx = -1;
@@ -590,7 +598,7 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 		float sdf = MaxSDF;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			objSDF[inx] = GetObjSDF(inx, ray.pos, traceCount, traceSum);
 			if (objSDF[inx] < sdf)
 			{
 				sdf = objSDF[inx];
@@ -617,7 +625,6 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 		{
 			info.bHit = true;
 			info.obj = objInx;
-			//info.N = GetObjNormal(objInx, ray.pos);
 			info.P = ray.pos;
 			break;
 		}
@@ -625,6 +632,7 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 		t += clamp(sdf, 0.01*SceneSDFSoftShadowBias, 0.5*SceneSDFSoftShadowBias);
 
 		ray.pos += sdf * ray.dir;
+		traceSum += sdf;
 		traceCount++;
 	}
 
