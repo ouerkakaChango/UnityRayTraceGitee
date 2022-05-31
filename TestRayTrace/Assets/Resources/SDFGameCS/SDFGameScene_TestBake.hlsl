@@ -253,7 +253,7 @@ float SDFPlanet(float3 p)
 	return re;
 }
 
-float GetObjSDF(int inx, float3 p, int traceCount, float traceSum)
+float GetObjSDF(int inx, float3 p, int traceCount, float traceSum, float lastTrace)
 {
 
 	//### A
@@ -349,7 +349,10 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			terrain = CosFBM(p.xz);
 
 			//Detail
-			terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+			if(lastTrace<0.15)
+			{
+				terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+			}
 			//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(5 * p.xz,0)));
 			//terrain -= 0.0001 * CosFBM(1000 * p.xz);
 			//terrain -= 25 * TerrainDetailNoise(p.xz);
@@ -429,16 +432,16 @@ return re;
 
 }
 
-float3 GetObjSDFNormal(int inx, float3 p, int traceCount, float traceSum)
+float3 GetObjSDFNormal(int inx, float3 p, int traceCount, float traceSum, float lastTrace)
 {
 	return normalize(float3(
-		GetObjSDF(inx, float3(p.x + NormalEpsilon, p.y, p.z), traceCount, traceSum) - GetObjSDF(inx, float3(p.x - NormalEpsilon, p.y, p.z), traceCount, traceSum),
-		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon, p.z), traceCount, traceSum) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon, p.z), traceCount, traceSum),
-		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon), traceCount, traceSum) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon), traceCount, traceSum)
+		GetObjSDF(inx, float3(p.x + NormalEpsilon, p.y, p.z), traceCount, traceSum, lastTrace) - GetObjSDF(inx, float3(p.x - NormalEpsilon, p.y, p.z), traceCount, traceSum, lastTrace),
+		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon, p.z), traceCount, traceSum, lastTrace) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon, p.z), traceCount, traceSum, lastTrace),
+		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon), traceCount, traceSum, lastTrace) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon), traceCount, traceSum, lastTrace)
 		));
 }
 
-float3 GetObjNormal(int inx, float3 p, int traceCount, float traceSum)
+float3 GetObjNormal(int inx, float3 p, int traceCount, float traceSum, float lastTrace)
 {
 //@@@SDFBakerMgr ObjNormal
 if(inx == 0 )
@@ -463,7 +466,7 @@ else if (inx == 5 )
 //@@@
 if (inx == -2)
 {//???
-	return GetObjSDFNormal(inx, p, traceCount, traceSum);
+	return GetObjSDFNormal(inx, p, traceCount, traceSum, lastTrace);
 	float2 dxy = CosFBM_Dxy(p.xz);
 	return normalize(float3(-dxy.x,1,-dxy.y));
 }
@@ -480,7 +483,7 @@ else if (inx == -3)
 }
 else
 {
-	return GetObjSDFNormal(inx, p, traceCount, traceSum);
+	return GetObjSDFNormal(inx, p, traceCount, traceSum, lastTrace);
 }
 }
 
@@ -491,6 +494,7 @@ float TraceScene(Ray ray, out HitInfo info)
 
 	int traceCount = 0;
 	float traceSum = 0;
+	float lastTrace = MaxSDF;
 	while (traceCount <= MaxTraceTime)
 	{
 		int objInx = -1;
@@ -498,7 +502,7 @@ float TraceScene(Ray ray, out HitInfo info)
 		float sdf = MaxSDF;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos, traceCount, traceSum);
+			objSDF[inx] = GetObjSDF(inx, ray.pos, traceCount, traceSum, lastTrace);
 			if (objSDF[inx] < sdf)
 			{
 				sdf = objSDF[inx];
@@ -515,12 +519,13 @@ float TraceScene(Ray ray, out HitInfo info)
 		{
 			info.bHit = true;
 			info.obj = objInx;
-			info.N = GetObjNormal(objInx, ray.pos, traceCount, traceSum);
+			info.N = GetObjNormal(objInx, ray.pos, traceCount, traceSum, lastTrace);
 			info.P = ray.pos;
 			break;
 		}
 		ray.pos += sdf * ray.dir;
 		traceSum += sdf;
+		lastTrace = sdf;
 		traceCount++;
 	}
 
@@ -540,6 +545,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 
 	int traceCount = 0;
 	float traceSum = 0;
+	float lastTrace = MaxSDF;
 	while (traceCount <= MaxTraceTime*0.01)
 	{
 		int objInx = -1;
@@ -547,7 +553,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 		float sdf = MaxSDF;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos, traceCount, traceSum);
+			objSDF[inx] = GetObjSDF(inx, ray.pos, traceCount, traceSum, lastTrace);
 			if (objSDF[inx] < sdf)
 			{
 				sdf = objSDF[inx];
@@ -569,6 +575,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 		}
 		ray.pos += sdf * ray.dir;
 		traceSum += sdf;
+		lastTrace = sdf;
 		traceCount++;
 	}
 
@@ -591,6 +598,7 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 
 	int traceCount = 0;
 	float traceSum = 0;
+	float lastTrace = MaxSDF;
 	while (traceCount <= MaxTraceTime*0.2)
 	{
 		int objInx = -1;
@@ -598,7 +606,7 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 		float sdf = MaxSDF;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos, traceCount, traceSum);
+			objSDF[inx] = GetObjSDF(inx, ray.pos, traceCount, traceSum, lastTrace);
 			if (objSDF[inx] < sdf)
 			{
 				sdf = objSDF[inx];
@@ -633,6 +641,7 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 
 		ray.pos += sdf * ray.dir;
 		traceSum += sdf;
+		lastTrace = sdf;
 		traceCount++;
 	}
 

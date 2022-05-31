@@ -304,7 +304,10 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			terrain = CosFBM(p.xz);
 
 			//Detail
-			terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+			if(lastTrace<0.15)
+			{
+				terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+			}
 			//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(5 * p.xz,0)));
 			//terrain -= 0.0001 * CosFBM(1000 * p.xz);
 			//terrain -= 25 * TerrainDetailNoise(p.xz);
@@ -408,7 +411,7 @@ else if (inx == 5 )
 //@@@
 if (inx == -2)
 {//???
-	return GetObjSDFNormal(inx, p, traceCount, traceSum);
+	return GetObjSDFNormal(inx, p, traceCount, traceSum, lastTrace);
 	float2 dxy = CosFBM_Dxy(p.xz);
 	return normalize(float3(-dxy.x,1,-dxy.y));
 }
@@ -425,6 +428,6 @@ else if (inx == -3)
 }
 else
 {
-	return GetObjSDFNormal(inx, p, traceCount, traceSum);
+	return GetObjSDFNormal(inx, p, traceCount, traceSum, lastTrace);
 }
 ###BLOCK
