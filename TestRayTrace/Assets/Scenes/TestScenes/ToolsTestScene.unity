@@ -375,8 +375,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b141b22e67ea83b4aadc1db56266fe76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  kernelHalf: 4
-  sigma: 1
+  kernelHalf: 2
+  sigma: 2
 --- !u!4 &674189239
 Transform:
   m_ObjectHideFlags: 0

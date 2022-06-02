@@ -28,6 +28,13 @@ struct HitInfo
 	float3 P;
 };
 
+struct TraceInfo
+{
+	int traceCount;
+	float traceSum;
+	float lastTrace;
+};
+
 struct VertHitInfo
 {
 	int bHit;
@@ -58,6 +65,13 @@ void Init(out HitInfo re)
 	re.P = 0;
 }
 
+void Init(out TraceInfo re, float maxSDF = 1000000)
+{
+	re.traceCount = 0;
+	re.traceSum = 0;
+	re.lastTrace = maxSDF;
+}
+
 void Init(out VertHitInfo re)
 {
 	re.bHit = 0;
@@ -79,6 +93,13 @@ void Assgin(out HitInfo re, HitInfo hit)
 	re.obj = hit.obj;
 	re.N = hit.N;
 	re.P = hit.P;
+}
+
+void Update(inout TraceInfo traceInfo, float sdf)
+{
+	traceInfo.traceCount += 1;
+	traceInfo.traceSum += sdf;
+	traceInfo.lastTrace = sdf;
 }
 
 bool NearZero(float x)

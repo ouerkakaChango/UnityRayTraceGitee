@@ -304,20 +304,17 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			terrain = CosFBM(p.xz);
 
 			//Detail
-			if(lastTrace<0.15)
+			if(traceInfo.lastTrace<0.15)
 			{
 				terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+				//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(5 * p.xz,0)));
+				//terrain -= 0.0001 * CosFBM(1000 * p.xz);
+				//terrain -= 25 * TerrainDetailNoise(p.xz);
+				//terrain -= 0.01 * TerrainDetailNoise(1000*p.xz);
 			}
-			//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(5 * p.xz,0)));
-			//terrain -= 0.0001 * CosFBM(1000 * p.xz);
-			//terrain -= 25 * TerrainDetailNoise(p.xz);
-			//terrain -= 0.01 * TerrainDetailNoise(1000*p.xz);
 
 			terrain = abs(p.y - terrain);
-
 			terrain *= 0.5;
-			//terrain *= lerp(0.5,1,pow(traceCount/(MaxTraceTime),1));
-			//terrain *= saturate(lerp(0.5,1,pow(traceSum/(800.0f),1)));
 		}
 		re = min(re, terrain );
 	}
@@ -339,24 +336,26 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
 			d = max(length(p-center)- r, 0);
 			re = min(re,d);
-
+			
 			c2 = c+grid*float2(-1,0);
 			center = float3(c2.x,CosFBM(c2),c2.y);
 			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
 			d = max(length(p-center)- r, 0);
 			re = min(re,d);
-
+			
 			c2 = c+grid*float2(0,1);
 			center = float3(c2.x,CosFBM(c2),c2.y);
 			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
 			d = max(length(p-center)- r, 0);
 			re = min(re,d);
-
+			
 			c2 = c+grid*float2(0,-1);
 			center = float3(c2.x,CosFBM(c2),c2.y);
 			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
 			d = max(length(p-center)- r, 0);
 			re = min(re,d);
+
+			//###
 
 			//c2 = c+grid*float2(-1,-1);
 			//center = float3(c2.x,CosFBM(c2),c2.y);
@@ -411,7 +410,7 @@ else if (inx == 5 )
 //@@@
 if (inx == -2)
 {//???
-	return GetObjSDFNormal(inx, p, traceCount, traceSum, lastTrace);
+	return GetObjSDFNormal(inx, p, traceInfo);
 	float2 dxy = CosFBM_Dxy(p.xz);
 	return normalize(float3(-dxy.x,1,-dxy.y));
 }
@@ -428,6 +427,6 @@ else if (inx == -3)
 }
 else
 {
-	return GetObjSDFNormal(inx, p, traceCount, traceSum, lastTrace);
+	return GetObjSDFNormal(inx, p, traceInfo);
 }
 ###BLOCK
