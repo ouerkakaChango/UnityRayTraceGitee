@@ -44,6 +44,8 @@ float3 ShearX(float3 p, float shy, float shz)
 	return mul(m, p);
 }
 
+//###############################################
+
 struct Transform
 {
 	float3 pos;
@@ -86,5 +88,30 @@ float3 DirTo3D(in Transform trans, float2 dir)
 {
 	float3 re = float3(dir.x, 0, dir.y);
 	return RotByEuler(re, trans.rotEuler);
+}
+
+//############
+
+struct Coord2D
+{
+	float3 origin;
+	float3 T, B, N;
+};
+
+float3 WorldToLocal(in Coord2D coord, float3 p)
+{
+	float3 d = p - coord.origin;
+	return float3(
+		dot(d, coord.T),
+		dot(d, coord.B),
+		dot(d, coord.N)
+		);
+}
+
+void ProjToCoord2D(out float2 p2d, out float projDis, float3 p, in Coord2D coord)
+{
+	float3 pLocal = WorldToLocal(coord, p);
+	projDis = pLocal.z;
+	p2d = pLocal.xy;
 }
 #endif

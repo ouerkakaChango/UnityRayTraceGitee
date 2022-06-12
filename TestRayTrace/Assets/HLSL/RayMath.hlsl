@@ -1,6 +1,7 @@
 #ifndef RAYMATH_HLSL
 #define RAYMATH_HLSL
 #include "CommonDef.hlsl"
+
 float Dis(Ray ray, float3 p)
 {
 	float3 v = p - ray.pos;

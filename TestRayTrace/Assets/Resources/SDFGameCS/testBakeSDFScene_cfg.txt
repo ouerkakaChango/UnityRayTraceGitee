@@ -1,6 +1,6 @@
 valMaps:
 //@@@SDFBakerMgr ValMaps
-ObjNum 6
+ObjNum 7
 //@@@
 
 Blocks:
@@ -12,6 +12,8 @@ Blocks:
 #include "../../HLSL/UV/UVCommonDef.hlsl"
 #include "../../HLSL/TransferMath/TransferMath.hlsl"
 #include "../../HLSL/Random/RandUtility.hlsl"
+#include "../../HLSL/Transform/TransformCommonDef.hlsl" 
+#include "../../HLSL/SDFGame/SDFCommonDef.hlsl"
 Texture2D woodPBR_albedo;
 Texture2D woodPBR_normal;
 Texture2D woodPBR_metallic;
@@ -47,11 +49,17 @@ re.roughness = 1;
 }
 else if (obj == 4 )
 {
+re.albedo = float3(0.006229852, 0.990566, 0.2363835);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 5 )
+{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.2;
 }
-else if (obj == 5 )
+else if (obj == 6 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -62,13 +70,14 @@ re.roughness = 1;
 
 ###BLOCK ObjRenderMode
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[6];
+int renderMode[7];
 renderMode[0] = 2;
 renderMode[1] = 0;
 renderMode[2] = 2;
 renderMode[3] = 2;
 renderMode[4] = 0;
-renderMode[5] = 2;
+renderMode[5] = 0;
+renderMode[6] = 2;
 return renderMode[obj];
 //@@@
 ###BLOCK
@@ -273,9 +282,13 @@ re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.070711
 }
 else if (inx == 4 )
 {
-re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
+inx = -3;
 }
 else if (inx == 5 )
+{
+re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
+}
+else if (inx == 6 )
 {
 re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
@@ -322,38 +335,64 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 	{
 		if(abs(p.x)<300 && abs(p.z)<300)
 		{
+			//### grid sphere
+			//float grid = 2.0;
+			//float2 m = floor(p.xz/grid);
+			//float2 c = grid*(m+0.5);
+			//float3 center = float3(c.x,CosFBM(c),c.y);
+			//center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			//float r =0.5;
+			//float d = max(length(p-center)- r, 0);
+			//re = min(re,d);
+
+			//### grid circle
 			float grid = 2.0;
 			float2 m = floor(p.xz/grid);
 			float2 c = grid*(m+0.5);
 			float3 center = float3(c.x,CosFBM(c),c.y);
-			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
-			float r =0.5;
-			float d = max(length(p-center)- r, 0);
+
+			float3 t = float3(1,0,0);
+			float3 b = float3(0,0,1);
+			float3 n = float3(0,1,0);
+			Coord2D coord;
+			coord.origin = center+float3(0,0.1,0);
+			coord.T = t;
+			coord.B = b;
+			coord.N = n;
+			float2 p2d;
+			float projDis;
+			ProjToCoord2D(p2d,projDis,p,coord);
+
+			//float sdf2d = max(length(p2d) - 0.5,0);
+			float sdf2d = max(SDFBox(p2d,0,0.5),0);
+
+			float d = sqrt(projDis*projDis + sdf2d*sdf2d);
 			re = min(re,d);
 
-			float2 c2 = c+grid*float2(1,0);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
-			d = max(length(p-center)- r, 0);
-			re = min(re,d);
-			
-			c2 = c+grid*float2(-1,0);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
-			d = max(length(p-center)- r, 0);
-			re = min(re,d);
-			
-			c2 = c+grid*float2(0,1);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
-			d = max(length(p-center)- r, 0);
-			re = min(re,d);
-			
-			c2 = c+grid*float2(0,-1);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
-			d = max(length(p-center)- r, 0);
-			re = min(re,d);
+			//### other dir
+			//float2 c2 = c+grid*float2(1,0);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			//d = max(length(p-center)- r, 0);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(-1,0);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			//d = max(length(p-center)- r, 0);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(0,1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			//d = max(length(p-center)- r, 0);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(0,-1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//center.y += rand01(float3(34,23,123)+center*0.1)*2 * Time01(5,center.y);
+			//d = max(length(p-center)- r, 0);
+			//re = min(re,d);
 
 			//###
 
@@ -403,8 +442,12 @@ else if (inx == 3 )
 }
 else if (inx == 4 )
 {
+inx = -3;
 }
 else if (inx == 5 )
+{
+}
+else if (inx == 6 )
 {
 }
 //@@@
@@ -416,14 +459,15 @@ if (inx == -2)
 }
 else if (inx == -3)
 {
-			float grid = 2.0;
-			float2 m = floor(p.xz/grid);
-			float2 c = grid*m+grid*0.5;
-			float3 center = float3(c.x,CosFBM(c),c.y);
-			float3 ori = center;
-			center.y += rand01(float3(34,23,123)+ori*0.1)*2 * Time01(5,ori.y);
-			return normalize(p-center);
-			//return GetObjSDFNormal(inx, p);
+//???
+	return GetObjSDFNormal(inx, p, traceInfo);
+	float grid = 2.0;
+	float2 m = floor(p.xz/grid);
+	float2 c = grid*m+grid*0.5;
+	float3 center = float3(c.x,CosFBM(c),c.y);
+	float3 ori = center;
+	center.y += rand01(float3(34,23,123)+ori*0.1)*2 * Time01(5,ori.y);
+	return normalize(p-center);
 }
 else
 {
