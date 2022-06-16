@@ -352,8 +352,8 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			float3 center = float3(c.x,CosFBM(c),c.y);
 
 			float3 t = float3(1,0,0);
-			float3 b = float3(0,0,1);
-			float3 n = float3(0,1,0);
+			float3 n = float3(0,0,1);
+			float3 b = float3(0,1,0);
 			Coord2D coord;
 			coord.origin = center+float3(0,0.1,0);
 			coord.T = t;
@@ -364,7 +364,8 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			ProjToCoord2D(p2d,projDis,p,coord);
 
 			//float sdf2d = max(length(p2d) - 0.5,0);
-			float sdf2d = max(SDFBox(p2d,0,0.5),0);
+			//float sdf2d = max(SDFBox(p2d,0,0.5),0);
+			float sdf2d = SDFTriangle2D(p2d,float2(0,1),float2(-0.1,-0.5),float2(0.1,-0.5));
 
 			float d = sqrt(projDis*projDis + sdf2d*sdf2d);
 			re = min(re,d);
