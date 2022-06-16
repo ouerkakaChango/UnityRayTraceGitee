@@ -209,6 +209,15 @@ float length2(float2 x)
 	return dot(x, x);
 }
 
+float len2(float x)
+{
+	return x * x;
+}
+float cross2D(float2 v1, float2 v2)
+{
+	return v1.x*v2.y - v1.y*v2.x;
+}
+
 float addv(float2 a) { return a.x + a.y; }
 
 float2 TexSafePos(float2 pos, uint2 size)

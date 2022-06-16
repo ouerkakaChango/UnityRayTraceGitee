@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -669,6 +669,176 @@ MonoBehaviour:
   - obj: {fileID: 91322455}
     oldMat: {fileID: 2100000, guid: 2c50f4e71f5161b42a0101de4af7e1bf, type: 2}
     newMat: {fileID: 2100000, guid: 8065b24dfec4e7544ab035bcc40a1c8e, type: 2}
+--- !u!1 &1107196368
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1107196370}
+  - component: {fileID: 1107196369}
+  m_Layer: 0
+  m_Name: TestShaderConverter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1107196369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1107196368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c66fd2cd55e93384ea4b768958684817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  oriString: "\r\nfloat len2(float x)\r\n{\r\n    return x*x;\r\n}\r\n\r\nbool Is01(float
+    x)\r\n{\r\n\r\n    return x>0.0f&&x<1.0f;\r\n}\r\n\r\nfloat cross2D(vec2 v1,vec2
+    v2)\r\n{\r\n    return v1.x*v2.y-v1.y*v2.x;\r\n}\r\n\r\nfloat SDFTriangle2D(vec2
+    p,vec2 A,vec2 B, vec2 C)\r\n{\r\n    vec2 AB = B-A;\r\n    vec2 BC = C-B;\r\n   
+    vec2 CA = A-C;\r\n    vec2 ap = p-A;\r\n    vec2 bp = p-B;\r\n    vec2 cp = p-C;\r\n   
+    float lenAB = length(AB);\r\n    float lenBC = length(BC);\r\n    float lenCA
+    = length(CA);\r\n    \r\n    float k1 = dot(ap,AB)/len2(lenAB);\r\n    float
+    k2 = dot(bp,BC)/len2(lenBC);\r\n    float k3 = dot(cp,CA)/len2(lenCA);\r\n   
+    \r\n    float c1 = cross2D(ap,AB);\r\n    float c2 = cross2D(bp,BC);\r\n    float
+    c3 = cross2D(cp,CA);\r\n    \r\n    float lenap = length(ap);\r\n    float lenbp
+    = length(bp);\r\n    float lencp = length(cp);\r\n    \r\n    if(Is01(k1)&&c1>0.0f)\r\n   
+    {\r\n        return sqrt(len2(lenap) - len2(k1*lenAB));\r\n    }\r\n    if(Is01(k2)&&c2>0.0f)\r\n   
+    {\r\n        return sqrt(len2(lenbp) - len2(k2*lenBC));\r\n    }\r\n    if(Is01(k3)&&c3>0.0f)\r\n   
+    {\r\n        return sqrt(len2(lencp) - len2(k3*lenCA));\r\n    }\r\n    \r\n   
+    if(c1<0.0f&&c2<0.0f&&c3<0.0f)\r\n    {\r\n        return 0.0f;\r\n    }\r\n  
+    \r\n    //return 0.0f;\r\n    return min(min(lenap,lenbp),lencp);\r\n    \r\n}\r\n\r\nvoid
+    mainImage( out vec4 fragColor, in vec2 fragCoord )\r\n{\r\n    // Normalized
+    pixel coordinates (from 0 to 1)\r\n    vec2 uv = fragCoord/iResolution.xy;\r\n\r\n   
+    vec2 screen = vec2(640.0f,360.0f);\r\n    vec2 B=vec2(0.2f,0.3f)*screen;\r\n   
+    vec2 C=vec2(0.8f,0.4f)*screen;\r\n    vec2 A=vec2(0.5f,0.6f)*screen;\r\n    vec2
+    p = uv*screen;\r\n    float d = SDFTriangle2D(p,A,B,C);\r\n\r\n    d*=0.01f;\r\n   
+    // Output to screen\r\n    fragColor = vec4(d,d,d,1.0);\r\n}"
+  outString: "\r\nfloat len2(float x)\r\n{\r\n    return x*x;\r\n}\r\n\r\nbool Is01(float
+    x)\r\n{\r\n\r\n    return x>0.0f&&x<1.0f;\r\n}\r\n\r\nfloat cross2D(float2 v1,float2
+    v2)\r\n{\r\n    return v1.x*v2.y-v1.y*v2.x;\r\n}\r\n\r\nfloat SDFTriangle2D(float2
+    p,float2 A,float2 B, float2 C)\r\n{\r\n    float2 AB = B-A;\r\n    float2 BC
+    = C-B;\r\n    float2 CA = A-C;\r\n    float2 ap = p-A;\r\n    float2 bp = p-B;\r\n   
+    float2 cp = p-C;\r\n    float lenAB = length(AB);\r\n    float lenBC = length(BC);\r\n   
+    float lenCA = length(CA);\r\n    \r\n    float k1 = dot(ap,AB)/len2(lenAB);\r\n   
+    float k2 = dot(bp,BC)/len2(lenBC);\r\n    float k3 = dot(cp,CA)/len2(lenCA);\r\n   
+    \r\n    float c1 = cross2D(ap,AB);\r\n    float c2 = cross2D(bp,BC);\r\n    float
+    c3 = cross2D(cp,CA);\r\n    \r\n    float lenap = length(ap);\r\n    float lenbp
+    = length(bp);\r\n    float lencp = length(cp);\r\n    \r\n    if(Is01(k1)&&c1>0.0f)\r\n   
+    {\r\n        return sqrt(len2(lenap) - len2(k1*lenAB));\r\n    }\r\n    if(Is01(k2)&&c2>0.0f)\r\n   
+    {\r\n        return sqrt(len2(lenbp) - len2(k2*lenBC));\r\n    }\r\n    if(Is01(k3)&&c3>0.0f)\r\n   
+    {\r\n        return sqrt(len2(lencp) - len2(k3*lenCA));\r\n    }\r\n    \r\n   
+    if(c1<0.0f&&c2<0.0f&&c3<0.0f)\r\n    {\r\n        return 0.0f;\r\n    }\r\n  
+    \r\n    //return 0.0f;\r\n    return min(min(lenap,lenbp),lencp);\r\n    \r\n}\r\n\r\nvoid
+    mainImage( out float4 fragColor, in float2 fragCoord )\r\n{\r\n    // Normalized
+    pixel coordinates (from 0 to 1)\r\n    float2 uv = fragCoord/iResolution.xy;\r\n\r\n   
+    float2 screen = float2(640.0f,360.0f);\r\n    float2 B=float2(0.2f,0.3f)*screen;\r\n   
+    float2 C=float2(0.8f,0.4f)*screen;\r\n    float2 A=float2(0.5f,0.6f)*screen;\r\n   
+    float2 p = uv*screen;\r\n    float d = SDFTriangle2D(p,A,B,C);\r\n\r\n    d*=0.01f;\r\n   
+    // Output to screen\r\n    fragColor = float4(d,d,d,1.0);\r\n}\n"
+  oriType: 2
+  outType: 1
+  lines:
+  - "\r"
+  - "float len2(float x)\r"
+  - "{\r"
+  - "    return x*x;\r"
+  - "}\r"
+  - "\r"
+  - "bool Is01(float x)\r"
+  - "{\r"
+  - "\r"
+  - "    return x>0.0f&&x<1.0f;\r"
+  - "}\r"
+  - "\r"
+  - "float cross2D(float2 v1,float2 v2)\r"
+  - "{\r"
+  - "    return v1.x*v2.y-v1.y*v2.x;\r"
+  - "}\r"
+  - "\r"
+  - "float SDFTriangle2D(float2 p,float2 A,float2 B, float2 C)\r"
+  - "{\r"
+  - "    float2 AB = B-A;\r"
+  - "    float2 BC = C-B;\r"
+  - "    float2 CA = A-C;\r"
+  - "    float2 ap = p-A;\r"
+  - "    float2 bp = p-B;\r"
+  - "    float2 cp = p-C;\r"
+  - "    float lenAB = length(AB);\r"
+  - "    float lenBC = length(BC);\r"
+  - "    float lenCA = length(CA);\r"
+  - "    \r"
+  - "    float k1 = dot(ap,AB)/len2(lenAB);\r"
+  - "    float k2 = dot(bp,BC)/len2(lenBC);\r"
+  - "    float k3 = dot(cp,CA)/len2(lenCA);\r"
+  - "    \r"
+  - "    float c1 = cross2D(ap,AB);\r"
+  - "    float c2 = cross2D(bp,BC);\r"
+  - "    float c3 = cross2D(cp,CA);\r"
+  - "    \r"
+  - "    float lenap = length(ap);\r"
+  - "    float lenbp = length(bp);\r"
+  - "    float lencp = length(cp);\r"
+  - "    \r"
+  - "    if(Is01(k1)&&c1>0.0f)\r"
+  - "    {\r"
+  - "        return sqrt(len2(lenap) - len2(k1*lenAB));\r"
+  - "    }\r"
+  - "    if(Is01(k2)&&c2>0.0f)\r"
+  - "    {\r"
+  - "        return sqrt(len2(lenbp) - len2(k2*lenBC));\r"
+  - "    }\r"
+  - "    if(Is01(k3)&&c3>0.0f)\r"
+  - "    {\r"
+  - "        return sqrt(len2(lencp) - len2(k3*lenCA));\r"
+  - "    }\r"
+  - "    \r"
+  - "    if(c1<0.0f&&c2<0.0f&&c3<0.0f)\r"
+  - "    {\r"
+  - "        return 0.0f;\r"
+  - "    }\r"
+  - "   \r"
+  - "    //return 0.0f;\r"
+  - "    return min(min(lenap,lenbp),lencp);\r"
+  - "    \r"
+  - "}\r"
+  - "\r"
+  - "void mainImage( out float4 fragColor, in float2 fragCoord )\r"
+  - "{\r"
+  - "    // Normalized pixel coordinates (from 0 to 1)\r"
+  - "    float2 uv = fragCoord/iResolution.xy;\r"
+  - "\r"
+  - "    float2 screen = float2(640.0f,360.0f);\r"
+  - "    float2 B=float2(0.2f,0.3f)*screen;\r"
+  - "    float2 C=float2(0.8f,0.4f)*screen;\r"
+  - "    float2 A=float2(0.5f,0.6f)*screen;\r"
+  - "    float2 p = uv*screen;\r"
+  - "    float d = SDFTriangle2D(p,A,B,C);\r"
+  - "\r"
+  - "    d*=0.01f;\r"
+  - "    // Output to screen\r"
+  - "    fragColor = float4(d,d,d,1.0);\r"
+  - '}'
+--- !u!4 &1107196370
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1107196368}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.129328, y: -1.8123727, z: -1.2276683}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1189217188
 GameObject:
   m_ObjectHideFlags: 0

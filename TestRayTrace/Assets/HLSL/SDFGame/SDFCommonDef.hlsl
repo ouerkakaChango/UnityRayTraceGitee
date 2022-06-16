@@ -183,4 +183,51 @@ float3 SDFXAxisNormal(float3 p)
 	return p.y > 0 ? float3(0, 1, 0) : float3(0, -1, 0);
 }
 
+float SDFTriangle2D(float2 p, float2 A, float2 B, float2 C)
+{
+	float2 AB = B - A;
+	float2 BC = C - B;
+	float2 CA = A - C;
+	float2 ap = p - A;
+	float2 bp = p - B;
+	float2 cp = p - C;
+	float lenAB = length(AB);
+	float lenBC = length(BC);
+	float lenCA = length(CA);
+
+	float k1 = dot(ap, AB) / len2(lenAB);
+	float k2 = dot(bp, BC) / len2(lenBC);
+	float k3 = dot(cp, CA) / len2(lenCA);
+
+	float c1 = cross2D(ap, AB);
+	float c2 = cross2D(bp, BC);
+	float c3 = cross2D(cp, CA);
+
+	float lenap = length(ap);
+	float lenbp = length(bp);
+	float lencp = length(cp);
+
+	if (Is01(k1) && c1 > 0.0f)
+	{
+		return sqrt(len2(lenap) - len2(k1*lenAB));
+	}
+	if (Is01(k2) && c2 > 0.0f)
+	{
+		return sqrt(len2(lenbp) - len2(k2*lenBC));
+	}
+	if (Is01(k3) && c3 > 0.0f)
+	{
+		return sqrt(len2(lencp) - len2(k3*lenCA));
+	}
+
+	if (c1 < 0.0f&&c2 < 0.0f&&c3 < 0.0f)
+	{
+		return 0.0f;
+	}
+
+	//return 0.0f;
+	return min(min(lenap, lenbp), lencp);
+
+}
+
 #endif
