@@ -228,6 +228,6 @@ float SDFTriangle2D(float2 p, float2 A, float2 B, float2 C)
 	//return 0.0f;
 	return min(min(lenap, lenbp), lencp);
 
-}
+}
 
 #endif

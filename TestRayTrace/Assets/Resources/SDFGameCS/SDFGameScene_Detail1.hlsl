@@ -43,6 +43,7 @@ re.albedo = 0.5f;
 
 int GetObjRenderMode(int obj)
 {
+	return 0;
 }
 
 void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
@@ -442,11 +443,11 @@ if (inx == 0)
 {
 	//return SDFSphereNormal(p, float3(0, 0.5, 0));
 	//return SDFPlanetNormal(p);
-	return GetObjSDFNormal(inx, p);
+	return GetObjSDFNormal(inx, p, traceInfo);
 }
 else
 {
-	return GetObjSDFNormal(inx, p);
+	return GetObjSDFNormal(inx, p, traceInfo);
 }
 }
 
