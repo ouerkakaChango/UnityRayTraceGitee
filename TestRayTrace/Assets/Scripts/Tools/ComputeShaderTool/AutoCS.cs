@@ -118,6 +118,7 @@ public class AutoCS : MonoBehaviour
             }
             myProcess.StartInfo.WorkingDirectory = Application.dataPath + "/CmdExe";
             myProcess.StartInfo.Arguments = FullPath(taskFile);
+            //Debug.Log(FullPath(taskFile));
             myProcess.EnableRaisingEvents = true;
             myProcess.Start();
             myProcess.WaitForExit();

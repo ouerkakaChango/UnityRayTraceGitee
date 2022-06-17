@@ -1,13 +1,14 @@
 ﻿#define OBJNUM 2
 
 #define MaxSDF 100000
-#define MaxTraceDis 1000
-#define MaxTraceTime 640
-#define TraceThre 0.001
-#define NormalEpsilon 0.0001
+#define MaxTraceDis 100
+#define MaxTraceTime 6400
+#define TraceThre 0.01
+#define NormalEpsilon 0.01
+
+#define SceneSDFShadowNormalBias 0.2
 
 #define SceneSDFSoftShadowBias 0.1
-#define SceneSDFShadowNormalBias 0.001
 #define SceneSDFSoftShadowK 16
 
 #include "../../HLSL/PBR/PBRCommonDef.hlsl"
@@ -23,6 +24,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	re.albedo = float3(1, 1, 1);
 	re.metallic = 0.0f;
 	re.roughness = 0.8f;
+	re.ao = 1;
 
 	if (obj == 0)
 	{		
@@ -39,10 +41,24 @@ re.albedo = 0.5f;
 	return re;
 }
 
+int GetObjRenderMode(int obj)
+{
+}
+
+void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
+{
+}
+
+void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
+{
+}
+
 float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 {
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
-
+	int mode = GetObjRenderMode(minHit.obj);
+	ObjPreRender(mode, mat, ray, minHit);
+	float3 result = 0;
 //if(minHit.obj==0)
 //{
 //	return PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
@@ -53,13 +69,25 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 	float3 lightColor = float3(1, 1, 1) * 3.5;
 	return PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor) + 0.3 * mat.albedo;
 }
-	return 0;
+	ObjPostRender(result, mode, mat, ray, minHit);
+	return result;
 }
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info);
 float SoftShadow_TraceScene(Ray ray, out HitInfo info);
+
+float GetDirHardShadow(Ray ray, float3 lightDir, in HitInfo minHit)
+{
+	ray.pos = minHit.P;
+	ray.dir = -lightDir;
+	ray.pos += SceneSDFShadowNormalBias * minHit.N;
+	HitInfo hitInfo;
+	return HardShadow_TraceScene(ray, hitInfo);
+}
+
 float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 {
+	float sha = 1;
 //float3 lightDir = normalize(float3(1, -1, 1));
 //ray.pos = minHit.P;
 //ray.dir = -lightDir;
@@ -195,7 +223,7 @@ d = min(max(w.x,w.y),0.0) + length(max(w,0.0));
 }
 
 
-float GetObjSDF(int inx, float3 p)
+float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 {
 if (inx == 0)
 {
@@ -399,16 +427,16 @@ else
 }
 }
 
-float3 GetObjSDFNormal(int inx, float3 p)
+float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo)
 {
 	return normalize(float3(
-		GetObjSDF(inx, float3(p.x + NormalEpsilon, p.y, p.z)) - GetObjSDF(inx, float3(p.x - NormalEpsilon, p.y, p.z)),
-		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon, p.z)) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon, p.z)),
-		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon)) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon))
+		GetObjSDF(inx, float3(p.x + NormalEpsilon, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon, p.y, p.z), traceInfo),
+		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon, p.z), traceInfo),
+		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon), traceInfo) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon), traceInfo)
 		));
 }
 
-float3 GetObjNormal(int inx, float3 p)
+float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 {
 if (inx == 0)
 {
@@ -427,15 +455,16 @@ float TraceScene(Ray ray, out HitInfo info)
 {
 	Init(info);
 
-	int traceCount = 0;
-	while (traceCount <= MaxTraceTime)
+	TraceInfo traceInfo;
+	Init(traceInfo,MaxSDF);
+	while (traceInfo.traceCount <= MaxTraceTime)
 	{
 		int objInx = -1;
 		float objSDF[OBJNUM];
 		float sdf = MaxSDF;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
 			if (objSDF[inx] < sdf)
 			{
 				sdf = objSDF[inx];
@@ -452,12 +481,12 @@ float TraceScene(Ray ray, out HitInfo info)
 		{
 			info.bHit = true;
 			info.obj = objInx;
-			info.N = GetObjNormal(objInx, ray.pos);
+			info.N = GetObjNormal(objInx, ray.pos, traceInfo);
 			info.P = ray.pos;
 			break;
 		}
 		ray.pos += sdf * ray.dir;
-		traceCount++;
+		Update(traceInfo,sdf);
 	}
 
 	if (info.bHit)
@@ -474,15 +503,16 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 {
 	Init(info);
 
-	int traceCount = 0;
-	while (traceCount <= MaxTraceTime*0.1)
+	TraceInfo traceInfo;
+	Init(traceInfo,MaxSDF);
+	while (traceInfo.traceCount <= MaxTraceTime*0.01)
 	{
 		int objInx = -1;
 		float objSDF[OBJNUM];
 		float sdf = MaxSDF;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
 			if (objSDF[inx] < sdf)
 			{
 				sdf = objSDF[inx];
@@ -490,21 +520,20 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 			}
 		}
 
-		if (sdf > MaxTraceDis)
+		if (sdf > MaxTraceDis*0.05)
 		{
 			break;
 		}
 
-		if (sdf <= TraceThre*0.5)
+		if (sdf <= TraceThre*2)
 		{
 			info.bHit = true;
 			info.obj = objInx;
-			//info.N = GetObjNormal(objInx, ray.pos);
 			info.P = ray.pos;
 			break;
 		}
 		ray.pos += sdf * ray.dir;
-		traceCount++;
+		Update(traceInfo,sdf);
 	}
 
 	if (info.bHit)
@@ -524,15 +553,16 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 	float sha = 1.0;
 	float t = 0.005 * 0.1; //一个非0小值，会避免极其细微的多余shadow
 
-	int traceCount = 0;
-	while (traceCount <= MaxTraceTime*0.2)
+	TraceInfo traceInfo;
+	Init(traceInfo,MaxSDF);
+	while (traceInfo.traceCount <= MaxTraceTime*0.2)
 	{
 		int objInx = -1;
 		float objSDF[OBJNUM];
 		float sdf = MaxSDF;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos);
+			objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
 			if (objSDF[inx] < sdf)
 			{
 				sdf = objSDF[inx];
@@ -559,7 +589,6 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 		{
 			info.bHit = true;
 			info.obj = objInx;
-			//info.N = GetObjNormal(objInx, ray.pos);
 			info.P = ray.pos;
 			break;
 		}
@@ -567,7 +596,7 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 		t += clamp(sdf, 0.01*SceneSDFSoftShadowBias, 0.5*SceneSDFSoftShadowBias);
 
 		ray.pos += sdf * ray.dir;
-		traceCount++;
+		Update(traceInfo,sdf);
 	}
 
 	return saturate(sha);
