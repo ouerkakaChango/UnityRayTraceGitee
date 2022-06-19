@@ -79,6 +79,20 @@ float rand01(float3 seed)
 	return random_float_01(stat);
 }
 
+//???
+//https://www.baeldung.com/cs/uniform-to-normal-distribution
+//https://blog.csdn.net/weixin_30734435/article/details/99602086
+float normalDistribution(float ave, float sqrtPhi,float3 seed1,float3 seed2)
+{
+	float random_1 = rand01(seed1);
+	float random_2 = rand01(seed2);
+	if (sqrtPhi <= 0)
+	{
+		return 0;
+	}
+	return sqrtPhi * sqrt(-2 * log(random_1)) * cos(2 * PI * random_2) + ave;
+}
+
 //#########################################################################
 // 1 ~ 8 Î¬µÄ sobol Éú³É¾ØÕó
 const uint V[8 * 32] = {

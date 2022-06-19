@@ -4,7 +4,7 @@
 #define MaxTraceDis 100
 #define MaxTraceTime 6400
 #define TraceThre 0.001
-#define NormalEpsilon 0.0001
+#define NormalEpsilon 0.001
 
 #define SceneSDFShadowNormalBias 0.2
 
@@ -104,12 +104,12 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 	###BLOCK
 }
 
-float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo)
+float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonScale = 1.0f)
 {
 	return normalize(float3(
-		GetObjSDF(inx, float3(p.x + NormalEpsilon, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon, p.y, p.z), traceInfo),
-		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon, p.z), traceInfo),
-		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon), traceInfo) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon), traceInfo)
+		GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
+		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
+		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon*eplisonScale), traceInfo) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon*eplisonScale), traceInfo)
 		));
 }
 

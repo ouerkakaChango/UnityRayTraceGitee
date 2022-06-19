@@ -38,7 +38,8 @@ float SDFGridGrass(float3 p, float3 center)
 	//$$$
 	//float sdf2d = max(length(p2d) - 0.5,0);
 	//float sdf2d = max(SDFBox(p2d,0,0.5),0);
-	float grassLen = 0.2 + 0.8*randK;
+	//randK = normalDistribution(0.01, 1, float3(34, 23, 123) * 50 + center*5, float3(43, 42, 112) * 50 + center*5);
+	float grassLen = 0.2 + 0.8 *  randK;
 
 	float2 tip = float2(0, grassLen);
 	float sdf2d = SDFTriangle2D(p2d, tip, float2(-0.1, -0.5), float2(0.1, -0.5));
