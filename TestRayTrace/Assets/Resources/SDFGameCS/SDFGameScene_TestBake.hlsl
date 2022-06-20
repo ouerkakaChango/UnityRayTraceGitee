@@ -379,7 +379,7 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 	}
 	else if(inx == -3)
 	{
-		if(abs(p.x)<300 && abs(p.z)<300 && traceInfo.lastTrace<10)
+		if(abs(p.x)<300 && abs(p.z)<300 && traceInfo.lastTrace<5)
 		{
 			//### grid grass
 			float grid = 0.1;
@@ -410,25 +410,27 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			d = SDFGridGrass(p,center);
 			re = min(re,d);
 
-			//c2 = c+grid*float2(1,1);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
-			//re = min(re,d);
-			//
-			//c2 = c+grid*float2(1,-1);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
-			//re = min(re,d);
-			//
-			//c2 = c+grid*float2(-1,1);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
-			//re = min(re,d);
-			//
-			//c2 = c+grid*float2(-1,-1);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
-			//re = min(re,d);
+			c2 = c+grid*float2(1,1);
+			center = float3(c2.x,CosFBM(c2),c2.y);
+			d = SDFGridGrass(p,center);
+			re = min(re,d);
+			
+			c2 = c+grid*float2(1,-1);
+			center = float3(c2.x,CosFBM(c2),c2.y);
+			d = SDFGridGrass(p,center);
+			re = min(re,d);
+			
+			c2 = c+grid*float2(-1,1);
+			center = float3(c2.x,CosFBM(c2),c2.y);
+			d = SDFGridGrass(p,center);
+			re = min(re,d);
+			
+			c2 = c+grid*float2(-1,-1);
+			center = float3(c2.x,CosFBM(c2),c2.y);
+			d = SDFGridGrass(p,center);
+			re = min(re,d);
+
+			re *= 0.2;
 		}
 	}
 return re;
@@ -480,7 +482,8 @@ if (inx == -2)
 else if (inx == -3)
 {
 //???
-	return GetObjSDFNormal(inx, p, traceInfo, 0.1f);
+	//return float3(0,1,0);
+	return GetObjSDFNormal(inx, p, traceInfo);
 	//float grid = 2.0;
 	//float2 m = floor(p.xz/grid);
 	//float2 c = grid*m+grid*0.5;

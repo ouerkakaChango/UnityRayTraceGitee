@@ -51,7 +51,7 @@ float3 GetSDFGameColor(in Ray ray)
 	return re;
 }
 
-#define SSAA_num 1
+#define SSAA_num 9
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
 {

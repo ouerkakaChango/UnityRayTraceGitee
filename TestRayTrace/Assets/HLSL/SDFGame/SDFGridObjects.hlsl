@@ -9,6 +9,8 @@
 
 float SDFGridGrass(float3 p, float3 center)
 {
+	//center.y += rand01(float3(34, 23, 123)*50 + center * 5) * 2 * Time01(1, center.y);
+	//return max(0, SDFBox(p, center, 0.05));
 	//???
 	float2 windDir = float2(1, 1);
 	float windStrength = 0.1 * cos(dot(windDir, 0.1*center.xz) + 2 * PI*frac(_Time.y / 5.0f));
