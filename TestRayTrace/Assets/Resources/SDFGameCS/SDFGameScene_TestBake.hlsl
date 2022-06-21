@@ -65,7 +65,7 @@ re.roughness = 1;
 }
 else if (obj == 4 )
 {
-re.albedo = float3(0.006229852, 0.990566, 0.2363835);
+re.albedo = float3(0, 1, 0.1720126);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -154,13 +154,18 @@ else if(mode == 3)
 	mode = 0;
 }
 
-//???
-if(minHit.obj==2)
+//??? grass color vary
+if(minHit.obj == 4)
 {
-	//float2 dxy = CosFBM_Dxy(minHit.P.xz);
-	//float3 N = normalize(float3(-dxy.x,1,-dxy.y));
-	//mat.albedo = float3(saturate(dxy),0);
-	//mat.albedo = float3(CosFBM(minHit.P.xz)>0?1:0,0,0);
+	//### grid grass
+	float grid = 0.1;
+	float2 m = floor(minHit.P.xz/grid);
+	float2 c = grid*(m+0.5);
+	float randK = cos(dot(float2(-1,0.5), 0.01*c)+PI);//rand01(float3(34, 23, 123) * 50 + float3(c.x,0,c.y) * 5);
+	float3 c1 = float3(1,0,0);
+	float3 c2 = float3(1,1,0);
+	mat.albedo = lerp(c1,lerp(c1,c2,randK),1);
+	
 }
 }
 
@@ -183,7 +188,7 @@ float3 lightDirs[1];
 float3 lightColors[1];
 lightDirs[0] = float3(0.3534208, -0.4141579, -0.8387889);
 lightColors[0] = float3(1, 1, 1);
-result = 0.03 * mat.albedo * mat.ao;
+result = 0.04 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
 {
 result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
@@ -392,44 +397,44 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			//### near dir
 			//float2 c2 = c+grid*float2(1,0);
 			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
+			//d = SDFGridGrass(p,center, grid);
 			//re = min(re,d);
 			//
 			//c2 = c+grid*float2(-1,0);
 			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
+			//d = SDFGridGrass(p,center, grid);
 			//re = min(re,d);
 			//
 			//c2 = c+grid*float2(0,1);
 			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
+			//d = SDFGridGrass(p,center, grid);
 			//re = min(re,d);
 			//
 			//c2 = c+grid*float2(0,-1);
 			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
+			//d = SDFGridGrass(p,center, grid);
 			//re = min(re,d);
 			//
 			//c2 = c+grid*float2(1,1);
 			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
+			//d = SDFGridGrass(p,center, grid);
 			//re = min(re,d);
 			//
 			//c2 = c+grid*float2(1,-1);
 			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
+			//d = SDFGridGrass(p,center, grid);
 			//re = min(re,d);
 			//
 			//c2 = c+grid*float2(-1,1);
 			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
+			//d = SDFGridGrass(p,center, grid);
 			//re = min(re,d);
 			//
 			//c2 = c+grid*float2(-1,-1);
 			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center);
+			//d = SDFGridGrass(p,center, grid);
 			//re = min(re,d);
-			//
+			
 			//re *= 0.2;
 		}
 	}
