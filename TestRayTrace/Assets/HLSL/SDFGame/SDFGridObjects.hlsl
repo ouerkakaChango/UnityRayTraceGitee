@@ -7,7 +7,7 @@
 #include "../Transform/TransformCommonDef.hlsl"
 #include "../Random/RandUtility.hlsl"
 
-float SDFGridGrass(float3 p, float3 center)
+float SDFGridGrass(float3 p, float3 center, float grid)
 {
 	//center.y += rand01(float3(34, 23, 123)*50 + center * 5) * 2 * Time01(1, center.y);
 	//return max(0, SDFBox(p, center, 0.05));

@@ -4,8 +4,6 @@
 #include "../../HLSL/UnityCommonDef.hlsl"
 #include "../../HLSL/RayMath.hlsl"
 
-#include "SDFGameScene_TestBake.hlsl"
-
 int w;
 int h;
 
@@ -27,6 +25,8 @@ Texture2D<float4> envDiffTex;
 Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
 
+//#########################################################################################################
+#include "SDFGameScene_TestBake.hlsl"
 //#########################################################################################################
 
 float3 GetSDFGameColor(in Ray ray)
@@ -51,7 +51,7 @@ float3 GetSDFGameColor(in Ray ray)
 	return re;
 }
 
-#define SSAA_num 9
+#define SSAA_num 1
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
 {

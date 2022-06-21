@@ -4,8 +4,6 @@
 #include "../../HLSL/UnityCommonDef.hlsl"
 #include "../../HLSL/RayMath.hlsl"
 
-#include "SDFGameScene_(@SceneName).hlsl"
-
 int w;
 int h;
 
@@ -27,6 +25,8 @@ Texture2D<float4> envDiffTex;
 Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
 
+//#########################################################################################################
+#include "SDFGameScene_(@SceneName).hlsl"
 //#########################################################################################################
 
 float3 GetSDFGameColor(in Ray ray)

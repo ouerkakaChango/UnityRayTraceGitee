@@ -350,7 +350,7 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 	else if(inx == -2)
 	{
 		float terrain = 100000;
-		if(abs(p.x)<300 && abs(p.z)<300)
+		if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 		{
 			//### fbm flaw effect.###
 			//###can only used for low height effect,and no sdf shadow, because trace it by height func is not right.
@@ -379,7 +379,7 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 	}
 	else if(inx == -3)
 	{
-		if(abs(p.x)<300 && abs(p.z)<300 && traceInfo.lastTrace<5)
+		if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300 && traceInfo.lastTrace<5)
 		{
 			//### grid grass
 			float grid = 0.1;
@@ -390,47 +390,47 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			re = min(re,d);
 
 			//### near dir
-			float2 c2 = c+grid*float2(1,0);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			d = SDFGridGrass(p,center);
-			re = min(re,d);
-			
-			c2 = c+grid*float2(-1,0);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			d = SDFGridGrass(p,center);
-			re = min(re,d);
-			
-			c2 = c+grid*float2(0,1);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			d = SDFGridGrass(p,center);
-			re = min(re,d);
-			
-			c2 = c+grid*float2(0,-1);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			d = SDFGridGrass(p,center);
-			re = min(re,d);
-
-			c2 = c+grid*float2(1,1);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			d = SDFGridGrass(p,center);
-			re = min(re,d);
-			
-			c2 = c+grid*float2(1,-1);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			d = SDFGridGrass(p,center);
-			re = min(re,d);
-			
-			c2 = c+grid*float2(-1,1);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			d = SDFGridGrass(p,center);
-			re = min(re,d);
-			
-			c2 = c+grid*float2(-1,-1);
-			center = float3(c2.x,CosFBM(c2),c2.y);
-			d = SDFGridGrass(p,center);
-			re = min(re,d);
-
-			re *= 0.2;
+			//float2 c2 = c+grid*float2(1,0);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//d = SDFGridGrass(p,center);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(-1,0);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//d = SDFGridGrass(p,center);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(0,1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//d = SDFGridGrass(p,center);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(0,-1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//d = SDFGridGrass(p,center);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(1,1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//d = SDFGridGrass(p,center);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(1,-1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//d = SDFGridGrass(p,center);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(-1,1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//d = SDFGridGrass(p,center);
+			//re = min(re,d);
+			//
+			//c2 = c+grid*float2(-1,-1);
+			//center = float3(c2.x,CosFBM(c2),c2.y);
+			//d = SDFGridGrass(p,center);
+			//re = min(re,d);
+			//
+			//re *= 0.2;
 		}
 	}
 return re;
