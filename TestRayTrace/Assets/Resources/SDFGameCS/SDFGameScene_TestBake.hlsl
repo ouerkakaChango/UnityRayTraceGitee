@@ -386,7 +386,7 @@ re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.0
 			float2 m = floor(p.xz/grid);
 			float2 c = grid*(m+0.5);
 			float3 center = float3(c.x,CosFBM(c),c.y);
-			float d = SDFGridGrass(p,center);
+			float d = SDFGridGrass(p,center,grid);
 			re = min(re,d);
 
 			//### near dir
