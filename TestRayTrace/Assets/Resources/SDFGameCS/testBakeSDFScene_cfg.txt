@@ -434,7 +434,7 @@ else if (inx == -3)
 //???
 	//return float3(0,1,0);
 	return GetObjSDFNormal(inx, p, traceInfo);
-	//float grid = 2.0;
+	//float grid = 0.1.0;
 	//float2 m = floor(p.xz/grid);
 	//float2 c = grid*m+grid*0.5;
 	//float3 center = float3(c.x,CosFBM(c),c.y);

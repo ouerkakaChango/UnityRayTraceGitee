@@ -9,6 +9,16 @@
 
 float SDFGridGrass(float3 p, float3 center, float grid)
 {
+	float randK = rand01(float3(34, 23, 123) * 50 + center * 5);
+
+	float randK2 = rand01(float3(43, 32, 127) * 50 + center * 50);
+	float randK3 = rand01(float3(34, 23, 123) * 50 + center * 50);
+
+	//return max(0, SDFBox(p, center, 0.05 + float3(0, randK2, 0)));
+
+	float2 offset = grid * 0.5 * (2 * float2(randK2, randK3) - 1);
+	center += float3(offset.x, 0, offset.y);
+
 	//center.y += rand01(float3(34, 23, 123)*50 + center * 5) * 2 * Time01(1, center.y);
 	//return max(0, SDFBox(p, center, 0.05));
 	//???
@@ -21,7 +31,6 @@ float SDFGridGrass(float3 p, float3 center, float grid)
 	float3 n = float3(0, 0, 1);
 	float3 b = float3(0, 1, 0);
 	
-	float randK = rand01(float3(34, 23, 123) * 50 + center * 5);
 	//???
 	t = float3(cos(2 * PI*randK), 0, sin(2 * PI*randK));
 	b = tipDir;
@@ -29,7 +38,7 @@ float SDFGridGrass(float3 p, float3 center, float grid)
 	t = cross(b, n);
 
 	Coord2D coord;
-	coord.origin = center + float3(0, 0.1, 0);
+	coord.origin = center + float3(0, 0.4, 0);
 	coord.T = t;
 	coord.B = b;
 	coord.N = n;
