@@ -2,6 +2,7 @@
 #define NOISECOMMONDEF_HLSL
 //https ://www.shadertoy.com/view/ldScDh
 Texture2D NoiseRGBTex;
+Texture2D perlinNoise1;
 
 SamplerState noise_linear_repeat_sampler;
 float noise_texBase(in float3 x)
@@ -47,5 +48,10 @@ float fbm4(in float3 p)
 	n += 0.250*noise(p*4.0);
 	n += 0.125*noise(p*8.0);
 	return n;
+}
+
+float perlinNoiseFromTex(float2 uv)
+{
+	return perlinNoise1.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;
 }
 #endif

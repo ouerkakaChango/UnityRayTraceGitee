@@ -50,6 +50,8 @@ public class ShaderConverter : MonoBehaviour
         }
     }
 
+    //TODO:
+    //vec3(1.0) => float3(1.0,1.0,1.0)
     void ConvertLine(ref string line)
     {
         if (oriType == ShaderLanguageType.glsl && outType == ShaderLanguageType.hlsl)
@@ -60,6 +62,9 @@ public class ShaderConverter : MonoBehaviour
             line = line.Replace("vec3(", "float3(");
             line = line.Replace("vec4 ", "float4 ");
             line = line.Replace("vec4(", "float4(");
+            line = line.Replace("mix(", "lerp(");
+            line = line.Replace("mod(", "fmod(");
+            line = line.Replace("fract(", "frac(");
         }
         else
         {

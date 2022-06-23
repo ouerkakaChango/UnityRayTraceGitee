@@ -260,4 +260,29 @@ float BilinearR(Texture2D tex, float2 floorPos, float2 fracPart)
 	float x1 = lerp(x01, x11, fracPart.x);
 	return lerp(x0, x1, fracPart.y);
 }
+
+//https://www.shadertoy.com/view/wt23Rt
+float3 RGBToHSV(float3 c) {
+	float4 K = float4(0., -1. / 3., 2. / 3., -1.),
+		p = lerp(float4(c.bg, K.wz), float4(c.gb, K.xy), step(c.b, c.g)),
+		q = lerp(float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r));
+	float d = q.x - min(q.w, q.y),
+		e = 1e-10;
+	return float3(abs(q.z + (q.w - q.y) / (6.*d + e)), d / (q.x + e), q.x);
+}
+
+//https://www.shadertoy.com/view/MsS3Wc
+float3 HSVToRGB_iq(in float3 c)
+{
+	float3 rgb = clamp(abs(fmod(c.x*6.0 + float3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+	rgb = rgb * rgb*(3.0 - 2.0*rgb); // cubic smoothing	
+	return c.z * lerp(float3(1,1,1), rgb, c.y);
+}
+
+//https://www.shadertoy.com/view/wt23Rt
+float3 HSVToRGB(float3 c) {
+	float4 K = float4(1., 2. / 3., 1. / 3., 3.);
+	return c.z*lerp(K.xxx, saturate(abs(frac(c.x + K.xyz)*6. - K.w) - K.x), c.y);
+}
+
 #endif

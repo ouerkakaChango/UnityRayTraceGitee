@@ -175,19 +175,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         cs.SetVector("_Time", Shader.GetGlobalVector("_Time"));
         cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
         cs.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
-
-        //for(int i=0;i<texSys.pbrTextures.Count;i++)
-        //{
-        //    cs.SetTexture(kInx, "pbrTex"+i+"albedo", texSys.pbrTextures[i].albedo);
-        //    cs.SetTexture(kInx, "pbrTex" + i + "normal", texSys.pbrTextures[i].normal);
-        //    cs.SetTexture(kInx, "pbrTex" + i + "metallic", texSys.pbrTextures[i].metallic);
-        //    cs.SetTexture(kInx, "pbrTex" + i + "roughness", texSys.pbrTextures[i].roughness);
-        //    cs.SetTexture(kInx, "pbrTex" + i + "ao", texSys.pbrTextures[i].ao);
-        //}
-        ////@@@
-        //???
-        //cs.SetTexture(kInx, "CosFBM_height", testTex1);
-        //cs.SetTexture(kInx, "CosFBM_grad", testTex2);
+        cs.SetTexture(kInx, "perlinNoise1", ShaderToyTool.Instance.perlinNoise1);
         //___
         for(int i=0;i<texSys.outTextures.Count;i++)
         {

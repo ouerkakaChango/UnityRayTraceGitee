@@ -143,10 +143,25 @@ if(minHit.obj == 4)
 	float grid = 0.1;
 	float2 m = floor(minHit.P.xz/grid);
 	float2 c = grid*(m+0.5);
-	float randK = cos(dot(float2(-1,0.5), 0.01*c)+PI);//rand01(float3(34, 23, 123) * 50 + float3(c.x,0,c.y) * 5);
-	float3 c1 = float3(1,0,0);
-	float3 c2 = float3(1,1,0);
-	mat.albedo = lerp(c1,lerp(c1,c2,randK),1);
+
+	int pattern = 2;
+	if(pattern == 1)
+	{
+		//tube shape,2 colors
+		float randK = perlinNoiseFromTex(0.005 * c);//cos(dot(float2(-1,0.5), 0.01*c)+PI);//rand01(float3(34, 23, 123) * 50 + float3(c.x,0,c.y) * 5);
+		float ori = randK;
+		randK = pow(randK,4.5);
+		randK = randK<0.1 ? 0:1;
+		float3 c1 = float3(1,0,0);
+		float3 c2 = float3(1,1,0);
+		mat.albedo = lerp(c1,c2,randK);
+	}
+	else if (pattern == 2)
+	{
+		float randK = perlinNoiseFromTex(0.005 * c);//cos(dot(float2(-1,0.5), 0.1*c)+PI); //
+		float3 color = HSVToRGB(float3(randK,1,1));
+		mat.albedo = color;
+	}
 	
 }
 ###BLOCK
