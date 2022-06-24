@@ -144,7 +144,7 @@ if(minHit.obj == 4)
 	float2 m = floor(minHit.P.xz/grid);
 	float2 c = grid*(m+0.5);
 
-	int pattern = 2;
+	int pattern = 1;
 	if(pattern == 1)
 	{
 		//tube shape,2 colors
@@ -158,8 +158,23 @@ if(minHit.obj == 4)
 	}
 	else if (pattern == 2)
 	{
-		float randK = perlinNoiseFromTex(0.005 * c);//cos(dot(float2(-1,0.5), 0.1*c)+PI); //
+		float randK = cos(dot(float2(-1,0.5), 10*c)+PI) * cos(dot(float2(0.5,-1), 10*c)+PI); //perlinNoiseFromTex(0.005 * c);//
+		//randK = pow(randK,2);
 		float3 color = HSVToRGB(float3(randK,1,1));
+		mat.albedo = color;
+	}
+	else if (pattern == 3)
+	{
+		float randK = voronoiNoiseFromTex(0.005 * c);
+		randK = pow(randK,4);
+		randK = randK<0.2 ? 0:1;
+		float3 c1 = float3(1,0,0);
+		float3 c2 = float3(1,1,0);
+		mat.albedo = lerp(c1,c2,randK);
+	}
+	else if (pattern ==4)
+	{
+		float3 color = HSVToRGB(float3(frac(_Time.y*2),1,1));
 		mat.albedo = color;
 	}
 	

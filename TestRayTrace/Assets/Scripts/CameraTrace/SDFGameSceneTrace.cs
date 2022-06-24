@@ -176,8 +176,9 @@ public class SDFGameSceneTrace : MonoBehaviour
         cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
         cs.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
         cs.SetTexture(kInx, "perlinNoise1", ShaderToyTool.Instance.perlinNoise1);
+        cs.SetTexture(kInx, "voronoiNoise1", ShaderToyTool.Instance.voronoiNoise1);
         //___
-        for(int i=0;i<texSys.outTextures.Count;i++)
+        for (int i=0;i<texSys.outTextures.Count;i++)
         {
             cs.SetTexture(kInx, texSys.outTextures[i].name, texSys.outTextures[i].tex);
         }

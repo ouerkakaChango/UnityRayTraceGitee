@@ -6,6 +6,7 @@
 
 #include "../Transform/TransformCommonDef.hlsl"
 #include "../Random/RandUtility.hlsl"
+#include "../Noise/NoiseCommonDef.hlsl"
 
 float SDFGridGrass(float3 p, float3 center, float grid)
 {
@@ -14,7 +15,9 @@ float SDFGridGrass(float3 p, float3 center, float grid)
 	float randK2 = rand01(float3(43, 32, 127) * 50 + center * 50);
 	float randK3 = rand01(float3(34, 23, 123) * 50 + center * 50);
 
-	//return max(0, SDFBox(p, center, 0.05 + float3(0, randK2, 0)));
+	{
+		//return max(0, SDFBox(p, center, 0.05 + float3(0, randK2, 0)));
+	}
 
 	float2 offset = grid * 0.5 * (2 * float2(randK2, randK3) - 1);
 	center += float3(offset.x, 0, offset.y);
