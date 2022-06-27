@@ -216,5 +216,28 @@ namespace Spline
             p += transform.position;
             return p;
         }
+
+        public List<Vector3> GetKeys()
+        {
+            List<Vector3> re = new List<Vector3>();
+            for (int i = 0; i < GetSegNum(); i++)
+            {
+                if (i == 0)
+                {
+                    re.Add(pnt0);
+                    re.Add(pnt1);
+                    re.Add(pnt2);
+                }
+                else
+                {
+                    //p0 是上一个的p2，不用画
+                    //画 p1, p2
+                    //p1 from mids,p2 from settings
+                    re.Add(mids[i - 1]);
+                    re.Add(segSettings[i - 1].p2);
+                }
+            }
+            return re;
+        }
     }
 }

@@ -24,6 +24,7 @@
 #include "../../HLSL/Transform/TransformCommonDef.hlsl"
 #include "../../HLSL/SDFGame/SDFCommonDef.hlsl"
 #include "../../HLSL/SDFGame/SDFGridObjects.hlsl"
+#include "../../HLSL/Spline/QuadBezier/QuadBezier.hlsl"
 Texture2D woodPBR_albedo;
 Texture2D woodPBR_normal;
 Texture2D woodPBR_metallic;
@@ -113,7 +114,6 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -4;
 }
 else if (inx == 1 )
 {
@@ -384,7 +384,17 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 	//@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -4;
+float d = re;
+float2 box = float2(0.1, 0.05);
+Transform trans;
+Init(trans);
+trans.pos = float3(-54.05, 0.35, -55.189);
+float2 spline[3];
+spline[0] = float3(0, 0, 0);
+spline[1] = float3(1, 0.93, 0);
+spline[2] = float3(2, 0, 0);
+FUNC_SDFBoxedQuadBezier(d, p, spline, 3, trans, box)
+re = min(re,d);
 }
 else if (inx == 1 )
 {
@@ -527,7 +537,6 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -4;
 }
 else if (inx == 1 )
 {
