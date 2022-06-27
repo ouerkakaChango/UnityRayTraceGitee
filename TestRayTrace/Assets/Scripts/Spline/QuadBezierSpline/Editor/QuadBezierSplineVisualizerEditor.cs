@@ -26,5 +26,10 @@ public class QuadBezierSplineVisualizerEditor : Editor
         {
             Target.ShowKeys();
         }
+
+        if (GUILayout.Button("ShowKeys3D"))
+        {
+            Target.ShowKeys3D();
+        }
     }
 }

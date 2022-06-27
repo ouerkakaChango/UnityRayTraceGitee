@@ -1,4 +1,4 @@
-﻿#define OBJNUM 7
+﻿#define OBJNUM 8
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -41,19 +41,19 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0, 0.2196412, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0.7254902, 0.4784314, 0.3411765);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 2 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.7254902, 0.4784314, 0.3411765);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -65,17 +65,23 @@ re.roughness = 1;
 }
 else if (obj == 4 )
 {
-re.albedo = float3(0, 1, 0.1720126);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 5 )
 {
+re.albedo = float3(0, 1, 0.1720126);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 6 )
+{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.2;
 }
-else if (obj == 6 )
+else if (obj == 7 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -88,20 +94,51 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[7];
-renderMode[0] = 2;
-renderMode[1] = 0;
-renderMode[2] = 2;
+int renderMode[8];
+renderMode[0] = 0;
+renderMode[1] = 2;
+renderMode[2] = 0;
 renderMode[3] = 2;
-renderMode[4] = 0;
+renderMode[4] = 2;
 renderMode[5] = 0;
-renderMode[6] = 2;
+renderMode[6] = 0;
+renderMode[7] = 2;
 return renderMode[obj];
 //@@@
 }
 
 void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
+int inx = minHit.obj;
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+inx = -4;
+}
+else if (inx == 1 )
+{
+}
+else if (inx == 2 )
+{
+inx = -2;
+}
+else if (inx == 3 )
+{
+}
+else if (inx == 4 )
+{
+}
+else if (inx == 5 )
+{
+inx = -3;
+}
+else if (inx == 6 )
+{
+}
+else if (inx == 7 )
+{
+}
+//@@@
 if(mode == 2)
 {
 	//mat.albedo *= WoodColor(5*minHit.P);
@@ -155,7 +192,7 @@ else if(mode == 3)
 }
 
 //??? grass color vary
-if(minHit.obj == 4)
+if(inx == -3)
 {
 	//### grid grass
 	float grid = 0.1;
@@ -347,29 +384,33 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 	//@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(-53.40586, -0.02504057, -55.8854), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
+inx = -4;
 }
 else if (inx == 1 )
 {
-inx = -2;
+re = min(re, 0 + SDFBox(p, float3(-53.40586, -0.02504057, -55.8854), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(-53.255, -0.1510001, -56.684), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
+inx = -2;
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
+re = min(re, 0 + SDFBox(p, float3(-53.255, -0.1510001, -56.684), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
 }
 else if (inx == 4 )
 {
-inx = -3;
+re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
 }
 else if (inx == 5 )
 {
-re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
+inx = -3;
 }
 else if (inx == 6 )
+{
+re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
+}
+else if (inx == 7 )
 {
 re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
@@ -483,28 +524,32 @@ float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonS
 
 float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 {
-//@@@SDFBakerMgr ObjNormal
+//@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -4;
 }
 else if (inx == 1 )
 {
-inx = -2;
 }
 else if (inx == 2 )
 {
+inx = -2;
 }
 else if (inx == 3 )
 {
 }
 else if (inx == 4 )
 {
-inx = -3;
 }
 else if (inx == 5 )
 {
+inx = -3;
 }
 else if (inx == 6 )
+{
+}
+else if (inx == 7 )
 {
 }
 //@@@

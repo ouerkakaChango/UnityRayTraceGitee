@@ -12,7 +12,7 @@ public class SDFBakerMgr : MonoBehaviour
     [ReadOnly]
     public List<string> bakedSDFs = new List<string>();
     [ReadOnly]
-    public List<string> bakedNormals = new List<string>();
+    public List<string> bakedSpecialObjects = new List<string>();
     [ReadOnly]
     public List<string> bakedMaterials = new List<string>();
     [ReadOnly]
@@ -49,7 +49,7 @@ public class SDFBakerMgr : MonoBehaviour
             SDFBakerTag tag = tags[i];
             PreAdd(i, ref bakedSDFs);
             //??? geometry normal not baked
-            PreAdd(i, ref bakedNormals);
+            PreAdd(i, ref bakedSpecialObjects);
             PreAdd(i, ref bakedMaterials, "obj");
 
             if (tag.shapeType == SDFShapeType.Special)
@@ -64,7 +64,7 @@ public class SDFBakerMgr : MonoBehaviour
             AddBakeRenderMode(i, tag);
 
             PostAdd(i, ref bakedSDFs);
-            PostAdd(i, ref bakedNormals);
+            PostAdd(i, ref bakedSpecialObjects);
             PostAdd(i, ref bakedMaterials);
         }
         EndBake();
@@ -107,7 +107,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedRenders.Clear();
         bakedDirShadows.Clear();
 
-        bakedNormals.Clear();
+        bakedSpecialObjects.Clear();
     }
 
     void EndBake()
@@ -193,7 +193,7 @@ public class SDFBakerMgr : MonoBehaviour
     void AddBakeSpecial(SDFBakerTag tag)
     {
         bakedSDFs.Add("inx = " + tag.specialID+";");
-        bakedNormals.Add("inx = " + tag.specialID + ";");
+        bakedSpecialObjects.Add("inx = " + tag.specialID + ";");
     }
 
     void AddBake(GameObject obj)

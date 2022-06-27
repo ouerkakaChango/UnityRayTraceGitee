@@ -20,7 +20,7 @@ public class AutoCS : MonoBehaviour
 
     public string[] lines;
     public string[] words;
-    public Dictionary<string, Vector2Int> rangeMap = new Dictionary<string, Vector2Int>();
+    Dictionary<string, List<Vector2Int>> rangeMap = new Dictionary<string, List<Vector2Int>>();
 
     public TextureSystem texSys;
     private void Awake()
@@ -150,13 +150,16 @@ public class AutoCS : MonoBehaviour
 
         rangeMap.Clear();
         //!!! 顺序必须对应cgf
-        rangeMap.Add("ValMaps", new Vector2Int(-1, -1));
-        rangeMap.Add("ObjMaterial", new Vector2Int(-1, -1));
-        rangeMap.Add("ObjRenderMode", new Vector2Int(-1, -1));
-        rangeMap.Add("ObjRender", new Vector2Int(-1, -1));
-        rangeMap.Add("DirShadow", new Vector2Int(-1, -1));
-        rangeMap.Add("ObjSDF", new Vector2Int(-1, -1));
-        rangeMap.Add("ObjNormal", new Vector2Int(-1, -1));
+        rangeMap.Add("ValMaps", new List<Vector2Int>());
+        rangeMap.Add("ObjMaterial", new List<Vector2Int>());
+        rangeMap.Add("ObjRenderMode", new List<Vector2Int>());
+        rangeMap.Add("ObjRender", new List<Vector2Int>());
+        rangeMap.Add("DirShadow", new List<Vector2Int>());
+        rangeMap.Add("ObjSDF", new List<Vector2Int>());
+        rangeMap.Add("SpecialObj", new List<Vector2Int>());
+
+        var keyList = rangeMap.Keys.ToList();
+        List<Vector2Int> orderList = new List<Vector2Int>();
 
         for (int i=0;i<lines.Length;i++)
         {
@@ -164,11 +167,11 @@ public class AutoCS : MonoBehaviour
             line = NiceLine(line);
 
             bool bDone = false;
-            foreach(var key in rangeMap.Keys.ToList())
+            foreach(var key in keyList)
             {
                 if (line == "//@@@SDFBakerMgr " + key)
                 {
-                    rangeMap[key] = new Vector2Int(i,-1);
+                    rangeMap[key].Add(new Vector2Int(i,-1));
                     bDone = true;
                     break;
                 }
@@ -178,14 +181,19 @@ public class AutoCS : MonoBehaviour
                 continue;
             }
 
-            foreach (var key in rangeMap.Keys.ToList())
+            for (int ikey = 0;ikey < keyList.Count;ikey++)
             {
-                if (line == "//@@@" && NeedEnd(rangeMap[key]))
+                string key = keyList[ikey];
+                for (int i1 = 0; i1 < rangeMap[key].Count; i1++)
                 {
-                    var tt = rangeMap[key];
-                    tt.y = i;
-                    rangeMap[key] = tt;
-                    break;
+                    if (line == "//@@@" && NeedEnd(rangeMap[key][i1]))
+                    {
+                        var tt = rangeMap[key][i1];
+                        tt.y = i;
+                        rangeMap[key][i1] = tt;
+                        orderList.Add(new Vector2Int(ikey, i1));
+                        break;
+                    }
                 }
             }
         }
@@ -193,71 +201,72 @@ public class AutoCS : MonoBehaviour
         List<string> newLines = new List<string>(lines);
         int offset = 0;
 
-        foreach (var iter in rangeMap)
+        for(int i=0;i<orderList.Count;i++)
         {
-            //Debug.Log(offset);
-            //Debug.Log(iter.Key + " " + iter.Value);
+            var order = orderList[i];
+            string key = keyList[order.x];
+            var range = rangeMap[key][order.y];
             int oricount = 0, newcount = 0;
 
-            if (iter.Key == "ObjSDF" && ValidRange(iter.Value))
+            if (key == "ObjSDF" && ValidRange(range))
             {
-                oricount = iter.Value.y - iter.Value.x - 1;
+                oricount = range.y - range.x - 1;
                 //删去(range.x,range.y)，插入 bakerMgr.bakedLines
                 newcount = bakerMgr.bakedSDFs.Count;
-                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
-                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedSDFs);
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedSDFs);
             }
-            else if (iter.Key == "ObjNormal" && ValidRange(iter.Value))
+            else if (key == "SpecialObj" && ValidRange(range))
             {
-                oricount = iter.Value.y - iter.Value.x - 1;
+                oricount = range.y - range.x - 1;
+                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
+                newcount = bakerMgr.bakedSpecialObjects.Count;
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedSpecialObjects);
+            }
+            else if (key == "ObjMaterial" && ValidRange(range))
+            {
+                oricount = range.y - range.x - 1;
                 //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
                 newcount = bakerMgr.bakedMaterials.Count;
-                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
-                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedNormals);
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedMaterials);
             }
-            else if (iter.Key == "ObjMaterial" && ValidRange(iter.Value))
+            else if (key == "ObjRenderMode" && ValidRange(range))
             {
-                oricount = iter.Value.y - iter.Value.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = bakerMgr.bakedMaterials.Count;
-                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
-                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedMaterials);
-            }
-            else if (iter.Key == "ObjRenderMode" && ValidRange(iter.Value))
-            {
-                oricount = iter.Value.y - iter.Value.x - 1;
+                oricount = range.y - range.x - 1;
                 //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
                 newcount = bakerMgr.bakedRenderModes.Count;
-                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
-                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedRenderModes);
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedRenderModes);
             }
-            else if (iter.Key == "ObjRender" && ValidRange(iter.Value))
+            else if (key == "ObjRender" && ValidRange(range))
             {
-                oricount = iter.Value.y - iter.Value.x - 1;
+                oricount = range.y - range.x - 1;
                 //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
                 newcount = bakerMgr.bakedRenders.Count;
-                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
-                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedRenders);
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedRenders);
             }
-            else if (iter.Key == "DirShadow" && ValidRange(iter.Value))
+            else if (key == "DirShadow" && ValidRange(range))
             {
-                oricount = iter.Value.y - iter.Value.x - 1;
+                oricount = range.y - range.x - 1;
                 //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
                 newcount = bakerMgr.bakedDirShadows.Count;
-                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
-                newLines.InsertRange(offset + iter.Value.x + 1, bakerMgr.bakedDirShadows);
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedDirShadows);
             }
-            else if (iter.Key == "ValMaps" && ValidRange(iter.Value))
+            else if (key == "ValMaps" && ValidRange(range))
             {
-                oricount = iter.Value.y - iter.Value.x - 1;
+                oricount = range.y - range.x - 1;
                 newcount = 1;
-                newLines.RemoveRange(offset + iter.Value.x + 1, oricount);
+                newLines.RemoveRange(offset + range.x + 1, oricount);
                 string[] newlines = new string[1];
                 newlines[0] = "ObjNum " + bakerMgr.tags.Length;
-                newLines.InsertRange(offset + iter.Value.x + 1, newlines);
+                newLines.InsertRange(offset + range.x + 1, newlines);
 
             }
-            
+
             offset += newcount - oricount;
         }
         File.WriteAllLines(path, newLines);

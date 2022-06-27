@@ -209,5 +209,12 @@ namespace Spline
 
             return d1_square < d2_square ? new Vector2(T.x,sqrt(d1_square)) : new Vector2(T.y, sqrt(d2_square));
         }
+
+        public Vector3 To3D(Vector2 p2d)
+        {
+            Vector3 p = new Vector3(p2d.x, 0, p2d.y);
+            p += transform.position;
+            return p;
+        }
     }
 }
