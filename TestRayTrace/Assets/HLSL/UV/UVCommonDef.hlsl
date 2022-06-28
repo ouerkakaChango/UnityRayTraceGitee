@@ -22,7 +22,7 @@ float2 BoxedUV(float2 p, float2 bound)
 float2 BoxedUV(float3 p, float3 center, float3 bound, float3 rotEuler)
 {
 	p = p - center;
-	p = RotByEuler(p, rotEuler);
+	p = InvRotByEuler(p, rotEuler);
 
 	if (InBound(p.xy, bound.xy)&&abs(p.z)>=bound.z)
 	{
@@ -43,22 +43,22 @@ float2 BoxedUV(float3 p, float3 center, float3 bound, float3 rotEuler)
 void BoxedTB(out float3 T, out float3 B, float3 p, float3 center, float3 bound, float3 rotEuler)
 {
 	p = p - center;
-	p = RotByEuler(p, rotEuler);
+	p = InvRotByEuler(p, rotEuler);
 
 	if (InBound(p.xy, bound.xy) && abs(p.z) >= bound.z)
 	{
-		T = RotByEuler(float3(1, 0, 0), rotEuler);
-		B = RotByEuler(float3(0, 1, 0), rotEuler);
+		T = InvRotByEuler(float3(1, 0, 0), rotEuler);
+		B = InvRotByEuler(float3(0, 1, 0), rotEuler);
 	}
 	else if (InBound(p.xz, bound.xz) && abs(p.y) >= bound.y)
 	{
-		T = RotByEuler(float3(1, 0, 0), rotEuler);
-		B = RotByEuler(float3(0, 0, 1), rotEuler);
+		T = InvRotByEuler(float3(1, 0, 0), rotEuler);
+		B = InvRotByEuler(float3(0, 0, 1), rotEuler);
 	}
 	else if (InBound(p.yz, bound.yz) && abs(p.x) >= bound.x)
 	{
-		T = RotByEuler(float3(0, 1, 0), rotEuler);
-		B = RotByEuler(float3(0, 0, 1), rotEuler);
+		T = InvRotByEuler(float3(0, 1, 0), rotEuler);
+		B = InvRotByEuler(float3(0, 0, 1), rotEuler);
 	}
 	//never reach!
 }

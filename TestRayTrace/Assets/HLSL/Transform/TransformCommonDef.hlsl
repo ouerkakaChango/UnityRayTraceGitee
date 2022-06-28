@@ -2,7 +2,38 @@
 #define TREANDFORMCOMMONDEF_HLSL
 #include "../CommonDef.hlsl"
 
+//correct:z-x-y,inv:y-x-z
 //Transform logic based on unity coordinate:x-right, y-up, z-in
+float3 InvRotByEuler(float3 p, float3 eulerAngle)
+{
+	float a = eulerAngle.x / 180.0f * PI;
+	float b = eulerAngle.y / 180.0f * PI;
+	float c = eulerAngle.z / 180.0f * PI;
+	float3x3 rotx = {
+		1,0,0,
+		0,cos(a),sin(a),
+		0,-sin(a),cos(a)
+	};
+
+	float3x3 roty = {
+		cos(b),0,-sin(b),
+		0,1,0,
+		sin(b),0,cos(b)
+	};
+
+	float3x3 rotz =
+	{
+		cos(c),sin(c),0,
+		-sin(c),cos(c),0,
+		0,0,1
+	};
+
+	p = mul(roty, p);
+	p = mul(rotx, p);
+	p = mul(rotz, p);
+	return p;
+}
+
 float3 RotByEuler(float3 p, float3 eulerAngle)
 {
 	float a = eulerAngle.x / 180.0f * PI;
@@ -26,10 +57,10 @@ float3 RotByEuler(float3 p, float3 eulerAngle)
 		-sin(c),cos(c),0,
 		0,0,1
 	};
-	//[ZXY][p]
-	p = mul(roty, p);
-	p = mul(rotx, p);
+
 	p = mul(rotz, p);
+	p = mul(rotx, p);
+	p = mul(roty, p);
 	return p;
 }
 
@@ -64,7 +95,7 @@ float3 WorldToLocal(in Transform trans, float3 world)
 {
 	float3 p = world - trans.pos;
 	p /= trans.scale;
-	p = RotByEuler(p, -trans.rotEuler);
+	p = InvRotByEuler(p, trans.rotEuler);
 	return p;
 }
 
@@ -87,7 +118,7 @@ float3 To3D(in Transform trans, float2 p2d)
 float3 DirTo3D(in Transform trans, float2 dir)
 {
 	float3 re = float3(dir.x, 0, dir.y);
-	return RotByEuler(re, trans.rotEuler);
+	return InvRotByEuler(re, trans.rotEuler);
 }
 
 //############

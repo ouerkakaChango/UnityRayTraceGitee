@@ -40,7 +40,7 @@ float SDFBox(float3 p, float3 center, float3 bound)
 float SDFBox(float3 p, float3 center, float3 bound, float3 rotEuler)
 {
 	p = p - center;
-	p = RotByEuler(p, rotEuler);
+	p = InvRotByEuler(p, rotEuler);
 	float3 q = abs(p) - bound;
 	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
@@ -72,7 +72,7 @@ float SDFShearXBoxTransform(float3 p, float3 bound,
 	bound *= scale;
 	float3 vec = p - center;
 	float3 shp = ShearX(vec, -shy, -shz);
-	p = RotByEuler(shp, rotEuler);
+	p = InvRotByEuler(shp, rotEuler);
 	float3 q = abs(p) - bound;
 	float re = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 	if (NearZero(shz)&& NearZero(shy))

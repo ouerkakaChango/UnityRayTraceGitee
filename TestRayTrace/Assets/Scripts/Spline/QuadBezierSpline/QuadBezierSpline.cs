@@ -213,13 +213,16 @@ namespace Spline
         public Vector3 To3D(Vector2 p2d)
         {
             Vector3 p = new Vector3(p2d.x, 0, p2d.y);
-            p += transform.position;
+            var worldRot = transform.rotation;
+            p = (worldRot) * p;
+            var worldPos = transform.position;
+            p += worldPos;
             return p;
         }
 
-        public List<Vector3> GetKeys()
+        public List<Vector2> GetKeys()
         {
-            List<Vector3> re = new List<Vector3>();
+            List<Vector2> re = new List<Vector2>();
             for (int i = 0; i < GetSegNum(); i++)
             {
                 if (i == 0)

@@ -62,13 +62,15 @@ SplineProjInfo ProjectQuadBezierBody(float3 p3d, float2 a, float2 b, float2 c, T
 		{
 			info.dis = sqrt(d1_2);
 			float2 local2d = QuadBezierGet(T.x, a, b, c);
-			info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));
+			//info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));
+			info.projPnt2D = local2d;
 		}
 		else
 		{
 			info.dis = sqrt(d2_2);
 			float2 local2d = QuadBezierGet(T.y, a, b, c);
-			info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));
+			//info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));
+			info.projPnt2D = local2d;
 		}
 	}
 	else if (Is01(T.x))
@@ -77,7 +79,8 @@ SplineProjInfo ProjectQuadBezierBody(float3 p3d, float2 a, float2 b, float2 c, T
 		float d1_2 = length2(C - (D + B * T.x) * T.x);
 		info.dis = sqrt(d1_2);
 		float2 local2d = QuadBezierGet(T.x, a, b, c);
-		info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));
+		//info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));
+		info.projPnt2D = local2d;
 	}
 	else if (Is01(T.y))
 	{
@@ -85,7 +88,8 @@ SplineProjInfo ProjectQuadBezierBody(float3 p3d, float2 a, float2 b, float2 c, T
 		float d2_2 = length2(C - (D + B * T.y) * T.y);
 		info.dis = sqrt(d2_2);
 		float2 local2d = QuadBezierGet(T.y, a, b, c);
-		info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));
+		//info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));
+		info.projPnt2D = local2d;
 	}
 
 	return info; 
@@ -96,9 +100,10 @@ SplineProjInfo PreProjQuadBezierCap(float3 p3d, int flag, float2 T, float2 G, in
 	SplineProjInfo info;
 	Init(info);
 	info.flag = flag;
-	info.projPnt = To3D(trans, T);
-	info.extra = DirTo3D(trans, normalize(T - G));
-
+	//info.projPnt = To3D(trans, T);
+	info.projPnt2D = T;
+	//info.extra = DirTo3D(trans, normalize(T - G));
+	info.extra2D = normalize(T - G);
 	return info;
 }
 

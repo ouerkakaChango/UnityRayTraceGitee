@@ -261,6 +261,8 @@ public class SDFBakerMgr : MonoBehaviour
         bakedSDFs.Add("Transform trans;");
         bakedSDFs.Add("Init(trans);");
         bakedSDFs.Add("trans.pos = "+ Bake(obj.transform.position) +";");
+        var bakeRot = obj.transform.rotation.eulerAngles;
+        bakedSDFs.Add("trans.rotEuler = " + Bake(bakeRot) + ";");
 
         var keys = spline.GetKeys();
         bakedSDFs.Add("float2 spline["+keys.Count+"];");
@@ -310,5 +312,10 @@ public class SDFBakerMgr : MonoBehaviour
     string BakeColor3(Color c)
     {
         return "float3(" + c.r + ", " + c.g + ", " + c.b + ")";
+    }
+
+    string BakeRotEuler(Quaternion rot)
+    {
+        return Bake(rot.eulerAngles);
     }
 }

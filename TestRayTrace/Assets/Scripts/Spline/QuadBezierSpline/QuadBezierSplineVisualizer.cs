@@ -35,7 +35,7 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
         
     }
 
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         if (!spline)
         {
