@@ -181,4 +181,16 @@ float2 Hammersley(uint i, uint N)
 {
 	return float2(float(i) / float(N), RadicalInverse_VdC(i));
 }
+
+//##########################################################################
+//https://zhuanlan.zhihu.com/p/47959352
+//https://www.shadertoy.com/view/NscfD8
+float RandFast(float2 PixelPos, float Magic = 3571.0)
+{
+	PixelPos = (0.4f + normalize(PixelPos))*512.0f;
+	float2 Random2 = (1.0 / 4320.0) * PixelPos + float2(0.25, 0.0);
+	float Random = frac(dot(Random2 * Random2, Magic));
+	Random = frac(Random * Random * (2 * Magic));
+	return Random;
+}
 #endif

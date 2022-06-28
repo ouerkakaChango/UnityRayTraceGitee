@@ -10,10 +10,13 @@
 
 float SDFGridGrass(float3 p, float3 center, float grid)
 {
-	float randK = rand01(float3(34, 23, 123) * 50 + center * 5);
+	//float randK = rand01(float3(34, 23, 123) * 50 + center * 5);
+	float randK = RandFast(center.xz);
 
-	float randK2 = rand01(float3(43, 32, 127) * 50 + center * 50);
-	float randK3 = rand01(float3(34, 23, 123) * 50 + center * 50);
+	//float randK2 = rand01(float3(43, 32, 127) * 50 + center * 50);
+	//float randK3 = rand01(float3(34, 23, 123) * 50 + center * 50);
+	float randK2 = RandFast(float2(43,127) + center.xz);
+	float randK3 = RandFast(float2(43, 341) + center.xz);
 
 	{
 		//return max(0, SDFBox(p, center, 0.05 + float3(0, randK2, 0)));

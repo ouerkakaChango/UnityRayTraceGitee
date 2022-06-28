@@ -42,19 +42,19 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0, 0.2196412, 1);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.7254902, 0.4784314, 0.3411765);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 2 )
 {
-re.albedo = float3(0.7254902, 0.4784314, 0.3411765);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -66,13 +66,13 @@ re.roughness = 1;
 }
 else if (obj == 4 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0, 1, 0.1720126);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 5 )
 {
-re.albedo = float3(0, 1, 0.1720126);
+re.albedo = float3(0, 0.2196412, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -96,11 +96,11 @@ int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
 int renderMode[8];
-renderMode[0] = 0;
-renderMode[1] = 2;
-renderMode[2] = 0;
+renderMode[0] = 2;
+renderMode[1] = 0;
+renderMode[2] = 2;
 renderMode[3] = 2;
-renderMode[4] = 2;
+renderMode[4] = 0;
 renderMode[5] = 0;
 renderMode[6] = 0;
 renderMode[7] = 2;
@@ -117,20 +117,20 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+inx = -2;
 }
 else if (inx == 2 )
 {
-inx = -2;
 }
 else if (inx == 3 )
 {
 }
 else if (inx == 4 )
 {
+inx = -3;
 }
 else if (inx == 5 )
 {
-inx = -3;
 }
 else if (inx == 6 )
 {
@@ -384,6 +384,26 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 	//@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
+re = min(re, 0 + SDFBox(p, float3(-53.40586, -0.02504057, -55.8854), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
+}
+else if (inx == 1 )
+{
+inx = -2;
+}
+else if (inx == 2 )
+{
+re = min(re, 0 + SDFBox(p, float3(-53.255, -0.1510001, -56.684), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
+}
+else if (inx == 3 )
+{
+re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
+}
+else if (inx == 4 )
+{
+inx = -3;
+}
+else if (inx == 5 )
+{
 float d = re;
 float2 box = float2(0.1, 0.05);
 Transform trans;
@@ -395,26 +415,6 @@ spline[1] = float3(1, 0.93, 0);
 spline[2] = float3(2, 0, 0);
 FUNC_SDFBoxedQuadBezier(d, p, spline, 3, trans, box)
 re = min(re,d);
-}
-else if (inx == 1 )
-{
-re = min(re, 0 + SDFBox(p, float3(-53.40586, -0.02504057, -55.8854), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
-}
-else if (inx == 2 )
-{
-inx = -2;
-}
-else if (inx == 3 )
-{
-re = min(re, 0 + SDFBox(p, float3(-53.255, -0.1510001, -56.684), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
-}
-else if (inx == 4 )
-{
-re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
-}
-else if (inx == 5 )
-{
-inx = -3;
 }
 else if (inx == 6 )
 {
@@ -540,20 +540,20 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+inx = -2;
 }
 else if (inx == 2 )
 {
-inx = -2;
 }
 else if (inx == 3 )
 {
 }
 else if (inx == 4 )
 {
+inx = -3;
 }
 else if (inx == 5 )
 {
-inx = -3;
 }
 else if (inx == 6 )
 {
