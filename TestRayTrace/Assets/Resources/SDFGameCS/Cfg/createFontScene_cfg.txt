@@ -1,0 +1,123 @@
+valMaps:
+//@@@SDFBakerMgr ValMaps
+ObjNum 1
+//@@@
+
+Blocks:
+
+###BLOCK ExtraInclude
+#include "../../../HLSL/Spline/SplineCommonDef.hlsl"
+#include "../../../HLSL/Noise/WoodNoise.hlsl"
+#include "../../../HLSL/Noise/TerrainNoise.hlsl"
+#include "../../../HLSL/UV/UVCommonDef.hlsl"
+#include "../../../HLSL/TransferMath/TransferMath.hlsl"
+#include "../../../HLSL/Random/RandUtility.hlsl"
+#include "../../../HLSL/Transform/TransformCommonDef.hlsl" 
+#include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
+#include "../../../HLSL/SDFGame/SDFGridObjects.hlsl"
+#include "../../../HLSL/Spline/QuadBezier/QuadBezier.hlsl"
+###BLOCK
+
+###BLOCK ObjMaterial
+	//@@@SDFBakerMgr ObjMaterial
+if(obj == 0 )
+{
+re.albedo = float3(1, 0, 0);
+re.metallic = 0;
+re.roughness = 1;
+}
+	//@@@
+###BLOCK
+
+###BLOCK ObjRenderMode
+//@@@SDFBakerMgr ObjRenderMode
+int renderMode[1];
+renderMode[0] = 0;
+return renderMode[obj];
+//@@@
+###BLOCK
+
+###BLOCK  ObjPreRender
+int inx = minHit.obj;
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+}
+//@@@
+###BLOCK
+
+###BLOCK ObjRender
+//@@@SDFBakerMgr ObjRender
+if(mode==0)
+{
+  float3 lightDirs[1];
+  float3 lightColors[1];
+  lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+  lightColors[0] = float3(1, 0.9568627, 0.8392157);
+  result = 0.03 * mat.albedo * mat.ao;
+  for(int i=0;i<1;i++)
+  {
+      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+  }
+}
+//@@@
+else if (mode == 1)
+{
+	result = PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
+}
+else if (mode == 3)
+{
+	float3 lightPos = float3(0,4,0);
+	float3 lightColor = float3(1,1,1);
+	float3 l = normalize(lightPos - minHit.P);
+	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
+}
+###BLOCK
+
+###BLOCK  ObjPostRender
+result = result / (result + 1.0);
+result = pow(result, 1/2.2); 
+###BLOCK
+
+###BLOCK SDFShadow
+if(true)
+{
+//@@@SDFBakerMgr DirShadow
+float3 lightDirs[1];
+lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+for(int i=0;i<1;i++)
+{
+	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
+}
+//@@@
+}
+sha = saturate(0.2 + sha);
+return sha;
+###BLOCK
+
+###BLOCK ExtraSDF
+
+###BLOCK
+
+###BLOCK ObjSDF
+float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
+
+//@@@SDFBakerMgr ObjSDF
+if(inx == 0 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+}
+//@@@
+
+return re;
+###BLOCK
+
+###BLOCK ObjNormal
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+}
+//@@@
+
+return GetObjSDFNormal(inx, p, traceInfo);
+###BLOCK

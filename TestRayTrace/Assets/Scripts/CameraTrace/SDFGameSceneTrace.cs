@@ -216,11 +216,6 @@ public class SDFGameSceneTrace : MonoBehaviour
             rt = new RenderTexture(w, h, 24);
             rt.enableRandomWrite = true;
             rt.Create();
-            //???
-            //autoCS.InitOuts();
-            //autoCS.outs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName +".compute");
-            //autoCS.outs[1] = autoCS.templates[1].Replace("Template.txt", "_" + SceneName + ".hlsl");
-            //autoCS.Generate();
             var csResourcesPath = ChopEnd(autoCS.outs[0], ".compute");
             csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
             cs = (ComputeShader)Resources.Load(csResourcesPath);
@@ -236,9 +231,9 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     public void RefreshAutoCS()
     {
-        autoCS.InitOuts();
-        autoCS.outs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName +".compute");
-        autoCS.outs[1] = autoCS.templates[1].Replace("Template.txt", "_" + SceneName + ".hlsl");
+        //autoCS.InitOuts();
+        //autoCS.outs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName +".compute");
+        //autoCS.outs[1] = autoCS.templates[1].Replace("Template.txt", "_" + SceneName + ".hlsl");
         autoCS.Generate();
     }
 

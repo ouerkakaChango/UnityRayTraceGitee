@@ -8,6 +8,8 @@ using UnityEngine;
 using static StringTool.StringHelper;
 using Debug = UnityEngine.Debug;
 
+using XUtility;
+
 //[ExecuteInEditMode]
 public class AutoCS : MonoBehaviour
 {
@@ -16,12 +18,13 @@ public class AutoCS : MonoBehaviour
     public List<string> outs = new List<string>();
     public List<string> cfgs = new List<string>();
 
-    public string taskFile;
+    public string outTaskFilePath;
 
     public string[] lines;
     public string[] words;
     Dictionary<string, List<Vector2Int>> rangeMap = new Dictionary<string, List<Vector2Int>>();
 
+    [HideInInspector]
     public TextureSystem texSys;
     private void Awake()
     {
@@ -81,7 +84,7 @@ public class AutoCS : MonoBehaviour
 
     void MakeTaskFile()
     {
-        string path = FullPath(taskFile);
+        string path = FullPath(outTaskFilePath);
         if (File.Exists(path))
         {
             File.Delete(path);
@@ -117,8 +120,8 @@ public class AutoCS : MonoBehaviour
                 myProcess.StartInfo.FileName = "C:\\Personal\\ParticleToy\\x64\\Debug\\ParticleToy.exe";
             }
             myProcess.StartInfo.WorkingDirectory = Application.dataPath + "/CmdExe";
-            myProcess.StartInfo.Arguments = FullPath(taskFile);
-            //Debug.Log(FullPath(taskFile));
+            myProcess.StartInfo.Arguments = FullPath(outTaskFilePath);
+            //Debug.Log(FullPath(outTaskFilePath));
             myProcess.EnableRaisingEvents = true;
             myProcess.Start();
             myProcess.WaitForExit();

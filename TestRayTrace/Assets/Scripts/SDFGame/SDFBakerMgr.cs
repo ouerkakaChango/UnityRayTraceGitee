@@ -94,6 +94,10 @@ public class SDFBakerMgr : MonoBehaviour
             }
         }
         dirLightTags = dirlightList.ToArray();
+        if(dirLightTags.Length==0)
+        {
+            Debug.LogError("No light has add SDF Light Tag,Stop");
+        }
     }
 
     void StartBake()

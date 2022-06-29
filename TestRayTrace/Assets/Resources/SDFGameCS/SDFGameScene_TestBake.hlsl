@@ -72,7 +72,7 @@ re.roughness = 1;
 }
 else if (obj == 5 )
 {
-re.albedo = float3(0, 0.2196412, 1);
+re.albedo = float3(0, 0.3212323, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -408,12 +408,12 @@ float d = re;
 float2 box = float2(0.1, 0.05);
 Transform trans;
 Init(trans);
-trans.pos = float3(-54.05, 0.35, -55.189);
-trans.rotEuler = float3(49.11001, 87.99999, 79.52);
+trans.pos = float3(-54.05, 0.35, -55.925);
+trans.rotEuler = float3(357.9441, 89.12995, 68.08731);
 float2 spline[3];
 spline[0] = float2(0, 0);
-spline[1] = float2(0.45, 0.93);
-spline[2] = float2(1.04, 0);
+spline[1] = float2(0.24, 0.63);
+spline[2] = float2(0.53, 0);
 FUNC_SDFBoxedQuadBezier(d, p, spline, 3, trans, box)
 re = min(re,d);
 }

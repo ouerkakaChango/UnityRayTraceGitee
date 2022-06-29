@@ -1,0 +1,11 @@
+templates:
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources\SDFGameCS\Template\Template_SDFGameTrace.txt
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources\SDFGameCS\Template\Template_SDFGameScene.txt
+
+outs:
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources\SDFGameCS\Outs\Template_SDFGameTrace.txt
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources\SDFGameCS\Outs\Template_SDFGameScene.txt
+
+configs:
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Cfg/Cfg_CreateFont.txt
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Cfg/Cfg_CreateFontScene.txt
