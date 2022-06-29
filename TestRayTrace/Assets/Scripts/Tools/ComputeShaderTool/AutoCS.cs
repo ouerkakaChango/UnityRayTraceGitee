@@ -20,8 +20,6 @@ public class AutoCS : MonoBehaviour
 
     public string outTaskFilePath;
 
-    public string[] lines;
-    public string[] words;
     Dictionary<string, List<Vector2Int>> rangeMap = new Dictionary<string, List<Vector2Int>>();
 
     [HideInInspector]
@@ -104,6 +102,7 @@ public class AutoCS : MonoBehaviour
         }
         MakeTaskFile();
         CallExe();
+        ClearMemory();
     }
 
     void CallExe()
@@ -149,7 +148,7 @@ public class AutoCS : MonoBehaviour
     {
         Debug.Log("###Precompile File: "+ path);
         //1.Load Files to string[]
-        lines = File.ReadAllLines(path);
+        var lines = File.ReadAllLines(path);
 
         rangeMap.Clear();
         //!!! Ë³Ðò±ØÐë¶ÔÓ¦cgf
@@ -283,5 +282,10 @@ public class AutoCS : MonoBehaviour
     bool ValidRange(Vector2Int range)
     {
         return range.x >= 0 && range.y >= range.x;
+    }
+
+    void ClearMemory()
+    {
+        bakerMgr.ClearMemory();
     }
 }

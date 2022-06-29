@@ -192,6 +192,12 @@ public class CosFBM : MonoBehaviour
 
     public void BakeHLSLCode(bool bakeHeightTex = false)
     {
+        if(bakeHeightTex==false)
+        {
+            //!!! release memory
+            Object.DestroyImmediate(heightTex.height);
+            Object.DestroyImmediate(heightTex.grad);
+        }
         bakedHLSLCode.Clear();
         if (dirs.Count!=octaves || phases.Count!=octaves)
         {
@@ -200,7 +206,7 @@ public class CosFBM : MonoBehaviour
         }
 
         //@@@ Textures
-        //if(bakeHeightTex)
+        if(bakeHeightTex)
         {
             bakedHLSLCode.Add("Texture2D " + funcName + "_height;");
             bakedHLSLCode.Add("Texture2D " + funcName + "_grad;");

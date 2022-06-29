@@ -10,17 +10,17 @@ public class SDFBakerMgr : MonoBehaviour
     //https://learnopengl-cn.github.io/07%20PBR/02%20Lighting/
     //²Î¿¼LearnOGL,Ä¬ÈÏ0.03
     public float ambientIntensity = 0.03f;
-    [ReadOnly]
+    [HideInInspector]
     public List<string> bakedSDFs = new List<string>();
-    [ReadOnly]
+    [HideInInspector]
     public List<string> bakedSpecialObjects = new List<string>();
-    [ReadOnly]
+    [HideInInspector]
     public List<string> bakedMaterials = new List<string>();
-    [ReadOnly]
+    [HideInInspector]
     public List<string> bakedRenderModes = new List<string>();
-    [ReadOnly]
+    [HideInInspector]
     public List<string> bakedRenders = new List<string>();
-    [ReadOnly]
+    [HideInInspector]
     public List<string> bakedDirShadows = new List<string>();
 
     public SDFBakerTag[] tags;
@@ -100,7 +100,7 @@ public class SDFBakerMgr : MonoBehaviour
         }
     }
 
-    void StartBake()
+    public void ClearMemory()
     {
         bakedSDFs.Clear();
 
@@ -113,6 +113,11 @@ public class SDFBakerMgr : MonoBehaviour
         bakedDirShadows.Clear();
 
         bakedSpecialObjects.Clear();
+    }
+
+    void StartBake()
+    {
+        ClearMemory();
     }
 
     void EndBake()
