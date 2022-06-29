@@ -185,12 +185,29 @@ float2 Hammersley(uint i, uint N)
 //##########################################################################
 //https://zhuanlan.zhihu.com/p/47959352
 //https://www.shadertoy.com/view/NscfD8
-float RandFast(float2 PixelPos, float Magic = 3571.0)
+float RandFast_Old(float2 PixelPos, float Magic = 3571.0)
 {
 	PixelPos = (0.4f + normalize(PixelPos))*512.0f;
 	float2 Random2 = (1.0 / 4320.0) * PixelPos + float2(0.25, 0.0);
 	float Random = frac(dot(Random2 * Random2, Magic));
 	Random = frac(Random * Random * (2 * Magic));
 	return Random;
+}
+
+//https://www.shadertoy.com/view/XlXcW4
+float3 hash_uint3(uint3 x)
+{
+	const uint k = 1103515245U;
+	x = ((x >> 8U) ^ x.yzx)*k;
+	x = ((x >> 8U) ^ x.yzx)*k;
+	x = ((x >> 8U) ^ x.yzx)*k;
+
+	return float3(x)*(1.0 / float(0xffffffffU));
+}
+
+float RandFast(float2 PixelPos, uint scale=512)
+{
+	uint2 upos = (uint2)(abs(PixelPos) * scale);
+	return hash_uint3(uint3(upos,0)).x;
 }
 #endif
