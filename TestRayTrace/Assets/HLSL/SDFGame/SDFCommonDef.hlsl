@@ -97,6 +97,39 @@ float SDFShearXBoxTransform(float3 p, float3 bound,
 	}
 }
 
+//???
+float SDFShearZBoxTransform(float3 p, float3 bound,
+	float shx, float shy,
+	float3 center, float3 rotEuler = 0, float3 scale = 1)
+{
+	bound *= scale;
+	float3 vec = p - center;
+	float3 shp = ShearZ(vec, -shx, -shy);
+	p = InvRotByEuler(shp, rotEuler);
+	float3 q = abs(p) - bound;
+	float re = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+	if (NearZero(shx) && NearZero(shy))
+	{
+		return re;
+	}
+	else if (NearZero(shy))
+	{
+		float tanX = abs(shx > 0 ? (1 / shy) : (shx));
+		return re * sin(atan(tanX));
+	}
+	else if (NearZero(shx))
+	{
+		float tanY = abs(shy > 0 ? (1 / shy) : (shy));
+		return re * sin(atan(tanY));
+	}
+	else
+	{
+		float tanX = abs(shx > 0 ? (1 / shy) : (shx));
+		float tanY = abs(shy > 0 ? (1 / shy) : (shy));
+		return re * sin(atan(tanY)) * sin(atan(tanX));
+	}
+}
+
 float SDFShearXSphere(float3 p, float3 center, float radius,
 	float shy, float shz)
 {

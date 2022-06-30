@@ -75,6 +75,16 @@ float3 ShearX(float3 p, float shy, float shz)
 	return mul(m, p);
 }
 
+float3 ShearZ(float3 p, float shx, float shy)
+{
+	float3x3 m = {
+		1,0,shx,
+		0,1,shy,
+		0,0,1
+	};
+	return mul(m, p);
+}
+
 //###############################################
 
 struct Transform

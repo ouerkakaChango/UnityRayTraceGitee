@@ -1,4 +1,4 @@
-﻿#define OBJNUM 1
+﻿#define OBJNUM 4
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -41,6 +41,24 @@ re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
+else if (obj == 1 )
+{
+re.albedo = float3(0.6037736, 0.6037736, 0.6037736);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 2 )
+{
+re.albedo = float3(1, 0, 0);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 3 )
+{
+re.albedo = float3(0, 0.311419, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
 	//@@@
 	return re;
 }
@@ -48,8 +66,11 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[1];
+int renderMode[4];
 renderMode[0] = 0;
+renderMode[1] = 4;
+renderMode[2] = 0;
+renderMode[3] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -61,7 +82,27 @@ int inx = minHit.obj;
 if(inx == 0 )
 {
 }
+else if (inx == 1 )
+{
+inx = -1;
+}
+else if (inx == 2 )
+{
+}
+else if (inx == 3 )
+{
+inx = -2;
+}
 //@@@
+if(inx == -1)
+{
+	float2 pos = minHit.P.xz;
+	int2 grid = floor(pos);
+	if(abs(grid.x%2) == abs(grid.y%2))
+	{
+		mat.albedo *= 0.5;
+	}
+}
 }
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
@@ -101,6 +142,10 @@ else if (mode == 3)
 	float3 l = normalize(lightPos - minHit.P);
 	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
 }
+else if (mode == 4)
+{
+	result = mat.albedo;
+}
 	ObjPostRender(result, mode, mat, ray, minHit);
 	return result;
 }
@@ -120,7 +165,7 @@ float GetDirHardShadow(Ray ray, float3 lightDir, in HitInfo minHit)
 float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 {
 	float sha = 1;
-if(true)
+if(false)
 {
 //@@@SDFBakerMgr DirShadow
 float3 lightDirs[1];
@@ -145,9 +190,54 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(1, 0, 1), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
+}
+else if (inx == 1 )
+{
+inx = -1;
+}
+else if (inx == 2 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
+}
+else if (inx == 3 )
+{
+inx = -2;
 }
 //@@@
+if(inx == -1)
+{
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	{
+		float d = abs(p.y);
+		re = min(re,d);
+	}
+}
+if(inx == -2)
+{
+	float d = re;
+	float height = 0.1;
+	float sizeU = 0.1;
+	float sizeV1 = 0.6;
+	float sizeV2 = 0.3;
+	float footDisToCenter = 0.12;
+	float shearStrength = 0.4;
+	float disToCenter1 = 0.1f;
+	float a1 = SDFShearZBoxTransform(p, float3(sizeU*0.5, height, sizeV1*0.5),
+	shearStrength, 0,
+	float3(0.5 - footDisToCenter, height, 0.5));
+
+	float a2 = SDFShearZBoxTransform(p, float3(sizeU*0.5, height, sizeV1*0.5),
+	-shearStrength, 0,
+	float3(0.5 + footDisToCenter, height, 0.5));
+
+	float a3 = SDFBox(p, float3(0.5, height, 0.5 - disToCenter1), float3(sizeV2*0.5, height, sizeU*0.5));
+
+	d = min(a1,a2);
+	d = min(d,a3);
+
+	re = min(re,d);
+}
 
 return re;
 }
@@ -166,6 +256,17 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+}
+else if (inx == 1 )
+{
+inx = -1;
+}
+else if (inx == 2 )
+{
+}
+else if (inx == 3 )
+{
+inx = -2;
 }
 //@@@
 
