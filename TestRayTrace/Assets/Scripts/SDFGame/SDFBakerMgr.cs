@@ -266,7 +266,7 @@ public class SDFBakerMgr : MonoBehaviour
         }
 
         bakedSDFs.Add("float d = re;");
-        bakedSDFs.Add("float2 box = float2(0.1, 0.05);");
+        bakedSDFs.Add("float2 box = "+ Bake(spline.boxShapeSize) + ";");
         bakedSDFs.Add("Transform trans;");
         bakedSDFs.Add("Init(trans);");
         bakedSDFs.Add("trans.pos = "+ Bake(obj.transform.position) +";");

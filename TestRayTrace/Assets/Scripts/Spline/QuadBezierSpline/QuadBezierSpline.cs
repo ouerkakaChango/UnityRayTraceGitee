@@ -32,6 +32,10 @@ namespace Spline
         [HideInInspector]
         public List<Vector2> mids = new List<Vector2>(); //p3,p5...
 
+        public SpineShapeType shape = SpineShapeType.Boxed;
+        [HideInInspector]
+        public Vector2 boxShapeSize = new Vector2(0.1f,0.05f);
+
         // Start is called before the first frame update
         void Start()
         {
