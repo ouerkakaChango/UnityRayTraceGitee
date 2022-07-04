@@ -18,13 +18,15 @@ public class SDFGameSceneTrace : MonoBehaviour
     const int CoreY = 8;
 
     RenderTexture rt;
+    RenderTexture easuRT,finalRT;
+    public bool useFSR = true;
+    public float FSR_Scale = 2.0f;
 
     public string SceneName = "Detail1";
     public AutoCS autoCS;
     public TextureSystem texSys;
-    //???
-    //public Texture2D testTex1,testTex2;
     ComputeShader cs;
+    ComputeShader cs_FSR;
     public Texture2DArray envSpecTex2DArr;
     public Texture2D envBgTex;
 
@@ -99,11 +101,17 @@ public class SDFGameSceneTrace : MonoBehaviour
     {
         if (rt == null)
         {
-            rt = new RenderTexture(w, h, 24);
-            rt.enableRandomWrite = true;
-            rt.Create();
+            return;
         }
-        Graphics.Blit(rt, destination);
+        if (useFSR)
+        {
+            FSRProcessor.ProcessRT(ref cs_FSR, ref rt, ref easuRT, ref finalRT);
+            Graphics.Blit(finalRT, destination);
+        }
+        else
+        {
+            Graphics.Blit(rt, destination);
+        }
     }
 
     private void OnDisable()
@@ -216,9 +224,13 @@ public class SDFGameSceneTrace : MonoBehaviour
             rt = new RenderTexture(w, h, 24);
             rt.enableRandomWrite = true;
             rt.Create();
+            //???
+            CreateRT(ref easuRT, FSR_Scale);
+            CreateRT(ref finalRT, FSR_Scale);
             var csResourcesPath = ChopEnd(autoCS.outs[0], ".compute");
             csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
             cs = (ComputeShader)Resources.Load(csResourcesPath);
+            cs_FSR = (ComputeShader)Resources.Load("FSR/FSR");
         }
         hasInited = true;
     }
@@ -240,6 +252,13 @@ public class SDFGameSceneTrace : MonoBehaviour
     void DoRender()
     {
         Compute_Render();
+    }
+
+    void CreateRT(ref RenderTexture rTex, float scale=1.0f)
+    {
+        rTex = new RenderTexture((int)(w* scale), (int)(h* scale), 24);
+        rTex.enableRandomWrite = true;
+        rTex.Create();
     }
     //####################################################################################
 
