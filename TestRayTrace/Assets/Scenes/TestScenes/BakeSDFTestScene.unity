@@ -1663,7 +1663,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   language: 0
-  content: 
+  content: A
 --- !u!1 &1491667009
 GameObject:
   m_ObjectHideFlags: 0
