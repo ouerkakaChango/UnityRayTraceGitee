@@ -1573,6 +1573,8 @@ MonoBehaviour:
   pnt2: {x: 0.53, y: 0}
   segSettings: []
   mids: []
+  shape: 0
+  boxShapeSize: {x: 0.1, y: 0.05}
 --- !u!114 &1305698780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1836,6 +1838,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce80f74af5a6108428874d9804bbe084, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useFSR: 0
+  FSR_Scale: 2
   SceneName: TestBake
   autoCS: {fileID: 1666331704}
   texSys: {fileID: 1928400448}
