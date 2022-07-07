@@ -49,13 +49,13 @@ re.roughness = 1;
 }
 else if (obj == 2 )
 {
-re.albedo = float3(1, 0, 0);
+re.albedo = float3(0, 0.311419, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 3 )
 {
-re.albedo = float3(0, 0.311419, 1);
+re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -88,10 +88,10 @@ inx = -1;
 }
 else if (inx == 2 )
 {
+inx = -2;
 }
 else if (inx == 3 )
 {
-inx = -2;
 }
 //@@@
 if(inx == -1)
@@ -181,39 +181,7 @@ return sha;
 }
 
 //###################################################################################
-
-
-float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
-{
-float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
-
-//@@@SDFBakerMgr ObjSDF
-if(inx == 0 )
-{
-re = min(re, 0 + SDFBox(p, float3(1, 0, 1), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
-}
-else if (inx == 1 )
-{
-inx = -1;
-}
-else if (inx == 2 )
-{
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
-}
-else if (inx == 3 )
-{
-inx = -2;
-}
-//@@@
-if(inx == -1)
-{
-	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
-	{
-		float d = abs(p.y);
-		re = min(re,d);
-	}
-}
-if(inx == -2)
+void SDFPrefab_ASCII_97(inout float re, in float3 p)
 {
 	float d = re;
 	float height = 0.1;
@@ -237,6 +205,46 @@ if(inx == -2)
 	d = min(d,a3);
 
 	re = min(re,d);
+}
+
+float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
+{
+float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
+
+//@@@SDFBakerMgr ObjSDF
+if(inx == 0 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
+}
+else if (inx == 1 )
+{
+inx = -1;
+}
+else if (inx == 2 )
+{
+inx = -2;
+}
+else if (inx == 3 )
+{
+re = min(re, 0 + SDFBox(p, float3(1, 0, 1), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
+}
+//@@@
+if(inx == -1)
+{
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	{
+		float d = abs(p.y);
+		re = min(re,d);
+	}
+}
+if(inx == -2)
+{
+	//idea:(us .cs to implement)
+	//1.when a 'special' need to be Baked as a SDFPrefab
+	//2.make sure autoCS has compiled, find ###BLOCK ObjSDF block where 'inx == specialID'
+	//3.expcet comments, make sure only has one line code, find the funcName(SDFPrefab_ASCII_97),copy its source to SDFPrefabBaker,
+	//make sure func params are in standard form
+	SDFPrefab_ASCII_97(re,p);
 }
 
 return re;
@@ -263,10 +271,10 @@ inx = -1;
 }
 else if (inx == 2 )
 {
+inx = -2;
 }
 else if (inx == 3 )
 {
-inx = -2;
 }
 //@@@
 
