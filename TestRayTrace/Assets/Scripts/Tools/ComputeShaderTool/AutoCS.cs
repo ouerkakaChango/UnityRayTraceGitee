@@ -42,7 +42,7 @@ public class AutoCS : MonoBehaviour
     }
 
     //##########################################
-    string FullPath(string localPath)
+    public static string FullPath(string localPath)
     {
         return Application.dataPath + "/" + localPath;
     }

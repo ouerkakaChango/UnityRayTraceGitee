@@ -247,6 +247,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce80f74af5a6108428874d9804bbe084, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useFSR: 1
+  FSR_Scale: 2
   SceneName: Detail1
   autoCS: {fileID: 135565127}
   texSys: {fileID: 1618879101}
@@ -748,6 +750,7 @@ GameObject:
   - component: {fileID: 1618879102}
   - component: {fileID: 1618879101}
   - component: {fileID: 1618879100}
+  - component: {fileID: 1618879103}
   m_Layer: 0
   m_Name: System
   m_TagString: Untagged
@@ -808,6 +811,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1618879103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1618879099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c728d84ecf18fef4aad8df9690e267af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoCS: {fileID: 135565127}
+  specialID: -2
+  test:
+  - "\t//idea:(us .cs to implement)"
+  - "\t//1.when a 'special' need to be Baked as a SDFPrefab"
+  - "\t//2.make sure autoCS has compiled, find ###BLOCK ObjSDF block where 'inx ==
+    specialID'"
+  - "\t//3.expcet comments, make sure only has one line code, find the funcName(SDFPrefab_ASCII_97),copy
+    its source to SDFPrefabBaker,"
+  - "\t//make sure func params are in standard form"
+  - "\tSDFPrefab_ASCII_97(re,p);"
 --- !u!1 &1627212793
 GameObject:
   m_ObjectHideFlags: 0
