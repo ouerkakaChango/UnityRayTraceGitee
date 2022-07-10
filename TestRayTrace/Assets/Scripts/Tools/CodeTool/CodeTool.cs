@@ -8,10 +8,15 @@ namespace CodeTool
     public static class CodeHelper
     {
         //if nice line,even though head is slightly diffentent(spacebar,tab...) is ok.
-        public static List<string> GetBlockOfHead(ref List<string> lines, string head, bool niceLine = true)
+        public static List<string> GetBlockOfHead(ref List<string> lines, string head, bool niceLine = true, bool addHead = false)
         {
             List<string> re = new List<string>();
-            if(niceLine)
+            if (addHead)
+            {
+                re.Add(head);
+                re.Add("{");
+            }
+            if (niceLine)
             {
                 head = StringHelper.NiceLine(head);
             }
@@ -60,6 +65,11 @@ namespace CodeTool
                 {
                     break;
                 }
+            }
+
+            if (addHead)
+            {
+                re.Add("}");
             }
             return re;
         }

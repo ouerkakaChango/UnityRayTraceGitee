@@ -8,7 +8,9 @@ public class SDFPrefabBaker : MonoBehaviour
 {
     public AutoCS autoCS;
     public int specialID = -1;
-    public List<string> test;
+    //public List<string> test;
+    public string dumpDir;
+    public List<SDFPrefab> prefabs = new List<SDFPrefab>();
     // Start is called before the first frame update
     void Start()
     {
@@ -34,8 +36,8 @@ public class SDFPrefabBaker : MonoBehaviour
 
         string[] lines = File.ReadAllLines(path);
 
-        var blocks = AutoCSHelper.GetBlockCode(ref lines, "ObjSDF");
-        var contents = CodeHelper.GetBlockOfHead(ref blocks,"if(inx == "+specialID+")");
+        var sdfBlock = AutoCSHelper.GetBlockCode(ref lines, "ObjSDF");
+        var contents = CodeHelper.GetBlockOfHead(ref sdfBlock,"if(inx == "+specialID+")");
         CodeHelper.ConvertToNiceLines(ref contents);
         CodeHelper.RemoveComments(ref contents);
         if(contents.Count>1)
@@ -61,9 +63,21 @@ public class SDFPrefabBaker : MonoBehaviour
                     return;
                 }
                 //now we get a valid func name, find its source in lines
-                Debug.Log("Baking " + funcName);
+                var funcBlock = AutoCSHelper.GetBlockCode(ref lines, "ExtraSDF");
+                var funcSource = CodeHelper.GetBlockOfHead(ref funcBlock, "void "+funcName+"(inout float re, in float3 p)",true,true);
+                SDFPrefab pre = new SDFPrefab();
+                pre.prefabName = funcName;
+                pre.lines = funcSource;
+                prefabs.Add(pre);
+                //test = funcSource;
+                Debug.Log("Bake " + funcName + " done");
             }    
         }
+    }
+
+    public void DumpAllToDir()
+    {
+
     }
 
 }
