@@ -2,15 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 using CodeTool;
+using XFileHelper;
+using StringTool;
 
 public class SDFPrefabBaker : MonoBehaviour
 {
     public AutoCS autoCS;
     public int specialID = -1;
     //public List<string> test;
+    public string[] extraInclude;
     public string dumpDir;
-    public List<SDFPrefab> prefabs = new List<SDFPrefab>();
+    public Dictionary<string, SDFPrefab> prefabs = new Dictionary<string, SDFPrefab>();
     // Start is called before the first frame update
     void Start()
     {
@@ -68,16 +72,75 @@ public class SDFPrefabBaker : MonoBehaviour
                 SDFPrefab pre = new SDFPrefab();
                 pre.prefabName = funcName;
                 pre.lines = funcSource;
-                prefabs.Add(pre);
+                prefabs[funcName] = pre;
                 //test = funcSource;
                 Debug.Log("Bake " + funcName + " done");
             }    
         }
     }
 
-    public void DumpAllToDir()
-    {
+    //public void DumpAllToDir()
+    //{
+    //    string path = FileHelper.FullPath(dumpDir);
+    //    if (File.Exists(path))
+    //    {
+    //        File.Delete(path);
+    //    }
+    //    File.WriteAllText(path, GetAllPrefabText());
+    //}
 
+    public void DumpAllToHLSL()
+    {
+        string path = FileHelper.FullPath(dumpDir);
+        //Debug.Log(path);
+        if(!path.EndsWith(".hlsl"))
+        {
+            Debug.LogError("Not a hlsl!");
+            return;
+        }
+        string fileName = StringHelper.GetFileName(path, ".hlsl");
+        //Debug.Log(fileName);
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
+        File.WriteAllText(path, GetAllPrefabHLSL(fileName));
     }
 
+    //public string GetAllPrefabText()
+    //{
+    //    string re = "";
+    //    var keyList = prefabs.Keys.ToList();
+    //    for (int i=0;i< keyList.Count; i++)
+    //    {
+    //        var key = keyList[i];
+    //        StringHelper.Append(ref re, in prefabs[key].lines);
+    //    }
+    //    return re;
+    //}
+
+    public string GetAllPrefabHLSL(string fileName)
+    {
+        string re = "";
+        //head
+        string bigName = fileName.ToUpper();
+        re += "#ifndef " + bigName + "_HLSL\n";
+        re += "#define " + bigName + "_HLSL\n";
+        StringHelper.Append(ref re, in extraInclude);
+        //mid
+        var keyList = prefabs.Keys.ToList();
+        for (int i = 0; i < keyList.Count; i++)
+        {
+            var key = keyList[i];
+            StringHelper.Append(ref re, in prefabs[key].lines);
+        }
+        //tail
+        re += "#endif";
+        return re;
+    }
+
+    public void Clear()
+    {
+        prefabs.Clear();
+    }
 }

@@ -486,6 +486,7 @@ MonoBehaviour:
   renderMode: 0
   shapeType: 0
   specialID: -1
+  fontCharacter: 0
 --- !u!1 &896962916
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,6 +525,7 @@ MonoBehaviour:
   renderMode: 4
   shapeType: 1
   specialID: -1
+  fontCharacter: 0
 --- !u!4 &896962918
 Transform:
   m_ObjectHideFlags: 0
@@ -548,6 +550,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1023847583}
   - component: {fileID: 1023847582}
+  - component: {fileID: 1023847584}
   m_Layer: 0
   m_Name: A
   m_TagString: Untagged
@@ -567,7 +570,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mat_PBR:
     albedo: {r: 0, g: 0.311419, b: 1, a: 1}
     metallic: 0
@@ -576,6 +579,7 @@ MonoBehaviour:
   renderMode: 0
   shapeType: 1
   specialID: -2
+  fontCharacter: 0
 --- !u!4 &1023847583
 Transform:
   m_ObjectHideFlags: 0
@@ -590,6 +594,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1023847584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1023847581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  active: 1
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 2
+  specialID: -1
+  fontCharacter: 65
 --- !u!1 &1258383326
 GameObject:
   m_ObjectHideFlags: 0
@@ -645,6 +671,7 @@ MonoBehaviour:
   renderMode: 0
   shapeType: 0
   specialID: -1
+  fontCharacter: 0
 --- !u!65 &1258383329
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -750,7 +777,6 @@ GameObject:
   - component: {fileID: 1618879102}
   - component: {fileID: 1618879101}
   - component: {fileID: 1618879100}
-  - component: {fileID: 1618879103}
   m_Layer: 0
   m_Name: System
   m_TagString: Untagged
@@ -779,10 +805,10 @@ MonoBehaviour:
   bakedRenders: []
   bakedDirShadows: []
   tags:
-  - {fileID: 1258383328}
-  - {fileID: 896962917}
+  - {fileID: 1023847584}
   - {fileID: 822204170}
-  - {fileID: 1023847582}
+  - {fileID: 896962917}
+  - {fileID: 1258383328}
 --- !u!114 &1618879101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -811,29 +837,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1618879103
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1618879099}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c728d84ecf18fef4aad8df9690e267af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  autoCS: {fileID: 135565127}
-  specialID: -2
-  test:
-  - "\t//idea:(us .cs to implement)"
-  - "\t//1.when a 'special' need to be Baked as a SDFPrefab"
-  - "\t//2.make sure autoCS has compiled, find ###BLOCK ObjSDF block where 'inx ==
-    specialID'"
-  - "\t//3.expcet comments, make sure only has one line code, find the funcName(SDFPrefab_ASCII_97),copy
-    its source to SDFPrefabBaker,"
-  - "\t//make sure func params are in standard form"
-  - "\tSDFPrefab_ASCII_97(re,p);"
 --- !u!1 &1627212793
 GameObject:
   m_ObjectHideFlags: 0
@@ -940,3 +943,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1679683790
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1679683792}
+  - component: {fileID: 1679683791}
+  m_Layer: 0
+  m_Name: Baker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1679683791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1679683790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c728d84ecf18fef4aad8df9690e267af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoCS: {fileID: 135565127}
+  specialID: -2
+  extraInclude:
+  - '#include "../../HLSL/SDFGame/SDFCommonDef.hlsl"'
+  dumpDir: Resources/SDFGamePrefab/font_prefab.hlsl
+--- !u!4 &1679683792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1679683790}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -51.61551, y: 1.1833289, z: -54.35381}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

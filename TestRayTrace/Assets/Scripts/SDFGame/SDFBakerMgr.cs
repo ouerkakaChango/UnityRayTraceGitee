@@ -57,7 +57,11 @@ public class SDFBakerMgr : MonoBehaviour
             {
                 AddBakeSpecial(tag);
             }
-            else
+            else if (tag.shapeType == SDFShapeType.Font)
+            {
+                AddBakeFont(tag);
+            }
+            else if (tag.shapeType == SDFShapeType.Normal)
             {
                 AddBake(tag.gameObject);
             }
@@ -204,6 +208,11 @@ public class SDFBakerMgr : MonoBehaviour
     {
         bakedSDFs.Add("inx = " + tag.specialID+";");
         bakedSpecialObjects.Add("inx = " + tag.specialID + ";");
+    }
+
+    void AddBakeFont(SDFBakerTag tag)
+    {
+        //???
     }
 
     void AddBake(GameObject obj)

@@ -3,8 +3,8 @@
 #define MaxSDF 100000
 #define MaxTraceDis 100
 #define MaxTraceTime 6400
-#define TraceThre 0.01
-#define NormalEpsilon 0.01
+#define TraceThre 0.001
+#define NormalEpsilon 0.001
 
 #define SceneSDFShadowNormalBias 0.2
 
@@ -43,7 +43,6 @@ re.albedo = 0.5f;
 
 int GetObjRenderMode(int obj)
 {
-	return 0;
 }
 
 void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
@@ -428,12 +427,12 @@ else
 }
 }
 
-float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo)
+float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonScale = 1.0f)
 {
 	return normalize(float3(
-		GetObjSDF(inx, float3(p.x + NormalEpsilon, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon, p.y, p.z), traceInfo),
-		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon, p.z), traceInfo),
-		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon), traceInfo) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon), traceInfo)
+		GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
+		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
+		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon*eplisonScale), traceInfo) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon*eplisonScale), traceInfo)
 		));
 }
 
@@ -443,11 +442,11 @@ if (inx == 0)
 {
 	//return SDFSphereNormal(p, float3(0, 0.5, 0));
 	//return SDFPlanetNormal(p);
-	return GetObjSDFNormal(inx, p, traceInfo);
+	return GetObjSDFNormal(inx, p);
 }
 else
 {
-	return GetObjSDFNormal(inx, p, traceInfo);
+	return GetObjSDFNormal(inx, p);
 }
 }
 

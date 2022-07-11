@@ -22,9 +22,18 @@ public class SDFPrefabBakerEditor : Editor
             Target.BakeSpecial();
         }
 
-        if (GUILayout.Button("Dump All To Dir"))
+        //if (GUILayout.Button("Dump All To Dir"))
+        //{
+        //    Target.DumpAllToDir();
+        //}
+        if (GUILayout.Button("Dump All To hlsl"))
         {
-            Target.DumpAllToDir();
+            Target.DumpAllToHLSL();
+        }
+
+        if (GUILayout.Button("Clear"))
+        {
+            Target.Clear();
         }
     }
 }

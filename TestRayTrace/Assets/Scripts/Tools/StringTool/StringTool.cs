@@ -31,5 +31,50 @@ namespace StringTool
             string[] words = str.Split(charSeparators, System.StringSplitOptions.RemoveEmptyEntries);
             return string.Join(" ", words);
         }
+
+        public static void Append(ref string re, in string[] lines)
+        {
+            for(int i=0;i<lines.Length;i++)
+            {
+                re += lines[i];
+                re += "\n";
+            }
+        }
+
+        public static void Append(ref string re, in List<string> lines)
+        {
+            for (int i = 0; i < lines.Count; i++)
+            {
+                re += lines[i];
+                re += "\n";
+            }
+        }
+
+        public static string GetFileName(string path, string postfix)
+        {
+            if(!path.EndsWith(postfix))
+            {
+                Debug.LogError("post fix not correct");
+                return "";
+            }
+            int i1 = postfix.Length;
+            int l1 = path.Length - 1;
+            int i2 = -1;
+            for(int idx = i1;idx<path.Length;idx++)
+            {
+                char c = path[l1 - idx];
+                if(c == '\\'||c=='/')
+                {
+                    i2 = idx-1;
+                    break;
+                }
+            }
+            if(i2 == -1)
+            {
+                Debug.LogError("not a folder path");
+                return "";
+            }
+            return path.Substring(l1 - i2, i2 - i1 + 1);
+        }
     }
 }

@@ -4,8 +4,6 @@
 #include "../../HLSL/UnityCommonDef.hlsl"
 #include "../../HLSL/RayMath.hlsl"
 
-#include "SDFGameScene_Detail1.hlsl"
-
 int w;
 int h;
 
@@ -28,6 +26,8 @@ Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
 
 //#########################################################################################################
+#include "SDFGameScene_Detail1.hlsl"
+//#########################################################################################################
 
 float3 GetSDFGameColor(in Ray ray)
 {
@@ -45,13 +45,13 @@ float3 GetSDFGameColor(in Ray ray)
 	}
 	else
 	{
-		//re = (@BackGroundColor);//GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+		re = (@BackGroundColor);//GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
 	}
 
 	return re;
 }
 
-#define SSAA_num 9
+#define SSAA_num 1
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
 {

@@ -113,5 +113,10 @@ namespace XFileHelper
             v.y = reader.ReadInt32();
             v.z = reader.ReadInt32();
         }
+
+        public static string FullPath(string localPath)
+        {
+            return Application.dataPath + "/" + localPath;
+        }
     };
 }
