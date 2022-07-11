@@ -109,6 +109,14 @@ float3 WorldToLocal(in Transform trans, float3 world)
 	return p;
 }
 
+float3 WorldToLocal(float3 world, in float3 pos, in float3 rotEuler,in float3 scale)
+{
+	float3 p = world - pos;
+	p /= scale;
+	p = InvRotByEuler(p, rotEuler);
+	return p;
+}
+
 float3 LocalToWorld(in Transform trans, float3 local)
 {
 	float3 p = RotByEuler(local, trans.rotEuler);

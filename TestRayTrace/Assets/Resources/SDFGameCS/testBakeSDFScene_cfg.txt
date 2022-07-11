@@ -1,6 +1,6 @@
 valMaps:
 //@@@SDFBakerMgr ValMaps
-ObjNum 8
+ObjNum 9
 //@@@
 
 Blocks:
@@ -16,6 +16,7 @@ Blocks:
 #include "../../HLSL/SDFGame/SDFCommonDef.hlsl"
 #include "../../HLSL/SDFGame/SDFGridObjects.hlsl"
 #include "../../HLSL/Spline/QuadBezier/QuadBezier.hlsl"
+#include "../SDFGamePrefab/font_prefab.hlsl"
 Texture2D woodPBR_albedo;
 Texture2D woodPBR_normal;
 Texture2D woodPBR_metallic;
@@ -63,11 +64,17 @@ re.roughness = 1;
 }
 else if (obj == 6 )
 {
+re.albedo = float3(0, 0.1484745, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 7 )
+{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.2;
 }
-else if (obj == 7 )
+else if (obj == 8 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -78,7 +85,7 @@ re.roughness = 1;
 
 ###BLOCK ObjRenderMode
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[8];
+int renderMode[9];
 renderMode[0] = 2;
 renderMode[1] = 0;
 renderMode[2] = 2;
@@ -86,7 +93,8 @@ renderMode[3] = 2;
 renderMode[4] = 0;
 renderMode[5] = 0;
 renderMode[6] = 0;
-renderMode[7] = 2;
+renderMode[7] = 0;
+renderMode[8] = 2;
 return renderMode[obj];
 //@@@
 ###BLOCK
@@ -118,6 +126,9 @@ else if (inx == 6 )
 {
 }
 else if (inx == 7 )
+{
+}
+else if (inx == 8 )
 {
 }
 //@@@
@@ -292,25 +303,10 @@ float SDFPlanet(float3 p)
 ###BLOCK
 
 ###BLOCK ObjSDF
+//### 
+float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 
-	//### A
-	//float a1 =  SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),
-	//	0, 0.3,
-	//	float3(0, -0.5, -1.5));
-	//
-	//float a2 =  SDFShearXBoxTransform(p, float3(5, 0.5, 0.5),
-	//	0, -0.3,
-	//	float3(0, -0.5, 1.5));
-	//
-	//float a3 = SDFBox(p, float3(-1.5, -0.5, 0), float3(0.4, 0.5, 2)); 
-	//
-	//float re =  min(a1,a2);
-	//re = min(re,a3);
-
-	//### 
-	float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
-
-	//@@@SDFBakerMgr ObjSDF
+//@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
 re = min(re, 0 + SDFBox(p, float3(-53.40586, -0.02504057, -55.8854), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
@@ -334,7 +330,7 @@ inx = -3;
 else if (inx == 5 )
 {
 float d = re;
-float2 box = float2(0.05, 0.05);
+float2 box = float2(0.1, 0.05);
 Transform trans;
 Init(trans);
 trans.pos = float3(-54.05, 0.35, -55.925);
@@ -348,109 +344,113 @@ re = min(re,d);
 }
 else if (inx == 6 )
 {
-re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
+p = WorldToLocal(p,float3(-53.299, 1.427, -56.434),float3(281.6757, 187.4573, 334.7128),float3(0.5000001, 0.5000001, 0.5000001));
+SDFPrefab_ASCII_65(re,p);
 }
 else if (inx == 7 )
 {
+re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
+}
+else if (inx == 8 )
+{
 re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
-	//@@@
-	if(inx == -1)
+//@@@
+if(inx == -1)
+{
+	//float trunkBox = SDFBox(p, float3(0, 2, 0), float3(0.2, 2, 0.2), float3(0, 0, 0));
+	float sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
+	re = min(re, sbox );
+	//re = min(re, trunkBox );
+	//re = min(re, SDFSphere(p, float3(0, 2, 0), 1) );
+}
+else if(inx == -2)
+{
+	float terrain = 100000;
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
-		//float trunkBox = SDFBox(p, float3(0, 2, 0), float3(0.2, 2, 0.2), float3(0, 0, 0));
-		float sbox = SDFBox(p, float3(0, 2, 0), float3(1, 1, 1), float3(0, 0, 0));
-		re = min(re, sbox );
-		//re = min(re, trunkBox );
-		//re = min(re, SDFSphere(p, float3(0, 2, 0), 1) );
-	}
-	else if(inx == -2)
-	{
-		float terrain = 100000;
-		if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+		//### fbm flaw effect.### 
+		//###can only used for low height effect,and no sdf shadow, because trace it by height func is not right.
+		//###but for low height effect, this flaw may be accepted
+		//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(p.xz+0.3,0)));
+
+		//terrain = abs(p.y);
+
+		//Terrain Main
+		terrain = CosFBM(p.xz);
+
+		//Detail
+		if(traceInfo.lastTrace<0.15)
 		{
-			//### fbm flaw effect.### 
-			//###can only used for low height effect,and no sdf shadow, because trace it by height func is not right.
-			//###but for low height effect, this flaw may be accepted
-			//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(p.xz+0.3,0)));
-
-			//terrain = abs(p.y);
-
-			//Terrain Main
-			terrain = CosFBM(p.xz);
-
-			//Detail
-			if(traceInfo.lastTrace<0.15)
-			{
-				terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
-				//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(5 * p.xz,0)));
-				//terrain -= 0.0001 * CosFBM(1000 * p.xz);
-				//terrain -= 25 * TerrainDetailNoise(p.xz);
-				//terrain -= 0.01 * TerrainDetailNoise(1000*p.xz);
-			}
-
-			terrain = abs(p.y - terrain);
-			terrain *= 0.5;
+			terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+			//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(5 * p.xz,0)));
+			//terrain -= 0.0001 * CosFBM(1000 * p.xz);
+			//terrain -= 25 * TerrainDetailNoise(p.xz);
+			//terrain -= 0.01 * TerrainDetailNoise(1000*p.xz);
 		}
-		re = min(re, terrain );
+
+		terrain = abs(p.y - terrain);
+		terrain *= 0.5;
 	}
-	else if(inx == -3)
+	re = min(re, terrain );
+}
+else if(inx == -3)
+{
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300  && traceInfo.lastTrace<5)
 	{
-		if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300  && traceInfo.lastTrace<5)
-		{
-			//### grid grass
-			float grid = 0.1;
-			float2 m = floor(p.xz/grid);
-			float2 c = grid*(m+0.5);
-			float3 center = float3(c.x,CosFBM(c),c.y);
-			float d = SDFGridGrass(p,center,grid);
-			re = min(re,d);
+		//### grid grass
+		float grid = 0.1;
+		float2 m = floor(p.xz/grid);
+		float2 c = grid*(m+0.5);
+		float3 center = float3(c.x,CosFBM(c),c.y);
+		float d = SDFGridGrass(p,center,grid);
+		re = min(re,d);
 
-			//### near dir
-			//float2 c2 = c+grid*float2(1,0);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center, grid);
-			//re = min(re,d);
-			//
-			//c2 = c+grid*float2(-1,0);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center, grid);
-			//re = min(re,d);
-			//
-			//c2 = c+grid*float2(0,1);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center, grid);
-			//re = min(re,d);
-			//
-			//c2 = c+grid*float2(0,-1);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center, grid);
-			//re = min(re,d);
-			//
-			//c2 = c+grid*float2(1,1);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center, grid);
-			//re = min(re,d);
-			//
-			//c2 = c+grid*float2(1,-1);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center, grid);
-			//re = min(re,d);
-			//
-			//c2 = c+grid*float2(-1,1);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center, grid);
-			//re = min(re,d);
-			//
-			//c2 = c+grid*float2(-1,-1);
-			//center = float3(c2.x,CosFBM(c2),c2.y);
-			//d = SDFGridGrass(p,center, grid);
-			//re = min(re,d);
-			
-			//re *= 0.2;
-		}
+		//### near dir
+		//float2 c2 = c+grid*float2(1,0);
+		//center = float3(c2.x,CosFBM(c2),c2.y);
+		//d = SDFGridGrass(p,center, grid);
+		//re = min(re,d);
+		//
+		//c2 = c+grid*float2(-1,0);
+		//center = float3(c2.x,CosFBM(c2),c2.y);
+		//d = SDFGridGrass(p,center, grid);
+		//re = min(re,d);
+		//
+		//c2 = c+grid*float2(0,1);
+		//center = float3(c2.x,CosFBM(c2),c2.y);
+		//d = SDFGridGrass(p,center, grid);
+		//re = min(re,d);
+		//
+		//c2 = c+grid*float2(0,-1);
+		//center = float3(c2.x,CosFBM(c2),c2.y);
+		//d = SDFGridGrass(p,center, grid);
+		//re = min(re,d);
+		//
+		//c2 = c+grid*float2(1,1);
+		//center = float3(c2.x,CosFBM(c2),c2.y);
+		//d = SDFGridGrass(p,center, grid);
+		//re = min(re,d);
+		//
+		//c2 = c+grid*float2(1,-1);
+		//center = float3(c2.x,CosFBM(c2),c2.y);
+		//d = SDFGridGrass(p,center, grid);
+		//re = min(re,d);
+		//
+		//c2 = c+grid*float2(-1,1);
+		//center = float3(c2.x,CosFBM(c2),c2.y);
+		//d = SDFGridGrass(p,center, grid);
+		//re = min(re,d);
+		//
+		//c2 = c+grid*float2(-1,-1);
+		//center = float3(c2.x,CosFBM(c2),c2.y);
+		//d = SDFGridGrass(p,center, grid);
+		//re = min(re,d);
+		
+		//re *= 0.2;
 	}
+}
 return re;
-
 ###BLOCK
 
 ###BLOCK ObjNormal
@@ -479,6 +479,9 @@ else if (inx == 6 )
 {
 }
 else if (inx == 7 )
+{
+}
+else if (inx == 8 )
 {
 }
 //@@@

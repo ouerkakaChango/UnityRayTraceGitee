@@ -42,7 +42,7 @@ public class SDFBakerMgr : MonoBehaviour
     //###
     public void Bake()
     {
-        Debug.Log("BakerMgr Bake");
+        //Debug.Log("BakerMgr Bake");
         PrepareBake();
         StartBake();
         for (int i=0;i<tags.Length;i++)
@@ -59,7 +59,7 @@ public class SDFBakerMgr : MonoBehaviour
             }
             else if (tag.shapeType == SDFShapeType.Font)
             {
-                AddBakeFont(tag);
+                AddBakeFont(tag.gameObject);
             }
             else if (tag.shapeType == SDFShapeType.Normal)
             {
@@ -210,9 +210,19 @@ public class SDFBakerMgr : MonoBehaviour
         bakedSpecialObjects.Add("inx = " + tag.specialID + ";");
     }
 
-    void AddBakeFont(SDFBakerTag tag)
+    void AddBakeFont(GameObject obj)
     {
-        //???
+        ///Debug.Log("bAKE fONT");
+        //SDFPrefab_ASCII_65
+        var tag = obj.GetComponent<SDFBakerTag>();
+
+        int id = tag.fontCharacter;
+        string funcName = "SDFPrefab_ASCII_"+id;
+        //由于在创作字体的时候，都是以0.5,0.5为中心
+        //p = WorldToLocal(p,pos,rot,scale);
+        //SDFPrefab_ASCII_65(re,p);
+        bakedSDFs.Add("p = WorldToLocal(p,"+Bake(obj.transform.position)+","+ BakeRotEuler(obj.transform.rotation) + ","+Bake(obj.transform.lossyScale)+ ");");
+        bakedSDFs.Add(funcName +"(re,p);");
     }
 
     void AddBake(GameObject obj)
