@@ -22,6 +22,8 @@ public class SDFBakerMgr : MonoBehaviour
     public List<string> bakedRenders = new List<string>();
     [HideInInspector]
     public List<string> bakedDirShadows = new List<string>();
+    [HideInInspector]
+    public List<string> bakedBeforeSDF = new List<string>();    //used for SDF Bounds
 
     public SDFBakerTag[] tags;
     SDFLightTag[] dirLightTags;
@@ -48,10 +50,14 @@ public class SDFBakerMgr : MonoBehaviour
         for (int i=0;i<tags.Length;i++)
         {
             SDFBakerTag tag = tags[i];
-            PreAdd(i, ref bakedSDFs);
-            //??? geometry normal not baked
-            PreAdd(i, ref bakedSpecialObjects);
-            PreAdd(i, ref bakedMaterials, "obj");
+
+            DoPreAddAction(i);
+            bool hasBound = HasSDFBound(tag.gameObject);
+            if(hasBound)
+            {
+                PreAdd(i, ref bakedBeforeSDF);
+                AddBakeBound(tag.gameObject);
+            }
 
             if (tag.shapeType == SDFShapeType.Special)
             {
@@ -65,14 +71,31 @@ public class SDFBakerMgr : MonoBehaviour
             {
                 AddBake(tag.gameObject);
             }
+
             AddBakeMaterial(tag);
             AddBakeRenderMode(i, tag);
 
-            PostAdd(i, ref bakedSDFs);
-            PostAdd(i, ref bakedSpecialObjects);
-            PostAdd(i, ref bakedMaterials);
+            DoPostAddAction(i);
+            if (hasBound)
+            {
+                PostAdd(i, ref bakedBeforeSDF);
+            }
         }
         EndBake();
+    }
+
+    void DoPreAddAction(int i)
+    {
+        PreAdd(i, ref bakedSDFs);
+        PreAdd(i, ref bakedSpecialObjects);
+        PreAdd(i, ref bakedMaterials, "obj");
+    }
+
+    void DoPostAddAction(int i)
+    {
+        PostAdd(i, ref bakedSDFs);
+        PostAdd(i, ref bakedSpecialObjects);
+        PostAdd(i, ref bakedMaterials);
     }
 
     void PrepareBake()
@@ -333,6 +356,18 @@ public class SDFBakerMgr : MonoBehaviour
             transform.hideFlags = HideFlags.None;
         }
     }
+
+    bool HasSDFBound(GameObject obj)
+    {
+        return false;
+    }
+
+    void AddBakeBound(GameObject obj)
+    {
+        //???
+    }
+
+    //##################################################################
 
     string Bake(Vector2 v)
     {

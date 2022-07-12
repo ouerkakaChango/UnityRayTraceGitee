@@ -151,7 +151,6 @@ public class AutoCS : MonoBehaviour
         var lines = File.ReadAllLines(path);
 
         rangeMap.Clear();
-        //!!! 顺序必须对应cgf
         rangeMap.Add("ValMaps", new List<Vector2Int>());
         rangeMap.Add("ObjMaterial", new List<Vector2Int>());
         rangeMap.Add("ObjRenderMode", new List<Vector2Int>());
@@ -159,6 +158,7 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("DirShadow", new List<Vector2Int>());
         rangeMap.Add("ObjSDF", new List<Vector2Int>());
         rangeMap.Add("SpecialObj", new List<Vector2Int>());
+        rangeMap.Add("BeforeObjSDF", new List<Vector2Int>());
 
         var keyList = rangeMap.Keys.ToList();
         List<Vector2Int> orderList = new List<Vector2Int>();
@@ -217,6 +217,14 @@ public class AutoCS : MonoBehaviour
                 newcount = bakerMgr.bakedSDFs.Count;
                 newLines.RemoveRange(offset + range.x + 1, oricount);
                 newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedSDFs);
+            }
+            else if (key == "BeforeObjSDF" && ValidRange(range))
+            {
+                oricount = range.y - range.x - 1;
+                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
+                newcount = bakerMgr.bakedBeforeSDF.Count;
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedBeforeSDF);
             }
             else if (key == "SpecialObj" && ValidRange(range))
             {

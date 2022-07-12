@@ -211,6 +211,16 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 {
 float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 
+if(inx == 3)
+{
+	//1.check p is is the boundingBox
+	//2.if not ,just 'return re'
+	//3.if in, do nothing,wait for following calculating SDF
+}
+
+//@@@SDFBakerMgr BeforeObjSDF
+//@@@
+//___
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
