@@ -55,7 +55,7 @@ public class SDFBakerMgr : MonoBehaviour
             bool hasBound = HasSDFBound(tag.gameObject);
             if(hasBound)
             {
-                PreAdd(i, ref bakedBeforeSDF);
+                PreAdd(i, ref bakedBeforeSDF, "inx", true);
                 AddBakeBound(tag.gameObject);
             }
 
@@ -129,6 +129,7 @@ public class SDFBakerMgr : MonoBehaviour
 
     public void ClearMemory()
     {
+        bakedBeforeSDF.Clear();
         bakedSDFs.Clear();
 
         bakedMaterials.Clear();
@@ -140,6 +141,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedDirShadows.Clear();
 
         bakedSpecialObjects.Clear();
+
     }
 
     void StartBake()
@@ -208,11 +210,11 @@ public class SDFBakerMgr : MonoBehaviour
         bakedDirShadows.Add("}");
     }
 
-    void PreAdd(int inx, ref List<string> lines, string inxName = "inx")
+    void PreAdd(int inx, ref List<string> lines, string inxName = "inx", bool ignoreElse = false)
     {
-        if(inx==0)
+        if(inx==0 || ignoreElse)
         {
-            lines.Add("if("+ inxName + " == 0 )");
+            lines.Add("if("+ inxName + " == "+ inx + " )");
             lines.Add("{");
         }
         else if(inx > 0)
@@ -359,12 +361,30 @@ public class SDFBakerMgr : MonoBehaviour
 
     bool HasSDFBound(GameObject obj)
     {
-        return false;
+        var sdfBound = obj.GetComponent<SDFBound>();
+        return sdfBound != null && sdfBound.isActiveAndEnabled;
     }
 
     void AddBakeBound(GameObject obj)
     {
-        //???
+        //if (!IsInBBox(p, center - scale * bound, center + scale * bound))
+        //{
+        //    return re;
+        //}
+        var sdfBound = obj.GetComponent<SDFBound>();
+        if(sdfBound==null)
+        {
+            Debug.LogError("BakeSDFBound but no bound");
+        }
+        Vector3 center = sdfBound.center;
+        Vector3 bound = sdfBound.bound;
+        float s = sdfBound.judgeScale;
+        Vector3 min = center - s * bound;
+        Vector3 max = center + s * bound;
+        bakedBeforeSDF.Add("if (!IsInBBox(p, "+Bake(min)+", "+ Bake(max) + "))");
+        bakedBeforeSDF.Add("{");
+        bakedBeforeSDF.Add("    return re;");
+        bakedBeforeSDF.Add("}");
     }
 
     //##################################################################

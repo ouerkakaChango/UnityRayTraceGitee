@@ -171,14 +171,28 @@ return sha;
 ###BLOCK ObjSDF
 float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 
-if(inx == 3)
-{
-	//1.check p is is the boundingBox
-	//2.if not ,just 'return re'
-	//3.if in, do nothing,wait for following calculating SDF
-}
+//if(inx == 3)
+//{
+//	//1.check p is is the boundingBox
+//	//2.if not ,just 'return re'
+//	//3.if in, do nothing,wait for following calculating SDF
+//	float3 center  = float3(1.5,0,0.5);
+//	float3 bound = float3(0.5,0.5,0.5);
+//	float scale = 20;
+//	if(!IsInBBox(p,center - scale*bound,center+scale*bound))
+//	{
+//		return re;
+//	}
+//}
 
 //@@@SDFBakerMgr BeforeObjSDF
+if(inx == 3 )
+{
+if (!IsInBBox(p, float3(-8.5, -10, -9.5), float3(11.5, 10, 10.5)))
+{
+    return re;
+}
+}
 //@@@
 //___
 //@@@SDFBakerMgr ObjSDF
@@ -196,10 +210,10 @@ re = min(re, 0 + SDFBox(p, float3(1, 0, 1), float3(0.05, 0.05, 0.05), float3(0, 
 }
 else if (inx == 3 )
 {
-p = WorldToLocal(p,float3(1, 0, 0),float3(0, 0, 0),float3(0.5, 0.5, 0.5));
+p = WorldToLocal(p,float3(1, 0, 0),float3(0, 0, 0),float3(1, 1, 1));
 float d = re;
 SDFPrefab_ASCII_65(d,p);
-d *= 0.5;
+d *= 1;
 re = min(re,d);
 }
 //@@@

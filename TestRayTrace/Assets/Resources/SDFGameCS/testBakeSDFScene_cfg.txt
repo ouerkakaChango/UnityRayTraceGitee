@@ -305,7 +305,15 @@ float SDFPlanet(float3 p)
 ###BLOCK ObjSDF
 //### 
 float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
-
+//@@@SDFBakerMgr BeforeObjSDF
+if(inx == 6 )
+{
+if (!IsInBBox(p, float3(-203.299, -148.573, -206.434), float3(96.70103, 151.427, 93.56603)))
+{
+    return re;
+}
+}
+//@@@
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
@@ -344,10 +352,10 @@ re = min(re,d);
 }
 else if (inx == 6 )
 {
-p = WorldToLocal(p,float3(-53.299, 1.427, -56.434),float3(281.6757, 187.4573, 334.7128),float3(0.5000001, 0.5000001, 0.5000001));
+p = WorldToLocal(p,float3(-53.299, 1.427, -56.434),float3(281.6757, 187.4573, 334.7128),float3(30.00001, 30, 30.00001));
 float d = re;
 SDFPrefab_ASCII_65(d,p);
-d *= 0.5000001;
+d *= 30.00001;
 re = min(re,d);
 }
 else if (inx == 7 )
