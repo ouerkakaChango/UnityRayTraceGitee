@@ -390,7 +390,10 @@ re = min(re,d);
 else if (inx == 6 )
 {
 p = WorldToLocal(p,float3(-53.299, 1.427, -56.434),float3(281.6757, 187.4573, 334.7128),float3(0.5000001, 0.5000001, 0.5000001));
-SDFPrefab_ASCII_65(re,p);
+float d = re;
+SDFPrefab_ASCII_65(d,p);
+d *= 0.5000001;
+re = min(re,d);
 }
 else if (inx == 7 )
 {

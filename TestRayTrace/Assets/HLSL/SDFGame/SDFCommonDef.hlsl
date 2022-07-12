@@ -25,6 +25,16 @@ void basis_unstable(in float3 n, out float3 f, out float3 r)
 	}
 }
 
+float SDFSphere(float3 p, float3 center, float radius)
+{
+	return length(p - center) - radius;
+}
+
+float3 SDFSphereNormal(float3 p, float3 center)
+{
+	return normalize(p - center);
+}
+
 float SDFBox(float2 p, float2 center, float2 bound)
 {
 	float2 q = abs(p - center) - bound;
@@ -33,6 +43,7 @@ float SDFBox(float2 p, float2 center, float2 bound)
 
 float SDFBox(float3 p, float3 center, float3 bound)
 {
+	//return SDFSphere(p, center, 1);
 	float3 q = abs(p - center) - bound;
 	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
 }
@@ -55,67 +66,28 @@ float SDFBoxByUVW(float3 p, float3 u, float3 v, float3 w, float3 center, float3 
 	return SDFBox(lp, float3(0, 0, 0), bound);
 }
 
-float SDFSphere(float3 p, float3 center, float radius)
-{
-	return length(p - center) - radius;
-}
-
-float3 SDFSphereNormal(float3 p, float3 center)
-{
-	return normalize(p - center);
-}
-
 float SDFShearXBoxTransform(float3 p, float3 bound,
 	float shy, float shz,
 	float3 center, float3 rotEuler = 0, float3 scale = 1)
 {
-	bound *= scale;
-	float3 vec = p - center;
-	float3 shp = ShearX(vec, -shy, -shz);
-	p = InvRotByEuler(shp, rotEuler);
-	float3 q = abs(p) - bound;
-	float re = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
-	if (NearZero(shz)&& NearZero(shy))
-	{
-		return re;
-	}
-	else if (NearZero(shz))
-	{
-		float tanY = abs(shy > 0 ? (1 / shz) : (shy));
-		return re * sin(atan(tanY));
-	}
-	else if (NearZero(shy))
-	{
-		float tanZ = abs(shz > 0 ? (1 / shz) : (shz));
-		return re * sin(atan(tanZ));
-	}
-	else
-	{
-		float tanY = abs(shy > 0 ? (1 / shz) : (shy));
-		float tanZ = abs(shz > 0 ? (1 / shz) : (shz));
-		return re * sin(atan(tanZ)) * sin(atan(tanY));
-	}
-}
-
-float N_SDFShearXBoxTransform(float3 p, float3 bound,
-	float shy, float shz,
-	float3 center, float3 rotEuler = 0, float3 scale = 1)
-{
 	p = WorldToLocal(p, center, rotEuler, scale);
+	p = ShearZ(p, -shy, -shz);
 	float3 q = abs(p) - bound;
 	float re = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+	//!!! losszyScale use scale.x
+	re *= scale.x;
 	if (NearZero(shz) && NearZero(shy))
 	{
 		return re;
 	}
 	else if (NearZero(shz))
 	{
-		float tanY = abs(shy > 0 ? (1 / shz) : (shy));
+		float tanY = abs(shy);
 		return re * sin(atan(tanY));
 	}
 	else if (NearZero(shy))
 	{
-		float tanZ = abs(shz > 0 ? (1 / shz) : (shz));
+		float tanZ = abs(shz);
 		return re * sin(atan(tanZ));
 	}
 	else
@@ -131,55 +103,25 @@ float SDFShearZBoxTransform(float3 p, float3 bound,
 	float shx, float shy,
 	float3 center, float3 rotEuler = 0, float3 scale = 1)
 {
-	bound *= scale;
-	float3 vec = p - center;
-	float3 shp = ShearZ(vec, -shx, -shy);
-	p = InvRotByEuler(shp, rotEuler);
-	float3 q = abs(p) - bound;
-	float re = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
-	if (NearZero(shx) && NearZero(shy))
-	{
-		return re;
-	}
-	else if (NearZero(shy))
-	{
-		float tanX = abs(shx > 0 ? (1 / shy) : (shx));
-		return re * sin(atan(tanX));
-	}
-	else if (NearZero(shx))
-	{
-		float tanY = abs(shy > 0 ? (1 / shy) : (shy));
-		return re * sin(atan(tanY));
-	}
-	else
-	{
-		float tanX = abs(shx > 0 ? (1 / shy) : (shx));
-		float tanY = abs(shy > 0 ? (1 / shy) : (shy));
-		return re * sin(atan(tanY)) * sin(atan(tanX));
-	}
-}
-
-//???
-float N_SDFShearZBoxTransform(float3 p, float3 bound,
-	float shx, float shy,
-	float3 center, float3 rotEuler = 0, float3 scale = 1)
-{
+	//return SDFSphere(p, center, 1);
 	p = WorldToLocal(p, center, rotEuler, scale);
 	p = ShearZ(p, -shx, -shy);
 	float3 q = abs(p) - bound;
 	float re = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+	//!!! losszyScale use scale.x
+	re *= scale.x;
 	if (NearZero(shx) && NearZero(shy))
 	{
 		return re;
 	}
 	else if (NearZero(shy))
 	{
-		float tanX = abs(shx > 0 ? (1 / shy) : (shx));
+		float tanX = abs(shx);
 		return re * sin(atan(tanX));
 	}
 	else if (NearZero(shx))
 	{
-		float tanY = abs(shy > 0 ? (1 / shy) : (shy));
+		float tanY = abs(shy);
 		return re * sin(atan(tanY));
 	}
 	else
@@ -188,7 +130,6 @@ float N_SDFShearZBoxTransform(float3 p, float3 bound,
 		float tanY = abs(shy > 0 ? (1 / shy) : (shy));
 		return re * sin(atan(tanY)) * sin(atan(tanX));
 	}
-	//return re;
 }
 
 float SDFShearXSphere(float3 p, float3 center, float radius,

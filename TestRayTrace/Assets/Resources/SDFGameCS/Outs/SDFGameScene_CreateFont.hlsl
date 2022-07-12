@@ -227,7 +227,10 @@ re = min(re, 0 + SDFBox(p, float3(1, 0, 1), float3(0.05, 0.05, 0.05), float3(0, 
 else if (inx == 3 )
 {
 p = WorldToLocal(p,float3(1, 0, 0),float3(0, 0, 0),float3(0.5, 0.5, 0.5));
-SDFPrefab_ASCII_65(re,p);
+float d = re;
+SDFPrefab_ASCII_65(d,p);
+d *= 0.5;
+re = min(re,d);
 }
 //@@@
 if(inx == -1)

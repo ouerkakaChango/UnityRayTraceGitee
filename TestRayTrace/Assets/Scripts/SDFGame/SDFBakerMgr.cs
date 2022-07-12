@@ -220,9 +220,16 @@ public class SDFBakerMgr : MonoBehaviour
         string funcName = "SDFPrefab_ASCII_"+id;
         //由于在创作字体的时候，都是以0.5,0.5为中心
         //p = WorldToLocal(p,pos,rot,scale);
-        //SDFPrefab_ASCII_65(re,p);
+        //float d = re;
+        //SDFPrefab_ASCII_65(d,p);
+        //d *= scale.x;
+        //re = min(re,d);
+        
         bakedSDFs.Add("p = WorldToLocal(p,"+Bake(obj.transform.position)+","+ BakeRotEuler(obj.transform.rotation) + ","+Bake(obj.transform.lossyScale)+ ");");
-        bakedSDFs.Add(funcName +"(re,p);");
+        bakedSDFs.Add("float d = re;");
+        bakedSDFs.Add(funcName +"(d,p);");
+        bakedSDFs.Add("d *= "+ obj.transform.lossyScale .x+ ";");
+        bakedSDFs.Add("re = min(re,d);");
     }
 
     void AddBake(GameObject obj)
