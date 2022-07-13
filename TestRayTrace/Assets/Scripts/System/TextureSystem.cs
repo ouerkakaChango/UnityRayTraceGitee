@@ -76,7 +76,7 @@ public class TextureSystem : MonoBehaviour
         List<TexSysTag> tagList = new List<TexSysTag>();
         for (int i = 0; i < allTags.Length; i++)
         {
-            if (allTags[i].active)
+            if (allTags[i].isActiveAndEnabled)
             {
                 tagList.Add(allTags[i]);
             }

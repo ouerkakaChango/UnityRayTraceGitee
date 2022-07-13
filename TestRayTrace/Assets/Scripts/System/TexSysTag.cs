@@ -11,7 +11,7 @@ public enum TexTagType
 
 public class TexSysTag : MonoBehaviour
 {
-    public bool active = true;
+    //public bool active = true;
     public TexTagType type = TexTagType.pbrTexture;
     [HideInInspector]
     [SerializeField]  public List<PBRTexture> pbrTextures = new List<PBRTexture>();

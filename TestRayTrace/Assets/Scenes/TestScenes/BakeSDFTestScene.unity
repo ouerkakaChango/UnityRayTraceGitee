@@ -155,7 +155,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 0
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 1
@@ -305,7 +304,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
   type: 0
   pbrTextures:
   - name: woodPBR
@@ -323,12 +321,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 142421526}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 0
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 1
@@ -491,7 +488,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
@@ -690,7 +686,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
   mat_PBR:
     albedo: {r: 0.7254902, g: 0.47843137, b: 0.34117648, a: 1}
     metallic: 0
@@ -809,7 +804,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
@@ -1072,7 +1066,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
@@ -1176,7 +1169,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 0
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
@@ -1448,7 +1440,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
   mat_PBR:
     albedo: {r: 0, g: 1, b: 0.17201257, a: 1}
     metallic: 0
@@ -1596,7 +1587,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
   mat_PBR:
     albedo: {r: 0, g: 0.32123232, b: 1, a: 1}
     metallic: 0
@@ -1651,7 +1641,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
   mat_PBR:
     albedo: {r: 0, g: 0.14847445, b: 1, a: 1}
     metallic: 0
@@ -1691,7 +1680,7 @@ MonoBehaviour:
   center: {x: -53.299, y: 1.427, z: -56.434}
   boundStrategy: 1
   bound: {x: 15.000004, y: 15.000002, z: 15.000003}
-  judgeScale: 10
+  judgeScale: 2
 --- !u!1 &1491667009
 GameObject:
   m_ObjectHideFlags: 0
@@ -1802,7 +1791,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
@@ -2151,7 +2139,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  active: 1
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
@@ -2272,15 +2259,17 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[9];
+  - int renderMode[11];
   bakedRenders: []
   bakedDirShadows: []
   bakedBeforeSDF: []
   tags:
+  - {fileID: 45438424}
   - {fileID: 348777198}
   - {fileID: 541193199}
   - {fileID: 563013440}
   - {fileID: 817168219}
+  - {fileID: 1004293004}
   - {fileID: 1283602066}
   - {fileID: 1305698780}
   - {fileID: 1355201447}

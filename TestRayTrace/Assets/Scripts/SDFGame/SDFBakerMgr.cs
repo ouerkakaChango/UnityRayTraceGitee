@@ -104,7 +104,7 @@ public class SDFBakerMgr : MonoBehaviour
         List<SDFBakerTag> tagList = new List<SDFBakerTag>();
         for(int i=0;i<allTags.Length;i++)
         {
-            if(allTags[i].active)
+            if(allTags[i].isActiveAndEnabled)
             {
                 tagList.Add(allTags[i]);
             }

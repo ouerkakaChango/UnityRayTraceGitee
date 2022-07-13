@@ -12,7 +12,7 @@ public enum SDFShapeType
 
 public class SDFBakerTag : MonoBehaviour
 {
-    public bool active = true;
+    //public bool active = true;
     public Material_PBR mat_PBR = Material_PBR.Default;
     public float SDF_offset = 0.0f;
     public int renderMode = 0;

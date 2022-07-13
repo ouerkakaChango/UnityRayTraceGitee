@@ -38,8 +38,16 @@ public class SDFBound : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = new Color(0, 0, 1);
-        Gizmos.DrawWireCube(center, bound*2);
+        var tag = GetComponent<SDFBakerTag>();
+        if(tag == null)
+        {
+            return;
+        }
+        if (isActiveAndEnabled && tag.isActiveAndEnabled)
+        {
+            Gizmos.color = new Color(0, 0, 1);
+            Gizmos.DrawWireCube(center, bound * 2);
+        }
     }
 
     //#####################################
