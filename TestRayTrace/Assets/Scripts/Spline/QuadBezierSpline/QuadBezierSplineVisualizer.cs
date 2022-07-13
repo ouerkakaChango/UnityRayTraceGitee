@@ -37,9 +37,17 @@ public class QuadBezierSplineVisualizer : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if(!isActiveAndEnabled)
+        {
+            return;
+        }
         if (!spline)
         {
             spline = GetComponent<QuadBezierSpline>();
+        }
+        if(spline == null)
+        {
+            return;
         }
         DoVisualize();
         
