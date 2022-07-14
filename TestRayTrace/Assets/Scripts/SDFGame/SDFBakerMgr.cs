@@ -50,6 +50,7 @@ public class SDFBakerMgr : MonoBehaviour
         for (int i=0;i<tags.Length;i++)
         {
             SDFBakerTag tag = tags[i];
+            tag.objInx = i;
 
             DoPreAddAction(i);
             bool hasBound = HasSDFBound(tag.gameObject);
@@ -285,6 +286,8 @@ public class SDFBakerMgr : MonoBehaviour
         string line = offset + " + SDFBox(p, " + Bake(obj.transform.position) + ", " + Bake(obj.transform.lossyScale*0.5f) + ", " + Bake(bakeRot) +")";
         line = "re = min(re, " + line + ");";
         bakedSDFs.Add(line);
+
+        SetTagMergeType(obj, SDFMergeType.Box);
     }
 
     void AddBakeQuadBezier(GameObject obj)
@@ -332,6 +335,8 @@ public class SDFBakerMgr : MonoBehaviour
         }
         bakedSDFs.Add("FUNC_SDFBoxedQuadBezier(d, p, spline, "+keys.Count+", trans, box)");
         bakedSDFs.Add("re = min(re,d);");
+
+        SetTagMergeType(obj, SDFMergeType.QuadBezier);
     }
 
     void AddBakeMaterial(SDFBakerTag tag)
@@ -385,6 +390,17 @@ public class SDFBakerMgr : MonoBehaviour
         bakedBeforeSDF.Add("{");
         bakedBeforeSDF.Add("    return re;");
         bakedBeforeSDF.Add("}");
+    }
+
+    void SetTagMergeType(GameObject obj, SDFMergeType type)
+    {
+        //mergetype
+        var tag = obj.GetComponent<SDFBakerTag>();
+        if (tag == null)
+        {
+            Debug.LogError("Tag is null");
+        }
+        tag.mergeType = type;
     }
 
     //##################################################################

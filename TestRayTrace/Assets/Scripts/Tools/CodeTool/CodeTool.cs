@@ -206,5 +206,19 @@ namespace CodeTool
                 return i == line.Length - 1;
             }
         }
+
+        public static List<string> MergeSDFBox(Dictionary<int, List<string>> boxLines)
+        {
+            List<string> re = new List<string>();
+            
+            return re;
+        }
+
+        public static List<string> MergeSDFQuadBezier(Dictionary<int, List<string>> boxLines)
+        {
+            List<string> re = new List<string>();
+
+            return re;
+        }
     }
 }

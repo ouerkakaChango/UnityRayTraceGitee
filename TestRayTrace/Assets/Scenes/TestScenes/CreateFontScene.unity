@@ -1163,7 +1163,7 @@ MonoBehaviour:
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
-  specialID: -1
+  specialID: -12
   fontCharacter: 0
 --- !u!33 &1619666537
 MeshFilter:

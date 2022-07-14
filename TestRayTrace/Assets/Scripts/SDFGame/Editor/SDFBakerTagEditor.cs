@@ -7,8 +7,8 @@ using UnityEditor;
 public class SDFBakerTagEditor : Editor
 {
     SDFBakerTag Target;
-    //protected bool showBakeFoldout = true;
-    //showBakeFoldout = EditorGUILayout.Foldout(showBakeFoldout, "Bake");
+    protected bool showMergeTag = true;
+    //showMergeTag = EditorGUILayout.Foldout(showMergeTag, "MergeSetting");
     void OnEnable()
     {
         Target = (SDFBakerTag)target;
@@ -22,11 +22,32 @@ public class SDFBakerTagEditor : Editor
         var type = Target.shapeType;
         if(type == SDFShapeType.Special)
         {
-            Target.specialID = EditorGUILayout.IntField("SpecialID", Target.specialID);
+            var nid = EditorGUILayout.IntField("SpecialID", Target.specialID);
+            if(nid!=Target.specialID)
+            {
+                Undo.RecordObject(Target, "SpecialID");
+                Target.specialID = nid;
+            }
         }
         else if(type == SDFShapeType.Font)
         {
-            Target.fontCharacter = EditorGUILayout.TextField("Character",Target.fontCharacter.ToString())[0];
+            char nc = EditorGUILayout.TextField("Character",Target.fontCharacter.ToString())[0];
+            if(nc!=Target.fontCharacter)
+            {
+                Undo.RecordObject(Target, "Character");
+                Target.fontCharacter = nc;
+            }
+        }
+
+        showMergeTag = EditorGUILayout.Foldout(showMergeTag, "Merge");
+        if (showMergeTag)
+        {
+            SDFMergeType nType = (SDFMergeType)EditorGUILayout.EnumPopup("MergeType",Target.mergeType);
+            if(nType!=Target.mergeType)
+            {
+                Undo.RecordObject(Target, "MergeType");
+                Target.mergeType = nType;
+            }
         }
     }
 }

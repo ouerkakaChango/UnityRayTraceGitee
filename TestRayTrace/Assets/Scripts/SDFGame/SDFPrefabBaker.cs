@@ -103,9 +103,48 @@ public class SDFPrefabBaker : MonoBehaviour
     public void BakeGroup()
     {
         //???
-        SDFPrefab pre = new SDFPrefab();
-        pre.prefabName = groupPrefabName;
-        prefabs.Add(pre);
+        //sdf merge
+        //1.先对所有mergedObjects给id
+        //2.对于所有spline（逐行处理逻辑）：
+        //2.1 将d换成d_[id]
+        //2.2 删除re=min(re,d)
+        //2.3 其他变量的删重
+        //3.对于所有box,换成d_[id]=SDFBox...
+        //4.re = min(re,d_[id])所有代码
+
+        List<string>[] linesArr = new List<string>[groups.Count];
+        
+        for (int id=0;id<groups.Count;id++)
+        {
+            linesArr[id] = GetObjLines(groups[id].objInx);
+            if(linesArr[id].Count==0)
+            {
+                Debug.LogError("Can't find obj.May need Refresh AutoCS?");
+                return;
+            }
+        }
+
+        Dictionary<int, List<string>> boxLines = new Dictionary<int, List<string>>();
+        Dictionary<int, List<string>> qbLines = new Dictionary<int, List<string>>();
+        for(int id=0;id<groups.Count;id++)
+        {
+            if(groups[id].mergeType == SDFMergeType.Box)
+            {
+                boxLines[id] = linesArr[id];
+            }
+            else if (groups[id].mergeType == SDFMergeType.QuadBezier)
+            {
+                qbLines[id] = linesArr[id];
+            }
+        }
+
+        //对于boxlines和qblines，分别进行merge，使用CodeHelper.MergeSDFBox/MergeSDFQuadBezier
+        var mergedBoxLines = CodeHelper.MergeSDFBox(boxLines);
+        var mergedQbLines = CodeHelper.MergeSDFQuadBezier(qbLines);
+
+        //SDFPrefab pre = new SDFPrefab();
+        //pre.prefabName = groupPrefabName;
+        //prefabs.Add(pre);
     }
 
     public void DumpAllToHLSL()
@@ -147,5 +186,12 @@ public class SDFPrefabBaker : MonoBehaviour
     public void Clear()
     {
         prefabs.Clear();
+    }
+
+    List<string> GetObjLines(int objInx)
+    {
+        List<string> re = new List<string>();
+
+        return re;
     }
 }

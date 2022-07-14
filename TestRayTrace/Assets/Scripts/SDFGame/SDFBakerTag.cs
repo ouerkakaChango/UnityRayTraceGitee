@@ -10,6 +10,13 @@ public enum SDFShapeType
     Font,
 };
 
+public enum SDFMergeType
+{
+    None,
+    Box,
+    QuadBezier,
+}
+
 public class SDFBakerTag : MonoBehaviour
 {
     //public bool active = true;
@@ -21,6 +28,10 @@ public class SDFBakerTag : MonoBehaviour
     public int specialID = -1;
     [HideInInspector]
     public char fontCharacter;
+    [HideInInspector]
+    public SDFMergeType mergeType = SDFMergeType.None;
+    [HideInInspector]
+    public int objInx;
     // Start is called before the first frame update
     void Start()
     {
