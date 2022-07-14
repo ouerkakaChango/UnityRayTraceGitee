@@ -31,25 +31,33 @@ public class SDFPrefabBakerEditor : Editor
             }
         }
 
-        if (GUILayout.Button("Clear now baked prefabs"))
-        {
-            Target.Clear();
-        }
-
         showBakeFoldout = EditorGUILayout.Foldout(showBakeFoldout, "Now Baked:");
         if (showBakeFoldout)
         {
+            EditorGUI.BeginChangeCheck();
             var prefabs = serializedObject.FindProperty("prefabs");
-            //if (prefabs != null)
+            EditorShowSDFPrefabList(serializedObject, Target.prefabs.Count, prefabs);
+            //EditorGUILayout.PropertyField(prefabs, new GUIContent("prefabs"), true);
+            //if (EditorGUI.EndChangeCheck())
+            //{
+            //    serializedObject.ApplyModifiedProperties();
+            //}
+            if (GUILayout.Button("Clear now baked prefabs"))
             {
-                EditorGUILayout.PropertyField(prefabs, new GUIContent("prefabs"), true);
+                Target.Clear();
             }
         }
 
         showBakeSpecialFoldout = EditorGUILayout.Foldout(showBakeSpecialFoldout, "BakeSpcecial");
         if (showBakeSpecialFoldout)
         {
-            Target.specialID = EditorGUILayout.IntField("SpecialID", Target.specialID);
+            //Target.specialID = EditorGUILayout.IntField("SpecialID", Target.specialID);
+            var nid = EditorGUILayout.IntField("SpecialID", Target.specialID);
+            if (nid != Target.specialID)
+            {
+                Undo.RecordObject(Target, "SpecialID");
+                Target.specialID = nid;
+            }
             if (GUILayout.Button("BakeSpecial"))
             {
                 Target.BakeSpecial();
@@ -61,10 +69,41 @@ public class SDFPrefabBakerEditor : Editor
         {
             var groups = serializedObject.FindProperty("groups");
             EditorGUILayout.PropertyField(groups, new GUIContent("groups"), true);
-            Target.groupPrefabName = EditorGUILayout.TextField("name", Target.groupPrefabName);
+
+            var nName = EditorGUILayout.TextField("name", Target.groupPrefabName);
+            if(nName!=Target.groupPrefabName)
+            {
+                Undo.RecordObject(Target, "groupPrefabName");
+                Target.groupPrefabName = nName;
+            }
+
             if (GUILayout.Button("BakeGroup"))
             {
                 Target.BakeGroup();
+            }
+        }
+
+        //EditorGUI.BeginChangeCheck();
+        //EditorGUI.EndChangeCheck();
+        //serializedObject.ApplyModifiedProperties() 
+        //EditorUtility.SetDirty(Target);
+    }
+    //########################################
+    public static void EditorShowSDFPrefabList(SerializedObject serializedObject, int listCount, SerializedProperty listSP)
+    {
+        for (int i = 0; i < listCount; i++)
+        {
+            SerializedProperty nameSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("prefabName");
+
+            EditorGUI.BeginChangeCheck();
+
+            //EditorGUILayout.PropertyField(nameSP, true);
+            EditorGUILayout.LabelField(nameSP.stringValue);
+
+            EditorGUILayout.Space();
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
             }
         }
     }

@@ -1368,6 +1368,10 @@ MonoBehaviour:
   extraInclude:
   - '#include "../../HLSL/SDFGame/SDFCommonDef.hlsl"'
   dumpDir: Resources/SDFGamePrefab/font_prefab.hlsl
+  prefabs:
+  - prefabName: SDFPrefab_ASCII_66
+    lines: []
+  groupPrefabName: SDFPrefab_ASCII_66
   groups:
   - {fileID: 1619666536}
   - {fileID: 1393436991}
