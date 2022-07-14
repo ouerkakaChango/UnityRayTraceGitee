@@ -37,14 +37,10 @@ public class SDFPrefabBakerEditor : Editor
             EditorGUI.BeginChangeCheck();
             var prefabs = serializedObject.FindProperty("prefabs");
             EditorShowSDFPrefabList(serializedObject, Target.prefabs.Count, prefabs);
-            //EditorGUILayout.PropertyField(prefabs, new GUIContent("prefabs"), true);
-            //if (EditorGUI.EndChangeCheck())
-            //{
-            //    serializedObject.ApplyModifiedProperties();
-            //}
             if (GUILayout.Button("Clear now baked prefabs"))
             {
                 Target.Clear();
+                EditorUtility.SetDirty(Target);
             }
         }
 
@@ -61,6 +57,7 @@ public class SDFPrefabBakerEditor : Editor
             if (GUILayout.Button("BakeSpecial"))
             {
                 Target.BakeSpecial();
+                EditorUtility.SetDirty(Target);
             }
         }
 
@@ -80,6 +77,7 @@ public class SDFPrefabBakerEditor : Editor
             if (GUILayout.Button("BakeGroup"))
             {
                 Target.BakeGroup();
+                EditorUtility.SetDirty(Target);
             }
         }
 
