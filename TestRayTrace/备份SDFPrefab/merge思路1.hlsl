@@ -38,6 +38,7 @@ re = min(re,d);
 
 re = min(re, 0 + SDFBox(p, float3(0.284, 0.1, 0.5), float3(0.05, 0.1, 0.35), float3(0, 0, 0)));
 
+//??? 用regex?
 //sdf merge
 //1.先对所有mergedObjects给id
 //2.对于所有spline（逐行处理逻辑）：
