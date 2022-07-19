@@ -115,28 +115,29 @@ public class SDFPrefabBaker : MonoBehaviour
 
         List<string>[] linesArr = new List<string>[groups.Count];
         
-        for (int id=0;id<groups.Count;id++)
+        for (int i=0;i<groups.Count;i++)
         {
-            linesArr[id] = GetObjLines(groups[id].objInx);
-            test2 = linesArr[id];
-            if (linesArr[id].Count==0)
+            linesArr[i] = GetObjLines(groups[i].objInx);
+            test2 = linesArr[i];
+            if (linesArr[i].Count==0)
             {
-                Debug.LogError("Can't find obj, id:"+ groups[id].objInx + ". May need Refresh AutoCS?");
+                Debug.LogError("Can't find obj, id:"+ groups[i].objInx + ". May need Refresh AutoCS?");
                 return;
             }
         }
 
         Dictionary<int, List<string>> boxLines = new Dictionary<int, List<string>>();
         Dictionary<int, List<string>> qbLines = new Dictionary<int, List<string>>();
-        for(int id=0;id<groups.Count;id++)
+        for(int i=0;i<groups.Count;i++)
         {
-            if(groups[id].mergeType == SDFMergeType.Box)
+            int id = groups[i].objInx;
+            if (groups[i].mergeType == SDFMergeType.Box)
             {
-                boxLines[id] = linesArr[id];
+                boxLines[id] = linesArr[i];
             }
-            else if (groups[id].mergeType == SDFMergeType.QuadBezier)
+            else if (groups[i].mergeType == SDFMergeType.QuadBezier)
             {
-                qbLines[id] = linesArr[id];
+                qbLines[id] = linesArr[i];
             }
         }
 
@@ -145,8 +146,11 @@ public class SDFPrefabBaker : MonoBehaviour
         test3 = linesArr[2];
 
         //对于boxlines和qblines，分别进行merge，使用CodeHelper.MergeSDFBox/MergeSDFQuadBezier
-        //var mergedBoxLines = CodeHelper.MergeSDFBox(boxLines);
+        var mergedBoxLines = CodeHelper.MergeSDFBox(boxLines);
         //var mergedQbLines = CodeHelper.MergeSDFQuadBezier(qbLines);
+
+        //???
+        test = mergedBoxLines;
 
         //SDFPrefab pre = new SDFPrefab();
         //pre.prefabName = groupPrefabName;

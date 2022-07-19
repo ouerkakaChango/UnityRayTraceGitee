@@ -1382,7 +1382,8 @@ MonoBehaviour:
   autoCS: {fileID: 135565127}
   specialID: -2
   test:
-  - re = min(re, 0 + SDFBox(p, float3(0.284, 0.1, 0.5), float3(0.05, 0.1, 0.35),
+  - float d6 = re;
+  - d6 = min(d6, 0 + SDFBox(p, float3(0.284, 0.1, 0.5), float3(0.05, 0.1, 0.35),
     float3(0, 0, 0)));
   test2:
   - float d = re;
