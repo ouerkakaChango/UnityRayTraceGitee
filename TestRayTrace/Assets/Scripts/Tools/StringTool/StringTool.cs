@@ -25,11 +25,21 @@ namespace StringTool
 
         //去除多余空格，tab
         //去除开头结尾的空格，tab
+        //之后，如果有if (..)，去除if后面的空格
+        //之后，如果有"( "," )"，去除空格
         public static string NiceLine(string str)
         {
             char[] charSeparators = new char[] { ' ', '\t' };
             string[] words = str.Split(charSeparators, System.StringSplitOptions.RemoveEmptyEntries);
-            return string.Join(" ", words);
+            string re = string.Join(" ", words);
+            if(re.Length>4 && re.Substring(0,4)=="if (")
+            {
+                re = "if(" + re.Substring(4);
+            }
+            re = re.Replace(" if (", " if(");
+            re = re.Replace("( ", "(");
+            re = re.Replace(" )", ")");
+            return re;
         }
 
         public static void Append(ref string re, in string[] lines)

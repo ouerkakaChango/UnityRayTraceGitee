@@ -12,7 +12,8 @@ public class SDFPrefabBaker : MonoBehaviour
     public AutoCS autoCS;
     [HideInInspector]
     public int specialID = -1;
-    //public List<string> test;
+    //???
+    public List<string> test, test2, test3;
     public string[] extraInclude;
     public string dumpDir;
     [HideInInspector]
@@ -117,9 +118,10 @@ public class SDFPrefabBaker : MonoBehaviour
         for (int id=0;id<groups.Count;id++)
         {
             linesArr[id] = GetObjLines(groups[id].objInx);
-            if(linesArr[id].Count==0)
+            test2 = linesArr[id];
+            if (linesArr[id].Count==0)
             {
-                Debug.LogError("Can't find obj.May need Refresh AutoCS?");
+                Debug.LogError("Can't find obj, id:"+ groups[id].objInx + ". May need Refresh AutoCS?");
                 return;
             }
         }
@@ -138,9 +140,13 @@ public class SDFPrefabBaker : MonoBehaviour
             }
         }
 
+        test = linesArr[0];
+        test2 = linesArr[1];
+        test3 = linesArr[2];
+
         //对于boxlines和qblines，分别进行merge，使用CodeHelper.MergeSDFBox/MergeSDFQuadBezier
-        var mergedBoxLines = CodeHelper.MergeSDFBox(boxLines);
-        var mergedQbLines = CodeHelper.MergeSDFQuadBezier(qbLines);
+        //var mergedBoxLines = CodeHelper.MergeSDFBox(boxLines);
+        //var mergedQbLines = CodeHelper.MergeSDFQuadBezier(qbLines);
 
         //SDFPrefab pre = new SDFPrefab();
         //pre.prefabName = groupPrefabName;
@@ -190,8 +196,23 @@ public class SDFPrefabBaker : MonoBehaviour
 
     List<string> GetObjLines(int objInx)
     {
-        List<string> re = new List<string>();
+        //!!! 现在默认在[1]处是整个场景的cfg
+        string path = AutoCS.FullPath(autoCS.cfgs[1]);
 
-        return re;
+        string[] lines = File.ReadAllLines(path);
+
+        var sdfBlock = AutoCSHelper.GetBlockCode(ref lines, "ObjSDF");
+        test = sdfBlock;
+        var contents = CodeHelper.GetBlockOfHead(ref sdfBlock, (objInx == 0?"":"else ") +"if(inx == " + objInx + ")");
+        if (contents.Count == 0)
+        {
+            Debug.LogError("Target id sdf not exist,id: "+ objInx);
+            if(objInx==0)
+            {
+                Debug.LogError("May need refreash AutoCS to get objInx?");
+            }
+            return contents;
+        }
+        return contents;
     }
 }

@@ -30,7 +30,7 @@ public class SDFBakerTag : MonoBehaviour
     public char fontCharacter;
     [HideInInspector]
     public SDFMergeType mergeType = SDFMergeType.None;
-    [HideInInspector]
+    //[HideInInspector]
     public int objInx;
     // Start is called before the first frame update
     void Start()

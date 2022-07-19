@@ -8,7 +8,7 @@ namespace CodeTool
     public static class CodeHelper
     {
         //if nice line,even though head is slightly diffentent(spacebar,tab...) is ok.
-        public static List<string> GetBlockOfHead(ref List<string> lines, string head, bool niceLine = true, bool addHead = false)
+        public static List<string> GetBlockOfHead(ref List<string> lines, string head, bool niceLineJudgeHead = true, bool addHead = false)
         {
             List<string> re = new List<string>();
             if (addHead)
@@ -16,7 +16,7 @@ namespace CodeTool
                 re.Add(head);
                 re.Add("{");
             }
-            if (niceLine)
+            if (niceLineJudgeHead)
             {
                 head = StringHelper.NiceLine(head);
             }
@@ -25,7 +25,7 @@ namespace CodeTool
             for(int i=0;i<lines.Count;i++)
             {
                 var line = lines[i];
-                if(niceLine)
+                if(niceLineJudgeHead)
                 {
                     line = StringHelper.NiceLine(line);
                 }
@@ -34,13 +34,14 @@ namespace CodeTool
                     break;
                 }
                 var next = lines[i + 1];
-                if(niceLine)
+                if(niceLineJudgeHead)
                 {
                     next = StringHelper.NiceLine(next);
                 }
-
+                //Debug.Log(line+"\n"+head);
                 if (!hasBegin && line == head && next == "{")
                 {
+                    //Debug.Log("hasBegin");
                     hasBegin = true;
                     i += 1;
                     continue;
