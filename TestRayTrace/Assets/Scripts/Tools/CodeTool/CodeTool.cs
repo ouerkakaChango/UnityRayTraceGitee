@@ -6,6 +6,16 @@ using StringTool;
 
 namespace CodeTool
 {
+    public enum CodeLineType
+    {
+        SingleValStatement, // not array val
+    };
+
+    public enum CodeSimplifyOp
+    {
+        RemoveRedundant, //keep first,remove rest all
+    };
+
     public static class CodeHelper
     {
         //if nice line,even though head is slightly diffentent(spacebar,tab...) is ok.
@@ -209,32 +219,33 @@ namespace CodeTool
             }
         }
 
-        //re = min(re, 0 + SDFBox(p, float3(0.284, 0.1, 0.5), float3(0.05, 0.1, 0.35), float3(0, 0, 0)));
-        public static List<string> MergeSDFBox(Dictionary<int, List<string>> boxLines)
+        public static void ReplaceIn(ref List<string> lines,string wholestr,string oldstr,string newstr)
         {
-            List<string> re = new List<string>();
-            var idList = boxLines.Keys.ToList();
-            for (int i = 0; i < idList.Count; i++)
+            for(int i=0;i<lines.Count;i++)
             {
-                string idstr = "d" + idList[i];
-                re.Add("float "+ idstr+" = re;");
+                var line = lines[i];
+                line = StringHelper.NiceLine(line);
+                if(line == wholestr)
+                {
+                    //Debug.Log("Match!");
+                    line = line.Replace(oldstr, newstr);
+                }
+                lines[i] = line;
             }
-            for(int i=0;i<idList.Count;i++)
-            {
-                int id = idList[i];
-                string idstr = "d" + id;
-                var line = boxLines[id][0];
-                line = line.Replace("re", idstr);
-                re.Add(line);
-            }
-            return re;
         }
 
-        public static List<string> MergeSDFQuadBezier(Dictionary<int, List<string>> boxLines)
+        public static void RemoveIn(ref List<string> lines, string wholestr)
         {
-            List<string> re = new List<string>();
+            lines.RemoveAll(i => i == wholestr);
+        }
 
-            return re;
+        public static void CodeSimplify(ref List<string> lines, CodeLineType targetType, CodeSimplifyOp targetOp)
+        {
+            if(targetType== CodeLineType.SingleValStatement && targetOp == CodeSimplifyOp.RemoveRedundant)
+            {
+                //删除多余的单值声明
+                //???
+            }
         }
     }
 }

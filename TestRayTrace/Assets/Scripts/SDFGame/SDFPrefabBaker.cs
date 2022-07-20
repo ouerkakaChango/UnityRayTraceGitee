@@ -146,11 +146,12 @@ public class SDFPrefabBaker : MonoBehaviour
         test3 = linesArr[2];
 
         //对于boxlines和qblines，分别进行merge，使用CodeHelper.MergeSDFBox/MergeSDFQuadBezier
-        var mergedBoxLines = CodeHelper.MergeSDFBox(boxLines);
-        //var mergedQbLines = CodeHelper.MergeSDFQuadBezier(qbLines);
+        var mergedBoxLines = SDFPrefabMergeHelper.MergeSDFBox(boxLines);
+        var mergedQbLines = SDFPrefabMergeHelper.MergeSDFQuadBezier(qbLines);
 
         //???
         test = mergedBoxLines;
+        test2 = mergedQbLines;
 
         //SDFPrefab pre = new SDFPrefab();
         //pre.prefabName = groupPrefabName;
