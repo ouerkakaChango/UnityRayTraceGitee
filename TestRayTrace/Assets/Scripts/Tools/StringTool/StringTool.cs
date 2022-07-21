@@ -6,14 +6,21 @@ namespace StringTool
 {
     public static class StringHelper
     {
-        public static string ChopEnd(string str, string postFix)
+        public static string ChopEnd(string str, string postFix, bool strict=true)
         {
             int len = str.Length - postFix.Length;
             int inx = str.IndexOf(postFix);
             if (inx != len)
             {
-                Debug.LogError("Not postFix");
-                return "";
+                if (strict)
+                {
+                    Debug.LogError("Not postFix");
+                    return "";
+                }
+                else
+                {
+                    return str;
+                }
             }
             return str.Substring(0, len);
         }

@@ -47,5 +47,15 @@ namespace Debugger
         {
             Debug.Log("line a: " + VecStr(line.a) + " line b: " + VecStr(line.b));
         }
+
+        public static void DebugWords(string[] words)
+        {
+            string re = "Words: ";
+            for(int i=0;i<words.Length;i++)
+            {
+                re += words[i] + " | ";
+            }
+            Debug.Log(re);
+        }
     }
 }

@@ -43,13 +43,13 @@ namespace CodeTool
                 CodeHelper.ReplaceIn(ref lines, "float d = re;", "d", "d" + idList[i]);
                 //2.删除re = min(re,d);
                 CodeHelper.RemoveIn(ref lines, "re = min(re,d);");
-                //3.变量声明删重
-                CodeHelper.CodeSimplify(ref lines, CodeLineType.SingleValStatement,CodeSimplifyOp.RemoveRedundant);
                 qbLines[id] = lines;
-
                 //???
                 re.AddRange(lines);
             }
+
+            //3.变量声明删重
+            CodeHelper.CodeSimplify(ref re, CodeLineType.SingleValStatement, CodeSimplifyOp.RemoveRedundant);
             return re;
         }
     }

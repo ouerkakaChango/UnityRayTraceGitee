@@ -247,7 +247,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce80f74af5a6108428874d9804bbe084, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useFSR: 1
+  useFSR: 0
   FSR_Scale: 2
   SceneName: Detail1
   autoCS: {fileID: 135565127}
