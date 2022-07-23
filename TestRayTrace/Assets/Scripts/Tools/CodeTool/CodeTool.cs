@@ -362,7 +362,71 @@ namespace CodeTool
             }
             else if (targetType == CodeLineType.ArrayValStatementAndInit && targetOp == CodeSimplifyOp.RemoveRedundantStatementAndInit)
             {
-                //???
+                List<CodeLineOp> op = new List<CodeLineOp>();
+                bool bInArrayInit = false;
+                bool bInArrayInitComp = false;
+                string tvalName = "";
+                Dictionary<string, List<string>> arrDic = new Dictionary<string, List<string>>();
+                for(int i=0;i<lines.Count;i++)
+                {
+                    var line = lines[i];
+                    string type, valName;
+                    if (IsArrayValStatement(line, out type, out valName))
+                    {
+                        Debug.Log("ArrayValStatement " + line);
+                        if (arrDic.ContainsKey(valName))
+                        {
+                            //1.标记删除此行statement
+                            //2.准备开启比较模式(如果和之前的赋值一样，则删除此行)
+                            op.Add(new CodeLineOp(i, CodeLineOpType.Remove));
+                            bInArrayInitComp = true;
+                        }
+                        else
+                        {
+                            bInArrayInit = true;
+                            arrDic.Add(valName, new List<string>());
+                        }
+                        //Debug.Log(Regex.Match("abc", "ab[\\w]").Success);
+                        tvalName = valName;
+                        continue;
+                    }
+                    if(bInArrayInit)
+                    {
+                        //spline[0] = float2(-0.05, 0);
+                        if(IsArrayInit(line, tvalName))
+                        {
+                            arrDic[tvalName].Add(line);
+                        }
+                        else
+                        {
+                            bInArrayInit = false;
+                        }
+                    }
+                    else if(bInArrayInitComp)
+                    {
+                        if (IsArrayInit(line, tvalName))
+                        {
+                            if(arrDic[tvalName].Contains(line))
+                            {
+                                op.Add(new CodeLineOp(i, CodeLineOpType.Remove));
+                            }
+                        }
+                        else
+                        {
+                            bInArrayInitComp = false;
+                        }
+                    }
+                }
+
+                DoCodeOperations(ref lines, ref op);
+                //!!! debug log op
+                //string tt = "";
+                //for(int i=0;i<op.Count;i++)
+                //{
+                //    tt += op[i].ToString() + "\n";
+                //}
+                //Debug.Log(tt);
+                //___
             }
         }
 
@@ -407,6 +471,39 @@ namespace CodeTool
             //{
             //    Debug.Log(line);
             //}
+            return re;
+        }
+
+        public static bool IsArrayValStatement(string line, out string type, out string valName)
+        {
+            type = "";
+            valName = "";
+            char[] charSeparators = new char[] { ' ', '\t' };
+            line = StringHelper.ChopEnd(line, ";", false);
+            string[] words = line.Split(charSeparators, System.StringSplitOptions.RemoveEmptyEntries);
+            if (words.Length == 2)
+            {
+                type = words[0];
+                valName = words[1];
+                if (IsArrayWord(valName))
+                {
+                    int inx = valName.IndexOf("[");
+                    valName = valName.Substring(0, inx);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool IsArrayInit(string line, string valName)
+        {
+            //Debug.Log("test " + line);
+            //spline[0] = float2(-0.05, 0);   ( )[=]( )[\\w*][;]
+            bool re = Regex.Match(line, "^"+ valName + "[\\[][0-9][\\]]( )[=]( )[\\w\\W]*;$").Success;
+            if(re)
+            {
+                Debug.Log("Match Array Init!!! " + line);
+            }
             return re;
         }
 
