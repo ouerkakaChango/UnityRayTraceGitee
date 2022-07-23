@@ -41,15 +41,19 @@ namespace CodeTool
                 //new: float d[id] = re;
                 var lines = qbLines[id];
                 CodeHelper.ReplaceIn(ref lines, "float d = re;", "d", "d" + idList[i]);
+                //ori: FUNC_SDFBoxedQuadBezier(d, p, spline, 9, trans, box)
+                //new: FUNC_SDFBoxedQuadBezier(d[id], p, spline, 9, trans, box)
+                CodeHelper.ReplaceIn(ref lines, "FUNC_SDFBoxedQuadBezier(d,", "d,", "d" + idList[i]+",",MatchPattern.partLine);
                 //2.删除re = min(re,d);
                 CodeHelper.RemoveIn(ref lines, "re = min(re,d);");
                 qbLines[id] = lines;
-                //???
                 re.AddRange(lines);
             }
 
-            //3.变量声明删重
-            CodeHelper.CodeSimplify(ref re, CodeLineType.SingleValStatement, CodeSimplifyOp.RemoveRedundant);
+            //3.非数组变量声明删重
+            CodeHelper.CodeSimplify(ref re, CodeLineType.SingleValStatement, CodeSimplifyOp.RemoveRedundantStatement);
+            //4.数组变量删重
+            CodeHelper.CodeSimplify(ref re, CodeLineType.ArrayValStatementAndInit, CodeSimplifyOp.RemoveRedundantStatementAndInit);
             return re;
         }
     }

@@ -12,11 +12,13 @@ namespace CodeTool
     public enum CodeLineType
     {
         SingleValStatement, // not array val
+        ArrayValStatementAndInit,
     };
 
     public enum CodeSimplifyOp
     {
-        RemoveRedundant, //keep first,remove rest all
+        RemoveRedundantStatement,
+        RemoveRedundantStatementAndInit,
     };
 
     public enum CodeLineOpType
@@ -41,6 +43,12 @@ namespace CodeTool
             return Enum.GetName(typeof(CodeLineOpType), type) + " " + inx;
         }
     }
+
+    public enum MatchPattern
+    {
+        wholeLine,
+        partLine,
+    };
 
     public static class CodeHelper
     {
@@ -245,16 +253,27 @@ namespace CodeTool
             }
         }
 
-        public static void ReplaceIn(ref List<string> lines,string wholestr,string oldstr,string newstr)
+        public static void ReplaceIn(ref List<string> lines,string str,string oldstr,string newstr, MatchPattern pattern = MatchPattern.wholeLine)
         {
             for(int i=0;i<lines.Count;i++)
             {
                 var line = lines[i];
                 line = StringHelper.NiceLine(line);
-                if(line == wholestr)
+                if (pattern == MatchPattern.wholeLine)
                 {
-                    //Debug.Log("Match!");
-                    line = line.Replace(oldstr, newstr);
+                    if (line == str)
+                    {
+                        //Debug.Log("Match!");
+                        line = line.Replace(oldstr, newstr);
+                    }
+                }
+                else if (pattern == MatchPattern.partLine)
+                {
+                    if(line.Contains(str))
+                    {
+                        var newpart = str.Replace(oldstr, newstr);
+                        line = line.Replace(str, newpart);
+                    }
                 }
                 lines[i] = line;
             }
@@ -267,7 +286,7 @@ namespace CodeTool
 
         public static void CodeSimplify(ref List<string> lines, CodeLineType targetType, CodeSimplifyOp targetOp)
         {
-            if(targetType== CodeLineType.SingleValStatement && targetOp == CodeSimplifyOp.RemoveRedundant)
+            if(targetType== CodeLineType.SingleValStatement && targetOp == CodeSimplifyOp.RemoveRedundantStatement)
             {
                 //1.删除多余的单值声明
                 Dictionary<string, Dictionary<string,Dictionary<string,List<int>>>> valMap = new Dictionary<string, Dictionary<string, Dictionary<string, List<int>>>>();
@@ -329,16 +348,21 @@ namespace CodeTool
                         }
                     }
                 }
-                //2.删除重复的变量赋值
+                //1.3 先将之前的操作变现
+                DoCodeOperations(ref lines, ref op);
 
-                //??? debug log op
-                string tt = "";
-                for(int i=0;i<op.Count;i++)
-                {
-                    tt += op[i].ToString() + "\n";
-                }
-                Debug.Log(tt);
+                //!!! debug log op
+                //string tt = "";
+                //for(int i=0;i<op.Count;i++)
+                //{
+                //    tt += op[i].ToString() + "\n";
+                //}
+                //Debug.Log(tt);
                 //___
+            }
+            else if (targetType == CodeLineType.ArrayValStatementAndInit && targetOp == CodeSimplifyOp.RemoveRedundantStatementAndInit)
+            {
+                //???
             }
         }
 
@@ -397,6 +421,24 @@ namespace CodeTool
             //    Debug.Log("Match Array world!!! " + str);
             //}
             return re;
+        }
+
+        public static void DoCodeOperations(ref List<string> lines, ref List<CodeLineOp> op)
+        {
+            int offset = 0;
+            for(int i=0;i<op.Count;i++)
+            {
+                var action = op[i];
+                if(action.type == CodeLineOpType.Remove)
+                {
+                    lines.RemoveAt(action.inx + offset);
+                    offset -= 1;
+                }
+                else
+                {
+                    Debug.LogError("undefined behavior");
+                }
+            }
         }
     }
 }
