@@ -23,6 +23,14 @@ public class SDFPrefabBakerEditor : Editor
     {
         base.OnInspectorGUI();
 
+        if (GUILayout.Button("Add Bake To hlsl"))
+        {
+            if (EditorUtility.DisplayDialog("confirm", "\'OK\' to continue", "ok", "cancel"))
+            {
+                Target.AddBakeToHLSL();
+            }
+        }
+
         if (GUILayout.Button("Dump All To hlsl"))
         {
             if (EditorUtility.DisplayDialog("confirm", "Are you sure? This will clear any prefab before.", "ok", "cancel"))

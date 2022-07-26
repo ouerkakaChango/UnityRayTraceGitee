@@ -126,6 +126,7 @@ public class SDFPrefabBaker : MonoBehaviour
             }
         }
 
+        List<int> idList = new List<int>(); 
         Dictionary<int, List<string>> boxLines = new Dictionary<int, List<string>>();
         Dictionary<int, List<string>> qbLines = new Dictionary<int, List<string>>();
         for(int i=0;i<groups.Count;i++)
@@ -134,28 +135,41 @@ public class SDFPrefabBaker : MonoBehaviour
             if (groups[i].mergeType == SDFMergeType.Box)
             {
                 boxLines[id] = linesArr[i];
+                idList.Add(id);
             }
             else if (groups[i].mergeType == SDFMergeType.QuadBezier)
             {
                 qbLines[id] = linesArr[i];
+                idList.Add(id);
             }
         }
-
-        test = linesArr[0];
-        test2 = linesArr[1];
-        test3 = linesArr[2];
 
         //对于boxlines和qblines，分别进行merge，使用CodeHelper.MergeSDFBox/MergeSDFQuadBezier
         var mergedBoxLines = SDFPrefabMergeHelper.MergeSDFBox(boxLines);
         var mergedQbLines = SDFPrefabMergeHelper.MergeSDFQuadBezier(qbLines);
 
+        var result = mergedBoxLines;
+        result.AddRange(mergedQbLines);
+
+        for(int i=0;i<idList.Count;i++)
+        {
+            int id = idList[i];
+            //re = min(re,d[id]);
+            result.Add("re = min(re, d"+id+");");
+        }
+
+        AddPrefabFuncWrap(ref result, groupPrefabName);
+
         //???
         test = mergedBoxLines;
         test2 = mergedQbLines;
+        test3 = result;
+        //___
 
-        //SDFPrefab pre = new SDFPrefab();
-        //pre.prefabName = groupPrefabName;
-        //prefabs.Add(pre);
+        SDFPrefab pre = new SDFPrefab();
+        pre.prefabName = groupPrefabName;
+        pre.lines = result;
+        prefabs.Add(pre);
     }
 
     public void DumpAllToHLSL()
@@ -174,6 +188,12 @@ public class SDFPrefabBaker : MonoBehaviour
             File.Delete(path);
         }
         File.WriteAllText(path, GetAllPrefabHLSL(fileName));
+    }
+
+    public void AddBakeToHLSL()
+    {
+        //???
+        Debug.Log("AddBakeToHLSL");
     }
 
     public string GetAllPrefabHLSL(string fileName)
@@ -219,5 +239,13 @@ public class SDFPrefabBaker : MonoBehaviour
             return contents;
         }
         return contents;
+    }
+
+    //void SDFPrefab_ASCII_65(inout float re, in float3 p)
+    void AddPrefabFuncWrap(ref List<string> lines, string prefabName)
+    {
+        lines.Insert(0, "{");
+        lines.Insert(0, "void " + prefabName + "(inout float re, in float3 p)");
+        lines.Add("}");
     }
 }

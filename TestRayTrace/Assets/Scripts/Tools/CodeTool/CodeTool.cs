@@ -327,7 +327,7 @@ namespace CodeTool
                             List<int> lineInx = ivalue.Value;
                             if(lineInx.Count>1)
                             {
-                                Debug.Log("Redundant whole: "+valName+"%%"+value);
+                                //Debug.Log("Redundant whole: "+valName+" value:"+value);
                             }
                             for(int i=1;i<lineInx.Count;i++)
                             {
@@ -373,7 +373,7 @@ namespace CodeTool
                     string type, valName;
                     if (IsArrayValStatement(line, out type, out valName))
                     {
-                        Debug.Log("ArrayValStatement " + line);
+                        //Debug.Log("ArrayValStatement " + line);
                         if (arrDic.ContainsKey(valName))
                         {
                             //1.标记删除此行statement
@@ -500,10 +500,10 @@ namespace CodeTool
             //Debug.Log("test " + line);
             //spline[0] = float2(-0.05, 0);   ( )[=]( )[\\w*][;]
             bool re = Regex.Match(line, "^"+ valName + "[\\[][0-9][\\]]( )[=]( )[\\w\\W]*;$").Success;
-            if(re)
-            {
-                Debug.Log("Match Array Init!!! " + line);
-            }
+            //if(re)
+            //{
+            //    Debug.Log("Match Array Init!!! " + line);
+            //}
             return re;
         }
 
