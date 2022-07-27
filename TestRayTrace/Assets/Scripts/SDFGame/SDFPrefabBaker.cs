@@ -194,6 +194,17 @@ public class SDFPrefabBaker : MonoBehaviour
     {
         //???
         Debug.Log("AddBakeToHLSL");
+        string path = FileHelper.FullPath(dumpDir);
+        //Debug.Log(path);
+        if (!path.EndsWith(".hlsl"))
+        {
+            Debug.LogError("Not a hlsl!");
+            return;
+        }
+        var orilines = File.ReadAllLines(path);
+        var lines = new List<string>(orilines);
+        CodeHelper.InsertBefore(ref lines, "#endif", GetAllPrefabHLSLLines());
+        File.WriteAllLines(path, lines);
     }
 
     public string GetAllPrefabHLSL(string fileName)
@@ -211,6 +222,18 @@ public class SDFPrefabBaker : MonoBehaviour
         }
         //tail
         re += "#endif";
+        return re;
+    }
+
+    public List<string> GetAllPrefabHLSLLines()
+    {
+        List<string> re = new List<string>();
+        re.Add("");
+        for (int i = 0; i < prefabs.Count; i++)
+        {
+            re.AddRange(prefabs[i].lines);
+            re.Add("");
+        }
         return re;
     }
 

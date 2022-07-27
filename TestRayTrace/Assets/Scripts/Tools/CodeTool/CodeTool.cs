@@ -284,6 +284,32 @@ namespace CodeTool
             lines.RemoveAll(i => i == wholestr);
         }
 
+        public static void InsertBefore(ref List<string> lines, string beforeLine, in List<string> toInsert, bool niceLineJudge = true)
+        {
+            int inx = -1;
+            for(int i=0;i<lines.Count;i++)
+            {
+                var line = lines[i];
+                if(niceLineJudge)
+                {
+                    line = StringHelper.NiceLine(line);
+                }
+                if(line == beforeLine)
+                {
+                    inx = i;
+                    break;
+                }
+            }
+            if(inx>=0)
+            {
+                lines.InsertRange(inx, toInsert);
+            }
+            else
+            {
+                Debug.LogWarning("Insert Failed");
+            }
+        }
+
         public static void CodeSimplify(ref List<string> lines, CodeLineType targetType, CodeSimplifyOp targetOp)
         {
             if(targetType== CodeLineType.SingleValStatement && targetOp == CodeSimplifyOp.RemoveRedundantStatement)

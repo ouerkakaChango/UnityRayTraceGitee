@@ -1,4 +1,4 @@
-﻿#define OBJNUM 7
+﻿#define OBJNUM 8
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -74,6 +74,12 @@ re.roughness = 1;
 }
 else if (obj == 6 )
 {
+re.albedo = float3(1, 0, 0);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 7 )
+{
 re.albedo = float3(0, 0, 1);
 re.metallic = 0;
 re.roughness = 1;
@@ -85,7 +91,7 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[7];
+int renderMode[8];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 4;
@@ -93,6 +99,7 @@ renderMode[3] = 0;
 renderMode[4] = 0;
 renderMode[5] = 0;
 renderMode[6] = 0;
+renderMode[7] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -122,6 +129,9 @@ else if (inx == 5 )
 {
 }
 else if (inx == 6 )
+{
+}
+else if (inx == 7 )
 {
 }
 //@@@
@@ -257,6 +267,13 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //}
 
 //@@@SDFBakerMgr BeforeObjSDF
+if(inx == 6 )
+{
+if (!IsInBBox(p, float3(-8.5, -10, -9.5), float3(11.5, 10, 10.5)))
+{
+return re;
+}
+}
 //@@@
 //___
 //@@@SDFBakerMgr ObjSDF
@@ -320,6 +337,14 @@ re = min(re,d);
 }
 else if (inx == 6 )
 {
+p = WorldToLocal(p,float3(1, 0, 0),float3(0, 0, 0),float3(1, 1, 1));
+float d = re;
+SDFPrefab_ASCII_66(d,p);
+d *= 1;
+re = min(re,d);
+}
+else if (inx == 7 )
+{
 re = min(re, 0 + SDFBox(p, float3(0.284, 0.1, 0.5), float3(0.05, 0.1, 0.35), float3(0, 0, 0)));
 }
 //@@@
@@ -377,6 +402,9 @@ else if (inx == 5 )
 {
 }
 else if (inx == 6 )
+{
+}
+else if (inx == 7 )
 {
 }
 //@@@

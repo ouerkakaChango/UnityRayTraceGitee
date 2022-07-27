@@ -65,8 +65,10 @@ void Render(uint3 id : SV_DispatchThreadID)
 	float SSAA_unitDis = 1.0f / SSAA_edge;
 	float3 SSAA_colors[SSAA_num];
 
+	[unroll(SSAA_edge)]
 	for (int j = 1; j <= SSAA_edge; j++)
 	{
+		[unroll(SSAA_edge)]
 		for (int i = 1; i <= SSAA_edge; i++)
 		{
 			Ray ray;

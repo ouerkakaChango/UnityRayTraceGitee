@@ -31,11 +31,14 @@ public class SDFBakerTagEditor : Editor
         }
         else if(type == SDFShapeType.Font)
         {
-            char nc = EditorGUILayout.TextField("Character",Target.fontCharacter.ToString())[0];
-            if(nc!=Target.fontCharacter)
+            if (Target.fontCharacter.ToString().Length > 0)
             {
-                Undo.RecordObject(Target, "Character");
-                Target.fontCharacter = nc;
+                char nc = EditorGUILayout.TextField("Character", Target.fontCharacter.ToString())[0];
+                if (nc != Target.fontCharacter)
+                {
+                    Undo.RecordObject(Target, "Character");
+                    Target.fontCharacter = nc;
+                }
             }
         }
 
