@@ -331,7 +331,7 @@ if(inx == 8 )
 {
 if (!IsInBBox(p, float3(-80, -1.907349E-06, -71.434), float3(-50, 30, -41.43399)))
 {
-    return re;
+    return SDFBox(p, float3(-65, 15, -56.434), float3(15, 15, 15)) + 0.1;
 }
 }
 //@@@

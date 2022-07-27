@@ -374,14 +374,9 @@ public class SDFBakerMgr : MonoBehaviour
     {
         //if (!IsInBBox(p, center - scale * bound, center + scale * bound))
         //{
-        //    return re;
+                // return SDFBox(p, center, bound) + 0.1;
         //}
-        //???
-        // float3 pmin = float3(-80, -1.907349E-06, -71.434);
-        // float3 pmax = float3(-50, 30, -41.43399);
-        // float3 center = (pmin + pmax) * 0.5;
-        // float3 bound = (pmax - pmin) * 0.5;
-        // return SDFBox(p, center, bound) + 0.1;
+        //0.1是一个epsilon，用来保证一定会trace进bbox内
 
         var sdfBound = obj.GetComponent<SDFBound>();
         if(sdfBound==null)
@@ -395,7 +390,7 @@ public class SDFBakerMgr : MonoBehaviour
         Vector3 max = center + s * bound;
         bakedBeforeSDF.Add("if (!IsInBBox(p, "+Bake(min)+", "+ Bake(max) + "))");
         bakedBeforeSDF.Add("{");
-        bakedBeforeSDF.Add("    return re;");
+        bakedBeforeSDF.Add("    return SDFBox(p, "+Bake(center)+", "+Bake(bound)+") + 0.1;");
         bakedBeforeSDF.Add("}");
     }
 

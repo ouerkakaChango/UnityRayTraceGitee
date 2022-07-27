@@ -376,11 +376,7 @@ if(inx == 8 )
 {
 if (!IsInBBox(p, float3(-80, -1.907349E-06, -71.434), float3(-50, 30, -41.43399)))
 {
-	float3 pmin = float3(-80, -1.907349E-06, -71.434);
-	float3 pmax = float3(-50, 30, -41.43399);
-	float3 center = (pmin + pmax)*0.5;
-	float3 bound = (pmax - pmin)*0.5;
-	return SDFBox(p, center, bound) + 0.1;
+return SDFBox(p, float3(-65, 15, -56.434), float3(15, 15, 15)) + 0.1;
 }
 }
 //@@@
