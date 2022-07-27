@@ -374,9 +374,13 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr BeforeObjSDF
 if(inx == 8 )
 {
-if (!IsInBBox(p, float3(-83.29901, -28.573, -86.43401), float3(-23.29899, 31.427, -26.43399)))
+if (!IsInBBox(p, float3(-80, -1.907349E-06, -71.434), float3(-50, 30, -41.43399)))
 {
-return re;
+	float3 pmin = float3(-80, -1.907349E-06, -71.434);
+	float3 pmax = float3(-50, 30, -41.43399);
+	float3 center = (pmin + pmax)*0.5;
+	float3 bound = (pmax - pmin)*0.5;
+	return SDFBox(p, center, bound) + 0.1;
 }
 }
 //@@@

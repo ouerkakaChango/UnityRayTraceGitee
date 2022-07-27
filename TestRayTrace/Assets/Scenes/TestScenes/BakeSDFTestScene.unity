@@ -164,6 +164,8 @@ MonoBehaviour:
   shapeType: 1
   specialID: -1
   fontCharacter: 0
+  mergeType: 0
+  objInx: 0
 --- !u!135 &45438425
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -335,6 +337,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  mergeType: 0
+  objInx: 0
 --- !u!65 &142421529
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -497,6 +501,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  mergeType: 1
+  objInx: 1
 --- !u!65 &348777199
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -695,6 +701,8 @@ MonoBehaviour:
   shapeType: 1
   specialID: -2
   fontCharacter: 0
+  mergeType: 0
+  objInx: 2
 --- !u!23 &541193201
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -813,6 +821,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  mergeType: 1
+  objInx: 3
 --- !u!65 &563013441
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1020,6 +1030,78 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hasUpdated: 1
   num: 50
+--- !u!1 &764754544
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 764754545}
+  - component: {fileID: 764754547}
+  - component: {fileID: 764754546}
+  m_Layer: 0
+  m_Name: TestSDF_B
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &764754545
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764754544}
+  m_LocalRotation: {x: -0.1292843, y: 0.76394755, z: 0.6259356, w: 0.08873776}
+  m_LocalPosition: {x: -86.8, y: 4.3, z: -68.1}
+  m_LocalScale: {x: 30, y: 30, z: 30}
+  m_Children: []
+  m_Father: {fileID: 1085768379}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: -78.324, y: 187.457, z: -25.287}
+--- !u!114 &764754546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764754544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  centerStrategy: 1
+  center: {x: -86.8, y: 4.3, z: -68.1}
+  boundStrategy: 1
+  bound: {x: 15.000004, y: 15.000002, z: 15.000003}
+  judgeScale: 2
+--- !u!114 &764754547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764754544}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 0, g: 0.14847445, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 2
+  specialID: -1
+  fontCharacter: 66
+  mergeType: 0
+  objInx: 0
 --- !u!1 &817168217
 GameObject:
   m_ObjectHideFlags: 0
@@ -1075,6 +1157,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  mergeType: 1
+  objInx: 4
 --- !u!65 &817168220
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1178,6 +1262,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  mergeType: 1
+  objInx: 5
 --- !u!65 &1004293005
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1392,6 +1478,7 @@ Transform:
   - {fileID: 817168218}
   - {fileID: 1305698777}
   - {fileID: 1355201446}
+  - {fileID: 764754545}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1449,6 +1536,8 @@ MonoBehaviour:
   shapeType: 1
   specialID: -3
   fontCharacter: 0
+  mergeType: 0
+  objInx: 6
 --- !u!23 &1283602067
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1596,6 +1685,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  mergeType: 2
+  objInx: 7
 --- !u!1 &1355201445
 GameObject:
   m_ObjectHideFlags: 0
@@ -1650,6 +1741,8 @@ MonoBehaviour:
   shapeType: 2
   specialID: -1
   fontCharacter: 65
+  mergeType: 0
+  objInx: 8
 --- !u!114 &1355201448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1676,11 +1769,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  centerStrategy: 1
-  center: {x: -53.299, y: 1.427, z: -56.434}
+  centerStrategy: 0
+  center: {x: -65, y: 15, z: -56.434}
   boundStrategy: 1
   bound: {x: 15.000004, y: 15.000002, z: 15.000003}
-  judgeScale: 2
+  judgeScale: 1
 --- !u!1 &1491667009
 GameObject:
   m_ObjectHideFlags: 0
@@ -1800,6 +1893,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  mergeType: 1
+  objInx: 9
 --- !u!1 &1666331700
 GameObject:
   m_ObjectHideFlags: 0
@@ -2148,6 +2243,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  mergeType: 1
+  objInx: 10
 --- !u!65 &1758613633
 BoxCollider:
   m_ObjectHideFlags: 0
