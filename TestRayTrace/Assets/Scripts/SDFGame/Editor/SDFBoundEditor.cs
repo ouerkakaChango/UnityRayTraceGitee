@@ -21,15 +21,33 @@ public class SDFBoundEditor : Editor
 
         {
             var type = Target.centerStrategy;
+            Vector3 newv = Vector3.zero;
             if (type == AnchorStrategy.CustomSet)
             {
                 //Target.specialID = EditorGUILayout.IntField("SpecialID", Target.specialID);
-                Target.center = EditorGUILayout.Vector3Field("center", Target.center);
+                newv = EditorGUILayout.Vector3Field("center", Target.center);
             }
             else if (type == AnchorStrategy.ByObject)
             {
                 //Target.fontCharacter = EditorGUILayout.TextField("Character",Target.fontCharacter.ToString())[0];
-                Target.center = Target.transform.position;
+                newv = Target.transform.position;
+            }
+            else if (type == AnchorStrategy.LocalBase)
+            {
+                newv = Target.GetCenterByLocalBase();
+            }
+
+            //var newOffset = EditorGUILayout.Vector3Field("centerOffset", Target.centerOffset);
+            //if(newOffset!=Target.centerOffset)
+            //{
+            //    Target.centerOffset = newOffset;
+            //}
+
+            newv = newv + Target.centerOffset;
+
+            if (Target.center != newv)
+            {
+                Target.center = newv;
             }
         }
 
@@ -37,11 +55,19 @@ public class SDFBoundEditor : Editor
             var type = Target.boundStrategy;
             if (type == SizeStrategy.CustomSet)
             {
-                Target.bound = EditorGUILayout.Vector3Field("bound", Target.bound);
+                var newv = EditorGUILayout.Vector3Field("bound", Target.bound);
+                if(Target.bound != newv)
+                {
+                    Target.bound = newv;
+                }
             }
             else if (type == SizeStrategy.AutoIfPossible)
             {
-                Target.bound = Target.TryGetAutoBound();
+                var newv = Target.TryGetAutoBound();
+                if (Target.bound != newv)
+                {
+                    Target.bound = newv;
+                }
             }
         }
     }

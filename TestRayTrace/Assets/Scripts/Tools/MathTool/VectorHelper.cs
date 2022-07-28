@@ -48,5 +48,26 @@ namespace MathHelper
         {
             return new Vector2(v.x, v.z);
         }
+
+        public static Vector3 GetAlignedAxis(in Vector3 v)
+        {
+            float xWight = abs(v.x);
+            float yWight = abs(v.y);
+            float zWight = abs(v.z);
+            if(xWight>=zWight && xWight >= yWight)
+            {
+                return sign(v.x) * new Vector3(1, 0, 0);
+            }
+            else if (yWight >= xWight && yWight>=zWight)
+            {
+                return sign(v.y) * new Vector3(0, 1, 0);
+            }
+            else if (zWight >= xWight && zWight >= yWight)
+            {
+                return sign(v.z) * new Vector3(0, 0, 1);
+            }
+            Debug.LogError("Error in GetAlignedAxis ");
+            return Vector3.zero;
+        }
     }
 }

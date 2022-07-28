@@ -1,4 +1,4 @@
-﻿#define OBJNUM 11
+﻿#define OBJNUM 12
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -67,7 +67,7 @@ re.roughness = 1;
 }
 else if (obj == 4 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0, 0.1484745, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -79,29 +79,35 @@ re.roughness = 1;
 }
 else if (obj == 6 )
 {
-re.albedo = float3(0, 1, 0.1720126);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 7 )
 {
-re.albedo = float3(0, 0.3212323, 1);
+re.albedo = float3(0, 1, 0.1720126);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 8 )
 {
-re.albedo = float3(0, 0.1484745, 1);
+re.albedo = float3(0, 0.3212323, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 9 )
 {
+re.albedo = float3(0, 0.1484745, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 10 )
+{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.2;
 }
-else if (obj == 10 )
+else if (obj == 11 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -114,18 +120,19 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[11];
+int renderMode[12];
 renderMode[0] = 3;
 renderMode[1] = 2;
 renderMode[2] = 0;
 renderMode[3] = 2;
-renderMode[4] = 2;
+renderMode[4] = 0;
 renderMode[5] = 2;
-renderMode[6] = 0;
+renderMode[6] = 2;
 renderMode[7] = 0;
 renderMode[8] = 0;
 renderMode[9] = 0;
-renderMode[10] = 2;
+renderMode[10] = 0;
+renderMode[11] = 2;
 return renderMode[obj];
 //@@@
 }
@@ -156,10 +163,10 @@ else if (inx == 5 )
 }
 else if (inx == 6 )
 {
-inx = -3;
 }
 else if (inx == 7 )
 {
+inx = -3;
 }
 else if (inx == 8 )
 {
@@ -168,6 +175,9 @@ else if (inx == 9 )
 {
 }
 else if (inx == 10 )
+{
+}
+else if (inx == 11 )
 {
 }
 //@@@
@@ -372,7 +382,14 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 //###
 float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr BeforeObjSDF
-if(inx == 8 )
+if(inx == 4 )
+{
+if (!IsInBBox(p, float3(-121.9, -24.79, -82.69), float3(-61.9, 35.21001, -22.68999)))
+{
+return SDFBox(p, float3(-91.90001, 5.210002, -52.68999), float3(15, 15, 15)) + 0.1;
+}
+}
+if(inx == 9 )
 {
 if (!IsInBBox(p, float3(-80, -1.907349E-06, -71.434), float3(-50, 30, -41.43399)))
 {
@@ -399,17 +416,25 @@ re = min(re, 0 + SDFBox(p, float3(-53.255, -0.1510001, -56.684), float3(0.070711
 }
 else if (inx == 4 )
 {
-re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
+p = WorldToLocal(p,float3(-76.9, -14.1, -61.3),float3(281.6757, 187.4573, 334.7128),float3(30.00001, 30, 30.00001));
+float d = re;
+SDFPrefab_ASCII_66(d,p);
+d *= 30.00001;
+re = min(re,d);
 }
 else if (inx == 5 )
 {
-re = min(re, -0.2 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
 }
 else if (inx == 6 )
 {
-inx = -3;
+re = min(re, -0.2 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 else if (inx == 7 )
+{
+inx = -3;
+}
+else if (inx == 8 )
 {
 float d = re;
 float2 box = float2(0.1, 0.05);
@@ -424,7 +449,7 @@ spline[2] = float2(0.53, 0);
 FUNC_SDFBoxedQuadBezier(d, p, spline, 3, trans, box)
 re = min(re,d);
 }
-else if (inx == 8 )
+else if (inx == 9 )
 {
 p = WorldToLocal(p,float3(-53.299, 1.427, -56.434),float3(281.6757, 187.4573, 334.7128),float3(30.00001, 30, 30.00001));
 float d = re;
@@ -432,11 +457,11 @@ SDFPrefab_ASCII_65(d,p);
 d *= 30.00001;
 re = min(re,d);
 }
-else if (inx == 9 )
+else if (inx == 10 )
 {
 re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
 }
-else if (inx == 10 )
+else if (inx == 11 )
 {
 re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
@@ -572,10 +597,10 @@ else if (inx == 5 )
 }
 else if (inx == 6 )
 {
-inx = -3;
 }
 else if (inx == 7 )
 {
+inx = -3;
 }
 else if (inx == 8 )
 {
@@ -584,6 +609,9 @@ else if (inx == 9 )
 {
 }
 else if (inx == 10 )
+{
+}
+else if (inx == 11 )
 {
 }
 //@@@
