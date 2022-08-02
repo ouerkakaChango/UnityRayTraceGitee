@@ -1,4 +1,4 @@
-﻿#define OBJNUM 8
+﻿#define OBJNUM 4
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -27,6 +27,9 @@
 #include "../../../HLSL/Spline/QuadBezier/QuadBezier.hlsl"
 #include "../../SDFGamePrefab/font_prefab.hlsl"
 
+Texture2D<float4> SphereSDFTex;
+SamplerState sdf_linear_repeat_sampler;
+
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
@@ -38,13 +41,13 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 0, 0);
+re.albedo = float3(0.2107661, 1, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0, 0, 1);
+re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -56,31 +59,7 @@ re.roughness = 1;
 }
 else if (obj == 3 )
 {
-re.albedo = float3(0, 0.311419, 1);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 4 )
-{
 re.albedo = float3(1, 0, 0);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 5 )
-{
-re.albedo = float3(0, 0, 1);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 6 )
-{
-re.albedo = float3(1, 0, 0);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 7 )
-{
-re.albedo = float3(0, 0, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -91,15 +70,11 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[8];
+int renderMode[4];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 4;
 renderMode[3] = 0;
-renderMode[4] = 0;
-renderMode[5] = 0;
-renderMode[6] = 0;
-renderMode[7] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -110,6 +85,7 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -3;
 }
 else if (inx == 1 )
 {
@@ -119,19 +95,6 @@ else if (inx == 2 )
 inx = -1;
 }
 else if (inx == 3 )
-{
-inx = -2;
-}
-else if (inx == 4 )
-{
-}
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-else if (inx == 7 )
 {
 }
 //@@@
@@ -267,40 +230,16 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //}
 
 //@@@SDFBakerMgr BeforeObjSDF
-if(inx == 6 )
-{
-if (!IsInBBox(p, float3(-8.5, -10, -9.5), float3(11.5, 10, 10.5)))
-{
-return re;
-}
-}
 //@@@
 //___
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
+inx = -3;
 }
 else if (inx == 1 )
 {
-float d = re;
-float2 box = float2(0.05, 0.1);
-Transform trans;
-Init(trans);
-trans.pos = float3(0.25, 0.1, 0.15);
-trans.rotEuler = float3(0, 180, 180);
-float2 spline[9];
-spline[0] = float2(-0.05, 0);
-spline[1] = float2(0.1, 0);
-spline[2] = float2(0.4, 0);
-spline[3] = float2(0.5, 0);
-spline[4] = float2(0.5, -0.2);
-spline[5] = float2(0.5, -0.35);
-spline[6] = float2(0.36, -0.35);
-spline[7] = float2(0.13, -0.3499999);
-spline[8] = float2(0, -0.35);
-FUNC_SDFBoxedQuadBezier(d, p, spline, 9, trans, box)
-re = min(re,d);
+re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
 }
 else if (inx == 2 )
 {
@@ -308,44 +247,7 @@ inx = -1;
 }
 else if (inx == 3 )
 {
-inx = -2;
-}
-else if (inx == 4 )
-{
 re = min(re, 0 + SDFBox(p, float3(1, 0, 1), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
-}
-else if (inx == 5 )
-{
-float d = re;
-float2 box = float2(0.05, 0.1);
-Transform trans;
-Init(trans);
-trans.pos = float3(0.25, 0.1, 0.85);
-trans.rotEuler = float3(0, 0, 0);
-float2 spline[9];
-spline[0] = float2(-0.05, 0);
-spline[1] = float2(0.1, 0);
-spline[2] = float2(0.4, 0);
-spline[3] = float2(0.5, 0);
-spline[4] = float2(0.5, -0.2);
-spline[5] = float2(0.5, -0.35);
-spline[6] = float2(0.36, -0.35);
-spline[7] = float2(0.13, -0.3499999);
-spline[8] = float2(0, -0.35);
-FUNC_SDFBoxedQuadBezier(d, p, spline, 9, trans, box)
-re = min(re,d);
-}
-else if (inx == 6 )
-{
-p = WorldToLocal(p,float3(1, 0, 0),float3(0, 0, 0),float3(1, 1, 1));
-float d = re;
-SDFPrefab_ASCII_66(d,p);
-d *= 1;
-re = min(re,d);
-}
-else if (inx == 7 )
-{
-re = min(re, 0 + SDFBox(p, float3(0.284, 0.1, 0.5), float3(0.05, 0.1, 0.35), float3(0, 0, 0)));
 }
 //@@@
 if(inx == -1)
@@ -365,6 +267,32 @@ if(inx == -2)
 	//make sure func params are in standard form
 	//SDFPrefab_ASCII_65(re,p);
 }
+if(inx == -3)
+{
+	float hBound = 0.1;
+	float d = re;
+	float d2d = re;
+	float2 picBound = float2(0.5,0.5);
+	float2 p2d = p.xz;
+	//if(gtor(abs(p2d),picBound))
+	//{
+	//	//not hit,than the sdf is sdfBoxPic
+	//	d2d = SDFBox(p,0,picBound)+0.1;
+	//}
+	//else
+	{
+		float2 uv = p2d/picBound;
+		uv = (uv+1)*0.5;
+		float sdfFromPic = SphereSDFTex.SampleLevel(sdf_linear_repeat_sampler,uv,0).r;
+		sdfFromPic/=256*sqrt(2);
+		sdfFromPic *= picBound.x;
+		d2d = sdfFromPic;
+	}
+	float dh = abs(p.y) - hBound;
+	dh = dh>0 ? dh:0;
+	d = sqrt(d2d*d2d+dh*dh);
+	re = min(re,d);
+}
 
 return re;
 }
@@ -383,6 +311,7 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -3;
 }
 else if (inx == 1 )
 {
@@ -392,19 +321,6 @@ else if (inx == 2 )
 inx = -1;
 }
 else if (inx == 3 )
-{
-inx = -2;
-}
-else if (inx == 4 )
-{
-}
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-else if (inx == 7 )
 {
 }
 //@@@

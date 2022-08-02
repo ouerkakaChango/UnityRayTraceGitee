@@ -24,6 +24,11 @@ namespace TextureHelper
             File.WriteAllBytes(folder + "/" + name + ".png", tex.EncodeToPNG());
         }
 
+        public static void SaveEXR(in Texture2D tex, string folder, string name)
+        {
+            File.WriteAllBytes(folder + "/" + name + ".EXR", tex.EncodeToEXR());
+        }
+
         public static void LoadPNG(ref Texture2D tex, string path)
         {
             var fileData = File.ReadAllBytes(path);

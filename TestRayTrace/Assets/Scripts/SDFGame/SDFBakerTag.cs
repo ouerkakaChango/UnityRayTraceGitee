@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using ShaderEqualision;
+using XUtility;
 
 public enum SDFShapeType
 {
@@ -30,7 +31,7 @@ public class SDFBakerTag : MonoBehaviour
     public char fontCharacter;
     [HideInInspector]
     public SDFMergeType mergeType = SDFMergeType.None;
-    //[HideInInspector]
+    [ReadOnly]
     public int objInx;
     // Start is called before the first frame update
     void Start()

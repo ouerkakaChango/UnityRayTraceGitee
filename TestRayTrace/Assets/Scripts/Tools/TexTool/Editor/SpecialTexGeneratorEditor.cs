@@ -30,5 +30,17 @@ public class SpecialTexGeneratorEditor : Editor
             Target.CreateAlphaMask();
             TexHelper.SavePNG(Target.outTex, "Assets", "alphaMask");
         }
+
+        if (GUILayout.Button("GenerateSphereSDF"))
+        {
+            Target.CreateSphereSDF();
+            TexHelper.SaveEXR(Target.outTex, "Assets", "sphereSDF");
+            //TexHelper.SavePNG(Target.outTex, "Assets", "sphereSDF");
+        }
+
+        if (GUILayout.Button("LogOutTexPixel"))
+        {
+            Target.LogOutTexPixel();
+        }
     }
 }

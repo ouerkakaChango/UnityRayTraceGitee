@@ -69,5 +69,24 @@ namespace MathHelper
             Debug.LogError("Error in GetAlignedAxis ");
             return Vector3.zero;
         }
+
+        public static float GetMidFromInt(int x)
+        {
+            if(x%2==0)
+            {
+                return x / 2;
+            }
+            else
+            {
+                return x / 2.0f;
+            }
+        }
+
+        public static Vector2 GetMidFromInt(Vector2Int size)
+        {
+            float x = GetMidFromInt(size.x);
+            float y = GetMidFromInt(size.y);
+            return new Vector2(x, y);
+        }
     }
 }

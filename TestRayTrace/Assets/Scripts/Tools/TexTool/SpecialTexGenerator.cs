@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MathHelper;
 
 public class SpecialTexGenerator : MonoBehaviour
 {
@@ -70,5 +71,33 @@ public class SpecialTexGenerator : MonoBehaviour
         }
         outTex.SetPixels(colors);
         outTex.Apply();
+    }
+
+    public void CreateSphereSDF()
+    {
+        outTex = new Texture2D(size.x, size.y, TextureFormat.RFloat, false);
+        Color[] colors = new Color[size.x * size.y];
+
+        Vector2 center = Vec.GetMidFromInt(size);
+
+        for (int j = 0; j < size.y; j++)
+        {
+            for (int i = 0; i < size.x; i++)
+            {
+                Vector2 p = new Vector2(i, j);
+                float length = (p - center).magnitude;
+                float sdf = length - 200;
+                sdf = sdf < 0 ? 0 : sdf;
+                colors[i + size.x * j].r = sdf;
+            }
+        }
+        outTex.SetPixels(colors);
+        outTex.Apply();
+    }
+
+    public void LogOutTexPixel()
+    {
+        var col = outTex.GetPixel(10, 10);
+        Debug.Log(col);
     }
 }

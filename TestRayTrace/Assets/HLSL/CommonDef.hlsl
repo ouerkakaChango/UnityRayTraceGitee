@@ -107,6 +107,16 @@ bool NearZero(float x)
 	return abs(x) < 0.000001f;
 }
 
+bool gt(float2 a, float2 b)
+{
+	return a.x > b.x && a.y > b.y;
+}
+
+bool gtor(float2 a, float2 b)
+{
+	return a.x > b.x || a.y > b.y;
+}
+
 bool gt(float3 a, float3 b)
 {
 	return a.x > b.x && a.y > b.y && a.z > b.z;
