@@ -274,12 +274,12 @@ if(inx == -3)
 	float d2d = re;
 	float2 picBound = float2(0.5,0.5);
 	float2 p2d = p.xz;
-	//if(gtor(abs(p2d),picBound))
-	//{
-	//	//not hit,than the sdf is sdfBoxPic
-	//	d2d = SDFBox(p,0,picBound)+0.1;
-	//}
-	//else
+	if(gtor(abs(p2d),picBound))
+	{
+		//not hit,than the sdf is sdfBoxPic
+		d2d = SDFBox(p2d,0,picBound)+ TraceThre*2;
+	}
+	else
 	{
 		float2 uv = p2d/picBound;
 		uv = (uv+1)*0.5;
