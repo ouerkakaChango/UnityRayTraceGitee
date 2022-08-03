@@ -79,7 +79,7 @@ public class SpecialTexGenerator : MonoBehaviour
         Color[] colors = new Color[size.x * size.y];
 
         Vector2 center = Vec.GetMidFromInt(size);
-
+        float normLength = size.magnitude/2;
         for (int j = 0; j < size.y; j++)
         {
             for (int i = 0; i < size.x; i++)
@@ -87,7 +87,6 @@ public class SpecialTexGenerator : MonoBehaviour
                 Vector2 p = new Vector2(i, j);
                 float length = (p - center).magnitude;
                 float sdf = length - 200;
-                sdf = sdf < 0 ? 0 : sdf;
                 colors[i + size.x * j].r = sdf;
             }
         }

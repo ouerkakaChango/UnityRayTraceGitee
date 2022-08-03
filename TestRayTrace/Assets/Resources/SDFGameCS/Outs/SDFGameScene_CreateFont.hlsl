@@ -283,8 +283,9 @@ if(inx == -3)
 	{
 		float2 uv = p2d/picBound;
 		uv = (uv+1)*0.5;
+		uint2 picSize = GetSize(SphereSDFTex);
 		float sdfFromPic = SphereSDFTex.SampleLevel(sdf_linear_repeat_sampler,uv,0).r;
-		sdfFromPic/=256*sqrt(2);
+		sdfFromPic /= picSize.x*0.5*sqrt(2);
 		sdfFromPic *= picBound.x;
 		d2d = sdfFromPic;
 	}
