@@ -1,18 +1,23 @@
 #ifndef TRANSFERMATH_HLSL
 #define TRANSFERMATH_HLSL
-//x: phi [0,2PI)
-//y: theta [0,PI]
+//x: theta [0,2PI)
+//y: phi [0,PI]
 //z: r
 float3 CartesianToSpherical(float3 xyz)
 {
 	float r = length(xyz);
 	xyz *= 1.f / r;
-	float theta = acos(xyz.z);
+	float phi = acos(xyz.z);
 
-	float phi = atan2(xyz.y, xyz.x); //atan2 [-PI,PI]
-	phi += (phi < 0) ? 2 * PI : 0;
+	if (NearZero(xyz.x) && NearZero(xyz.y))
+	{
+		return float3(0, phi, r);
+	}
 
-	return float3(phi, theta, r);
+	float theta = atan2(xyz.y, xyz.x); //atan2 [-PI,PI]
+	theta += (theta < 0) ? 2 * PI : 0;
+
+	return float3(theta, phi, r);
 }
 
 float3 SphericalToCartesian(float phi, float theta, float r=1)

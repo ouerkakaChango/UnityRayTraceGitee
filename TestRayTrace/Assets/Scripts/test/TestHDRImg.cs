@@ -24,21 +24,31 @@ public class TestHDRImg : MonoBehaviour
     {
         
     }
-    
+
+    bool NearZero(float x)
+    {
+        return Mathf.Abs(x) < 0.000001f;
+    }
+
     //x: phi [0,2PI)
     //y: theta [0,PI]
     //z: r
-   Vector3 CartesianToSpherical(Vector3 xyz)
+    Vector3 CartesianToSpherical(Vector3 xyz)
     {
        float r = xyz.magnitude;
         xyz *= 1.0f / r;
-       float theta = Mathf.Acos(xyz.z);
+       float phi = Mathf.Acos(xyz.z);
 
-       float phi = Mathf.Atan2(xyz.y, xyz.x); //Mathf.Atan2 [-PI,PI]
+        if (NearZero(xyz.x) && NearZero(xyz.y))
+        {
+            return new Vector3(0, phi, r);
+        }
+
+        float theta = Mathf.Atan2(xyz.y, xyz.x); //Mathf.Atan2 [-PI,PI]
         //Debug.Log(phi);
-        phi += (phi < 0) ? 2 * PI : 0; // only if you want [0,2pi)
+        theta += (theta < 0) ? 2 * PI : 0; // only if you want [0,2pi)
 
-        return new Vector3(phi, theta, r);
+        return new Vector3(theta, phi, r);
     }
 
    Vector3 SphericalToCartesian(float phi,float theta,float r = 1)
