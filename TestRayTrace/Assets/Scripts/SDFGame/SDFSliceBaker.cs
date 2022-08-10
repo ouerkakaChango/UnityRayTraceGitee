@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using ImageUtility;
+using static ImageProcess.ImageTool;
 
 public class SDFSliceBaker : MonoBehaviour
 {
-    public Texture inputTex;
+    public Texture2D inputTex;
     public ColorChannel targetChannel = ColorChannel.R;
     public bool blackOrWhite = true;
+    float[] shapeArr = null;
+    float[] sdfArr = null;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,5 +21,52 @@ public class SDFSliceBaker : MonoBehaviour
     void Update()
     {
         
+    }
+
+    //#################################################
+
+    void Bake()
+    {
+        if(inputTex == null)
+        {
+            Debug.LogError("input null!");
+            return;
+        }
+
+        int w = inputTex.width;
+        int h = inputTex.height;
+
+        sdfArr = new float[w * h];
+
+        //0.初始化shape
+        InitShapeData();
+        //1.阈值化shape
+        Thresholding(ref shapeArr, 0.5f);
+        //2.根据blackOrWhite设定是否反转权重
+        if(blackOrWhite)
+        {
+            Reverse(ref shapeArr);
+        }
+        CalculateSDF(w, h, in shapeArr, out sdfArr);
+    }
+
+    void InitShapeData()
+    {
+        int w = inputTex.width;
+        int h = inputTex.height;
+
+        shapeArr = new float[w * h];
+        var colors = inputTex.GetPixels();
+        for(int i=0;i<colors.Length;i++)
+        {
+            if(targetChannel == ColorChannel.R)
+            {
+                shapeArr[i] = colors[i].r;
+            }
+            else
+            {
+                Debug.LogError("Not handle.");
+            }
+        }
     }
 }
