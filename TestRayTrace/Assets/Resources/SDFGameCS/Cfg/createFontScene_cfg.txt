@@ -254,6 +254,8 @@ if(inx == -3)
 	float dh = abs(p.y) - hBound;
 	dh = dh>0 ? dh:0;
 	d = sqrt(d2d*d2d+dh*dh);
+	//???
+	d -= 0.005;
 	re = min(re,d);
 }
 

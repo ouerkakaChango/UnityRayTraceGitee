@@ -6,7 +6,7 @@ using static ImageProcess.ImageTool;
 
 public class SDFSliceBaker : MonoBehaviour
 {
-    public Texture2D inputTex;
+    public Texture2D inputTex, outTex;
     public ColorChannel targetChannel = ColorChannel.R;
     public bool blackOrWhite = true;
     float[] shapeArr = null;
@@ -25,7 +25,7 @@ public class SDFSliceBaker : MonoBehaviour
 
     //#################################################
 
-    void Bake()
+    public void Bake()
     {
         if(inputTex == null)
         {
@@ -48,6 +48,8 @@ public class SDFSliceBaker : MonoBehaviour
             Reverse(ref shapeArr);
         }
         CalculateSDF(w, h, in shapeArr, out sdfArr);
+
+        OutputSDFToTex();
     }
 
     void InitShapeData()
@@ -68,5 +70,21 @@ public class SDFSliceBaker : MonoBehaviour
                 Debug.LogError("Not handle.");
             }
         }
+    }
+
+    void OutputSDFToTex()
+    {
+        int w = inputTex.width;
+        int h = inputTex.height;
+        outTex = new Texture2D(w, h, TextureFormat.RFloat, false);
+        Color[] colors = new Color[w * h];
+        for(int i=0;i<colors.Length;i++)
+        {
+            //???
+            colors[i] = new Color(sdfArr[i], 0, 0);
+            //colors[i] = new Color(shapeArr[i], 0, 0);
+        }
+        outTex.SetPixels(colors);
+        outTex.Apply();
     }
 }
