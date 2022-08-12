@@ -9,6 +9,7 @@ public enum SDFShapeType
     Normal,
     Special,
     Font,
+    Slice,
 };
 
 public enum SDFMergeType
@@ -25,14 +26,34 @@ public class SDFBakerTag : MonoBehaviour
     public float SDF_offset = 0.0f;
     public int renderMode = 0;
     public SDFShapeType shapeType = SDFShapeType.Normal;
+
+    //---Special
     [HideInInspector]
     public int specialID = -1;
+    //___Special
+
+    //---Font
     [HideInInspector]
     public char fontCharacter;
+    //___Font
+
+    //---Slice
+    [HideInInspector]
+    public TexSysTag sliceTexTag = null;
+    [HideInInspector]
+    public float hBound = 0.1f;
+    //___Slice
+
+    //---Merge
     [HideInInspector]
     public SDFMergeType mergeType = SDFMergeType.None;
+    //___Merge
+
     [ReadOnly]
     public int objInx;
+
+    //#######################################################
+
     // Start is called before the first frame update
     void Start()
     {

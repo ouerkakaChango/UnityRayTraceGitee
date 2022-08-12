@@ -72,6 +72,10 @@ public class SDFBakerMgr : MonoBehaviour
             {
                 AddBake(tag.gameObject);
             }
+            else if (tag.shapeType == SDFShapeType.Slice)
+            {
+                AddBakeSlice(tag.gameObject);
+            }
 
             AddBakeMaterial(tag);
             AddBakeRenderMode(i, tag);
@@ -256,6 +260,38 @@ public class SDFBakerMgr : MonoBehaviour
         bakedSDFs.Add(funcName +"(d,p);");
         bakedSDFs.Add("d *= "+ obj.transform.lossyScale .x+ ";");
         bakedSDFs.Add("re = min(re,d);");
+    }
+
+    void AddBakeSlice(GameObject obj)
+    {
+        //float hBound = 0.1;
+        //float dh = abs(p.y) - hBound;
+        //dh = dh > 0 ? dh : 0;
+        //
+        //float d = re;
+        //float d2d = re;
+        //float2 picBound = float2(0.5, 0.5);
+        //float2 p2d = p.xz;
+        //if (gtor(abs(p2d), picBound))
+        //{
+        //    //not hit,than the sdf is sdfBoxPic
+        //    d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;
+        //    d = sqrt(d2d * d2d + dh * dh);
+        //}
+        //else
+        //{
+        //    float2 uv = p2d / picBound;
+        //    uv = (uv + 1) * 0.5;
+        //    uint2 picSize = GetSize(SphereSDFTex);
+        //    float sdfFromPic = SphereSDFTex.SampleLevel(sdf_linear_repeat_sampler, uv, 0).r;
+        //    sdfFromPic /= picSize.x * 0.5 * sqrt(2);
+        //    sdfFromPic *= picBound.x;
+        //    d2d = sdfFromPic;
+        //    d = sqrt(d2d * d2d + dh * dh);
+        //    d -= 0.005;
+        //}
+        //re = min(re, d);
+
     }
 
     void AddBake(GameObject obj)

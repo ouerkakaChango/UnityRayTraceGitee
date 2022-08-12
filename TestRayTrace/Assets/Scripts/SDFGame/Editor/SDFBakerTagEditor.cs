@@ -41,6 +41,14 @@ public class SDFBakerTagEditor : Editor
                 }
             }
         }
+        else if(type == SDFShapeType.Slice)
+        {
+            SerializedProperty sliceTexTag = serializedObject.FindProperty("sliceTexTag");
+            EditorGUILayout.PropertyField(sliceTexTag, new GUIContent("sliceTexTag"), true);
+
+            SerializedProperty hBound = serializedObject.FindProperty("hBound");
+            EditorGUILayout.PropertyField(hBound, new GUIContent("hBound"), true);
+        }
 
         showMergeTag = EditorGUILayout.Foldout(showMergeTag, "Merge");
         if (showMergeTag)
@@ -52,5 +60,7 @@ public class SDFBakerTagEditor : Editor
                 Target.mergeType = nType;
             }
         }
+
+        serializedObject.ApplyModifiedProperties();
     }
 }
