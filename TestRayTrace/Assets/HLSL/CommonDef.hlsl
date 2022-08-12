@@ -158,6 +158,29 @@ float invSmooth3(float x) {
 	//return 0.5f - sin(asin(1 - 2 * x) / 3);
 }
 
+bool Is01(float x)
+{
+	return x > 0 && x < 1;
+}
+
+float length2(float2 x)
+{
+	return dot(x, x);
+}
+
+float len2(float x)
+{
+	return x * x;
+}
+float cross2D(float2 v1, float2 v2)
+{
+	return v1.x*v2.y - v1.y*v2.x;
+}
+
+float addv(float2 a) { return a.x + a.y; }
+
+//###############################################################
+
 int GetTreeDepth(int inx,int maxDepth)
 {
 	//depht = 2,  >=2^2-1, <=2^3-2
@@ -171,6 +194,18 @@ int GetTreeDepth(int inx,int maxDepth)
 	}
 	return -1;
 }
+
+//###############################################################
+
+float Time01(float frequency=1.0f,float phi = 0.0f)
+{
+	return 0.5*(sin(frequency * _Time.y+phi) + 1);
+}
+
+//####################################################################
+
+SamplerState common_point_repeat_sampler;
+SamplerState common_linear_repeat_sampler;
 
 float2 GetUV(RWTexture2D<float4> dst, uint3 id)
 {
@@ -204,31 +239,6 @@ uint2 GetSize(Texture2D<float4> dst)
 	return size;
 }
 
-float Time01(float frequency=1.0f,float phi = 0.0f)
-{
-	return 0.5*(sin(frequency * _Time.y+phi) + 1);
-}
- 
-bool Is01(float x)
-{
-	return x > 0 && x < 1;
-}
-
-float length2(float2 x)
-{
-	return dot(x, x);
-}
-
-float len2(float x)
-{
-	return x * x;
-}
-float cross2D(float2 v1, float2 v2)
-{
-	return v1.x*v2.y - v1.y*v2.x;
-}
-
-float addv(float2 a) { return a.x + a.y; }
 
 float2 TexSafePos(float2 pos, uint2 size)
 {
@@ -253,8 +263,6 @@ float2 TexSafePos(float2 pos, uint2 size)
 	return re;
 }
 
-SamplerState common_point_repeat_sampler;
-SamplerState common_linear_repeat_sampler;
 float BilinearR(Texture2D tex, float2 floorPos, float2 fracPart)
 {
 	uint2 size = GetSize(tex);

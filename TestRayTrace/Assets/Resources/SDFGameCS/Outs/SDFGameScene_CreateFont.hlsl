@@ -41,7 +41,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0.2107661, 1, 0);
+re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -85,7 +85,6 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -3;
 }
 else if (inx == 1 )
 {
@@ -235,7 +234,32 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -3;
+float3 localp = WorldToLocal(p, float3(0, 0, 0), float3(0, 0, 0), float3(1, 1, 1));
+float dh = abs(localp.y) - 0.05;
+dh = dh > 0 ? dh : 0;
+
+float d = re;
+float d2d = re;
+float2 picBound = float2(0.5, 0.5) * 1;
+float2 p2d = localp.xz * 1;
+if (gtor(abs(p2d), picBound))
+{
+d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;
+d = sqrt(d2d * d2d + dh * dh);
+}
+else
+{
+float2 uv = p2d / picBound;
+uv = (uv + 1) * 0.5;
+uint2 picSize = GetSize(SphereSDFTex);
+float sdfFromPic = SphereSDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 1;
+sdfFromPic *= picBound.x;
+d2d = sdfFromPic;
+d = sqrt(d2d * d2d + dh * dh);
+d += -0.005;
+}
+re = min(re, d);
 }
 else if (inx == 1 )
 {
@@ -269,14 +293,16 @@ if(inx == -2)
 }
 if(inx == -3)
 {
-	float hBound = 0.1;
-	float dh = abs(p.y) - hBound;
+	float3 scale = 0.9;//float3(0.8,0.8,0.8);
+	float3 localp = WorldToLocal(p,float3(1,0,0),float3(0,30,30),scale);
+	float hBound = 0.1*scale.x;
+	float dh = abs(localp.y*scale.x) - hBound;
 	dh = dh>0 ? dh:0;
 
 	float d = re;
 	float d2d = re;
-	float2 picBound = float2(0.5,0.5);
-	float2 p2d = p.xz;
+	float2 picBound = float2(0.5,0.5) * scale.x;
+	float2 p2d = localp.xz* scale.x;
 	if(gtor(abs(p2d),picBound))
 	{
 		//not hit,than the sdf is sdfBoxPic
@@ -289,7 +315,7 @@ if(inx == -3)
 		uv = (uv+1)*0.5;
 		uint2 picSize = GetSize(SphereSDFTex);
 		float sdfFromPic = SphereSDFTex.SampleLevel(sdf_linear_repeat_sampler,uv,0).r;
-		sdfFromPic /= picSize.x*0.5*sqrt(2);
+		sdfFromPic /= picSize.x*0.5*sqrt(2)* scale.x;
 		sdfFromPic *= picBound.x;
 		d2d = sdfFromPic;
 		d = sqrt(d2d*d2d+dh*dh);
@@ -315,7 +341,6 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -3;
 }
 else if (inx == 1 )
 {

@@ -74,7 +74,7 @@ public class SDFBakerMgr : MonoBehaviour
             }
             else if (tag.shapeType == SDFShapeType.Slice)
             {
-                AddBakeSlice(tag.gameObject);
+                AddBakeSlice(tag);
             }
 
             AddBakeMaterial(tag);
@@ -249,29 +249,31 @@ public class SDFBakerMgr : MonoBehaviour
         int id = tag.fontCharacter;
         string funcName = "SDFPrefab_ASCII_"+id;
         //由于在创作字体的时候，都是以0.5,0.5为中心
-        //p = WorldToLocal(p,pos,rot,scale);
+        //float3 localp = WorldToLocal(p,pos,rot,scale);
         //float d = re;
-        //SDFPrefab_ASCII_65(d,p);
+        //SDFPrefab_ASCII_65(d,localp);
         //d *= scale.x;
         //re = min(re,d);
-        
-        bakedSDFs.Add("p = WorldToLocal(p,"+Bake(obj.transform.position)+","+ BakeRotEuler(obj.transform.rotation) + ","+Bake(obj.transform.lossyScale)+ ");");
+
+        bakedSDFs.Add("float3 localp = WorldToLocal(p,"+Bake(obj.transform.position)+","+ BakeRotEuler(obj.transform.rotation) + ","+Bake(obj.transform.lossyScale)+ ");");
         bakedSDFs.Add("float d = re;");
-        bakedSDFs.Add(funcName +"(d,p);");
+        bakedSDFs.Add(funcName + "(d,localp);");
         bakedSDFs.Add("d *= "+ obj.transform.lossyScale .x+ ";");
         bakedSDFs.Add("re = min(re,d);");
     }
 
-    void AddBakeSlice(GameObject obj)
+    void AddBakeSlice(SDFBakerTag tag)
     {
-        //float hBound = 0.1;
-        //float dh = abs(p.y) - hBound;
+        //float3 scale = 0.9;//float3(0.8,0.8,0.8);
+        //float3 localp = WorldToLocal(p, float3(1, 0, 0), float3(0, 30, 30), scale);
+        //float hBound = 0.1 * scale.x;
+        //float dh = abs(localp.y * scale.x) - hBound;
         //dh = dh > 0 ? dh : 0;
         //
         //float d = re;
         //float d2d = re;
-        //float2 picBound = float2(0.5, 0.5);
-        //float2 p2d = p.xz;
+        //float2 picBound = float2(0.5, 0.5) * scale.x;
+        //float2 p2d = localp.xz * scale.x;
         //if (gtor(abs(p2d), picBound))
         //{
         //    //not hit,than the sdf is sdfBoxPic
@@ -284,7 +286,7 @@ public class SDFBakerMgr : MonoBehaviour
         //    uv = (uv + 1) * 0.5;
         //    uint2 picSize = GetSize(SphereSDFTex);
         //    float sdfFromPic = SphereSDFTex.SampleLevel(sdf_linear_repeat_sampler, uv, 0).r;
-        //    sdfFromPic /= picSize.x * 0.5 * sqrt(2);
+        //    sdfFromPic /= picSize.x * 0.5 * sqrt(2) * scale.x;
         //    sdfFromPic *= picBound.x;
         //    d2d = sdfFromPic;
         //    d = sqrt(d2d * d2d + dh * dh);
@@ -292,6 +294,42 @@ public class SDFBakerMgr : MonoBehaviour
         //}
         //re = min(re, d);
 
+        var obj = tag.gameObject;
+
+        if(tag.sliceTexTag == null)
+        {
+            Debug.LogError("BakeError:slice not refer a tex tag "+obj);
+        }
+        var sliceTexName = tag.sliceTexTag.plainTextures[0].name;
+
+        Vector3 scale = obj.transform.lossyScale;
+
+        bakedSDFs.Add("float3 localp = WorldToLocal(p, "+Bake(obj.transform.position)+", "+BakeRotEuler(obj.transform.rotation)+", "+Bake(obj.transform.lossyScale)+");");
+        bakedSDFs.Add("float dh = abs(localp.y) - " + tag.hBound * scale.x + ";");
+        bakedSDFs.Add("dh = dh > 0 ? dh : 0;");
+        bakedSDFs.Add("");
+        bakedSDFs.Add("float d = re;");
+        bakedSDFs.Add("float d2d = re;");
+        bakedSDFs.Add("float2 picBound = float2(0.5, 0.5) * " + scale.x + ";");
+        bakedSDFs.Add("float2 p2d = localp.xz * "+scale.x+";");
+        bakedSDFs.Add("if (gtor(abs(p2d), picBound))");
+        bakedSDFs.Add("{");
+        bakedSDFs.Add("    d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;");
+        bakedSDFs.Add("    d = sqrt(d2d * d2d + dh * dh);");
+        bakedSDFs.Add("}");
+        bakedSDFs.Add("else");
+        bakedSDFs.Add("{");
+        bakedSDFs.Add("    float2 uv = p2d / picBound;");
+        bakedSDFs.Add("    uv = (uv + 1) * 0.5;");
+        bakedSDFs.Add("    uint2 picSize = GetSize("+sliceTexName+");");
+        bakedSDFs.Add("    float sdfFromPic = "+sliceTexName+ ".SampleLevel(common_linear_repeat_sampler, uv, 0).r;");
+        bakedSDFs.Add("    sdfFromPic /= picSize.x * 0.5 * sqrt(2) * "+scale.x+";");
+        bakedSDFs.Add("    sdfFromPic *= picBound.x;");
+        bakedSDFs.Add("    d2d = sdfFromPic;");
+        bakedSDFs.Add("    d = sqrt(d2d * d2d + dh * dh);");
+        bakedSDFs.Add("    d += "+tag.SDF_offset+";");
+        bakedSDFs.Add("}");
+        bakedSDFs.Add("re = min(re, d);");
     }
 
     void AddBake(GameObject obj)
@@ -440,6 +478,26 @@ public class SDFBakerMgr : MonoBehaviour
         }
         tag.mergeType = type;
     }
+
+    //SDFBakerTag GetActiveTag(GameObject obj)
+    //{
+    //    var tags = obj.GetComponents<SDFBakerTag>();
+    //    int num = 0;
+    //    SDFBakerTag re = null;
+    //    for (int i=0;i<tags.Length;i++)
+    //    {
+    //        if(tags[i].isActiveAndEnabled)
+    //        {
+    //            re = tags[i];
+    //            num++;
+    //        }
+    //    }
+    //    if(num>1)
+    //    {
+    //        Debug.LogWarning("SDF Baker active tag > 1");
+    //    }
+    //    return re;
+    //}
 
     //##################################################################
 

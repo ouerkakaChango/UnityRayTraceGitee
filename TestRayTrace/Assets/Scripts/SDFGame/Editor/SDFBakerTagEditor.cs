@@ -62,5 +62,6 @@ public class SDFBakerTagEditor : Editor
         }
 
         serializedObject.ApplyModifiedProperties();
+
     }
 }
