@@ -82,18 +82,18 @@ void EASU(uint3 id : SV_DispatchThreadID)
 	float2 npos = fpos + scale1 * float2(0, 2);
 	float2 opos = fpos + scale1 * float2(1, 2);
 
-	float3 bC = inTex[bpos];
-	float3 cC = inTex[cpos];
-	float3 eC = inTex[epos];
-	float3 fC = inTex[fpos];
-	float3 gC = inTex[gpos];
-	float3 hC = inTex[hpos];
-	float3 iC = inTex[ipos];
-	float3 jC = inTex[jpos];
-	float3 kC = inTex[kpos];
-	float3 lC = inTex[lpos];
-	float3 nC = inTex[npos];
-	float3 oC = inTex[opos];
+	float3 bC = inTex[TexSafePos(bpos,srcSize)].rgb;
+	float3 cC = inTex[TexSafePos(cpos,srcSize)].rgb;
+	float3 eC = inTex[TexSafePos(epos,srcSize)].rgb;
+	float3 fC = inTex[TexSafePos(fpos,srcSize)].rgb;
+	float3 gC = inTex[TexSafePos(gpos,srcSize)].rgb;
+	float3 hC = inTex[TexSafePos(hpos,srcSize)].rgb;
+	float3 iC = inTex[TexSafePos(ipos,srcSize)].rgb; 
+	float3 jC = inTex[TexSafePos(jpos,srcSize)].rgb;
+	float3 kC = inTex[TexSafePos(kpos,srcSize)].rgb;
+	float3 lC = inTex[TexSafePos(lpos,srcSize)].rgb;
+	float3 nC = inTex[TexSafePos(npos,srcSize)].rgb;
+	float3 oC = inTex[TexSafePos(opos,srcSize)].rgb;
 
 	float bL = FsrL(bC);
 	float cL = FsrL(cC);
@@ -175,7 +175,7 @@ void EASU(uint3 id : SV_DispatchThreadID)
 
 #define FSR_RCAS_LIMIT (0.25f - (1.0f / 16.0))
 
-RWTexture2D<float4> easuRT;
+RWTexture2D<float3> easuRT;
 float sharpness;// = 0.9f;
 [numthreads(8, 8, 1)]
 void RCAS(uint3 id : SV_DispatchThreadID)
@@ -186,7 +186,7 @@ void RCAS(uint3 id : SV_DispatchThreadID)
 	//    b
 	//  d e f
 	//    h
-	float3 eC = easuRT[id.xy];
+	float3 eC = easuRT[id.xy].rgb;
 	float3 bC = easuRT[id.xy + scale2 * int2(0,-1)];
 	float3 dC = easuRT[id.xy + scale2 * int2(-1, 0)];
 	float3 fC = easuRT[id.xy + scale2 * int2(1, 0)];

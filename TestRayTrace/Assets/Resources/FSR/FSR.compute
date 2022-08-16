@@ -7,7 +7,7 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture2D<float4> Result;
-Texture2D<float4> inTex;
+Texture2D<float3> inTex;
 
 #define AU1_AF1(x) asuint(float(x))
 float APrxLoRcpF1(float a) { return asfloat((uint)(0x7ef07ebb) - AU1_AF1(a)); }
@@ -172,7 +172,7 @@ void EASU(uint3 id : SV_DispatchThreadID)
 
 #define FSR_RCAS_LIMIT (0.25f - (1.0f / 16.0))
 
-RWTexture2D<float4> easuRT;
+RWTexture2D<float3> easuRT;
 float sharpness;// = 0.9f;
 [numthreads(8, 8, 1)]
 void RCAS(uint3 id : SV_DispatchThreadID)

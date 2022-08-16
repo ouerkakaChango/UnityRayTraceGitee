@@ -113,11 +113,13 @@ public class TexSysTagEditor : Editor
         {
             SerializedProperty nameSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("name");
             SerializedProperty texSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("tex");
+            SerializedProperty channelSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("channel");
 
             EditorGUI.BeginChangeCheck();
 
             EditorGUILayout.PropertyField(nameSP, true);
             EditorGUILayout.PropertyField(texSP, true);
+            EditorGUILayout.PropertyField(channelSP, true);
 
             EditorGUILayout.Space();
             if (EditorGUI.EndChangeCheck())

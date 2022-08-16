@@ -64,9 +64,9 @@ void Bake(uint3 id : SV_DispatchThreadID)
 	float3 V = N;
 	float totalWeight = 0;
 	float equirectangularArea = EquirectangularArea(w);
-	for (int i = 0; i < SPP; i++)
+	for (int i1 = 0; i1 < (int)SPP; i1++)
 	{
-		float2 Xi = Hammersley(i, SPP);
+		float2 Xi = Hammersley(i1, SPP);
 		float3 H = IS_SampleSpecularH(N, bakeRough, Xi.x, Xi.y);
 		float3 L = normalize(2.0 * dot(V, H) * H - V);
 
@@ -91,6 +91,6 @@ void Bake(uint3 id : SV_DispatchThreadID)
 	}
 	re /= totalWeight;
 
-	re = pow(re, 2.2);
+	re = pow(abs(re), 2.2);
 	outRT[id.xy] = float4(re, 1);
 }

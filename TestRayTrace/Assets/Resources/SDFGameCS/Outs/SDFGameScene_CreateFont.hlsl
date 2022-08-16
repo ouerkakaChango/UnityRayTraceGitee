@@ -30,7 +30,7 @@
 //Texture2D<float4> SphereSDFTex;
 //SamplerState sdf_linear_repeat_sampler;
 //@@@SDFBakerMgr TexSys
-Texture2D<float4> B_SDFTex;
+Texture2D<float> B_SDFTex;
 //@@@
 
 Material_PBR GetObjMaterial_PBR(int obj)

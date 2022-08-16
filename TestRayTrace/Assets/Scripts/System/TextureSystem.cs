@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using ImageUtility;
+
 [System.Serializable]
 public struct PBRTexture
 {
@@ -24,7 +26,9 @@ public struct HeightTexture
 public struct NamedTexture
 {
     public string name;
-    public Texture tex;
+    public Texture2D tex;
+    public ColorChannel channel;
+
 }
 
 public class TextureSystem : MonoBehaviour
@@ -94,14 +98,19 @@ public class TextureSystem : MonoBehaviour
             NamedTexture albedo, normal, metallic, roughness, ao;
             albedo.name = pbrTex.name + "_albedo";
             albedo.tex = pbrTex.albedo;
+            albedo.channel = ColorChannel.RGB;
             normal.name = pbrTex.name + "_normal";
             normal.tex = pbrTex.normal;
+            normal.channel = ColorChannel.RGB;
             metallic.name = pbrTex.name + "_metallic";
             metallic.tex = pbrTex.metallic;
+            metallic.channel = ColorChannel.R;
             roughness.name = pbrTex.name + "_roughness";
             roughness.tex = pbrTex.roughness;
+            roughness.channel = ColorChannel.R;
             ao.name = pbrTex.name + "_ao";
             ao.tex = pbrTex.ao;
+            ao.channel = ColorChannel.R;
 
             outTextures.Add(albedo);
             outTextures.Add(normal);
@@ -119,8 +128,10 @@ public class TextureSystem : MonoBehaviour
             NamedTexture height,grad;
             height.name = heightTex.name + "_height";
             height.tex = heightTex.height;
+            height.channel = ColorChannel.R;
             grad.name = heightTex.name + "_grad";
             grad.tex = heightTex.grad;
+            grad.channel = ColorChannel.RG;
 
             outTextures.Add(height);
             outTextures.Add(grad);
@@ -131,12 +142,41 @@ public class TextureSystem : MonoBehaviour
     {
         bakedDeclares.Clear();
 
+        //??? 目前都是float4这么声明
         //Texture2D<float4> SphereSDFTex
         for (int i=0;i<outTextures.Count;i++)
         {
             string line = "";
-            line = "Texture2D<float4> " + outTextures[i].name+";";
+            string prefix = GetPrefex(outTextures[i]);
+            line = prefix + " " + outTextures[i].name+";";
             bakedDeclares.Add(line);
+            var tex = outTextures[i].tex;
+        }
+    }
+
+    string GetPrefex(NamedTexture namedTexture)
+    {
+        var channel = namedTexture.channel;
+        if (channel == ColorChannel.RGBA)
+        {
+            return "Texture2D<float4>";
+        }
+        else if (channel == ColorChannel.RGB)
+        {
+            return "Texture2D<float3>";
+        }
+        else if (channel == ColorChannel.RG)
+        {
+            return "Texture2D<float2>";
+        }
+        else if (channel == ColorChannel.R)
+        {
+            return "Texture2D<float>";
+        }
+        else
+        {
+            Debug.Log(namedTexture.name + " channel " + channel + " not handled prefix,turn to defalt \'Texture<float4>\'");
+            return "Texture2D<float4>";
         }
     }
 }

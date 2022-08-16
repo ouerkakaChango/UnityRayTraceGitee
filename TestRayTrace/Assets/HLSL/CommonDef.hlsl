@@ -122,6 +122,11 @@ bool gt(float3 a, float3 b)
 	return a.x > b.x && a.y > b.y && a.z > b.z;
 }
 
+bool lt(float2 a, float2 b)
+{
+	return a.x < b.x && a.y < b.y;
+}
+
 bool lt(float3 a, float3 b)
 {
 	return a.x < b.x && a.y < b.y && a.z < b.z;
@@ -239,28 +244,54 @@ uint2 GetSize(Texture2D<float4> dst)
 	return size;
 }
 
-
-float2 TexSafePos(float2 pos, uint2 size)
+uint2 GetSize(Texture2D<float3> dst)
 {
+	uint2 size;
+	dst.GetDimensions(size.x, size.y);
+	return size;
+}
+
+uint2 GetSize(Texture2D<float2> dst)
+{
+	uint2 size;
+	dst.GetDimensions(size.x, size.y);
+	return size;
+}
+
+uint2 GetSize(Texture2D<float> dst)
+{
+	uint2 size;
+	dst.GetDimensions(size.x, size.y);
+	return size;
+}
+
+
+uint2 TexSafePos(float2 pos, uint2 size)
+{
+	if (size.x < (uint)1 || size.y < (uint)1)
+	{
+		return uint2(0,0);
+	}
+
 	float2 re = pos;
 	if (re.x < 0)
 	{
 		re.x = 0;
 	}
-	else if (re.x >= size.x)
+	else if (re.x >= (float)size.x)
 	{
-		re.x = size.x - 1;
+		re.x = (float)size.x - 1;
 	}
-
+	
 	if (re.y < 0)
 	{
 		re.y = 0;
 	}
-	else if (re.y > size.y)
+	else if (re.y > (float)size.y)
 	{
-		re.y = size.y - 1;
+		re.y = (float)size.y - 1;
 	}
-	return re;
+	return (uint2)re;
 }
 
 float BilinearR(Texture2D tex, float2 floorPos, float2 fracPart)

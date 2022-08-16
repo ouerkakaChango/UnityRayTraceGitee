@@ -65,7 +65,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 	HitInfo minHit;
 	Init(minHit);
 	//trace bvh to determin start inx
-	int start = 0, end = triInxNum/3-1;
+	int start = 0, end = (uint)triInxNum/3-1;
 
 	int toCheck[MAXLEAVES]; //used as a stack
 	int iter = 0; //used as a stack helper

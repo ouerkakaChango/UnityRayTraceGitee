@@ -128,9 +128,8 @@ public class AutoCS : MonoBehaviour
             myProcess.EnableRaisingEvents = true;
             myProcess.Start();
             myProcess.WaitForExit();
-            UnityEngine.Debug.Log("AutoCS已经运行关闭了");
             int ExitCode = myProcess.ExitCode;
-            print(ExitCode);
+            UnityEngine.Debug.Log("AutoCS已经运行关闭了 运行返回：" + ExitCode);
         }
         catch (Exception e)
         {
@@ -150,7 +149,7 @@ public class AutoCS : MonoBehaviour
 
     void PreCompile(string path, int fileInx)
     {
-        Debug.Log("###Precompile File: "+ path);
+        //Debug.Log("###Precompile File: "+ path);
         //1.Load Files to string[]
         var lines = File.ReadAllLines(path);
 

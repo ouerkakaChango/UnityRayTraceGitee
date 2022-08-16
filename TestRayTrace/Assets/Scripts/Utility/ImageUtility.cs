@@ -6,6 +6,9 @@ namespace ImageUtility
 {
     public enum ColorChannel
     {
+        RGBA,
+        RGB,
+        RG,
         R,G,B,A,
     }
 

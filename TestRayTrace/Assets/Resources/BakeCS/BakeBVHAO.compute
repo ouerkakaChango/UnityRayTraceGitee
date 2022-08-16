@@ -64,7 +64,7 @@ void BakeBVHShadow(uint3 id : SV_DispatchThreadID)
 	sum /= SPP;
 
 	re = sum;
-	re = pow(re, darkPower);
+	re = pow(abs(re), darkPower);
 	Result[id.xy] = float4(re, 1);
 }
 //#########################################################################################################

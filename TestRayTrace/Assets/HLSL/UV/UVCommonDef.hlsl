@@ -7,7 +7,7 @@ bool InBound(float2 p, float2 bound, float tolerence = 0.00001f)
 	{
 		return false; 
 	}
-	return abs(p) < (bound + tolerence);
+	return lt(abs(p) , (bound + tolerence) );
 }
 
 float2 BoxedUV(float2 p, float2 bound)
