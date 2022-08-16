@@ -17,9 +17,8 @@ public class SDFGameSceneTraceEditor : Editor
     {
         base.OnInspectorGUI();
 
-        if (GUILayout.Button("Refresh autoCS && texSys"))
+        if (GUILayout.Button("Refresh autoCS"))
         {
-            Target.RefreshTextureSystem();
             Target.RefreshAutoCS();
             AssetDatabase.Refresh();
         }

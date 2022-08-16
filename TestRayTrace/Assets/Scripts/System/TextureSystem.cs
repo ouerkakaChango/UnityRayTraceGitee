@@ -30,8 +30,9 @@ public struct NamedTexture
 public class TextureSystem : MonoBehaviour
 {
     public List<NamedTexture> outTextures;
-
     public TexSysTag[] tags;
+
+    public List<string> bakedDeclares = new List<string>();
     // Start is called before the first frame update
     void Start()
     {
@@ -67,6 +68,7 @@ public class TextureSystem : MonoBehaviour
                 }
             }
         }
+        BakeCode();
     }
 
     void PreRefresh()
@@ -122,6 +124,19 @@ public class TextureSystem : MonoBehaviour
 
             outTextures.Add(height);
             outTextures.Add(grad);
+        }
+    }
+
+    void BakeCode()
+    {
+        bakedDeclares.Clear();
+
+        //Texture2D<float4> SphereSDFTex
+        for (int i=0;i<outTextures.Count;i++)
+        {
+            string line = "";
+            line = "Texture2D<float4> " + outTextures[i].name+";";
+            bakedDeclares.Add(line);
         }
     }
 }

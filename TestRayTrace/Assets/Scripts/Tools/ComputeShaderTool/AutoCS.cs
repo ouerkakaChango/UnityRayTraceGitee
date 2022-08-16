@@ -14,6 +14,7 @@ using XUtility;
 public class AutoCS : MonoBehaviour
 {
     public SDFBakerMgr bakerMgr = null;
+    public TextureSystem texSys = null;
     public List<string> templates = new List<string>();
     public List<string> outs = new List<string>();
     public List<string> cfgs = new List<string>();
@@ -22,8 +23,6 @@ public class AutoCS : MonoBehaviour
 
     Dictionary<string, List<Vector2Int>> rangeMap = new Dictionary<string, List<Vector2Int>>();
 
-    [HideInInspector]
-    public TextureSystem texSys;
     private void Awake()
     {
         //Generate();
@@ -95,10 +94,15 @@ public class AutoCS : MonoBehaviour
         //将templates,outs等写入config
         //调用外部控制台程序exe，进行config+templates => outs
 
-        if(bakerMgr!=null)
+        if(bakerMgr!=null && texSys!=null)
         {
+            texSys.Refresh();
             bakerMgr.Bake();
             PreCompile();
+        }
+        else
+        {
+            Debug.LogError("bakerMgr,texSys not give to autoCS");
         }
         MakeTaskFile();
         CallExe();
@@ -159,6 +163,7 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("ObjSDF", new List<Vector2Int>());
         rangeMap.Add("SpecialObj", new List<Vector2Int>());
         rangeMap.Add("BeforeObjSDF", new List<Vector2Int>());
+        rangeMap.Add("TexSys", new List<Vector2Int>());
 
         var keyList = rangeMap.Keys.ToList();
         List<Vector2Int> orderList = new List<Vector2Int>();
@@ -225,6 +230,14 @@ public class AutoCS : MonoBehaviour
                 newcount = bakerMgr.bakedBeforeSDF.Count;
                 newLines.RemoveRange(offset + range.x + 1, oricount);
                 newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedBeforeSDF);
+            }
+            else if (key == "TexSys" && ValidRange(range))
+            {
+                oricount = range.y - range.x - 1;
+                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
+                newcount = texSys.bakedDeclares.Count;
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, texSys.bakedDeclares);
             }
             else if (key == "SpecialObj" && ValidRange(range))
             {

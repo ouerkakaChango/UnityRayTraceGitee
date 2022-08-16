@@ -20,8 +20,11 @@ Blocks:
 #include "../../../HLSL/Spline/QuadBezier/QuadBezier.hlsl"
 #include "../../SDFGamePrefab/font_prefab.hlsl"
 
-Texture2D<float4> SphereSDFTex;
-SamplerState sdf_linear_repeat_sampler;
+//Texture2D<float4> SphereSDFTex;
+//SamplerState sdf_linear_repeat_sampler;
+//@@@SDFBakerMgr TexSys
+Texture2D<float4> B_SDFTex;
+//@@@
 ###BLOCK
 
 ###BLOCK ObjMaterial
@@ -213,8 +216,8 @@ else
 {
     float2 uv = p2d / picBound;
     uv = (uv + 1) * 0.5;
-    uint2 picSize = GetSize(SphereSDFTex);
-    float sdfFromPic = SphereSDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+    uint2 picSize = GetSize(B_SDFTex);
+    float sdfFromPic = B_SDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
     sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 1;
     sdfFromPic *= picBound.x;
     d2d = sdfFromPic;
@@ -255,35 +258,35 @@ if(inx == -2)
 }
 if(inx == -3)
 {
-	float3 scale = 0.9;//float3(0.8,0.8,0.8);
-	float3 localp = WorldToLocal(p,float3(1,0,0),float3(0,30,30),scale);
-	float hBound = 0.1*scale.x;
-	float dh = abs(localp.y*scale.x) - hBound;
-	dh = dh>0 ? dh:0;
-
-	float d = re;
-	float d2d = re;
-	float2 picBound = float2(0.5,0.5) * scale.x;
-	float2 p2d = localp.xz* scale.x;
-	if(gtor(abs(p2d),picBound))
-	{
-		//not hit,than the sdf is sdfBoxPic
-		d2d = SDFBox(p2d,0,picBound)+ TraceThre*2;
-		d = sqrt(d2d*d2d+dh*dh);
-	}
-	else
-	{
-		float2 uv = p2d/picBound;
-		uv = (uv+1)*0.5;
-		uint2 picSize = GetSize(SphereSDFTex);
-		float sdfFromPic = SphereSDFTex.SampleLevel(sdf_linear_repeat_sampler,uv,0).r;
-		sdfFromPic /= picSize.x*0.5*sqrt(2)* scale.x;
-		sdfFromPic *= picBound.x;
-		d2d = sdfFromPic;
-		d = sqrt(d2d*d2d+dh*dh);
-		d -= 0.005;
-	}
-	re = min(re,d);
+	//float3 scale = 0.9;//float3(0.8,0.8,0.8);
+	//float3 localp = WorldToLocal(p,float3(1,0,0),float3(0,30,30),scale);
+	//float hBound = 0.1*scale.x;
+	//float dh = abs(localp.y*scale.x) - hBound;
+	//dh = dh>0 ? dh:0;
+	//
+	//float d = re;
+	//float d2d = re;
+	//float2 picBound = float2(0.5,0.5) * scale.x;
+	//float2 p2d = localp.xz* scale.x;
+	//if(gtor(abs(p2d),picBound))
+	//{
+	//	//not hit,than the sdf is sdfBoxPic
+	//	d2d = SDFBox(p2d,0,picBound)+ TraceThre*2;
+	//	d = sqrt(d2d*d2d+dh*dh);
+	//}
+	//else
+	//{
+	//	float2 uv = p2d/picBound;
+	//	uv = (uv+1)*0.5;
+	//	uint2 picSize = GetSize(SphereSDFTex);
+	//	float sdfFromPic = SphereSDFTex.SampleLevel(sdf_linear_repeat_sampler,uv,0).r;
+	//	sdfFromPic /= picSize.x*0.5*sqrt(2)* scale.x;
+	//	sdfFromPic *= picBound.x;
+	//	d2d = sdfFromPic;
+	//	d = sqrt(d2d*d2d+dh*dh);
+	//	d -= 0.005;
+	//}
+	//re = min(re,d);
 }
 
 return re;

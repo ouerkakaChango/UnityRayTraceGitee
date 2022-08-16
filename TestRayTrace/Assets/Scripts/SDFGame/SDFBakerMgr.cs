@@ -305,7 +305,7 @@ public class SDFBakerMgr : MonoBehaviour
         Vector3 scale = obj.transform.lossyScale;
 
         bakedSDFs.Add("float3 localp = WorldToLocal(p, "+Bake(obj.transform.position)+", "+BakeRotEuler(obj.transform.rotation)+", "+Bake(obj.transform.lossyScale)+");");
-        bakedSDFs.Add("float dh = abs(localp.y) - " + tag.hBound * scale.x + ";");
+        bakedSDFs.Add("float dh = abs(localp.y) - " + tag.hBound + ";");
         bakedSDFs.Add("dh = dh > 0 ? dh : 0;");
         bakedSDFs.Add("");
         bakedSDFs.Add("float d = re;");

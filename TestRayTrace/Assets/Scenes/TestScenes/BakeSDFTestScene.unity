@@ -164,6 +164,8 @@ MonoBehaviour:
   shapeType: 1
   specialID: -1
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 0
   objInx: 0
 --- !u!135 &45438425
@@ -301,7 +303,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 142421526}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
   m_Name: 
@@ -337,6 +339,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 0
   objInx: 0
 --- !u!65 &142421529
@@ -501,6 +505,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 1
   objInx: 1
 --- !u!65 &348777199
@@ -701,6 +707,8 @@ MonoBehaviour:
   shapeType: 1
   specialID: -2
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 0
   objInx: 0
 --- !u!23 &541193201
@@ -821,6 +829,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 1
   objInx: 3
 --- !u!65 &563013441
@@ -1041,6 +1051,7 @@ GameObject:
   - component: {fileID: 764754545}
   - component: {fileID: 764754547}
   - component: {fileID: 764754546}
+  - component: {fileID: 764754548}
   m_Layer: 0
   m_Name: TestSDF_B
   m_TagString: Untagged
@@ -1056,7 +1067,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 764754544}
   m_LocalRotation: {x: -0.1292843, y: 0.76394755, z: 0.6259356, w: 0.08873776}
-  m_LocalPosition: {x: -76.9, y: -14.1, z: -61.3}
+  m_LocalPosition: {x: -107.3, y: 9.7, z: -61.3}
   m_LocalScale: {x: 30, y: 30, z: 30}
   m_Children: []
   m_Father: {fileID: 1085768379}
@@ -1074,12 +1085,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  centerStrategy: 2
-  center: {x: -91.90001, y: 5.2100024, z: -52.689995}
+  centerStrategy: 1
+  center: {x: -107.3, y: 9.7, z: -61.3}
   boundStrategy: 1
   bound: {x: 15.000004, y: 15.000002, z: 15.000003}
-  judgeScale: 2
-  centerOffset: {x: 0, y: 4.31, z: -6.39}
+  judgeScale: 1
+  centerOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &764754547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1087,7 +1098,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 764754544}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -1098,11 +1109,31 @@ MonoBehaviour:
     roughness: 1
   SDF_offset: 0
   renderMode: 0
-  shapeType: 2
+  shapeType: 3
   specialID: -1
   fontCharacter: 66
+  sliceTexTag: {fileID: 764754548}
+  hBound: 0.1
   mergeType: 0
   objInx: 1
+--- !u!114 &764754548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 764754544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  pbrTextures: []
+  heightTextures: []
+  plainTextures:
+  - name: B_SDFTex
+    tex: {fileID: 2800000, guid: 2e2e756d54fd1bb40b7839aa472cfb48, type: 3}
 --- !u!1 &817168217
 GameObject:
   m_ObjectHideFlags: 0
@@ -1158,6 +1189,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 1
   objInx: 5
 --- !u!65 &817168220
@@ -1263,6 +1296,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 1
   objInx: 3
 --- !u!65 &1004293005
@@ -1537,8 +1572,10 @@ MonoBehaviour:
   shapeType: 1
   specialID: -3
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 0
-  objInx: 2
+  objInx: 1
 --- !u!23 &1283602067
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1686,6 +1723,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 2
   objInx: 8
 --- !u!1 &1355201445
@@ -1701,7 +1740,7 @@ GameObject:
   - component: {fileID: 1355201447}
   - component: {fileID: 1355201449}
   m_Layer: 0
-  m_Name: TestSDFText
+  m_Name: TestSDF_A
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1715,8 +1754,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1355201445}
   m_LocalRotation: {x: -0.1292843, y: 0.76394755, z: 0.6259356, w: 0.08873776}
-  m_LocalPosition: {x: -53.299, y: 1.427, z: -56.434}
-  m_LocalScale: {x: 30, y: 30, z: 30}
+  m_LocalPosition: {x: -38.49, y: 6.91, z: -56.434}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_Children: []
   m_Father: {fileID: 1085768379}
   m_RootOrder: 4
@@ -1737,13 +1776,15 @@ MonoBehaviour:
     albedo: {r: 0, g: 0.14847445, b: 1, a: 1}
     metallic: 0
     roughness: 1
-  SDF_offset: 0
+  SDF_offset: -0.005
   renderMode: 0
-  shapeType: 2
+  shapeType: 3
   specialID: -1
-  fontCharacter: 65
+  fontCharacter: 66
+  sliceTexTag: {fileID: 764754548}
+  hBound: 0.1
   mergeType: 0
-  objInx: 3
+  objInx: 2
 --- !u!114 &1355201448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1765,15 +1806,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1355201445}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  centerStrategy: 0
-  center: {x: -65, y: 15, z: -56.434}
+  centerStrategy: 1
+  center: {x: -38.49, y: 6.91, z: -56.434}
   boundStrategy: 1
-  bound: {x: 15.000004, y: 15.000002, z: 15.000003}
+  bound: {x: 5.000001, y: 5.0000005, z: 5.0000014}
   judgeScale: 1
   centerOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &1491667009
@@ -1895,6 +1936,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 1
   objInx: 10
 --- !u!1 &1666331700
@@ -1997,6 +2040,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bakerMgr: {fileID: 1928400447}
+  texSys: {fileID: 1928400448}
   templates:
   - Resources/SDFGameCS/CS_SDFGameTemplate.txt
   - Resources/SDFGameCS/SDFGameSceneTemplate.txt
@@ -2007,7 +2051,6 @@ MonoBehaviour:
   - Resources/SDFGameCS/testBakeSDF_cfg.txt
   - Resources/SDFGameCS/testBakeSDFScene_cfg.txt
   outTaskFilePath: Resources/SDFGameCS/TestBake_task.txt
-  texSys: {fileID: 1928400448}
 --- !u!114 &1666331705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2024,7 +2067,6 @@ MonoBehaviour:
   FSR_Scale: 2
   SceneName: TestBake
   autoCS: {fileID: 1666331704}
-  texSys: {fileID: 1928400448}
   envSpecTex2DArr: {fileID: 18700000, guid: 0f551ab412a7b6a43adb8fff0951af3f, type: 2}
   envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
   w: 1024
@@ -2245,6 +2287,8 @@ MonoBehaviour:
   shapeType: 0
   specialID: -1
   fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
   mergeType: 1
   objInx: 11
 --- !u!65 &1758613633
@@ -2358,13 +2402,12 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[4];
+  - int renderMode[3];
   bakedRenders: []
   bakedDirShadows: []
   bakedBeforeSDF: []
   tags:
   - {fileID: 541193199}
-  - {fileID: 764754547}
   - {fileID: 1283602066}
   - {fileID: 1355201447}
 --- !u!114 &1928400448
@@ -2380,15 +2423,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
-  - name: woodPBR_albedo
-    tex: {fileID: 2800000, guid: e95d4103f8811604d8cc666f70f5f830, type: 3}
-  - name: woodPBR_normal
-    tex: {fileID: 2800000, guid: e95d4103f8811604d8cc666f70f5f830, type: 3}
-  - name: woodPBR_metallic
-    tex: {fileID: 2800000, guid: e95d4103f8811604d8cc666f70f5f830, type: 3}
-  - name: woodPBR_roughness
-    tex: {fileID: 2800000, guid: e95d4103f8811604d8cc666f70f5f830, type: 3}
-  - name: woodPBR_ao
-    tex: {fileID: 2800000, guid: e95d4103f8811604d8cc666f70f5f830, type: 3}
+  - name: B_SDFTex
+    tex: {fileID: 2800000, guid: 2e2e756d54fd1bb40b7839aa472cfb48, type: 3}
   tags:
-  - {fileID: 142421527}
+  - {fileID: 764754548}
+  bakedDeclares:
+  - Texture2D<float4> B_SDFTex;

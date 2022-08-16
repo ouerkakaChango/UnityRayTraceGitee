@@ -24,7 +24,6 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     public string SceneName = "Detail1";
     public AutoCS autoCS;
-    public TextureSystem texSys;
     ComputeShader cs;
     ComputeShader cs_FSR;
     public Texture2DArray envSpecTex2DArr;
@@ -186,9 +185,9 @@ public class SDFGameSceneTrace : MonoBehaviour
         cs.SetTexture(kInx, "perlinNoise1", ShaderToyTool.Instance.perlinNoise1);
         cs.SetTexture(kInx, "voronoiNoise1", ShaderToyTool.Instance.voronoiNoise1);
         //___
-        for (int i=0;i<texSys.outTextures.Count;i++)
+        for (int i=0;i<autoCS.texSys.outTextures.Count;i++)
         {
-            cs.SetTexture(kInx, texSys.outTextures[i].name, texSys.outTextures[i].tex);
+            cs.SetTexture(kInx, autoCS.texSys.outTextures[i].name, autoCS.texSys.outTextures[i].tex);
         }
         //####
 
@@ -233,12 +232,6 @@ public class SDFGameSceneTrace : MonoBehaviour
             cs_FSR = (ComputeShader)Resources.Load("FSR/FSR");
         }
         hasInited = true;
-    }
-
-    public void RefreshTextureSystem()
-    {
-        texSys.Refresh();
-        autoCS.texSys = texSys;
     }
 
     public void RefreshAutoCS()
