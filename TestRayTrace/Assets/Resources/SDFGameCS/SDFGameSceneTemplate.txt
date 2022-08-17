@@ -127,19 +127,58 @@ float TraceScene(Ray ray, out HitInfo info)
 
 	TraceInfo traceInfo;
 	Init(traceInfo,MaxSDF);
+
+	float objSDF[OBJNUM];
+	bool innerBoundFlag[OBJNUM];
+	int objInx = -1;
+	float sdf = MaxSDF;
+	bool bInnerBound = false;
+
 	while (traceInfo.traceCount <= MaxTraceTime)
 	{
-		int objInx = -1;
-		float objSDF[OBJNUM];
-		float sdf = MaxSDF;
+		objInx = -1;
+		sdf = MaxSDF;
+		bInnerBound = false;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
-			if (objSDF[inx] < sdf)
+			innerBoundFlag[inx] = false;
+		}
+
+		###BLOCK CheckInnerBound
+		...
+		###BLOCK
+
+		if(bInnerBound)
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
 			{
-				sdf = objSDF[inx];
-				objInx = inx;
+				if(innerBoundFlag[inx])
+				{
+					objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+					if (objSDF[inx] < sdf)
+					{
+						sdf = objSDF[inx];
+						objInx = inx;
+					}
+				}
 			}
+		}
+		else
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+				if (objSDF[inx] < sdf)
+				{
+					sdf = objSDF[inx];
+					objInx = inx;
+				}
+			}
+		}
+
+		if(objInx == -1)
+		{
+			break;
 		}
 
 		if (sdf > MaxTraceDis)

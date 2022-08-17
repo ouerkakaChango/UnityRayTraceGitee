@@ -1098,7 +1098,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 764754544}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -1134,6 +1134,7 @@ MonoBehaviour:
   plainTextures:
   - name: B_SDFTex
     tex: {fileID: 2800000, guid: 2e2e756d54fd1bb40b7839aa472cfb48, type: 3}
+    channel: 0
 --- !u!1 &817168217
 GameObject:
   m_ObjectHideFlags: 0
@@ -1575,7 +1576,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   mergeType: 0
-  objInx: 1
+  objInx: 2
 --- !u!23 &1283602067
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1784,7 +1785,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 764754548}
   hBound: 0.1
   mergeType: 0
-  objInx: 2
+  objInx: 3
 --- !u!114 &1355201448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2402,12 +2403,13 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[3];
+  - int renderMode[4];
   bakedRenders: []
   bakedDirShadows: []
   bakedBeforeSDF: []
   tags:
   - {fileID: 541193199}
+  - {fileID: 764754547}
   - {fileID: 1283602066}
   - {fileID: 1355201447}
 --- !u!114 &1928400448
@@ -2425,6 +2427,7 @@ MonoBehaviour:
   outTextures:
   - name: B_SDFTex
     tex: {fileID: 2800000, guid: 2e2e756d54fd1bb40b7839aa472cfb48, type: 3}
+    channel: 0
   tags:
   - {fileID: 764754548}
   bakedDeclares:

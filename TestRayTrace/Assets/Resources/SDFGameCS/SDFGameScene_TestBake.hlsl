@@ -1,4 +1,4 @@
-﻿#define OBJNUM 3
+﻿#define OBJNUM 4
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -48,11 +48,17 @@ re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0, 1, 0.1720126);
+re.albedo = float3(0, 0.1484745, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 2 )
+{
+re.albedo = float3(0, 1, 0.1720126);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 3 )
 {
 re.albedo = float3(0, 0.1484745, 1);
 re.metallic = 0;
@@ -65,10 +71,11 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[3];
+int renderMode[4];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
+renderMode[3] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -83,9 +90,12 @@ inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -3;
 }
 else if (inx == 2 )
+{
+inx = -3;
+}
+else if (inx == 3 )
 {
 }
 //@@@
@@ -290,7 +300,14 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 //###
 float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr BeforeObjSDF
-if(inx == 2 )
+if(inx == 1 )
+{
+if (!IsInBBox(p, float3(-122.3, -5.300002, -76.3), float3(-92.3, 24.7, -46.3)))
+{
+return SDFBox(p, float3(-107.3, 9.7, -61.3), float3(15, 15, 15)) + 0.1;
+}
+}
+if(inx == 3 )
 {
 if (!IsInBBox(p, float3(-43.49, 1.909999, -61.434), float3(-33.49, 11.91, -51.434)))
 {
@@ -305,9 +322,38 @@ inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -3;
+float3 localp = WorldToLocal(p, float3(-107.3, 9.7, -61.3), float3(281.6757, 187.4573, 334.7128), float3(30.00001, 30, 30.00001));
+float dh = abs(localp.y) - 0.1;
+dh = dh > 0 ? dh : 0;
+
+float d = re;
+float d2d = re;
+float2 picBound = float2(0.5, 0.5) * 30.00001;
+float2 p2d = localp.xz * 30.00001;
+if (gtor(abs(p2d), picBound))
+{
+d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;
+d = sqrt(d2d * d2d + dh * dh);
+}
+else
+{
+float2 uv = p2d / picBound;
+uv = (uv + 1) * 0.5;
+uint2 picSize = GetSize(B_SDFTex);
+float sdfFromPic = B_SDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 30.00001;
+sdfFromPic *= picBound.x;
+d2d = sdfFromPic;
+d = sqrt(d2d * d2d + dh * dh);
+d += 0;
+}
+re = min(re, d);
 }
 else if (inx == 2 )
+{
+inx = -3;
+}
+else if (inx == 3 )
 {
 float3 localp = WorldToLocal(p, float3(-38.49, 6.91, -56.434), float3(281.6757, 187.4573, 334.7128), float3(10, 10, 10));
 float dh = abs(localp.y) - 0.1;
@@ -452,9 +498,12 @@ inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -3;
 }
 else if (inx == 2 )
+{
+inx = -3;
+}
+else if (inx == 3 )
 {
 }
 //@@@
@@ -490,19 +539,83 @@ float TraceScene(Ray ray, out HitInfo info)
 
 	TraceInfo traceInfo;
 	Init(traceInfo,MaxSDF);
+
+	float objSDF[OBJNUM];
+	bool innerBoundFlag[OBJNUM];
+	int objInx = -1;
+	float sdf = MaxSDF;
+	bool bInnerBound = false;
+
 	while (traceInfo.traceCount <= MaxTraceTime)
 	{
-		int objInx = -1;
-		float objSDF[OBJNUM];
-		float sdf = MaxSDF;
+		objInx = -1;
+		sdf = MaxSDF;
+		bInnerBound = false;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
-			if (objSDF[inx] < sdf)
+			innerBoundFlag[inx] = false;
+		}
+
+//???
+if (IsInBBox(ray.pos, float3(-43.49, 5.09999, -59.434), float3(-33.49, 11.91, -53.434)))
+{
+bInnerBound = true;
+	innerBoundFlag[3] = true;
+}
+
+if (IsInBBox(ray.pos, float3(-122.3, -5.300002, -76.3), float3(-92.3, 24.7, -46.3)))
+{
+bInnerBound = true;
+	innerBoundFlag[1] = true;
+}
+bool bInGrassRange = false;
+if(abs(ray.pos.x-eyePos.x)<300 && abs(ray.pos.z - eyePos.z)<300)
+{
+	float terrain = CosFBM(ray.pos.xz);
+	terrain = abs(ray.pos.y - terrain);
+	if(terrain<1.5)
+	{
+		bInGrassRange = true;
+	}
+}
+if (bInGrassRange)
+{
+	bInnerBound = true;
+	innerBoundFlag[2] = true;
+	innerBoundFlag[0] = true;
+}
+
+		if(bInnerBound)
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
 			{
-				sdf = objSDF[inx];
-				objInx = inx;
+				if(innerBoundFlag[inx])
+				{
+					objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+					if (objSDF[inx] < sdf)
+					{
+						sdf = objSDF[inx];
+						objInx = inx;
+					}
+				}
 			}
+		}
+		else
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+				if (objSDF[inx] < sdf)
+				{
+					sdf = objSDF[inx];
+					objInx = inx;
+				}
+			}
+		}
+
+		if(objInx == -1)
+		{
+			break;
 		}
 
 		if (sdf > MaxTraceDis)
