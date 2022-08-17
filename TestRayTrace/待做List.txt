@@ -1,2 +1,3 @@
-1.手动公式，画出A-Z的SDF模型
-2.SDF-prefab编辑器，用于调整，保存A-Z的英文字体prefab
+【暂停，换用画图Slice】--1.手动公式，画出A-Z的SDF模型
+【CreateFontScene目前可支持此功能】--2.SDF-prefab编辑器，用于调整，保存A-Z的英文字体prefab
+3.完善innerBound自动Bake，阴影里的trace也要加上
