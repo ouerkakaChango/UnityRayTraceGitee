@@ -3,7 +3,7 @@ valMaps:
 ObjNum 4
 //@@@
 TraceThre 0.001
-NormalEpsilon 0.001
+NormalEpsilon 0.01
 
 Blocks:
 
@@ -21,7 +21,8 @@ Blocks:
 #include "../SDFGamePrefab/font_prefab.hlsl"
 
 //@@@SDFBakerMgr TexSys
-Texture2D<float4> B_SDFTex;
+Texture2D<float> testA_SDF;
+Texture2D<float> C_SDFTex;
 //@@@
 ###BLOCK
 
@@ -296,8 +297,8 @@ else
 {
     float2 uv = p2d / picBound;
     uv = (uv + 1) * 0.5;
-    uint2 picSize = GetSize(B_SDFTex);
-    float sdfFromPic = B_SDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+    uint2 picSize = GetSize(C_SDFTex);
+    float sdfFromPic = C_SDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
     sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 30.00001;
     sdfFromPic *= picBound.x;
     d2d = sdfFromPic;
@@ -329,8 +330,8 @@ else
 {
     float2 uv = p2d / picBound;
     uv = (uv + 1) * 0.5;
-    uint2 picSize = GetSize(B_SDFTex);
-    float sdfFromPic = B_SDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+    uint2 picSize = GetSize(testA_SDF);
+    float sdfFromPic = testA_SDF.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
     sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 10;
     sdfFromPic *= picBound.x;
     d2d = sdfFromPic;
@@ -480,32 +481,47 @@ else
 ###BLOCK
 
 ###BLOCK CheckInnerBound
-//???
-if (IsInBBox(ray.pos, float3(-43.49, 5.09999, -59.434), float3(-33.49, 11.91, -53.434)))
+//@@@SDFBakerMgr CheckInnerBound
+if (IsInBBox(ray.pos, float3(-120.8, -3.800001, -74.8), float3(-93.8, 23.2, -47.8)))
 {
-    bInnerBound = true;
-	innerBoundFlag[3] = true;
+  bInnerBound = true;
+  innerBoundFlag[1] = true;
 }
-
-if (IsInBBox(ray.pos, float3(-122.3, -5.300002, -76.3), float3(-92.3, 24.7, -46.3)))
+if (IsInBBox(ray.pos, float3(-42.99, 5.559999, -60.934), float3(-33.99, 11.41, -51.934)))
 {
-    bInnerBound = true;
-	innerBoundFlag[1] = true;
+  bInnerBound = true;
+  innerBoundFlag[3] = true;
 }
-bool bInGrassRange = false;
-if(abs(ray.pos.x-eyePos.x)<300 && abs(ray.pos.z - eyePos.z)<300)
-{
-	float terrain = CosFBM(ray.pos.xz);
-	terrain = abs(ray.pos.y - terrain);
-	if(terrain<1.5)
-	{
-		bInGrassRange = true;
-	}
-}
-if (bInGrassRange)
-{
-	bInnerBound = true;
-	innerBoundFlag[2] = true;
-	innerBoundFlag[0] = true;
-}
+//@@@
+//bool bInGrassRange = false;
+//if(abs(ray.pos.x-eyePos.x)<300 && abs(ray.pos.z - eyePos.z)<300)
+//{
+//	float terrain = CosFBM(ray.pos.xz);
+//	terrain = abs(ray.pos.y - terrain);
+//	if(terrain<0.1)
+//	{
+//		bInGrassRange = true;
+//	}
+//}
+//if (bInGrassRange)
+//{
+//	bInnerBound = true;
+//	innerBoundFlag[2] = true;
+//	innerBoundFlag[0] = true;
+//}
 ###BLOCK
+
+###BLOCK CheckInnerBound2
+//@@@SDFBakerMgr CheckInnerBound
+if (IsInBBox(ray.pos, float3(-120.8, -3.800001, -74.8), float3(-93.8, 23.2, -47.8)))
+{
+  bInnerBound = true;
+  innerBoundFlag[1] = true;
+}
+if (IsInBBox(ray.pos, float3(-42.99, 5.559999, -60.934), float3(-33.99, 11.41, -51.934)))
+{
+  bInnerBound = true;
+  innerBoundFlag[3] = true;
+}
+//@@@
+###

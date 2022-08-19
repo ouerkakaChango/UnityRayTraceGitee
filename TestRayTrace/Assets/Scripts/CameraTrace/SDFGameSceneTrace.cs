@@ -63,28 +63,8 @@ public class SDFGameSceneTrace : MonoBehaviour
         }
     }
 
-    float daoSpeed = 20.0f;
     void Update()
     {
-        //if (Input.GetKeyDown("q"))
-        //{
-        //    //print("q key was pressed");
-        //    float dt = Mathf.Min(0.001f, Time.deltaTime);
-        //    float delDao = -1 * daoSpeed * dt;
-        //    daoScale += delDao;
-        //    daoScale = Mathf.Max(0.00001f, daoScale);
-        //    //print(delDao + " " + daoScale);
-        //}
-        //
-        //if (Input.GetKeyDown("e"))
-        //{
-        //    //print("q key was pressed");
-        //    float dt = Mathf.Min(0.01f, Time.deltaTime);
-        //    float delDao = 1 * daoSpeed * dt;
-        //    daoScale += delDao;
-        //    //print(delDao + " " + daoScale);
-        //}
-
         if (Input.GetKeyDown("q"))
         {
             daoScale *= 0.5f;

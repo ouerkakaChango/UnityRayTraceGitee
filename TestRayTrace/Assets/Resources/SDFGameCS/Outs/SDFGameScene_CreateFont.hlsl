@@ -30,7 +30,7 @@
 //Texture2D<float4> SphereSDFTex;
 //SamplerState sdf_linear_repeat_sampler;
 //@@@SDFBakerMgr TexSys
-Texture2D<float> B_SDFTex;
+Texture2D<float> C_SDFTex;
 //@@@
 
 Material_PBR GetObjMaterial_PBR(int obj)
@@ -254,13 +254,13 @@ else
 {
 float2 uv = p2d / picBound;
 uv = (uv + 1) * 0.5;
-uint2 picSize = GetSize(B_SDFTex);
-float sdfFromPic = B_SDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+uint2 picSize = GetSize(C_SDFTex);
+float sdfFromPic = C_SDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
 sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 1;
 sdfFromPic *= picBound.x;
 d2d = sdfFromPic;
 d = sqrt(d2d * d2d + dh * dh);
-d += -0.005;
+d += -0.02;
 }
 re = min(re, d);
 }

@@ -26,6 +26,11 @@ public class SDFBound : MonoBehaviour
     public Vector3 bound;
     public float judgeScale = 2;
     public Vector3 centerOffset = Vector3.zero;
+    [HideInInspector]
+    public bool enableInnerBound = false;
+    [HideInInspector]
+    public float innerBoundRelativeScale = 0.9f;
+    public float iDown = 1.0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -49,6 +54,15 @@ public class SDFBound : MonoBehaviour
         {
             Gizmos.color = new Color(0, 0, 1);
             Gizmos.DrawWireCube(center, bound * 2);
+
+            if(enableInnerBound)
+            {
+                Vector3 bmin, bmax;
+                GetInnerBoundMinMax(out bmin, out bmax);
+                var icenter = (bmin + bmax) * 0.5f;
+                Gizmos.color = new Color(1, 1, 0);
+                Gizmos.DrawWireCube(icenter, (bmax-bmin));
+            }
         }
     }
 
@@ -67,5 +81,11 @@ public class SDFBound : MonoBehaviour
         var xDir = GetAlignedAxis(trans.right);
         var yDir = GetAlignedAxis(trans.up);
         return minPos + bound.x * xDir + bound.y * yDir + bound.z * zDir;
+    }
+
+    public void GetInnerBoundMinMax(out Vector3 iboxmin, out Vector3 iboxmax)
+    {
+        iboxmin = center - Mul(bound , innerBoundRelativeScale * new Vector3(1,iDown,1));
+        iboxmax = center + bound * innerBoundRelativeScale;
     }
 }

@@ -11,6 +11,8 @@ public class SDFSliceBaker : MonoBehaviour
     public bool blackOrWhite = true;
     float[] shapeArr = null;
     float[] sdfArr = null;
+    public string outName = "";
+
     // Start is called before the first frame update
     void Start()
     {
@@ -80,11 +82,18 @@ public class SDFSliceBaker : MonoBehaviour
         Color[] colors = new Color[w * h];
         for(int i=0;i<colors.Length;i++)
         {
-            //???
             colors[i] = new Color(sdfArr[i], 0, 0);
-            //colors[i] = new Color(shapeArr[i], 0, 0);
         }
         outTex.SetPixels(colors);
         outTex.Apply();
+    }
+
+    public void Clear()
+    {
+        inputTex = null;outTex=null;
+        targetChannel = ColorChannel.R;
+        blackOrWhite = true;
+        shapeArr = null;
+        sdfArr = null;
     }
 }

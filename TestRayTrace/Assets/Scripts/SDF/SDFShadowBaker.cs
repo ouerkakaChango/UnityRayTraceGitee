@@ -11,7 +11,7 @@ public class SDFShadowBaker : MonoBehaviour
 {
     public TextAsset meshSDFFile;
     public Transform CasterTrans;
-    public Light light;
+    public Light targetLight;
     public Vector2Int size;
     public float softK = 2;
     public RenderTexture rt;
@@ -88,7 +88,7 @@ public class SDFShadowBaker : MonoBehaviour
         cs.SetVector("quadSize", new Vector3(transform.localScale.x,transform.localScale.y,0));
         cs.SetVector("quadPos", transform.position - CasterTrans.position);
         //!!! 目前只支持了dirLight
-        cs.SetVector("lightDir", light.transform.forward);
+        cs.SetVector("lightDir", targetLight.transform.forward);
 
         cs.Dispatch(kInx, size.x / 8, size.y / 8, 1);
         //### compute

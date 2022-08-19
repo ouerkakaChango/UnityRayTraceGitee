@@ -1091,6 +1091,9 @@ MonoBehaviour:
   bound: {x: 15.000004, y: 15.000002, z: 15.000003}
   judgeScale: 1
   centerOffset: {x: 0, y: 0, z: 0}
+  enableInnerBound: 1
+  innerBoundRelativeScale: 0.9
+  iDown: 1
 --- !u!114 &764754547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1132,9 +1135,9 @@ MonoBehaviour:
   pbrTextures: []
   heightTextures: []
   plainTextures:
-  - name: B_SDFTex
-    tex: {fileID: 2800000, guid: 2e2e756d54fd1bb40b7839aa472cfb48, type: 3}
-    channel: 0
+  - name: C_SDFTex
+    tex: {fileID: 2800000, guid: 6cb78cc27d9ced84fa12d52a0751b3b1, type: 3}
+    channel: 3
 --- !u!1 &817168217
 GameObject:
   m_ObjectHideFlags: 0
@@ -1740,6 +1743,7 @@ GameObject:
   - component: {fileID: 1355201448}
   - component: {fileID: 1355201447}
   - component: {fileID: 1355201449}
+  - component: {fileID: 1355201450}
   m_Layer: 0
   m_Name: TestSDF_A
   m_TagString: Untagged
@@ -1782,7 +1786,7 @@ MonoBehaviour:
   shapeType: 3
   specialID: -1
   fontCharacter: 66
-  sliceTexTag: {fileID: 764754548}
+  sliceTexTag: {fileID: 1355201450}
   hBound: 0.1
   mergeType: 0
   objInx: 3
@@ -1818,6 +1822,28 @@ MonoBehaviour:
   bound: {x: 5.000001, y: 5.0000005, z: 5.0000014}
   judgeScale: 1
   centerOffset: {x: 0, y: 0, z: 0}
+  enableInnerBound: 1
+  innerBoundRelativeScale: 0.9
+  iDown: 0.3
+--- !u!114 &1355201450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1355201445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  pbrTextures: []
+  heightTextures: []
+  plainTextures:
+  - name: testA_SDF
+    tex: {fileID: 2800000, guid: 2e2e756d54fd1bb40b7839aa472cfb48, type: 3}
+    channel: 3
 --- !u!1 &1491667009
 GameObject:
   m_ObjectHideFlags: 0
@@ -2407,6 +2433,7 @@ MonoBehaviour:
   bakedRenders: []
   bakedDirShadows: []
   bakedBeforeSDF: []
+  bakedCheckInnerBound: []
   tags:
   - {fileID: 541193199}
   - {fileID: 764754547}
@@ -2425,10 +2452,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
-  - name: B_SDFTex
+  - name: testA_SDF
     tex: {fileID: 2800000, guid: 2e2e756d54fd1bb40b7839aa472cfb48, type: 3}
-    channel: 0
+    channel: 3
+  - name: C_SDFTex
+    tex: {fileID: 2800000, guid: 6cb78cc27d9ced84fa12d52a0751b3b1, type: 3}
+    channel: 3
   tags:
+  - {fileID: 1355201450}
   - {fileID: 764754548}
   bakedDeclares:
-  - Texture2D<float4> B_SDFTex;
+  - Texture2D<float> testA_SDF;
+  - Texture2D<float> C_SDFTex;

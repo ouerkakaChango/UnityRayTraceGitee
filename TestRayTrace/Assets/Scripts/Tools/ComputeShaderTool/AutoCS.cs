@@ -163,6 +163,7 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("SpecialObj", new List<Vector2Int>());
         rangeMap.Add("BeforeObjSDF", new List<Vector2Int>());
         rangeMap.Add("TexSys", new List<Vector2Int>());
+        rangeMap.Add("CheckInnerBound", new List<Vector2Int>());
 
         var keyList = rangeMap.Keys.ToList();
         List<Vector2Int> orderList = new List<Vector2Int>();
@@ -229,6 +230,14 @@ public class AutoCS : MonoBehaviour
                 newcount = bakerMgr.bakedBeforeSDF.Count;
                 newLines.RemoveRange(offset + range.x + 1, oricount);
                 newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedBeforeSDF);
+            }
+            else if (key == "CheckInnerBound" && ValidRange(range))
+            {
+                oricount = range.y - range.x - 1;
+                //…æ»•(range.x,range.y)£¨≤Â»Î bakerMgr.bakedxxx
+                newcount = bakerMgr.bakedCheckInnerBound.Count;
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedCheckInnerBound);
             }
             else if (key == "TexSys" && ValidRange(range))
             {

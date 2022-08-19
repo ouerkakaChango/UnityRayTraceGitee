@@ -7,8 +7,8 @@ using UnityEditor;
 public class SDFBoundEditor : Editor
 {
     SDFBound Target;
-    //protected bool showBakeFoldout = true;
-    //showBakeFoldout = EditorGUILayout.Foldout(showBakeFoldout, "Bake");
+    protected bool showInnerBound = true;
+
     void OnEnable()
     {
         Target = (SDFBound)target;
@@ -70,5 +70,15 @@ public class SDFBoundEditor : Editor
                 }
             }
         }
+
+        showInnerBound = EditorGUILayout.Foldout(showInnerBound, "InnerBound");
+        if(showInnerBound)
+        {
+            SerializedProperty enableInnerBound = serializedObject.FindProperty("enableInnerBound");
+            EditorGUILayout.PropertyField(enableInnerBound, new GUIContent("enableInnerBound"), true);
+            SerializedProperty innerBoundRelativeScale = serializedObject.FindProperty("innerBoundRelativeScale");
+            EditorGUILayout.PropertyField(innerBoundRelativeScale, new GUIContent("innerBoundRelativeScale"), true);
+        }
+        serializedObject.ApplyModifiedProperties();
     }
 }

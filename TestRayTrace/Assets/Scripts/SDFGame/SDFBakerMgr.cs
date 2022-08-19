@@ -24,6 +24,8 @@ public class SDFBakerMgr : MonoBehaviour
     public List<string> bakedDirShadows = new List<string>();
     [HideInInspector]
     public List<string> bakedBeforeSDF = new List<string>();    //used for SDF Bounds
+    [HideInInspector]
+    public List<string> bakedCheckInnerBound = new List<string>();
 
     public SDFBakerTag[] tags;
     SDFLightTag[] dirLightTags;
@@ -57,7 +59,7 @@ public class SDFBakerMgr : MonoBehaviour
             if(hasBound)
             {
                 PreAdd(i, ref bakedBeforeSDF, "inx", true);
-                AddBakeBound(tag.gameObject);
+                AddBakeBound(tag);
             }
 
             if (tag.shapeType == SDFShapeType.Special)
@@ -147,6 +149,7 @@ public class SDFBakerMgr : MonoBehaviour
 
         bakedSpecialObjects.Clear();
 
+        bakedCheckInnerBound.Clear();
     }
 
     void StartBake()
@@ -444,14 +447,14 @@ public class SDFBakerMgr : MonoBehaviour
         return sdfBound != null && sdfBound.isActiveAndEnabled;
     }
 
-    void AddBakeBound(GameObject obj)
+    void AddBakeBound(SDFBakerTag tag)
     {
         //if (!IsInBBox(p, center - scale * bound, center + scale * bound))
         //{
-                // return SDFBox(p, center, bound) + 0.1;
+        // return SDFBox(p, center, bound) + 0.1;
         //}
         //0.1是一个epsilon，用来保证一定会trace进bbox内
-
+        var obj = tag.gameObject;
         var sdfBound = obj.GetComponent<SDFBound>();
         if(sdfBound==null)
         {
@@ -460,12 +463,33 @@ public class SDFBakerMgr : MonoBehaviour
         Vector3 center = sdfBound.center;
         Vector3 bound = sdfBound.bound;
         float s = sdfBound.judgeScale;
-        Vector3 min = center - s * bound;
-        Vector3 max = center + s * bound;
-        bakedBeforeSDF.Add("if (!IsInBBox(p, "+Bake(min)+", "+ Bake(max) + "))");
+        Vector3 boxmin = center - s * bound;
+        Vector3 boxmax = center + s * bound;
+        bakedBeforeSDF.Add("if (!IsInBBox(p, "+Bake(boxmin) +", "+ Bake(boxmax) + "))");
         bakedBeforeSDF.Add("{");
         bakedBeforeSDF.Add("    return SDFBox(p, "+Bake(center)+", "+Bake(bound)+") + 0.1;");
         bakedBeforeSDF.Add("}");
+
+        if(sdfBound.enableInnerBound)
+        {
+            Vector3 iboxmin, iboxmax;
+            sdfBound.GetInnerBoundMinMax(out iboxmin, out iboxmax);
+            BakeInnerBound(iboxmin, iboxmax, tag.objInx);
+        }
+    }
+
+    void BakeInnerBound(Vector3 boxmin, Vector3 boxmax, int objInx)
+    {
+        //if (IsInBBox(ray.pos, boxmin, boxmax))
+        //{
+        //    bInnerBound = true;
+        //	innerBoundFlag[objInx] = true;
+        //}
+        bakedCheckInnerBound.Add("if (IsInBBox(ray.pos, "+ Bake(boxmin)+", "+ Bake(boxmax) +"))");
+        bakedCheckInnerBound.Add("{");
+        bakedCheckInnerBound.Add("  bInnerBound = true;");
+        bakedCheckInnerBound.Add("  innerBoundFlag["+objInx+"] = true;");
+        bakedCheckInnerBound.Add("}");
     }
 
     void SetTagMergeType(GameObject obj, SDFMergeType type)
