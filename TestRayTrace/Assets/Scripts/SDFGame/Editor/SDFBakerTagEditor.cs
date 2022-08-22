@@ -48,6 +48,9 @@ public class SDFBakerTagEditor : Editor
 
             SerializedProperty hBound = serializedObject.FindProperty("hBound");
             EditorGUILayout.PropertyField(hBound, new GUIContent("hBound"), true);
+
+            SerializedProperty SDF_offset2D = serializedObject.FindProperty("SDF_offset2D");
+            EditorGUILayout.PropertyField(SDF_offset2D, new GUIContent("SDF_offset2D"), true);
         }
 
         showMergeTag = EditorGUILayout.Foldout(showMergeTag, "Merge");

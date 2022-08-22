@@ -69,6 +69,34 @@ namespace ImageProcess
             {
                 CalculateSDF_CPU(w, h, in shapeArr, out sdfArr);
             }
+            //else if (core == ImageCalculationCore.GPU)
+            //{
+            //    CalculateSDF_GPU(w, h, in shapeArr, out sdfArr);
+            //}
+            else
+            {
+                Debug.LogError("Not handle");
+            }
+        }
+
+        public static void CalculateSDF(int w, int h, in float[] shapeArr, out Texture2D sdfArr, ImageCalculationCore core = ImageCalculationCore.CPU)
+        {
+            sdfArr = null;
+            if (w <= 0 || h <= 0)
+            {
+                Debug.LogError("Not handle w/h<=0");
+                return;
+            }
+            if (shapeArr.Length != w * h)
+            {
+                Debug.LogError("size not match");
+                return;
+            }
+
+            if (core == ImageCalculationCore.GPU)
+            {
+                CalculateSDF_GPU(w, h, in shapeArr, out sdfArr);
+            }
             else
             {
                 Debug.LogError("Not handle");
@@ -121,6 +149,32 @@ namespace ImageProcess
                     }
                 }
             }
+        }
+
+        public static void CalculateSDF_GPU(int w, int h, in float[] shapeArr, out Texture2D sdfArr)
+        {
+            var elemList = new List<Vector2Int>();
+            for (int i = 0; i < shapeArr.Length; i++)
+            {
+                //if shape is 1
+                if (shapeArr[i] > 0.99)
+                {
+                    int x, y;
+                    GetInx2(out x, out y, i, w);
+                    elemList.Add(new Vector2Int(x, y));
+                }
+            }
+
+            Debug.Log("elem collect");
+
+            sdfArr = new Texture2D(w, h, TextureFormat.RFloat, false);
+            RenderTexture result = null;
+            CopyUtility.CreateRT(ref result, ref sdfArr, RenderTextureFormat.RFloat);
+
+            //??? 用cs，把elemList通过ComputeBuffer传进去
+            //int kInx = cs.FindKernel(kernel);
+            //cs.SetTexture(kInx, "Result", result);
+            //cs.Dispatch(kInx, w / 8, h / 8, 1);
         }
 
         public static bool AdjustInx(ref int inxX, ref int inxY, int w, int h)

@@ -42,6 +42,8 @@ public class SDFBakerTag : MonoBehaviour
     public TexSysTag sliceTexTag = null;
     [HideInInspector]
     public float hBound = 0.1f;
+    [HideInInspector]
+    public float SDF_offset2D = 0.0f;
     //___Slice
 
     //---Merge

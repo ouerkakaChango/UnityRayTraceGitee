@@ -44,7 +44,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 0, 0);
+re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -237,14 +237,15 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-float3 localp = WorldToLocal(p, float3(0, 0, 0), float3(0, 0, 0), float3(1, 1, 1));
+float3 localp = WorldToLocal(p, float3(0.5, 0, 0.5), float3(0, 0, 0), float3(0.9, 0.9, 0.9));
 float dh = abs(localp.y) - 0.05;
 dh = dh > 0 ? dh : 0;
+dh *= 0.9;
 
 float d = re;
 float d2d = re;
-float2 picBound = float2(0.5, 0.5) * 1;
-float2 p2d = localp.xz * 1;
+float2 picBound = float2(0.5, 0.5) * 0.9;
+float2 p2d = localp.xz * 0.9;
 if (gtor(abs(p2d), picBound))
 {
 d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;
@@ -256,11 +257,13 @@ float2 uv = p2d / picBound;
 uv = (uv + 1) * 0.5;
 uint2 picSize = GetSize(C_SDFTex);
 float sdfFromPic = C_SDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
-sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 1;
+sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 0.9;
 sdfFromPic *= picBound.x;
 d2d = sdfFromPic;
+d2d += 0;
+d2d = max(d2d,0);
 d = sqrt(d2d * d2d + dh * dh);
-d += -0.02;
+d += 0;
 }
 re = min(re, d);
 }

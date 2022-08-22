@@ -272,6 +272,7 @@ public class SDFBakerMgr : MonoBehaviour
         //float hBound = 0.1 * scale.x;
         //float dh = abs(localp.y * scale.x) - hBound;
         //dh = dh > 0 ? dh : 0;
+        //dh *= scale.x;
         //
         //float d = re;
         //float d2d = re;
@@ -292,8 +293,10 @@ public class SDFBakerMgr : MonoBehaviour
         //    sdfFromPic /= picSize.x * 0.5 * sqrt(2) * scale.x;
         //    sdfFromPic *= picBound.x;
         //    d2d = sdfFromPic;
+        //    d2d += SDF_offset2D;
+        //    d2d = max(d2d, 0);
         //    d = sqrt(d2d * d2d + dh * dh);
-        //    d -= 0.005;
+        //    d += SDF_offset;
         //}
         //re = min(re, d);
 
@@ -310,6 +313,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedSDFs.Add("float3 localp = WorldToLocal(p, "+Bake(obj.transform.position)+", "+BakeRotEuler(obj.transform.rotation)+", "+Bake(obj.transform.lossyScale)+");");
         bakedSDFs.Add("float dh = abs(localp.y) - " + tag.hBound + ";");
         bakedSDFs.Add("dh = dh > 0 ? dh : 0;");
+        bakedSDFs.Add("dh *= "+scale.x+";");
         bakedSDFs.Add("");
         bakedSDFs.Add("float d = re;");
         bakedSDFs.Add("float d2d = re;");
@@ -329,6 +333,8 @@ public class SDFBakerMgr : MonoBehaviour
         bakedSDFs.Add("    sdfFromPic /= picSize.x * 0.5 * sqrt(2) * "+scale.x+";");
         bakedSDFs.Add("    sdfFromPic *= picBound.x;");
         bakedSDFs.Add("    d2d = sdfFromPic;");
+        bakedSDFs.Add("    d2d += "+tag.SDF_offset2D+";");
+        bakedSDFs.Add("    d2d = max(d2d,0);");
         bakedSDFs.Add("    d = sqrt(d2d * d2d + dh * dh);");
         bakedSDFs.Add("    d += "+tag.SDF_offset+";");
         bakedSDFs.Add("}");
