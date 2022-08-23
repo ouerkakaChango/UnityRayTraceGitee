@@ -720,7 +720,7 @@ MonoBehaviour:
   heightTextures: []
   plainTextures:
   - name: slice_whiteboardText
-    tex: {fileID: 2800000, guid: d7cea49045826e146bdb8b219ca3b32c, type: 3}
+    tex: {fileID: 2800000, guid: abf373543fd65e24f934b328d5ed2a55, type: 3}
     channel: 3
 --- !u!114 &446652357
 MonoBehaviour:
@@ -2635,7 +2635,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   outTextures:
   - name: slice_whiteboardText
-    tex: {fileID: 2800000, guid: d7cea49045826e146bdb8b219ca3b32c, type: 3}
+    tex: {fileID: 2800000, guid: abf373543fd65e24f934b328d5ed2a55, type: 3}
     channel: 3
   tags:
   - {fileID: 446652356}

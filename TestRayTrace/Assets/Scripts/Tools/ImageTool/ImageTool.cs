@@ -3,12 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using ImageUtility;
 using static MathHelper.XMathFunc;
+using TextureHelper;
 
 namespace ImageProcess
 {
     public enum ImageCalculationCore
     {
         CPU,GPU
+    }
+
+    public struct IPos
+    {
+        public uint x, y;
+        public IPos(uint x_, uint y_)
+        {
+            x = x_;
+            y = y_;
+        }
     }
     public static class ImageTool
     {
@@ -153,28 +164,62 @@ namespace ImageProcess
 
         public static void CalculateSDF_GPU(int w, int h, in float[] shapeArr, out Texture2D sdfArr)
         {
-            var elemList = new List<Vector2Int>();
+            var elemList = new List<IPos>();
             for (int i = 0; i < shapeArr.Length; i++)
             {
                 //if shape is 1
-                if (shapeArr[i] > 0.99)
+                if (shapeArr[i] > 0.5)
                 {
                     int x, y;
                     GetInx2(out x, out y, i, w);
-                    elemList.Add(new Vector2Int(x, y));
+                    elemList.Add(new IPos((uint)x, (uint)y));
                 }
             }
 
-            Debug.Log("elem collect");
+            Debug.Log(elemList.Count);
+            int num = elemList.Count;
+
+            int baseLoopCount = num/16;
+            int loopNum = Mathf.CeilToInt(num / (float)baseLoopCount);
 
             sdfArr = new Texture2D(w, h, TextureFormat.RFloat, false);
             RenderTexture result = null;
             CopyUtility.CreateRT(ref result, ref sdfArr, RenderTextureFormat.RFloat);
 
+
             //??? 用cs，把elemList通过ComputeBuffer传进去
-            //int kInx = cs.FindKernel(kernel);
-            //cs.SetTexture(kInx, "Result", result);
-            //cs.Dispatch(kInx, w / 8, h / 8, 1);
+            ComputeBuffer buffer_elemArr = null;
+            ComputeShaderHelper.PreComputeBuffer(ref buffer_elemArr, sizeof(uint) * 2, elemList.ToArray());
+
+            var cs = (ComputeShader)Resources.Load("BakeCS/BakeSDFSlice");
+            int kInx = cs.FindKernel("CSMain");
+            cs.SetBuffer(kInx, "elemArr", buffer_elemArr); //RWStructuredBuffer<int2> bvh;
+            cs.SetTexture(kInx, "Result", result);
+
+            int kInx0 = cs.FindKernel("SDFInit");
+            cs.SetTexture(kInx0, "Result", result);
+            cs.Dispatch(kInx0, w / 8, h / 8, 1);
+
+            for (int i = 0; i < loopNum; i++)
+            {
+                int start = -1, end = -1;
+                if (i == loopNum-1)
+                {
+                    start = baseLoopCount * (loopNum - 1);
+                    end = num - 1;
+                }
+                else
+                {
+                    start = baseLoopCount * i;
+                    end = baseLoopCount * (i + 1) - 1;
+                }
+                cs.SetInt("start", start);
+                cs.SetInt("end", end);
+                Debug.Log("dispatch " + i + " start " + start + " end " + end);
+                cs.Dispatch(kInx, w / 8, h / 8, 1);
+            }
+
+            TexHelper.RT2Tex2D(ref sdfArr, ref result, TextureFormat.RFloat);
         }
 
         public static bool AdjustInx(ref int inxX, ref int inxY, int w, int h)

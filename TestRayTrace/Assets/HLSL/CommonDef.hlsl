@@ -132,6 +132,16 @@ bool lt(float3 a, float3 b)
 	return a.x < b.x && a.y < b.y && a.z < b.z;
 }
 
+bool eq(int2 a, int2 b)
+{
+	return a.x == b.x && a.y == b.y;
+}
+
+bool eq(uint2 a, uint2 b)
+{
+	return a.x == b.x && a.y == b.y;
+}
+
 bool equal(float a, float b, float tolerance = 0.000001f)
 {
 	return abs(a - b) < tolerance;
