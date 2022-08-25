@@ -7,7 +7,7 @@ using UnityEditor;
 public class SDFBakerTagEditor : Editor
 {
     SDFBakerTag Target;
-    protected bool showMergeTag = true;
+    protected bool showMergeTag = false;
     //showMergeTag = EditorGUILayout.Foldout(showMergeTag, "MergeSetting");
     void OnEnable()
     {
