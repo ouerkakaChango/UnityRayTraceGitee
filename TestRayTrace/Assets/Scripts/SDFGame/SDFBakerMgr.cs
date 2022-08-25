@@ -49,16 +49,18 @@ public class SDFBakerMgr : MonoBehaviour
         //Debug.Log("BakerMgr Bake");
         PrepareBake();
         StartBake();
+        for (int i = 0; i < tags.Length; i++)
+        {
+            tags[i].objInx = i;
+        }
         for (int i=0;i<tags.Length;i++)
         {
-            SDFBakerTag tag = tags[i];
-            tag.objInx = i;
+            var tag = tags[i];
 
             DoPreAddAction(i);
             bool hasBound = HasSDFBound(tag.gameObject);
             if(hasBound)
             {
-                PreAdd(i, ref bakedBeforeSDF, "inx", true);
                 AddBakeBound(tag);
             }
 
@@ -230,6 +232,27 @@ public class SDFBakerMgr : MonoBehaviour
             lines.Add("else if ("+ inxName + " == "+inx+" )");
             lines.Add("{");
         }
+    }
+
+    void PreAdd(int[] ids, ref List<string> lines, string inxName = "inx")
+    {
+        //if(inx == 1 || inx == 2 || inx == 3)
+        //{
+        string s1 = "if(";
+        for(int i=0;i<ids.Length;i++)
+        {
+            s1 += inxName + " == " + ids[i];
+            if(i == ids.Length - 1)
+            {
+                s1 += ")";
+            }
+            else
+            {
+                s1 += "||";
+            }
+        }
+        lines.Add(s1);
+        lines.Add("{");
     }
 
     void PostAdd(int inx, ref List<string> lines)
@@ -454,6 +477,22 @@ public class SDFBakerMgr : MonoBehaviour
     }
 
     void AddBakeBound(SDFBakerTag tag)
+    {
+        var sdfBound = tag.gameObject.GetComponent<SDFBound>();
+        if (sdfBound.type == SDFBoundType.Default)
+        {
+            PreAdd(tag.objInx, ref bakedBeforeSDF, "inx", true);
+            AddBakeDefaultBound(tag);
+        }
+        else if (sdfBound.type == SDFBoundType.SharedBound)
+        {
+            int[] ids = sdfBound.GetSharedObjIDs();
+            PreAdd(ids, ref bakedBeforeSDF);
+            AddBakeDefaultBound(tag);
+        }
+    }
+
+    void AddBakeDefaultBound(SDFBakerTag tag)
     {
         //if (!IsInBBox(p, center - scale * bound, center + scale * bound))
         //{

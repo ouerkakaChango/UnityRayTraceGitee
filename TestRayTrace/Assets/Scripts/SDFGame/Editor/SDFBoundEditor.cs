@@ -7,7 +7,8 @@ using UnityEditor;
 public class SDFBoundEditor : Editor
 {
     SDFBound Target;
-    protected bool showInnerBound = true;
+    protected bool showInnerBound = false;
+    protected bool showSharedBound = false;
 
     void OnEnable()
     {
@@ -78,7 +79,20 @@ public class SDFBoundEditor : Editor
             EditorGUILayout.PropertyField(enableInnerBound, new GUIContent("enableInnerBound"), true);
             SerializedProperty innerBoundRelativeScale = serializedObject.FindProperty("innerBoundRelativeScale");
             EditorGUILayout.PropertyField(innerBoundRelativeScale, new GUIContent("innerBoundRelativeScale"), true);
+            SerializedProperty iDown = serializedObject.FindProperty("iDown");
+            EditorGUILayout.PropertyField(iDown, new GUIContent("DownScale"), true);
         }
+
+        if (Target.type == SDFBoundType.SharedBound)
+        {
+            showSharedBound = EditorGUILayout.Foldout(showSharedBound, "SharedBound");
+            if(showSharedBound)
+            {
+                SerializedProperty sharedTags = serializedObject.FindProperty("sharedTags");
+                EditorGUILayout.PropertyField(sharedTags, new GUIContent("sharedTags"), true);
+            }
+        }
+
         serializedObject.ApplyModifiedProperties();
     }
 }

@@ -16,8 +16,16 @@ public enum SizeStrategy
     AutoIfPossible,
 };
 
+public enum SDFBoundType
+{
+    Default,
+    SharedBound,
+}
+
 public class SDFBound : MonoBehaviour
 {
+    public SDFBoundType type = SDFBoundType.Default;
+
     public AnchorStrategy centerStrategy = AnchorStrategy.ByObject;
     [HideInInspector]
     public Vector3 center;
@@ -26,11 +34,21 @@ public class SDFBound : MonoBehaviour
     public Vector3 bound;
     public float judgeScale = 2;
     public Vector3 centerOffset = Vector3.zero;
+
+    //---InnerBound
     [HideInInspector]
     public bool enableInnerBound = false;
     [HideInInspector]
     public float innerBoundRelativeScale = 0.9f;
+    [HideInInspector]
     public float iDown = 1.0f;
+    //___
+
+    //---SharedBound
+    [HideInInspector]
+    public List<SDFBakerTag> sharedTags = new List<SDFBakerTag>();
+    //___
+
     // Start is called before the first frame update
     void Start()
     {
@@ -52,7 +70,14 @@ public class SDFBound : MonoBehaviour
         }
         if (isActiveAndEnabled && tag.isActiveAndEnabled)
         {
-            Gizmos.color = new Color(0, 0, 1);
+            if (type == SDFBoundType.Default)
+            {
+                Gizmos.color = new Color(0, 0, 1);
+            }
+            else if (type == SDFBoundType.SharedBound)
+            {
+                Gizmos.color = new Color(0, 1, 1);
+            }
             Gizmos.DrawWireCube(center, bound * 2);
 
             if(enableInnerBound)
@@ -87,5 +112,20 @@ public class SDFBound : MonoBehaviour
     {
         iboxmin = center - Mul(bound , innerBoundRelativeScale * new Vector3(1,iDown,1));
         iboxmax = center + bound * innerBoundRelativeScale;
+    }
+
+    public int[] GetSharedObjIDs()
+    {
+        if(type!= SDFBoundType.SharedBound)
+        {
+            return null;
+        }
+
+        int[] re = new int[sharedTags.Count];
+        for(int i=0;i<sharedTags.Count;i++)
+        {
+            re[i] = sharedTags[i].objInx;
+        }
+        return re;
     }
 }

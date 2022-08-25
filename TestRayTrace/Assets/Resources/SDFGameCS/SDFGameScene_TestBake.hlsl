@@ -340,11 +340,11 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 //###
 float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr BeforeObjSDF
-if(inx == 1 )
+if(inx == 6||inx == 3||inx == 4||inx == 0||inx == 7||inx == 1)
 {
-if (!IsInBBox(p, float3(-56.33, -1.872, -58.392), float3(-51.83, 2.628, -53.892)))
+if (!IsInBBox(p, float3(-56.05, -1.65, -58.16), float3(-52.05, 2.35, -54.16)))
 {
-return SDFBox(p, float3(-54.08, 0.378, -56.142), float3(0.7500002, 0.7500001, 0.7500002)) + 0.1;
+return SDFBox(p, float3(-54.05, 0.35, -56.16), float3(2, 2, 2)) + 0.1;
 }
 }
 //@@@

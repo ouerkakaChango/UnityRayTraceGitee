@@ -729,11 +729,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 446652354}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 0
   centerStrategy: 1
   center: {x: -54.08, y: 0.378, z: -56.142}
   boundStrategy: 1
@@ -743,6 +744,7 @@ MonoBehaviour:
   enableInnerBound: 0
   innerBoundRelativeScale: 0.9
   iDown: 0.3
+  sharedTags: []
 --- !u!114 &446652358
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1189,6 +1191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 0
   centerStrategy: 1
   center: {x: -107.3, y: 9.7, z: -61.3}
   boundStrategy: 1
@@ -1198,6 +1201,7 @@ MonoBehaviour:
   enableInnerBound: 1
   innerBoundRelativeScale: 0.9
   iDown: 1
+  sharedTags: []
 --- !u!114 &764754547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1409,6 +1413,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 0
   centerStrategy: 1
   center: {x: -53.812, y: 1.118, z: -55.949}
   boundStrategy: 1
@@ -1418,6 +1423,7 @@ MonoBehaviour:
   enableInnerBound: 0
   innerBoundRelativeScale: 0.9
   iDown: 0.3
+  sharedTags: []
 --- !u!114 &990469784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1992,6 +1998,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 0
   centerStrategy: 1
   center: {x: -38.49, y: 6.91, z: -56.434}
   boundStrategy: 1
@@ -2001,6 +2008,7 @@ MonoBehaviour:
   enableInnerBound: 1
   innerBoundRelativeScale: 0.9
   iDown: 1
+  sharedTags: []
 --- !u!114 &1355201450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2033,6 +2041,7 @@ GameObject:
   - component: {fileID: 1491667011}
   - component: {fileID: 1491667010}
   - component: {fileID: 1491667014}
+  - component: {fileID: 1491667015}
   m_Layer: 0
   m_Name: BoardMain
   m_TagString: Untagged
@@ -2144,6 +2153,35 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 1
   objInx: 6
+--- !u!114 &1491667015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1491667009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 1
+  centerStrategy: 1
+  center: {x: -54.05, y: 0.35, z: -56.16}
+  boundStrategy: 0
+  bound: {x: 2, y: 2, z: 2}
+  judgeScale: 1
+  centerOffset: {x: 0, y: 0, z: 0}
+  enableInnerBound: 0
+  innerBoundRelativeScale: 0.9
+  iDown: 1
+  sharedTags:
+  - {fileID: 1491667014}
+  - {fileID: 563013440}
+  - {fileID: 817168219}
+  - {fileID: 348777198}
+  - {fileID: 1758613632}
+  - {fileID: 446652358}
 --- !u!1 &1666331700
 GameObject:
   m_ObjectHideFlags: 0
