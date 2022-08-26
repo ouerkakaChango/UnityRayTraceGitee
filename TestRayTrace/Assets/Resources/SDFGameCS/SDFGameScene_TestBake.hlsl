@@ -31,6 +31,11 @@
 Texture2D<float> slice_whiteboardText;
 //@@@
 
+//@@@SDFBakerMgr DyValSys
+float dy_radius;
+float test2;
+//@@@
+
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
@@ -39,28 +44,28 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	re.roughness = 0.8f;
 	re.ao = 1;
 
-	//@@@SDFBakerMgr ObjMaterial
+//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
-{
-re.albedo = float3(0.8587747, 0, 1);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 1 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
-else if (obj == 2 )
+else if (obj == 1 )
 {
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
-else if (obj == 3 )
+else if (obj == 2 )
 {
 re.albedo = float3(0.7254902, 0.4784314, 0.3411765);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 3 )
+{
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -72,25 +77,25 @@ re.roughness = 1;
 }
 else if (obj == 5 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0, 1, 0.1720126);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 6 )
 {
-re.albedo = float3(0, 1, 0.1720126);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.2;
 }
 else if (obj == 7 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.2;
+re.roughness = 1;
 }
 else if (obj == 8 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.8587747, 0, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -102,15 +107,15 @@ int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
 int renderMode[9];
-renderMode[0] = 0;
-renderMode[1] = 2;
+renderMode[0] = 2;
+renderMode[1] = 0;
 renderMode[2] = 0;
-renderMode[3] = 0;
+renderMode[3] = 2;
 renderMode[4] = 2;
-renderMode[5] = 2;
+renderMode[5] = 0;
 renderMode[6] = 0;
-renderMode[7] = 0;
-renderMode[8] = 2;
+renderMode[7] = 2;
+renderMode[8] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -121,33 +126,33 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -4;
 }
 else if (inx == 1 )
 {
 }
 else if (inx == 2 )
 {
+inx = -2;
 }
 else if (inx == 3 )
 {
-inx = -2;
 }
 else if (inx == 4 )
 {
 }
 else if (inx == 5 )
 {
+inx = -3;
 }
 else if (inx == 6 )
 {
-inx = -3;
 }
 else if (inx == 7 )
 {
 }
 else if (inx == 8 )
 {
+inx = -4;
 }
 //@@@
 if(mode == 2)
@@ -351,7 +356,7 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 //###
 float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr BeforeObjSDF
-if(inx == 7||inx == 4||inx == 5||inx == 1||inx == 8||inx == 2)
+if(inx == 6||inx == 3||inx == 4||inx == 0||inx == 7||inx == 1)
 {
 if (!IsInBBox(p, float3(-56.05, -1.65, -58.16), float3(-52.05, 2.35, -54.16)))
 {
@@ -362,13 +367,9 @@ return SDFBox(p, float3(-54.05, 0.35, -56.16), float3(2, 2, 2)) + 0.1;
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -4;
-}
-else if (inx == 1 )
-{
 re = min(re, 0 + SDFBox(p, float3(-53.40586, -0.02504057, -55.8854), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
-else if (inx == 2 )
+else if (inx == 1 )
 {
 float3 localp = WorldToLocal(p, float3(-54.08, 0.378, -56.142), float3(290.1456, 168.0618, 358.9117), float3(1.500001, 1.5, 1.5));
 float dh = abs(localp.y) - 0.05;
@@ -400,29 +401,33 @@ d += 0;
 }
 re = min(re, d);
 }
-else if (inx == 3 )
+else if (inx == 2 )
 {
 inx = -2;
 }
-else if (inx == 4 )
+else if (inx == 3 )
 {
 re = min(re, 0 + SDFBox(p, float3(-53.255, -0.1510001, -56.684), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
 }
-else if (inx == 5 )
+else if (inx == 4 )
 {
 re = min(re, 0 + SDFBox(p, float3(-54.646, -0.1510001, -56.947), float3(0.07071169, 1.511707, 0.06462751), float3(10.90515, 349.3067, -2.608424E-06)));
 }
-else if (inx == 6 )
+else if (inx == 5 )
 {
 inx = -3;
 }
-else if (inx == 7 )
+else if (inx == 6 )
 {
 re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
 }
-else if (inx == 8 )
+else if (inx == 7 )
 {
 re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
+}
+else if (inx == 8 )
+{
+inx = -4;
 }
 //@@@
 if(inx == -1)
@@ -521,7 +526,7 @@ else if(inx == -3)
 }
 else if (inx == -4)
 {
-	float dy_radius = Time01();
+	//float dy_radius = Time01();
 	float r = dy_radius;
 	float d = SDFSphere(p,float3(-55.05, 0.35, -56.16),r);
 	re = min(re, d);
@@ -543,33 +548,33 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -4;
 }
 else if (inx == 1 )
 {
 }
 else if (inx == 2 )
 {
+inx = -2;
 }
 else if (inx == 3 )
 {
-inx = -2;
 }
 else if (inx == 4 )
 {
 }
 else if (inx == 5 )
 {
+inx = -3;
 }
 else if (inx == 6 )
 {
-inx = -3;
 }
 else if (inx == 7 )
 {
 }
 else if (inx == 8 )
 {
+inx = -4;
 }
 //@@@
 if (inx == -2)

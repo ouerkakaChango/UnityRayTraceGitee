@@ -15,6 +15,24 @@ public struct DynamicFloat
     public string name;
     public float val;
     public AnimationCurve cv;
+
+    public float GetVal()
+    {
+        if(type == DynamicType.Default)
+        {
+            return val;
+        }
+        else if (type == DynamicType.Curve)
+        {
+            float time = Shader.GetGlobalVector("_Time").y;
+            return cv.Evaluate(time);
+        }
+        else
+        {
+            Debug.LogError("Not handled");
+        }
+        return 0;
+    }
 }
 
 public class DynamicValTag : MonoBehaviour

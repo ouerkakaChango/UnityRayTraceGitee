@@ -164,11 +164,19 @@ public class SDFGameSceneTrace : MonoBehaviour
         cs.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
         cs.SetTexture(kInx, "perlinNoise1", ShaderToyTool.Instance.perlinNoise1);
         cs.SetTexture(kInx, "voronoiNoise1", ShaderToyTool.Instance.voronoiNoise1);
-        //___
         for (int i=0;i<autoCS.texSys.outTextures.Count;i++)
         {
             cs.SetTexture(kInx, autoCS.texSys.outTextures[i].name, autoCS.texSys.outTextures[i].tex);
         }
+        //??? DynamicValSys
+        for (int i = 0; i < autoCS.dyValSys.outFloats.Count; i++)
+        {
+            //var tName = autoCS.dyValSys.outFloats[i].name;
+            //var tF = autoCS.dyValSys.outFloats[i].GetVal();
+            cs.SetFloat(autoCS.dyValSys.outFloats[i].name, autoCS.dyValSys.outFloats[i].GetVal());
+            //Debug.Log("Dynamic: " + tName + " " + tF);
+        }
+        //___
         //####
 
         cs.SetTexture(kInx, "Result", rt);
@@ -192,12 +200,6 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     void Init()
     {
-        //if (cs == null)
-        {
-            //autoCS.Generate();
-            //cs = (ComputeShader)Resources.Load("SDFGameCS/CS_SDFGame_" + SceneName);
-            //cs = (ComputeShader)Resources.Load(ChopEnd(autoCS.outs[0],".compute"));
-        }
         if (rt == null)
         {
             rt = new RenderTexture(w, h, 24);
@@ -216,9 +218,6 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     public void RefreshAutoCS()
     {
-        //autoCS.InitOuts();
-        //autoCS.outs[0] = autoCS.templates[0].Replace("Template.txt", "_" + SceneName +".compute");
-        //autoCS.outs[1] = autoCS.templates[1].Replace("Template.txt", "_" + SceneName + ".hlsl");
         autoCS.Generate();
     }
 

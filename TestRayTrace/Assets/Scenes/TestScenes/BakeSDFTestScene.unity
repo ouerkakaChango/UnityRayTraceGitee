@@ -420,7 +420,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 1
+  objInx: 0
 --- !u!65 &348777199
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -679,7 +679,7 @@ MonoBehaviour:
   hBound: 0.05
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 2
+  objInx: 1
 --- !u!1 &541193198
 GameObject:
   m_ObjectHideFlags: 0
@@ -724,7 +724,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 3
+  objInx: 2
 --- !u!23 &541193201
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -847,7 +847,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 4
+  objInx: 3
 --- !u!65 &563013441
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1215,7 +1215,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 5
+  objInx: 4
 --- !u!65 &817168220
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1683,7 +1683,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 6
+  objInx: 5
 --- !u!23 &1283602067
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2061,7 +2061,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 7
+  objInx: 6
 --- !u!114 &1491667015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2192,6 +2192,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bakerMgr: {fileID: 1928400447}
   texSys: {fileID: 1928400448}
+  dyValSys: {fileID: 1928400449}
   templates:
   - Resources/SDFGameCS/CS_SDFGameTemplate.txt
   - Resources/SDFGameCS/SDFGameSceneTemplate.txt
@@ -2241,7 +2242,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 191fe419a3e75734a905e79ba9b149d0, type: 3}
   m_Name: 
@@ -2442,7 +2443,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 8
+  objInx: 7
 --- !u!65 &1758613633
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2516,6 +2517,7 @@ GameObject:
   - component: {fileID: 1928400446}
   - component: {fileID: 1928400447}
   - component: {fileID: 1928400448}
+  - component: {fileID: 1928400449}
   m_Layer: 0
   m_Name: Systems
   m_TagString: Untagged
@@ -2560,7 +2562,6 @@ MonoBehaviour:
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   tags:
-  - {fileID: 2041803221}
   - {fileID: 348777198}
   - {fileID: 446652358}
   - {fileID: 541193199}
@@ -2569,6 +2570,7 @@ MonoBehaviour:
   - {fileID: 1283602066}
   - {fileID: 1491667014}
   - {fileID: 1758613632}
+  - {fileID: 2041803221}
 --- !u!114 &1928400448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2589,6 +2591,96 @@ MonoBehaviour:
   - {fileID: 446652356}
   bakedDeclares:
   - Texture2D<float> slice_whiteboardText;
+--- !u!114 &1928400449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928400445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c87f79a15225a4741817ad3b45347504, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outFloats:
+  - type: 1
+    name: dy_radius
+    val: 0
+    cv:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.49908447
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.23168425
+        value: 0.5074404
+        inSlope: 2.0295544
+        outSlope: 2.0295544
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.08736028
+      - serializedVersion: 3
+        time: 0.6913075
+        value: 0.6784905
+        inSlope: 0.13073468
+        outSlope: 0.13073468
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+  - type: 0
+    name: test2
+    val: 2.5
+    cv:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+  tags:
+  - {fileID: 2041803220}
+  bakedDeclares:
+  - float dy_radius;
+  - float test2;
 --- !u!1 &2041803218
 GameObject:
   m_ObjectHideFlags: 0
@@ -2641,19 +2733,37 @@ MonoBehaviour:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
+        time: 0.0014562061
+        value: 0.009871244
+        inSlope: 2
+        outSlope: 2
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
+        time: 0.23168425
+        value: 0.5074404
+        inSlope: 2.0295544
+        outSlope: 2.0295544
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.08736028
+      - serializedVersion: 3
+        time: 0.6913075
+        value: 0.6784905
+        inSlope: 0.13073468
+        outSlope: 0.13073468
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
         time: 1
         value: 1
-        inSlope: 2
-        outSlope: 2
+        inSlope: 0
+        outSlope: 0
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
@@ -2713,4 +2823,4 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 0
+  objInx: 8

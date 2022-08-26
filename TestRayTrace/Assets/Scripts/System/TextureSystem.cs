@@ -142,15 +142,13 @@ public class TextureSystem : MonoBehaviour
     {
         bakedDeclares.Clear();
 
-        //??? 目前都是float4这么声明
-        //Texture2D<float4> SphereSDFTex
+        //such as: Texture2D<float4> SphereSDFTex;
         for (int i=0;i<outTextures.Count;i++)
         {
             string line = "";
             string prefix = GetPrefex(outTextures[i]);
             line = prefix + " " + outTextures[i].name+";";
             bakedDeclares.Add(line);
-            var tex = outTextures[i].tex;
         }
     }
 
