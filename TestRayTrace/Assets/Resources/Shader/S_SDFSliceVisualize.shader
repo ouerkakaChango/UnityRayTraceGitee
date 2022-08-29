@@ -6,7 +6,9 @@ Shader "Unlit/S_SDFSliceVisualize"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+		Tags {"Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent"}
+		ZWrite Off
+		Blend SrcAlpha OneMinusSrcAlpha
         LOD 100
 
         Pass
@@ -54,7 +56,7 @@ Shader "Unlit/S_SDFSliceVisualize"
 				}
 				else
 				{
-					re = 1;
+					re = 0;
 				}
                 return re;
             }

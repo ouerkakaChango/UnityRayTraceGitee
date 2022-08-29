@@ -47,19 +47,19 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 0, 0);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 2 )
 {
-re.albedo = float3(0, 0, 0);
+re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -113,8 +113,8 @@ int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
 int renderMode[10];
-renderMode[0] = 0;
-renderMode[1] = 2;
+renderMode[0] = 2;
+renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
 renderMode[4] = 2;
@@ -366,7 +366,7 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 //###
 float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr BeforeObjSDF
-if(inx == 7||inx == 4||inx == 5||inx == 1||inx == 8||inx == 2)
+if(inx == 7||inx == 4||inx == 5||inx == 0||inx == 8||inx == 1)
 {
 if (!IsInBBox(p, float3(-56.05, -1.65, -58.16), float3(-52.05, 2.35, -54.16)))
 {
@@ -377,15 +377,11 @@ return SDFBox(p, float3(-54.05, 0.35, -56.16), float3(2, 2, 2)) + 0.1;
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(-53.642, 0.041, -55.839), float3(0.04, 0.005, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
+re = min(re, 0 + SDFBox(p, float3(-53.40586, -0.02504057, -55.8854), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(-53.40586, -0.02504057, -55.8854), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
-}
-else if (inx == 2 )
-{
-float3 localp = WorldToLocal(p, float3(-54.072, 0.392, -56.101), float3(291.8169, 168.0358, 1.048534), float3(1.5, 1.5, 1.5));
+float3 localp = WorldToLocal(p, float3(-54.065, 0.378, -56.136), float3(291.8169, 168.0358, 1.048534), float3(1.5, 1.5, 1.5));
 float dh = abs(localp.y) - 0.03;
 dh = dh > 0 ? dh : 0;
 dh *= 1.5;
@@ -414,6 +410,10 @@ d = sqrt(d2d * d2d + dh * dh);
 d += 0;
 }
 re = min(re, d);
+}
+else if (inx == 2 )
+{
+re = min(re, 0 + SDFBox(p, float3(-53.6709, 0.016, -55.9093), float3(0.04, 0.005, 0.0136015), float3(338.16, 349.307, 90)));
 }
 else if (inx == 3 )
 {
