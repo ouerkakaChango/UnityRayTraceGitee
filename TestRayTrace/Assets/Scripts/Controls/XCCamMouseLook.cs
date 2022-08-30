@@ -26,10 +26,13 @@ public class XCCamMouseLook : MonoBehaviour
         smoothV.x = Mathf.Lerp(smoothV.x, md.x, 1f / smoothing);
         smoothV.y = Mathf.Lerp(smoothV.y, md.y, 1f / smoothing);
         mouseLook += smoothV;
+
         mouseLook.y = Mathf.Clamp(mouseLook.y, -90f, 90f);
 
         var dRotX =  Quaternion.AngleAxis(mouseLook.x, camUp);
-        var newRight = Vector3.Cross(camUp, transform.forward);
+        //用于更新transform.forward，以正确计算newRight
+        transform.rotation = dRotX * baseRot;
+        var newRight = Vector3.Cross(camUp, transform.forward).normalized;    
         var dRotY = Quaternion.AngleAxis(-mouseLook.y, newRight);
         transform.rotation = dRotY * dRotX * baseRot;
     }

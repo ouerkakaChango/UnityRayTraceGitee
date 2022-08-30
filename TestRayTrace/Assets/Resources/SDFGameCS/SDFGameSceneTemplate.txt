@@ -106,6 +106,10 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 
 float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonScale = 1.0f)
 {
+	float normalEpsilon = NormalEpsilon;
+	###BLOCK BeforeObjSDFNormal
+	...
+	###BLOCK
 	return normalize(float3(
 		GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
 		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
@@ -123,6 +127,12 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 
 void TraceScene(Ray ray, out HitInfo info)
 {
+	float traceThre = TraceThre;
+
+	###BLOCK BeforeTraceScene
+	...
+	###BLOCK
+
 	Init(info);
 
 	TraceInfo traceInfo;
@@ -188,7 +198,7 @@ void TraceScene(Ray ray, out HitInfo info)
 			break;
 		}
 
-		if (sdf <= TraceThre)
+		if (sdf <= traceThre)
 		{
 			info.bHit = true;
 			info.obj = objInx;

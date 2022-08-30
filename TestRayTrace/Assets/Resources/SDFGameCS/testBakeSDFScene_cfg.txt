@@ -20,6 +20,8 @@ Blocks:
 #include "../../HLSL/Spline/QuadBezier/QuadBezier.hlsl"
 #include "../SDFGamePrefab/font_prefab.hlsl"
 
+float daoScale;
+
 //@@@SDFBakerMgr TexSys
 Texture2D<float> slice_whiteboardText;
 //@@@
@@ -505,6 +507,10 @@ else if (inx == -4)
 return re;
 ###BLOCK
 
+###BLOCK BeforeObjSDFNormal
+	//normalEpsilon *= daoScale;
+###BLOCK
+
 ###BLOCK ObjNormal
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
@@ -564,6 +570,10 @@ else
 {
 	return GetObjSDFNormal(inx, p, traceInfo);
 }
+###BLOCK
+
+###BLOCK BeforeTraceScene
+	//traceThre *= daoScale;
 ###BLOCK
 
 ###BLOCK CheckInnerBound

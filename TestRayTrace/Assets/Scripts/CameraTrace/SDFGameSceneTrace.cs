@@ -159,6 +159,7 @@ public class SDFGameSceneTrace : MonoBehaviour
 
         //####
         //System Value
+        cs.SetFloat("daoScale", daoScale);
         cs.SetVector("_Time", Shader.GetGlobalVector("_Time"));
         cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
         cs.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);

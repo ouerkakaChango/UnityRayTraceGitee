@@ -27,6 +27,8 @@
 #include "../../HLSL/Spline/QuadBezier/QuadBezier.hlsl"
 #include "../SDFGamePrefab/font_prefab.hlsl"
 
+float daoScale;
+
 //@@@SDFBakerMgr TexSys
 Texture2D<float> slice_whiteboardText;
 //@@@
@@ -550,6 +552,8 @@ return re;
 
 float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonScale = 1.0f)
 {
+	float normalEpsilon = NormalEpsilon;
+	//normalEpsilon *= daoScale;
 	return normalize(float3(
 		GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
 		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
@@ -622,6 +626,10 @@ else
 
 void TraceScene(Ray ray, out HitInfo info)
 {
+	float traceThre = TraceThre;
+
+	//traceThre *= daoScale;
+
 	Init(info);
 
 	TraceInfo traceInfo;
@@ -702,7 +710,7 @@ void TraceScene(Ray ray, out HitInfo info)
 			break;
 		}
 
-		if (sdf <= TraceThre)
+		if (sdf <= traceThre)
 		{
 			info.bHit = true;
 			info.obj = objInx;
