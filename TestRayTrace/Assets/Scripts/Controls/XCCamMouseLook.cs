@@ -38,7 +38,7 @@ public class XCCamMouseLook : MonoBehaviour
     }
 
     //###################################################
-    void RecordCamDir()
+    public void RecordCamDir()
     {
         camRight = transform.right;
         camUp = transform.up;

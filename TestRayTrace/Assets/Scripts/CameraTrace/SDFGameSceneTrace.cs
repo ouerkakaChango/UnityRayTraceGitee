@@ -41,9 +41,14 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     float daoScale = 1.0f;
 
-    //Tools for Screen show
+    //--- FPS
     float fps = 0;
     TimeLogger fpsTimer = new TimeLogger("fps");
+    //___
+
+    //--- Keyboard
+    KeyboardInputer keyboard;
+    //___
 
     bool hasInited = false;
 
@@ -61,19 +66,22 @@ public class SDFGameSceneTrace : MonoBehaviour
             Co_GoIter = GoIter();
             StartCoroutine(Co_GoIter);
         }
+        keyboard = GetComponent<KeyboardInputer>();
+        if (keyboard == null)
+        {
+            Debug.Log("KeyboardInputer null!!!");
+        }
+        else
+        {
+            keyboard.keyDic.Add("q", Dao_GetSmall);
+            keyboard.keyDic.Add("e", Dao_GetBig);
+            keyboard.keyDic.Add("1", TestChangeCamDir);
+        }
     }
 
     void Update()
     {
-        if (Input.GetKeyDown("q"))
-        {
-            daoScale *= 0.5f;
-        }
-        
-        if (Input.GetKeyDown("e"))
-        {
-            daoScale *= 2.0f;
-        }
+
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -96,6 +104,26 @@ public class SDFGameSceneTrace : MonoBehaviour
     private void OnDisable()
     {
         //SafeDispose(buffer_tris);
+    }
+
+    //##################################################################################################
+    public void Dao_GetSmall()
+    {
+        daoScale *= 0.5f;
+    }
+
+    public void Dao_GetBig()
+    {
+        daoScale *= 2;
+    }
+
+    public void TestChangeCamDir()
+    {
+        Debug.Log("TestChangeCamDir");
+        //new rot: -0.86 -99.21 -68.3
+        gameObject.transform.rotation = Quaternion.Euler(-0.86f, -99.21f, -68.3f);
+        var mouseLook = GetComponent<XCCamMouseLook>();
+        mouseLook.RecordCamDir();
     }
 
     //##################################################################################################
