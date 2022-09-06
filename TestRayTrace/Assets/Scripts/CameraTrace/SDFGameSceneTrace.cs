@@ -6,7 +6,63 @@ using Ray = FastGeo.Ray;
 using Debugger;
 using static StringTool.StringHelper;
 
-[ExecuteInEditMode]
+//可能之后加点物理相机 https://ciechanow.ski/cameras-and-lenses/
+public abstract class SDFCameraParam
+{
+    public int w = 1024, h = 720;
+
+    public abstract void UpdateCamParam(ref Camera cam, float daoScale);
+    public virtual void InsertParamToComputeShader(ref ComputeShader cs)
+    {
+
+    }
+}
+
+public class SDFGameCameraParam : SDFCameraParam
+{
+    public float pixW, pixH;
+    public Vector3 eyePos;
+    public Vector3 screenLeftDownPix;
+    public Vector3 screenU;
+    public Vector3 screenV;
+
+    public override void UpdateCamParam(ref Camera cam, float daoScale = 1.0f)
+    {
+        var obj = cam.gameObject;
+
+        var near = cam.nearClipPlane;
+        near *= daoScale;
+        //var far = cam.farClipPlane;
+
+        var camPos = obj.transform.position;
+        var camForward = obj.transform.forward;
+        eyePos = camPos;
+        var screenPos = camPos + near * camForward;
+        screenU = obj.transform.right;
+        screenV = obj.transform.up;
+
+        //大概在Unity场景中对比了一下渲染大小，定下了合理的像素晶元大小（也就是根据了w,h和原始的cam nf,FOV,尝试出合适的pixW）
+        pixW = 0.000485f;
+        pixH = pixW;
+        pixW *= daoScale;
+        pixH *= daoScale;
+        screenLeftDownPix = screenPos + screenU * (-w / 2.0f + 0.5f) * pixW + screenV * (-h / 2.0f + 0.5f) * pixH;
+    }
+
+    public override void InsertParamToComputeShader(ref ComputeShader cs)
+    {
+        cs.SetInt("w", w);
+        cs.SetInt("h", h);
+        cs.SetFloat("pixW", pixW);
+        cs.SetFloat("pixH", pixH);
+        cs.SetVector("screenLeftDownPix", screenLeftDownPix);
+        cs.SetVector("eyePos", eyePos);
+        cs.SetVector("screenU", screenU);
+        cs.SetVector("screenV", screenV);
+    }
+}
+
+//[ExecuteInEditMode]
 public class SDFGameSceneTrace : MonoBehaviour
 {
     struct MeshInfo
@@ -29,15 +85,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     public Texture2DArray envSpecTex2DArr;
     public Texture2D envBgTex;
 
-    public int w = 1024;
-    public int h = 720;
-
-    Vector3 eyePos;
-    Vector3 screenLeftDownPix;
-    Vector3 screenU;
-    Vector3 screenV;
-    float pixW;
-    float pixH;
+    SDFGameCameraParam maincamParam;
 
     float daoScale = 1.0f;
 
@@ -56,26 +104,27 @@ public class SDFGameSceneTrace : MonoBehaviour
     {
         if (Application.isEditor && !Application.isPlaying)
         {
-            //do what you want
             //RefreshAutoCS();
         }
         else
         {
-            QualitySettings.vSyncCount = 1;
-            UpdateCamParam();
+            maincamParam = new SDFGameCameraParam();
+
+            QualitySettings.vSyncCount = 0;
             Co_GoIter = GoIter();
             StartCoroutine(Co_GoIter);
-        }
-        keyboard = GetComponent<KeyboardInputer>();
-        if (keyboard == null)
-        {
-            Debug.Log("KeyboardInputer null!!!");
-        }
-        else
-        {
-            keyboard.keyDic.Add("q", Dao_GetSmall);
-            keyboard.keyDic.Add("e", Dao_GetBig);
-            keyboard.keyDic.Add("1", TestChangeCamDir);
+
+            keyboard = GetComponent<KeyboardInputer>();
+            if (keyboard == null)
+            {
+                Debug.Log("Warning: KeyboardInputer null!!!");
+            }
+            else
+            {
+                keyboard.keyDic.Add("q", Dao_GetSmall);
+                keyboard.keyDic.Add("e", Dao_GetBig);
+                keyboard.keyDic.Add("1", TestChangeCamDir);
+            }
         }
     }
 
@@ -127,27 +176,6 @@ public class SDFGameSceneTrace : MonoBehaviour
     }
 
     //##################################################################################################
-    void UpdateCamParam()
-    {
-        var cam = gameObject.GetComponent<Camera>();
-        var near = cam.nearClipPlane;
-        near *= daoScale;
-        //var far = cam.farClipPlane;
-
-        var camPos = gameObject.transform.position;
-        var camForward = gameObject.transform.forward;
-        eyePos = camPos;
-        var screenPos = camPos + near * camForward;
-        screenU = gameObject.transform.right;
-        screenV = gameObject.transform.up;
-
-        //大概在Unity场景中对比了一下渲染大小，定下了合理的像素晶元大小（也就是根据了w,h和原始的cam nf,FOV,尝试出合适的pixW）
-        pixW = 0.000485f;
-        pixH = pixW;
-        pixW *= daoScale;
-        pixH *= daoScale;
-        screenLeftDownPix = screenPos + screenU * (-w / 2.0f + 0.5f) * pixW + screenV * (-h / 2.0f + 0.5f) * pixH;
-    }
 
     static public void PreComputeBuffer(ref ComputeBuffer buffer, int stride, in System.Array dataArr)
     {
@@ -173,7 +201,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         return 2 * vec3Size;
     }
     //################################################################################################################
-    void Compute_Render()
+    void Compute_Render(ref ComputeShader computeShader, ref RenderTexture rTex, SDFCameraParam camParam)
     {
         if(!hasInited)
         {
@@ -183,66 +211,61 @@ public class SDFGameSceneTrace : MonoBehaviour
         //PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, vertices);
         //##################################
         //### compute
-        int kInx = cs.FindKernel("Render");
+        int kInx = computeShader.FindKernel("Render");
 
         //####
         //System Value
-        cs.SetFloat("daoScale", daoScale);
-        cs.SetVector("_Time", Shader.GetGlobalVector("_Time"));
-        cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
-        cs.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
-        cs.SetTexture(kInx, "perlinNoise1", ShaderToyTool.Instance.perlinNoise1);
-        cs.SetTexture(kInx, "voronoiNoise1", ShaderToyTool.Instance.voronoiNoise1);
+        computeShader.SetFloat("daoScale", daoScale);
+        computeShader.SetVector("_Time", Shader.GetGlobalVector("_Time"));
+        computeShader.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
+        computeShader.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
+        computeShader.SetTexture(kInx, "perlinNoise1", ShaderToyTool.Instance.perlinNoise1);
+        computeShader.SetTexture(kInx, "voronoiNoise1", ShaderToyTool.Instance.voronoiNoise1);
         for (int i=0;i<autoCS.texSys.outTextures.Count;i++)
         {
-            cs.SetTexture(kInx, autoCS.texSys.outTextures[i].name, autoCS.texSys.outTextures[i].tex);
+            computeShader.SetTexture(kInx, autoCS.texSys.outTextures[i].name, autoCS.texSys.outTextures[i].tex);
         }
         //??? DynamicValSys
         for (int i = 0; i < autoCS.dyValSys.outFloats.Count; i++)
         {
             //var tName = autoCS.dyValSys.outFloats[i].name;
             //var tF = autoCS.dyValSys.outFloats[i].GetVal();
-            cs.SetFloat(autoCS.dyValSys.outFloats[i].name, autoCS.dyValSys.outFloats[i].GetVal());
+            computeShader.SetFloat(autoCS.dyValSys.outFloats[i].name, autoCS.dyValSys.outFloats[i].GetVal());
             //Debug.Log("Dynamic: " + tName + " " + tF);
         }
         //___
         //####
 
-        cs.SetTexture(kInx, "Result", rt);
-        cs.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
-        cs.SetTexture(kInx, "envBgTex", envBgTex);
+        computeShader.SetTexture(kInx, "Result", rTex);
+        computeShader.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
+        computeShader.SetTexture(kInx, "envBgTex", envBgTex);
 
-        cs.SetInt("w", w);
-        cs.SetInt("h", h);
-        cs.SetFloat("pixW", pixW);
-        cs.SetFloat("pixH", pixH);
-        cs.SetVector("screenLeftDownPix", screenLeftDownPix);
-        cs.SetVector("eyePos", eyePos);
-        cs.SetVector("screenU", screenU);
-        cs.SetVector("screenV", screenV);
+        camParam.InsertParamToComputeShader(ref computeShader);
 
-        cs.Dispatch(kInx, w / CoreX, h / CoreY, 1);
+        computeShader.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
         //### compute
         //#####################################;
     }
     //####################################################################################
 
-    void Init()
+    void Init(ref RenderTexture rTex, SDFCameraParam camParam)
     {
-        if (rt == null)
+        if (rTex == null)
         {
-            rt = new RenderTexture(w, h, 24);
-            rt.enableRandomWrite = true;
-            rt.Create();
-            //???
-            CreateRT(ref easuRT, FSR_Scale);
-            CreateRT(ref finalRT, FSR_Scale);
+            rTex = new RenderTexture(camParam.w, camParam.h, 24);
+            rTex.enableRandomWrite = true;
+            rTex.Create();
+            CreateRT(ref easuRT, FSR_Scale, camParam.w, camParam.h);
+            CreateRT(ref finalRT, FSR_Scale, camParam.w, camParam.h);
             var csResourcesPath = ChopEnd(autoCS.outs[0], ".compute");
             csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
             cs = (ComputeShader)Resources.Load(csResourcesPath);
             cs_FSR = (ComputeShader)Resources.Load("FSR/FSR");
         }
-        hasInited = true;
+        if (rTex == rt)
+        {
+            hasInited = true;
+        }
     }
 
     public void RefreshAutoCS()
@@ -250,12 +273,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         autoCS.Generate();
     }
 
-    void DoRender()
-    {
-        Compute_Render();
-    }
-
-    void CreateRT(ref RenderTexture rTex, float scale=1.0f)
+    void CreateRT(ref RenderTexture rTex, float scale, int w, int h)
     {
         rTex = new RenderTexture((int)(w* scale), (int)(h* scale), 24);
         rTex.enableRandomWrite = true;
@@ -312,11 +330,24 @@ public class SDFGameSceneTrace : MonoBehaviour
         while(true)
         {
             fpsTimer.Start();
-            Init();
-            UpdateCamParam();
-            DoRender();
+            var cam = gameObject.GetComponent<Camera>();
+            if (cam == null)
+            {
+                Debug.LogError("No Camera with SDFGameSceneTrace");
+            }
+            else
+            {
+                RenderCamToRT(ref rt, ref cam, maincamParam);
+            }
             yield return null;
             fps = fpsTimer.GetFPS();
         }
+    }
+
+    public void RenderCamToRT(ref RenderTexture rTex, ref Camera cam, SDFCameraParam camParam)
+    {
+        Init(ref rTex, camParam);
+        camParam.UpdateCamParam(ref cam, daoScale);
+        Compute_Render(ref cs, ref rTex, camParam);
     }
 }

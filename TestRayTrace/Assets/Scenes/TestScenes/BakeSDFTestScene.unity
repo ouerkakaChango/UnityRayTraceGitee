@@ -605,6 +605,96 @@ Material:
     m_Floats: []
     m_Colors: []
   m_BuildTextureStacks: []
+--- !u!1 &441224766
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 441224767}
+  - component: {fileID: 441224769}
+  - component: {fileID: 441224768}
+  m_Layer: 0
+  m_Name: EnvBaker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &441224767
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441224766}
+  m_LocalRotation: {x: -0, y: 0.9999497, z: -0, w: 0.010029336}
+  m_LocalPosition: {x: -41.31, y: 4.578, z: -49.029}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1052979404}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 178.851, z: 0}
+--- !u!20 &441224768
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441224766}
+  m_Enabled: 0
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_FocalLength: 50
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!114 &441224769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441224766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39715057e28d86442b9562519cfb61c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  testrt: {fileID: 0}
+  tracer: {fileID: 1666331705}
+  testCam: {fileID: 0}
 --- !u!1 &446652354
 GameObject:
   m_ObjectHideFlags: 0
@@ -1762,6 +1852,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1052979403
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1052979404}
+  m_Layer: 0
+  m_Name: Bakers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1052979404
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1052979403}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 441224767}
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1085768378
 GameObject:
   m_ObjectHideFlags: 0
@@ -2237,7 +2358,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 8
+  objInx: 7
 --- !u!114 &1491667015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2399,8 +2520,6 @@ MonoBehaviour:
   autoCS: {fileID: 1666331704}
   envSpecTex2DArr: {fileID: 18700000, guid: 0f551ab412a7b6a43adb8fff0951af3f, type: 2}
   envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
-  w: 1024
-  h: 720
 --- !u!114 &1666331706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2647,7 +2766,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 9
+  objInx: 8
 --- !u!65 &1758613633
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2760,7 +2879,7 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[11];
+  - int renderMode[10];
   bakedRenders: []
   bakedDirShadows: []
   bakedBeforeSDF: []
@@ -2773,7 +2892,6 @@ MonoBehaviour:
   - {fileID: 563013440}
   - {fileID: 817168219}
   - {fileID: 1283602066}
-  - {fileID: 1355201447}
   - {fileID: 1491667014}
   - {fileID: 1758613632}
   - {fileID: 2041803221}
@@ -2793,15 +2911,10 @@ MonoBehaviour:
   - name: slice_whiteboardText
     tex: {fileID: 2800000, guid: abf373543fd65e24f934b328d5ed2a55, type: 3}
     channel: 3
-  - name: SDF_q
-    tex: {fileID: 2800000, guid: 44ca264073e61394fba8ae90a951e8a5, type: 3}
-    channel: 3
   tags:
   - {fileID: 446652356}
-  - {fileID: 1355201450}
   bakedDeclares:
   - Texture2D<float> slice_whiteboardText;
-  - Texture2D<float> SDF_q;
 --- !u!114 &1928400449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3034,4 +3147,4 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 10
+  objInx: 9
