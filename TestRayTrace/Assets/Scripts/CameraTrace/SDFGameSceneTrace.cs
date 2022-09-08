@@ -11,11 +11,15 @@ public abstract class SDFCameraParam
 {
     public int w = 1024, h = 720;
     public int camType = 0;
+    public int camGammaMode = 0;
 
     public abstract void UpdateCamParam(ref Camera cam, float daoScale);
     public virtual void InsertParamToComputeShader(ref ComputeShader cs)
     {
-
+        cs.SetInt("w", w);
+        cs.SetInt("h", h);
+        cs.SetInt("camType", camType);
+        cs.SetInt("camGammaMode", camGammaMode);
     }
 
     public static void Copy(SDFCameraParam from, SDFCameraParam to)
@@ -23,6 +27,7 @@ public abstract class SDFCameraParam
         to.w = from.w;
         to.h = from.h;
         to.camType = from.camType;
+        to.camGammaMode = from.camGammaMode;
     }
 
     public void DoNothing()
@@ -98,9 +103,7 @@ public class SDFGameCameraParam : SDFCameraParam
 
     public override void InsertParamToComputeShader(ref ComputeShader cs)
     {
-        cs.SetInt("w", w);
-        cs.SetInt("h", h);
-        cs.SetInt("camType", camType);
+        base.InsertParamToComputeShader(ref cs);
         cs.SetFloat("pixW", pixW);
         cs.SetFloat("pixH", pixH);
         cs.SetVector("screenLeftDownPix", screenLeftDownPix);

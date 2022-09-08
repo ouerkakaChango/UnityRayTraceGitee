@@ -6,8 +6,21 @@ using UnityEditor;
 [CustomEditor(typeof(IBLSpecBaker))]
 public class IBLSpecBakerEditor : Editor
 {
+    IBLSpecBaker Target;
     void OnEnable()
     {
-        AssetDatabase.Refresh();
+        Target = (IBLSpecBaker)target;
+    }
+
+    //@@@
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+
+        if (GUILayout.Button("BakeSingle"))
+        {
+            Target.BakeSingle();
+            AssetDatabase.Refresh();
+        }
     }
 }

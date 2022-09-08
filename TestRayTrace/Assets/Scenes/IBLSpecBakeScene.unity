@@ -216,6 +216,42 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!84 &954591387
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 3
+  m_Width: 1024
+  m_Height: 512
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthFormat: 2
+  m_ColorFormat: 52
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
 --- !u!1 &1996522459
 GameObject:
   m_ObjectHideFlags: 0
@@ -310,6 +346,8 @@ GameObject:
   - component: {fileID: 2007675636}
   - component: {fileID: 2007675637}
   - component: {fileID: 2007675638}
+  - component: {fileID: 2007675639}
+  - component: {fileID: 2007675640}
   m_Layer: 0
   m_Name: IBLBaker
   m_TagString: Untagged
@@ -351,12 +389,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2007675635}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c577c41ca2c54b447ae57ff930c6e4dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  outName: IBLSpecTest
   cs: {fileID: 7200000, guid: e2130cfa22e054d45bf7a29d7da4c15c, type: 3}
+  gammaMode: 0
   SPP: 10240
   bakeRough: 0.05
   saveFolder: Assets
@@ -364,3 +404,45 @@ MonoBehaviour:
   nowIter: 0
   envRefTex: {fileID: 2800000, guid: e2c20b5b965658145947ef9b6b62cf7b, type: 3}
   outRT: {fileID: 0}
+--- !u!114 &2007675639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007675635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c577c41ca2c54b447ae57ff930c6e4dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outName: envTest
+  cs: {fileID: 7200000, guid: e2130cfa22e054d45bf7a29d7da4c15c, type: 3}
+  gammaMode: 0
+  SPP: 10240
+  bakeRough: 1
+  saveFolder: Assets
+  IterNum: 1
+  nowIter: 0
+  envRefTex: {fileID: 2800000, guid: dda785d5495c696438f55a4f8540d103, type: 3}
+  outRT: {fileID: 954591387}
+--- !u!114 &2007675640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007675635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86bd8c4fd4d20464085a4b57f0b55131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  texs:
+  - {fileID: 2800000, guid: 5e150a40ebb56644188b4e6cfbead481, type: 3}
+  - {fileID: 2800000, guid: 983940b7e9806e540aa8365c4d029f12, type: 3}
+  - {fileID: 2800000, guid: 377398c823c6f4e41bea5722503545c8, type: 3}
+  - {fileID: 2800000, guid: 9607ed9c3b2f1a94690cc6f9a8ea9668, type: 3}
+  - {fileID: 2800000, guid: eba2cbb85dbe618459e4f2603d330dbc, type: 3}
+  outTex2DArr: {fileID: 18700000, guid: d37b2c39ff60a64418373d4106357100, type: 2}
+  savePath: Assets/envTest_TexArray.asset

@@ -25,6 +25,7 @@ RWTexture2D<float4> outRT;
 Texture2D<float4> envRefTex;
 uint SPP;
 float bakeRough;
+int gammaMode;
 //#########################################################################################################
 float EquirectangularArea(float width, float height)
 {
@@ -91,6 +92,13 @@ void Bake(uint3 id : SV_DispatchThreadID)
 	}
 	re /= totalWeight;
 
-	re = pow(abs(re), 2.2);
+	if (gammaMode == 1)
+	{
+
+	}
+	else
+	{
+		re = pow(abs(re), 2.2);
+	}
 	outRT[id.xy] = float4(re, 1);
 }

@@ -2136,17 +2136,17 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1355201445}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {r: 1, g: 1, b: 1, a: 1}
+    albedo: {r: 0, g: 1, b: 1, a: 1}
     metallic: 1
-    roughness: 0
+    roughness: 0.15
   SDF_offset: -0.001
-  renderMode: 1
+  renderMode: 2
   shapeType: 3
   specialID: -1
   fontCharacter: 66
@@ -2162,7 +2162,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1355201445}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
   m_Name: 
@@ -2185,7 +2185,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1355201445}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
   m_Name: 
@@ -2321,7 +2321,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 7
+  objInx: 8
 --- !u!114 &1491667015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2481,7 +2481,7 @@ MonoBehaviour:
   FSR_Scale: 2
   SceneName: TestBake
   autoCS: {fileID: 1666331704}
-  envSpecTex2DArr: {fileID: 18700000, guid: 0f551ab412a7b6a43adb8fff0951af3f, type: 2}
+  envSpecTex2DArr: {fileID: 18700000, guid: d37b2c39ff60a64418373d4106357100, type: 2}
   envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
 --- !u!114 &1666331706
 MonoBehaviour:
@@ -2729,7 +2729,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 8
+  objInx: 9
 --- !u!65 &1758613633
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2842,7 +2842,7 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[10];
+  - int renderMode[11];
   bakedRenders: []
   bakedDirShadows: []
   bakedBeforeSDF: []
@@ -2855,6 +2855,7 @@ MonoBehaviour:
   - {fileID: 563013440}
   - {fileID: 817168219}
   - {fileID: 1283602066}
+  - {fileID: 1355201447}
   - {fileID: 1491667014}
   - {fileID: 1758613632}
   - {fileID: 2041803221}
@@ -2874,10 +2875,15 @@ MonoBehaviour:
   - name: slice_whiteboardText
     tex: {fileID: 2800000, guid: abf373543fd65e24f934b328d5ed2a55, type: 3}
     channel: 3
+  - name: SDF_q
+    tex: {fileID: 2800000, guid: 44ca264073e61394fba8ae90a951e8a5, type: 3}
+    channel: 3
   tags:
   - {fileID: 446652356}
+  - {fileID: 1355201450}
   bakedDeclares:
   - Texture2D<float> slice_whiteboardText;
+  - Texture2D<float> SDF_q;
 --- !u!114 &1928400449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3110,4 +3116,4 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 9
+  objInx: 10

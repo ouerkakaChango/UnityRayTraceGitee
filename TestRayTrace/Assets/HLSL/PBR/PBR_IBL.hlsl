@@ -36,16 +36,16 @@ float3 IBLBakeSpecMipByRoughness(Texture2DArray envSpecTex2DArr, float3 dir, flo
 	uint Elements;
 	envSpecTex2DArr.GetDimensions(Width, Height, Elements);
 
-	float inx = roughness * Elements;
+	float inx = roughness * (Elements-1);
 	float fpart = frac(inx);
 	if (NearZero(fpart))
 	{
 		return IBLBakeSpecMip(envSpecTex2DArr, dir, inx, unityDir);
 	}
-	else if (equal(roughness, 1.0f))
-	{
-		return IBLBakeSpecMip(envSpecTex2DArr, dir, Elements-1, unityDir);
-	}
+	//else if (equal(roughness, 1.0f))
+	//{
+	//	return IBLBakeSpecMip(envSpecTex2DArr, dir, Elements-1, unityDir);
+	//}
 	else
 	{
 		int inx1 = floor(inx);
@@ -61,7 +61,7 @@ float3 IBLBakeSpecMipByRoughness(Texture2DArray envSpecTex2DArr, float3 dir, flo
 
 SamplerState my_point_clamp_sampler;
 SamplerState _LinearClamp;
-float3 PBR_IBL(Texture2DArray envSpecTex2DArr, Texture2D brdfLUT, Material_PBR param, float3 N, float3 V)
+float3 PBR_IBL(Texture2DArray envSpecTex2DArr, Texture2D brdfLUT, Material_PBR param, float3 N, float3 V, float diffRate=1, float specRate=1, bool diffGamma = false, bool specGamma = false)
 {
 	uint Width;
 	uint Height;
@@ -77,28 +77,37 @@ float3 PBR_IBL(Texture2DArray envSpecTex2DArr, Texture2D brdfLUT, Material_PBR p
 	//diffuse
 	float3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, param.roughness);
 	float3 kD = 1.0 - kS;
-	float3 irradiance = IBLBakeSpecMip(envSpecTex2DArr, N, Elements-1, true);
-	float3 indirect_diffuse = (kD * irradiance * param.albedo) * ao;
+	float3 diff_irr = diffRate * IBLBakeSpecMip(envSpecTex2DArr, N, Elements-1, true);
+	//1.1 envMap may come from png combined exr, need do gamma to correct
+	if (diffGamma)
+	{
+		diff_irr = pow(diff_irr, 2.2);
+	}
+	float3 indirect_diffuse = (kD * diff_irr * param.albedo) * ao;
 
 	//spec
 	float3 R = reflect(-V, N);
-	float3 prefilteredColor;
 	//Unity_ComputeShader里没法用cubemap和它自带的卷积mip功能
 	//得自己用texArr，将预积分的5张图放进去。	
-	prefilteredColor = IBLBakeSpecMipByRoughness(envSpecTex2DArr, R, param.roughness, true);
+	float3 spec_irr = specRate * IBLBakeSpecMipByRoughness(envSpecTex2DArr, R, param.roughness, true);
+	//see 1.1
+	if (specGamma)
+	{
+		spec_irr = pow(spec_irr, 2.2);
+	}
 
 	float2 envBRDF_UV = 0;
 	envBRDF_UV.x = max(dot(N, V),0);
 	envBRDF_UV.y = param.roughness;
 	
 	float2 envBRDF = brdfLUT.SampleLevel(my_point_clamp_sampler, envBRDF_UV, 0).rg;
-	float3 indirect_specular = prefilteredColor * (kS * envBRDF.x + envBRDF.y) * ao;
+	float3 indirect_specular = spec_irr * (kS * envBRDF.x + envBRDF.y) * ao;
 
 	return indirect_diffuse + indirect_specular;
 }
 
-float3 PBR_IBL(Texture2DArray envSpecTex2DArr, Material_PBR param, float3 N, float3 V)
+float3 PBR_IBL(Texture2DArray envSpecTex2DArr, Material_PBR param, float3 N, float3 V, float diffRate = 1, float specRate = 1, bool diffGamma=false, bool specGamma=false)
 {
-	return PBR_IBL(envSpecTex2DArr, LUT_BRDF, param, N, V);
+	return PBR_IBL(envSpecTex2DArr, LUT_BRDF, param, N, V, diffRate, specRate, diffGamma, specGamma);
 }
 #endif

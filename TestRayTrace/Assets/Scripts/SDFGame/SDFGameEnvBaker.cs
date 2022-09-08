@@ -36,6 +36,7 @@ public class SDFGameEnvBaker : MonoBehaviour
         //因为是cubemap，用了网上的转换工具，要求w ==h
         shotParam.h = shotParam.w;
         shotParam.camType = 2;
+        shotParam.camGammaMode = 1;
 
         RenderTexture rt = null;
         var tcam = gameObject.AddComponent<Camera>();

@@ -8,6 +8,7 @@ int w;
 int h;
 
 int camType; //0:normal 1:orthogonal
+int camGammaMode; //0:normal 1:notGamma
 //#########################################################################################################
 int Inx2D(int i, int j)
 {
@@ -22,7 +23,6 @@ float3 screenU;
 float3 screenV;
 
 RWTexture2D<float4> Result;
-Texture2D<float4> envDiffTex;
 Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
 

@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class IBLSpecBaker : MonoBehaviour
 {
+    public string outName = "IBLSpecTest";
     public ComputeShader cs;
-
+    public int gammaMode = 0; //0:Do pow2.2 gamma 1:not gamma
     public int SPP = 16;
     public float bakeRough = 0.25f;
     public string saveFolder = "Assets";
@@ -23,7 +24,7 @@ public class IBLSpecBaker : MonoBehaviour
     {
         w = envRefTex.width;
         h = envRefTex.height;
-        //Debug.Log("envRef "+w+" "+h);
+        Debug.Log("envRef "+w+" "+h);
         //DebugHDRImg(envRefTex);
     }
 
@@ -43,6 +44,7 @@ public class IBLSpecBaker : MonoBehaviour
         cs.SetTexture(kInx, "outRT", outRT);
         cs.SetInt("w", w);
         cs.SetInt("h", h);
+        cs.SetInt("gammaMode", gammaMode);
         cs.SetInt("SPP", SPP);
         cs.SetFloat("bakeRough", bakeRough);
 
@@ -91,16 +93,7 @@ public class IBLSpecBaker : MonoBehaviour
     {
         var tex = RT2Tex2D(outRT, TextureFormat.RGBAFloat);
         //DebugHDRImg(tex);
-        System.IO.File.WriteAllBytes(saveFolder+"/IBLSpecTest.exr", tex.EncodeToEXR());
-    }
-
-    static public Texture2D RT2Tex2D_unreliable(RenderTexture rTex, TextureFormat format = TextureFormat.RGBA32)
-    {
-        Texture2D dest = new Texture2D(rTex.width, rTex.height, format, false);
-        dest.Apply(false);
-        RenderTexture.active = rTex;
-        Graphics.CopyTexture(rTex, dest);
-        return dest;
+        System.IO.File.WriteAllBytes(saveFolder+"/"+ outName +"_"+bakeRough.ToString("f2") + ".exr", tex.EncodeToEXR());
     }
 
     Texture2D RT2Tex2D(RenderTexture rTex, TextureFormat format = TextureFormat.RGBA32)
@@ -137,5 +130,14 @@ public class IBLSpecBaker : MonoBehaviour
             }
             yield return null;
         }
+    }
+
+    public void BakeSingle()
+    {
+        w = envRefTex.width;
+        h = envRefTex.height;
+        Debug.Log("envRef " + w + " " + h);
+        DoBake();
+        Export();
     }
 }
