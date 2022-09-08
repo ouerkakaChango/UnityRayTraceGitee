@@ -10,14 +10,33 @@ using static StringTool.StringHelper;
 public abstract class SDFCameraParam
 {
     public int w = 1024, h = 720;
+    public int camType = 0;
 
     public abstract void UpdateCamParam(ref Camera cam, float daoScale);
     public virtual void InsertParamToComputeShader(ref ComputeShader cs)
     {
 
     }
+
+    public static void Copy(SDFCameraParam from, SDFCameraParam to)
+    {
+        to.w = from.w;
+        to.h = from.h;
+        to.camType = from.camType;
+    }
+
+    public void DoNothing()
+    {
+
+    }
 }
 
+public delegate void SimpleHandler();
+
+//camType
+//0-正常
+//1-正交
+//2-Cube烘培用(调整near)
 public class SDFGameCameraParam : SDFCameraParam
 {
     public float pixW, pixH;
@@ -25,14 +44,46 @@ public class SDFGameCameraParam : SDFCameraParam
     public Vector3 screenLeftDownPix;
     public Vector3 screenU;
     public Vector3 screenV;
+    public SimpleHandler paramFinalFunc = null;
+
+    public SDFGameCameraParam() {
+        paramFinalFunc = this.DoNothing;
+    }
+
+    public SDFGameCameraParam(SDFGameCameraParam p)
+    {
+        SDFCameraParam.Copy(p,this);
+        Copy(p, this);
+    }
+
+    public static void Copy(SDFGameCameraParam from, SDFGameCameraParam to)
+    {
+        to.pixW = from.pixW;
+        to.pixH = from.pixH;
+        to.eyePos = from.eyePos;
+        to.screenLeftDownPix = from.screenLeftDownPix;
+        to.screenU = from.screenU;
+        to.screenV = from.screenV;
+        to.paramFinalFunc = from.paramFinalFunc;
+    }
 
     public override void UpdateCamParam(ref Camera cam, float daoScale = 1.0f)
     {
         var obj = cam.gameObject;
 
+        //大概在Unity场景中对比了一下渲染大小，定下了合理的像素晶元大小（也就是根据了w,h和原始的cam nf,FOV,尝试出合适的pixW）
+        pixW = 0.000485f;
+        pixH = pixW;
+        pixW *= daoScale;
+        pixH *= daoScale;
+
         var near = cam.nearClipPlane;
         near *= daoScale;
-        //var far = cam.farClipPlane;
+        
+        if(camType==2)
+        {
+            near = pixW * w /2.0f;
+        }
 
         var camPos = obj.transform.position;
         var camForward = obj.transform.forward;
@@ -41,18 +92,15 @@ public class SDFGameCameraParam : SDFCameraParam
         screenU = obj.transform.right;
         screenV = obj.transform.up;
 
-        //大概在Unity场景中对比了一下渲染大小，定下了合理的像素晶元大小（也就是根据了w,h和原始的cam nf,FOV,尝试出合适的pixW）
-        pixW = 0.000485f;
-        pixH = pixW;
-        pixW *= daoScale;
-        pixH *= daoScale;
         screenLeftDownPix = screenPos + screenU * (-w / 2.0f + 0.5f) * pixW + screenV * (-h / 2.0f + 0.5f) * pixH;
+        paramFinalFunc();
     }
 
     public override void InsertParamToComputeShader(ref ComputeShader cs)
     {
         cs.SetInt("w", w);
         cs.SetInt("h", h);
+        cs.SetInt("camType", camType);
         cs.SetFloat("pixW", pixW);
         cs.SetFloat("pixH", pixH);
         cs.SetVector("screenLeftDownPix", screenLeftDownPix);
@@ -201,7 +249,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         return 2 * vec3Size;
     }
     //################################################################################################################
-    void Compute_Render(ref ComputeShader computeShader, ref RenderTexture rTex, SDFCameraParam camParam)
+    void Compute_Render(ref ComputeShader computeShader, ref RenderTexture rTex, in SDFCameraParam camParam)
     {
         if(!hasInited)
         {
@@ -248,7 +296,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     }
     //####################################################################################
 
-    void Init(ref RenderTexture rTex, SDFCameraParam camParam)
+    void Init(ref RenderTexture rTex, in SDFCameraParam camParam)
     {
         if (rTex == null)
         {
@@ -344,7 +392,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         }
     }
 
-    public void RenderCamToRT(ref RenderTexture rTex, ref Camera cam, SDFCameraParam camParam)
+    public void RenderCamToRT(ref RenderTexture rTex, ref Camera cam, in SDFCameraParam camParam)
     {
         Init(ref rTex, camParam);
         camParam.UpdateCamParam(ref cam, daoScale);

@@ -7,6 +7,7 @@
 int w;
 int h;
 
+int camType; //0:normal 1:orthogonal
 //#########################################################################################################
 int Inx2D(int i, int j)
 {
@@ -65,6 +66,8 @@ void Render(uint3 id : SV_DispatchThreadID)
 	float SSAA_unitDis = 1.0f / SSAA_edge;
 	float3 SSAA_colors[SSAA_num];
 
+	float3 camFoward = normalize(cross(screenU,screenV));
+
 	[unroll(SSAA_edge)]
 	for (int j = 1; j <= SSAA_edge; j++)
 	{
@@ -73,7 +76,14 @@ void Render(uint3 id : SV_DispatchThreadID)
 		{
 			Ray ray;
 			ray.pos = pixLeftDownPos + screenU * pixW * i * SSAA_unitDis + screenV * pixH * j * SSAA_unitDis;
-			ray.dir = normalize(ray.pos - eyePos);
+			if(camType == 1)
+			{
+				ray.dir = camFoward;
+			}
+			else
+			{
+				ray.dir = normalize(ray.pos - eyePos);
+			}
 
 			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray);
 		}

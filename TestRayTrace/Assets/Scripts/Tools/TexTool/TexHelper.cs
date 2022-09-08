@@ -19,9 +19,14 @@ namespace TextureHelper
             AssetDatabase.Refresh();
         }
 
-        public static void SavePNG(in Texture2D tex, string folder, string name)
+        public static void SavePNG(in Texture2D tex, string folder, string name, bool replace = true)
         {
-            File.WriteAllBytes(folder + "/" + name + ".png", tex.EncodeToPNG());
+            string fullpath = folder + "/" + name + ".png";
+            if (replace && File.Exists(fullpath))
+            {
+                File.Delete(fullpath);
+            }
+            File.WriteAllBytes(fullpath, tex.EncodeToPNG());
         }
 
         public static void SaveEXR(in Texture2D tex, string folder, string name)
