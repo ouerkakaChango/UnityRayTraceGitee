@@ -14,6 +14,8 @@ public class SDFGameEnvBaker : MonoBehaviour
     public Texture2D[] cubeOut = new Texture2D[6];
     public Vector2Int outEnvSize = new Vector2Int(1024,512);
     public Texture2D outEnvTex;
+    public Texture2D[] outIBLArr = null;
+    public Texture2DArray outEnvTexArr = null;
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +24,7 @@ public class SDFGameEnvBaker : MonoBehaviour
         shotParam.w = shotSize.x;
         shotParam.h = shotSize.y;
         var keyboard = tracer.gameObject.GetComponent<KeyboardInputer>();
-        keyboard.keyDic.Add("2", OutputEnvTex_CubeMapMode);
+        keyboard.keyDic.Add("2", OutputIBLTexArr_CubeMapMode);
     }
 
     // Update is called once per frame
@@ -112,6 +114,26 @@ public class SDFGameEnvBaker : MonoBehaviour
         //### compute
         //#####################################
         TexHelper.RT2Tex2D(ref envTex, ref rt);
+    }
+
+    public void OutputIBLArr_CubeMapMode()
+    {
+        OutputEnvTex_CubeMapMode();
+        var iblBaker = gameObject.AddComponent<IBLSpecBaker>();
+        iblBaker.envRefTex = outEnvTex;
+        iblBaker.UseDefaultBakeCS();
+        iblBaker.Bake_AverageDelta(ref outIBLArr);
+        Destroy(iblBaker);
+    }
+
+    public void OutputIBLTexArr_CubeMapMode()
+    {
+        OutputIBLArr_CubeMapMode();
+        var generator = gameObject.AddComponent<Tex2DArrGenerator>();
+        generator.texs = outIBLArr;
+        generator.CreateTexArray();
+        outEnvTexArr = generator.outTex2DArr;
+        Destroy(generator);
     }
 
 }

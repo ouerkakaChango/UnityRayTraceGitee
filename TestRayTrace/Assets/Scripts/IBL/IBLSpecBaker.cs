@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TextureHelper;
 
 public class IBLSpecBaker : MonoBehaviour
 {
     public string outName = "IBLSpecTest";
     public ComputeShader cs;
     public int gammaMode = 0; //0:Do pow2.2 gamma 1:not gamma
-    public int SPP = 16;
+    public int SPP = 10240;
     public float bakeRough = 0.25f;
     public string saveFolder = "Assets";
     public int IterNum = 1;
@@ -22,10 +23,7 @@ public class IBLSpecBaker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        w = envRefTex.width;
-        h = envRefTex.height;
-        Debug.Log("envRef "+w+" "+h);
-        //DebugHDRImg(envRefTex);
+
     }
 
     // Update is called once per frame
@@ -55,6 +53,12 @@ public class IBLSpecBaker : MonoBehaviour
     //####################################################################################
     void Init()
     {
+        w = envRefTex.width;
+        h = envRefTex.height;
+        if (w != h * 2)
+        {
+            Debug.Log("Warning: envTex w not h*2, bake may not accurate, because CS_IBLSpecBaker.compute not accurate calculate ellipse surface area");
+        }
         if (outRT == null)
         {
             //### 一定要声明为ARGBFloat，才能被computeshader输出大于1的值
@@ -62,12 +66,6 @@ public class IBLSpecBaker : MonoBehaviour
             outRT.enableRandomWrite = true;
             outRT.Create();
         }
-    }
-
-    void DoBake()
-    {
-        Init();
-        Compute_Bake();
     }
 
     void DebugHDRImg(Texture2D hdrImg)
@@ -122,7 +120,8 @@ public class IBLSpecBaker : MonoBehaviour
     {
         while (nowIter < IterNum)
         {
-            DoBake();
+            Init();
+            Compute_Bake();
             nowIter++;
             if(nowIter == IterNum)
             {
@@ -134,10 +133,32 @@ public class IBLSpecBaker : MonoBehaviour
 
     public void BakeSingle()
     {
-        w = envRefTex.width;
-        h = envRefTex.height;
-        Debug.Log("envRef " + w + " " + h);
-        DoBake();
+        //Debug.Log("envRef " + w + " " + h);
+        Init();
+        Compute_Bake();
         Export();
+    }
+
+    public void Bake_AverageDelta(ref Texture2D[] outTexs,float deltaRoughness=0.25f)
+    {
+        Init();
+        int texCount = (int)(1.0f / deltaRoughness) + 1;
+        outTexs = new Texture2D[texCount];
+        for (int i=0;i<texCount;i++)
+        {
+            float r = i * deltaRoughness;
+            Debug.Log("Bake IBL roughness = "+r.ToString("f2"));
+            bakeRough = r;
+            //因为现在是从SDFGameEnvBaker里bake出的线性texture，所以不需要做gamma
+            gammaMode = 1;
+            Compute_Bake();
+            TexHelper.RT2Tex2D(ref outTexs[i], ref outRT);
+        }
+        Debug.Log("Bake IBL done ");
+    }
+
+    public void UseDefaultBakeCS()
+    {
+        cs = Resources.Load<ComputeShader>("BakeCS/CS_IBLSpecBaker");
     }
 }

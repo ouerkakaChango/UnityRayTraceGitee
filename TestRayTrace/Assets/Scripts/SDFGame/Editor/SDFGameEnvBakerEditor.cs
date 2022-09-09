@@ -19,6 +19,11 @@ public class SDFGameEnvBakerEditor : Editor
     {
         base.OnInspectorGUI();
 
+        if (GUILayout.Button("SaveEnvEXR"))
+        {
+            TexHelper.SaveEXR(Target.outEnvTex, "Assets", "env_"+Target.outName);
+        }
+
         if (GUILayout.Button("SaveCubePNG"))
         {
             //名称与工具对齐 https://danilw.github.io/GLSL-howto/cubemap_to_panorama_js/cubemap_to_panorama.html
