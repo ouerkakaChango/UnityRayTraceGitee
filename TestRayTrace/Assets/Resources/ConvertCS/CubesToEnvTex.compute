@@ -21,7 +21,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
 	//3d space all unity-coord
 	float3 dir = UVToEquirectangular(uv, true);
-
+	
 	Ray ray;
 	ray.pos = 0;
 	ray.dir = dir;
@@ -43,7 +43,63 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 		float d = RayCastPlane(ray, plane);
 		float3 pos = dir * d;
 		float2 faceUV = (pos.xy + 1)*0.5;
-		re = front.SampleLevel(common_linear_repeat_sampler, uv, 0).rgb;
+		faceUV = saturate(faceUV);
+		re = front.SampleLevel(common_linear_clamp_sampler, faceUV, 0).rgb;
+	}
+	else if (maxAxis == 2 && axisSign == -1)
+	{//back
+		plane.p = float3(0, 0, -1);
+		plane.n = -plane.p;
+		float d = RayCastPlane(ray, plane);
+		float3 pos = dir * d;
+		float2 faceUV = (pos.xy*float2(-1,1) + 1)*0.5;
+		faceUV = saturate(faceUV);
+		re = back.SampleLevel(common_linear_clamp_sampler, faceUV, 0).rgb;
+	}
+	else if (maxAxis == 1 && axisSign == 1)
+	{//up
+		plane.p = float3(0, 1, 0);
+		plane.n = -plane.p;
+		float d = RayCastPlane(ray, plane);
+		float3 pos = dir * d;
+		float2 faceUV = (pos.xz*float2(1,-1) + 1)*0.5;
+		faceUV = saturate(faceUV);
+		re = up.SampleLevel(common_linear_clamp_sampler, faceUV, 0).rgb;
+	}
+	else if (maxAxis == 1 && axisSign == -1)
+	{//down
+		plane.p = float3(0, -1, 0);
+		plane.n = -plane.p;
+		float d = RayCastPlane(ray, plane);
+		float3 pos = dir * d;
+		float2 faceUV = (pos.xz + 1)*0.5;
+		faceUV = saturate(faceUV);
+		re = down.SampleLevel(common_linear_clamp_sampler, faceUV, 0).rgb;
+	}
+	else if (maxAxis == 0 && axisSign == 1)
+	{//right
+		plane.p = float3(1, 0, 0);
+		plane.n = -plane.p;
+		float d = RayCastPlane(ray, plane);
+		float3 pos = dir * d;
+		float2 faceUV = (pos.zy*float2(-1, 1) + 1)*0.5;
+		faceUV = saturate(faceUV);
+		re = right.SampleLevel(common_linear_clamp_sampler, faceUV, 0).rgb;
+	}
+	else if (maxAxis == 0 && axisSign == -1)
+	{//left
+		plane.p = float3(-1, 0, 0);
+		plane.n = -plane.p;
+		float d = RayCastPlane(ray, plane);
+		float3 pos = dir * d;
+		float2 faceUV = (pos.zy + 1)*0.5;
+		faceUV = saturate(faceUV);
+		re = left.SampleLevel(common_linear_clamp_sampler, faceUV, 0).rgb;
+	}
+	else
+	{
+		//error color
+		re = float3(1, 0, 1);
 	}
     Result[id.xy] = float4(re,1);
 }

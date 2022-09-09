@@ -246,6 +246,7 @@ float Time01(float frequency=1.0f,float phi = 0.0f)
 
 SamplerState common_point_repeat_sampler;
 SamplerState common_linear_repeat_sampler;
+SamplerState common_linear_clamp_sampler;
 
 float2 GetUV(RWTexture2D<float4> dst, uint3 id)
 {
