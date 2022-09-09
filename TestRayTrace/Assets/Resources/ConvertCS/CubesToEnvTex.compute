@@ -1,0 +1,49 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+#include "../../HLSL/CommonDef.hlsl"
+#include "../../HLSL/RayMath.hlsl"
+#include "../../HLSL/TransferMath/TransferMath.hlsl"
+
+RWTexture2D<float4> Result;
+Texture2D<float4> front;
+Texture2D<float4> back;
+Texture2D<float4> up;
+Texture2D<float4> down;
+Texture2D<float4> left;
+Texture2D<float4> right;
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	float3 re = 0;
+	uint2 outSize = GetSize(Result);
+	float2 uv = float2(id.x / (float)outSize.x, id.y / (float)outSize.y);
+
+	//3d space all unity-coord
+	float3 dir = UVToEquirectangular(uv, true);
+
+	Ray ray;
+	ray.pos = 0;
+	ray.dir = dir;
+	Plane plane;
+	//judge face inx from dir
+	//0-front 1-back ... see above
+	int maxAxis;
+	int axisSign;
+	GetMaxAxisInfo(dir, maxAxis, axisSign);
+	if (maxAxis == 2 && axisSign == 1)
+	{//front
+		//leftDown norm(-1,-1,1)
+		//upright: norm(1, 1, 1)
+		//[x,y] z=1
+
+		//dirToFaceUV,get hit by plane Z=1
+		plane.p = float3(0, 0, 1);
+		plane.n = -plane.p;
+		float d = RayCastPlane(ray, plane);
+		float3 pos = dir * d;
+		float2 faceUV = (pos.xy + 1)*0.5;
+		re = front.SampleLevel(common_linear_repeat_sampler, uv, 0).rgb;
+	}
+    Result[id.xy] = float4(re,1);
+}

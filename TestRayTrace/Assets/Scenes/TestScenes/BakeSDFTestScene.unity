@@ -412,7 +412,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
   SDF_offset: 0
-  renderMode: 2
+  renderMode: 4
   shapeType: 0
   specialID: -1
   fontCharacter: 0
@@ -1067,7 +1067,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
   SDF_offset: 0
-  renderMode: 2
+  renderMode: 4
   shapeType: 0
   specialID: -1
   fontCharacter: 0
@@ -1435,7 +1435,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
   SDF_offset: 0
-  renderMode: 2
+  renderMode: 4
   shapeType: 0
   specialID: -1
   fontCharacter: 0
@@ -2721,7 +2721,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
   SDF_offset: 0
-  renderMode: 2
+  renderMode: 4
   shapeType: 0
   specialID: -1
   fontCharacter: 0

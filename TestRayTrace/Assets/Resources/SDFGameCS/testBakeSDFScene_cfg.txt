@@ -107,16 +107,16 @@ re.roughness = 1;
 ###BLOCK ObjRenderMode
 //@@@SDFBakerMgr ObjRenderMode
 int renderMode[11];
-renderMode[0] = 2;
+renderMode[0] = 4;
 renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
-renderMode[4] = 2;
-renderMode[5] = 2;
+renderMode[4] = 4;
+renderMode[5] = 4;
 renderMode[6] = 0;
 renderMode[7] = 2;
 renderMode[8] = 0;
-renderMode[9] = 2;
+renderMode[9] = 4;
 renderMode[10] = 0;
 return renderMode[obj];
 //@@@
@@ -162,34 +162,34 @@ else if (inx == 10 )
 inx = -4;
 }
 //@@@
-//if(mode == 999)
-//{
-//	//mat.albedo *= WoodColor(5*minHit.P);
-//	//minHit.N += float3(100,0,0);//WoodDisplacement(minHit.P);
-//	//minHit.N = float3(0,0,0);//normalize(minHit.N);
-//	//mat.albedo = WoodDisplacement(5*minHit.P);
-//
-//	float3 pos = minHit.P;
-//	float3 tile = float3(1,1,1);
-//	float woodNEpsilon = NormalEpsilon;
-//	float3 T = float3(1,0,0);
-//	float3 B = float3(0,1,0);
-//	float3 N = float3(0,0,1);
-//	
-//	float3 woodN = normalize(float3(
-//		WoodDisplacement(tile * pos + woodNEpsilon*T) - WoodDisplacement(tile * pos - woodNEpsilon*T),
-//		WoodDisplacement(tile * pos + woodNEpsilon*B) - WoodDisplacement(tile * pos - woodNEpsilon*B),
-//		WoodDisplacement(tile * pos + woodNEpsilon*N) - WoodDisplacement(tile * pos - woodNEpsilon*N)
-//		));
-//
-//	float normalIntensity = 0.2;
-//	woodN = normalize(normalIntensity * woodN + minHit.N);
-//
-//	mat.albedo *= WoodColor(tile*pos);
-//	minHit.N = woodN;
-//
-//	mode = 0;
-//}
+if(mode == 4)
+{
+	//mat.albedo *= WoodColor(5*minHit.P);
+	//minHit.N += float3(100,0,0);//WoodDisplacement(minHit.P);
+	//minHit.N = float3(0,0,0);//normalize(minHit.N);
+	//mat.albedo = WoodDisplacement(5*minHit.P);
+
+	float3 pos = minHit.P;
+	float3 tile = float3(1,1,1);
+	float woodNEpsilon = NormalEpsilon;
+	float3 T = float3(1,0,0);
+	float3 B = float3(0,1,0);
+	float3 N = float3(0,0,1);
+	
+	float3 woodN = normalize(float3(
+		WoodDisplacement(tile * pos + woodNEpsilon*T) - WoodDisplacement(tile * pos - woodNEpsilon*T),
+		WoodDisplacement(tile * pos + woodNEpsilon*B) - WoodDisplacement(tile * pos - woodNEpsilon*B),
+		WoodDisplacement(tile * pos + woodNEpsilon*N) - WoodDisplacement(tile * pos - woodNEpsilon*N)
+		));
+
+	float normalIntensity = 0.2;
+	woodN = normalize(normalIntensity * woodN + minHit.N);
+
+	mat.albedo *= WoodColor(tile*pos);
+	minHit.N = woodN;
+
+	mode = 0;
+}
 //else if(mode == 3)
 //{//???
 //	float3 pos = minHit.P;

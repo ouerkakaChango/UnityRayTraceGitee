@@ -51,5 +51,12 @@ namespace TextureHelper
             tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
             tex.Apply();
         }
+
+        public static void CreateRT(ref RenderTexture rTex, int w, int h , int depth=24, RenderTextureFormat format = RenderTextureFormat.ARGBFloat)
+        {
+            rTex = new RenderTexture(w,h, depth, format);
+            rTex.enableRandomWrite = true;
+            rTex.Create();
+        }
     }
 }

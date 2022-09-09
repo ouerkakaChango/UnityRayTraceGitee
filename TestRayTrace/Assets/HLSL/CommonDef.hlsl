@@ -210,6 +210,31 @@ int GetTreeDepth(int inx,int maxDepth)
 	return -1;
 }
 
+void GetMaxAxisInfo(float3 vec, out int axisInx, out int axisSign)
+{
+	axisInx = -1; axisSign = 0;
+	float3 avec = abs(vec);
+	if (avec.x >= avec.y&&avec.x >= avec.z)
+	{
+		axisInx = 0;
+		axisSign = sign(vec.x);
+	}
+	else if (avec.y >= avec.x&&avec.y >= avec.z)
+	{
+		axisInx = 1;
+		axisSign = sign(vec.y);
+	}
+	else if (avec.z >= avec.x&&avec.z >= avec.y)
+	{
+		axisInx = 2;
+		axisSign = sign(vec.z);
+	}
+	if (axisSign == 0)
+	{
+		axisSign = 1;
+	}
+}
+
 //###############################################################
 
 float Time01(float frequency=1.0f,float phi = 0.0f)
@@ -224,7 +249,7 @@ SamplerState common_linear_repeat_sampler;
 
 float2 GetUV(RWTexture2D<float4> dst, uint3 id)
 {
-	uint dstW, dstH;
+	uint dstW, dstH; 
 	dst.GetDimensions(dstW, dstH);
 	return float2(
 		((float)id.x) / dstW,

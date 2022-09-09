@@ -12,6 +12,8 @@ public class SDFGameEnvBaker : MonoBehaviour
     SDFGameCameraParam shotParam;
 
     public Texture2D[] cubeOut = new Texture2D[6];
+    public Vector2Int outEnvSize = new Vector2Int(1024,512);
+    public Texture2D outEnvTex;
 
     // Start is called before the first frame update
     void Start()
@@ -20,7 +22,7 @@ public class SDFGameEnvBaker : MonoBehaviour
         shotParam.w = shotSize.x;
         shotParam.h = shotSize.y;
         var keyboard = tracer.gameObject.GetComponent<KeyboardInputer>();
-        keyboard.keyDic.Add("2", OutputCubemap);
+        keyboard.keyDic.Add("2", OutputEnvTex_CubeMapMode);
     }
 
     // Update is called once per frame
@@ -73,6 +75,43 @@ public class SDFGameEnvBaker : MonoBehaviour
 
         Destroy(tcam);
         shotParam = oriParam;
+    }
+
+    public void OutputEnvTex_CubeMapMode()
+    {
+        OutputCubemap();
+        //cube to Equirectangular
+        outEnvTex = null;
+        EnvTexFromCubeMap(ref outEnvTex, outEnvSize.x, outEnvSize.y, ref cubeOut);
+    }
+
+    public static void EnvTexFromCubeMap(ref Texture2D envTex, int w, int h, ref Texture2D[] cubes)
+    {
+        if(cubes.Length!=6)
+        {
+            Debug.LogError("Cubes size not 6");
+            return;
+        }
+
+        RenderTexture rt = null;
+        TexHelper.CreateRT(ref rt, w, h);
+        var cs = Resources.Load<ComputeShader>("ConvertCS/CubesToEnvTex");
+        //##################################
+        //### compute
+        int kInx = cs.FindKernel("CSMain");
+
+        cs.SetTexture(kInx, "Result", rt);
+        cs.SetTexture(kInx, "front", cubes[0]);
+        cs.SetTexture(kInx, "up", cubes[1]);
+        cs.SetTexture(kInx, "down", cubes[2]);
+        cs.SetTexture(kInx, "back", cubes[3]);
+        cs.SetTexture(kInx, "left", cubes[4]);
+        cs.SetTexture(kInx, "right", cubes[5]);
+
+        cs.Dispatch(kInx, w / 8, h / 8, 1);
+        //### compute
+        //#####################################
+        TexHelper.RT2Tex2D(ref envTex, ref rt);
     }
 
 }
