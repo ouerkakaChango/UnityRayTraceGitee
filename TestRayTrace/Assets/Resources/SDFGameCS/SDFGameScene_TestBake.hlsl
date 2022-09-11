@@ -39,6 +39,33 @@ float dy_radius;
 float test2;
 //@@@
 
+//???
+
+void GetEnvInfoByID(int envInx, out bool isPNGEnv, out Texture2DArray envTexArr)
+{
+	isPNGEnv = false;
+	envTexArr = envSpecTex2DArr;
+	//@@@SDFBakerMgr TexSys_EnvTexSetting
+	//if(envInx == 233)
+	//{
+	//	isPNGEnv = false;
+	//	envTexArr = xxx;
+	//}
+	//@@@
+}
+
+void GetEnvTexArrByObj(int objInx, out bool isPNGEnv, out Texture2DArray envTexArr)
+{
+	isPNGEnv = false;
+	envTexArr = envSpecTex2DArr;
+	//@@@SDFBakerMgr ObjEnvTex
+	//if(objInx == 1)
+	//{
+	// GetEnvInfoByID(233,isPNGEnv,envTexArr);
+	//}
+	//@@@
+}
+
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
@@ -207,7 +234,7 @@ if(mode == 4)
 	mode = 0;
 }
 //else if(mode == 3)
-//{//???
+//{
 //	float3 pos = minHit.P;
 //	float3 boxPos = float3(-55,0.6,-52);
 //	float3 boxBound = 0.5;
@@ -230,7 +257,7 @@ if(mode == 4)
 //	mode = 0;
 //}
 
-//??? grass color vary
+//grass color vary
 if(inx == -3)
 {
 	//### grid grass
@@ -314,14 +341,16 @@ else if (mode == 1)
 else if (mode == 2)
 {
 	//??? object reflection IBL
-	int isPNGEnv = true;
+	bool isPNGEnv;
+	Texture2DArray tempEnv;
+	GetEnvTexArrByObj(minHit.obj, isPNGEnv, tempEnv);
 	if(isPNGEnv)
 	{
-		result = PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir,1,1,true,true);
+		result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir,1,1,true,true);
 	}
 	else
 	{
-		result = PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
+		result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir);
 	}
 }
 else if (mode == 3)
@@ -670,26 +699,25 @@ else if (inx == 10 )
 inx = -4;
 }
 //@@@
-if (inx == -2)
-{//???
-	return GetObjSDFNormal(inx, p, traceInfo);
-	float2 dxy = CosFBM_Dxy(p.xz);
-	return normalize(float3(-dxy.x,1,-dxy.y));
-}
-else if (inx == -3)
-{
-//???
-	//return float3(0,1,0);
-	return GetObjSDFNormal(inx, p, traceInfo);
-	//float grid = 0.1.0;
-	//float2 m = floor(p.xz/grid);
-	//float2 c = grid*m+grid*0.5;
-	//float3 center = float3(c.x,CosFBM(c),c.y);
-	//float3 ori = center;
-	//center.y += rand01(float3(34,23,123)+ori*0.1)*2 * Time01(5,ori.y);
-	//return normalize(p-center);
-}
-else
+//if (inx == -2)
+//{
+//	return GetObjSDFNormal(inx, p, traceInfo);
+//	float2 dxy = CosFBM_Dxy(p.xz);
+//	return normalize(float3(-dxy.x,1,-dxy.y));
+//}
+//else if (inx == -3)
+//{
+//	//return float3(0,1,0);
+//	return GetObjSDFNormal(inx, p, traceInfo);
+//	//float grid = 0.1.0;
+//	//float2 m = floor(p.xz/grid);
+//	//float2 c = grid*m+grid*0.5;
+//	//float3 center = float3(c.x,CosFBM(c),c.y);
+//	//float3 ori = center;
+//	//center.y += rand01(float3(34,23,123)+ori*0.1)*2 * Time01(5,ori.y);
+//	//return normalize(p-center);
+//}
+//else
 {
 	return GetObjSDFNormal(inx, p, traceInfo);
 }
