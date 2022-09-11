@@ -167,6 +167,8 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("TexSys", new List<Vector2Int>());
         rangeMap.Add("DyValSys", new List<Vector2Int>());
         rangeMap.Add("CheckInnerBound", new List<Vector2Int>());
+        rangeMap.Add("ObjEnvTex", new List<Vector2Int>());
+        rangeMap.Add("TexSys_EnvTexSettings", new List<Vector2Int>());
 
         var keyList = rangeMap.Keys.ToList();
         List<Vector2Int> orderList = new List<Vector2Int>();
@@ -234,6 +236,14 @@ public class AutoCS : MonoBehaviour
                 newLines.RemoveRange(offset + range.x + 1, oricount);
                 newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedBeforeSDF);
             }
+            else if (key == "ObjEnvTex" && ValidRange(range))
+            {//ObjEnvTex
+                oricount = range.y - range.x - 1;
+                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
+                newcount = bakerMgr.bakedObjEnvTex.Count;
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedObjEnvTex);
+            }
             else if (key == "CheckInnerBound" && ValidRange(range))
             {
                 oricount = range.y - range.x - 1;
@@ -249,6 +259,14 @@ public class AutoCS : MonoBehaviour
                 newcount = texSys.bakedDeclares.Count;
                 newLines.RemoveRange(offset + range.x + 1, oricount);
                 newLines.InsertRange(offset + range.x + 1, texSys.bakedDeclares);
+            }
+            else if (key == "TexSys_EnvTexSettings" && ValidRange(range))
+            {
+                oricount = range.y - range.x - 1;
+                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
+                newcount = texSys.bakedEnvTexSettings.Count;
+                newLines.RemoveRange(offset + range.x + 1, oricount);
+                newLines.InsertRange(offset + range.x + 1, texSys.bakedEnvTexSettings);
             }
             else if (key == "DyValSys" && ValidRange(range))
             {

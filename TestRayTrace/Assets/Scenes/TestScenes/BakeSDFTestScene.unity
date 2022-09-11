@@ -228,6 +228,8 @@ MonoBehaviour:
     ao: {fileID: 2800000, guid: e95d4103f8811604d8cc666f70f5f830, type: 3}
   heightTextures: []
   plainTextures: []
+  envTextures: []
+  texInx: -1
 --- !u!114 &142421528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -660,6 +662,8 @@ MonoBehaviour:
   - {fileID: 0}
   outEnvSize: {x: 1024, y: 512}
   outEnvTex: {fileID: 0}
+  outIBLArr: []
+  outEnvTexArr: {fileID: 0}
 --- !u!1 &446652354
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,6 +718,8 @@ MonoBehaviour:
   - name: slice_whiteboardText
     tex: {fileID: 2800000, guid: abf373543fd65e24f934b328d5ed2a55, type: 3}
     channel: 3
+  envTextures: []
+  texInx: 1
 --- !u!114 &446652357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1386,6 +1392,8 @@ MonoBehaviour:
   - name: C_SDFTex
     tex: {fileID: 2800000, guid: 6cb78cc27d9ced84fa12d52a0751b3b1, type: 3}
     channel: 3
+  envTextures: []
+  texInx: -1
 --- !u!1 &817168217
 GameObject:
   m_ObjectHideFlags: 0
@@ -2110,6 +2118,7 @@ GameObject:
   - component: {fileID: 1355201447}
   - component: {fileID: 1355201449}
   - component: {fileID: 1355201450}
+  - component: {fileID: 1355201448}
   m_Layer: 0
   m_Name: SDF_q
   m_TagString: Untagged
@@ -2157,6 +2166,27 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 0
   objInx: 7
+--- !u!114 &1355201448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1355201445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 3
+  pbrTextures: []
+  heightTextures: []
+  plainTextures: []
+  envTextures:
+  - name: qEnvTest
+    tex: {fileID: 18700000, guid: d37b2c39ff60a64418373d4106357100, type: 2}
+    isPNGEnv: 1
+  texInx: 0
 --- !u!114 &1355201449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2199,6 +2229,8 @@ MonoBehaviour:
   - name: SDF_q
     tex: {fileID: 2800000, guid: 44ca264073e61394fba8ae90a951e8a5, type: 3}
     channel: 3
+  envTextures: []
+  texInx: 2
 --- !u!1 &1491667009
 GameObject:
   m_ObjectHideFlags: 0
@@ -2849,6 +2881,7 @@ MonoBehaviour:
   bakedDirShadows: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
+  bakedObjEnvTex: []
   tags:
   - {fileID: 348777198}
   - {fileID: 446652358}
@@ -2874,6 +2907,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
+  - name: qEnvTest
+    tex: {fileID: 18700000, guid: d37b2c39ff60a64418373d4106357100, type: 2}
+    channel: 0
   - name: slice_whiteboardText
     tex: {fileID: 2800000, guid: abf373543fd65e24f934b328d5ed2a55, type: 3}
     channel: 3
@@ -2881,11 +2917,19 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: 44ca264073e61394fba8ae90a951e8a5, type: 3}
     channel: 3
   tags:
+  - {fileID: 1355201448}
   - {fileID: 446652356}
   - {fileID: 1355201450}
   bakedDeclares:
+  - Texture2DArray qEnvTest;
   - Texture2D<float> slice_whiteboardText;
   - Texture2D<float> SDF_q;
+  bakedEnvTexSettings:
+  - if(texInx == 0)
+  - '{'
+  - '   isPNGEnv = true;'
+  - '   envTexArr = qEnvTest;'
+  - '}'
 --- !u!114 &1928400449
 MonoBehaviour:
   m_ObjectHideFlags: 0

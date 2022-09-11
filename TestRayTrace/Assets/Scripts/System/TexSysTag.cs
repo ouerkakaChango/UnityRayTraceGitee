@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using XUtility;
 
 public enum TexTagType
 {
     pbrTexture,
     heightTextue,
     plainTexture,
+    envTexture,
 };
 
 public class TexSysTag : MonoBehaviour
@@ -19,6 +21,11 @@ public class TexSysTag : MonoBehaviour
     public List<HeightTexture> heightTextures = new List<HeightTexture>();
     [HideInInspector]
     public List<NamedTexture> plainTextures = new List<NamedTexture>();
+    [HideInInspector]
+    public List<EnvTexture> envTextures = new List<EnvTexture>();
+
+    [ReadOnly]
+    public int texInx = -1;
     // Start is called before the first frame update
     void Start()
     {

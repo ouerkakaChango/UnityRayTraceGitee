@@ -55,6 +55,16 @@ public class TexSysTagEditor : Editor
                 EditorShowPlainTextureList(serializedObject, Target.plainTextures.Count, listSP);
             }
         }
+        else if (Target.type == TexTagType.envTexture)
+        {
+            var listSP = serializedObject.FindProperty("envTextures");
+            EditorGUILayout.PropertyField(listSP, new GUIContent("envTextures"), true);
+            showDetailFoldout = EditorGUILayout.Foldout(showDetailFoldout, "Detail");
+            if (showDetailFoldout)
+            {
+                EditorShowEnvTextureList(serializedObject, Target.envTextures.Count, listSP);
+            }
+        }
     }
 
     //###############################################################
@@ -120,6 +130,28 @@ public class TexSysTagEditor : Editor
             EditorGUILayout.PropertyField(nameSP, true);
             EditorGUILayout.PropertyField(texSP, true);
             EditorGUILayout.PropertyField(channelSP, true);
+
+            EditorGUILayout.Space();
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+            }
+        }
+    }
+
+    public static void EditorShowEnvTextureList(SerializedObject serializedObject, int listCount, SerializedProperty listSP)
+    {//name,height,grad,(bound?)
+        for (int i = 0; i < listCount; i++)
+        {
+            SerializedProperty nameSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("name");
+            SerializedProperty texSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("tex");
+            SerializedProperty isPNGEnvSP = listSP.GetArrayElementAtIndex(i).FindPropertyRelative("isPNGEnv");
+
+            EditorGUI.BeginChangeCheck();
+
+            EditorGUILayout.PropertyField(nameSP, true);
+            EditorGUILayout.PropertyField(texSP, true);
+            EditorGUILayout.PropertyField(isPNGEnvSP, true);
 
             EditorGUILayout.Space();
             if (EditorGUI.EndChangeCheck())

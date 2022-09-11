@@ -30,6 +30,7 @@
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
+Texture2DArray qEnvTest;
 Texture2D<float> slice_whiteboardText;
 Texture2D<float> SDF_q;
 //@@@
@@ -41,28 +42,24 @@ float test2;
 
 //???
 
-void GetEnvInfoByID(int envInx, out bool isPNGEnv, out Texture2DArray envTexArr)
+void GetEnvInfoByID(int texInx, out bool isPNGEnv, out Texture2DArray envTexArr)
 {
-	isPNGEnv = false;
-	envTexArr = envSpecTex2DArr;
-	//@@@SDFBakerMgr TexSys_EnvTexSetting
-	//if(envInx == 233)
-	//{
-	//	isPNGEnv = false;
-	//	envTexArr = xxx;
-	//}
+	//@@@SDFBakerMgr TexSys_EnvTexSettings
+if(texInx == 0)
+{
+isPNGEnv = true;
+envTexArr = qEnvTest;
+}
 	//@@@
 }
 
 void GetEnvTexArrByObj(int objInx, out bool isPNGEnv, out Texture2DArray envTexArr)
 {
-	isPNGEnv = false;
-	envTexArr = envSpecTex2DArr;
 	//@@@SDFBakerMgr ObjEnvTex
-	//if(objInx == 1)
-	//{
-	// GetEnvInfoByID(233,isPNGEnv,envTexArr);
-	//}
+if(objInx == 7)
+{
+GetEnvInfoByID(0,isPNGEnv,envTexArr);
+}
 	//@@@
 }
 
@@ -340,7 +337,7 @@ else if (mode == 1)
 }
 else if (mode == 2)
 {
-	//??? object reflection IBL
+	//object reflection IBL
 	bool isPNGEnv;
 	Texture2DArray tempEnv;
 	GetEnvTexArrByObj(minHit.obj, isPNGEnv, tempEnv);

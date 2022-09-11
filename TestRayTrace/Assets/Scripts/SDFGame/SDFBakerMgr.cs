@@ -26,6 +26,8 @@ public class SDFBakerMgr : MonoBehaviour
     public List<string> bakedBeforeSDF = new List<string>();    //used for SDF Bounds
     [HideInInspector]
     public List<string> bakedCheckInnerBound = new List<string>();
+    [HideInInspector]
+    public List<string> bakedObjEnvTex = new List<string>();
 
     public SDFBakerTag[] tags;
     SDFLightTag[] dirLightTags;
@@ -152,6 +154,8 @@ public class SDFBakerMgr : MonoBehaviour
         bakedSpecialObjects.Clear();
 
         bakedCheckInnerBound.Clear();
+
+        bakedObjEnvTex.Clear();
     }
 
     void StartBake()
@@ -450,6 +454,41 @@ public class SDFBakerMgr : MonoBehaviour
         bakedMaterials.Add("re.albedo = " + BakeColor3(tag.mat_PBR.albedo) + ";");
         bakedMaterials.Add("re.metallic = " + tag.mat_PBR.metallic + ";");
         bakedMaterials.Add("re.roughness = " + tag.mat_PBR.roughness + ";");
+        AddBakeMaterialExtra(tag);
+    }
+
+    void AddBakeMaterialExtra(SDFBakerTag tag)
+    {
+        if(tag.renderMode == 2)
+        {
+            var textags = tag.gameObject.GetComponents<TexSysTag>();
+            bool foundEnv = false;
+            for(int i=0;i<textags.Length;i++)
+            {
+                if(textags[i].type == TexTagType.envTexture)
+                {
+                    foundEnv = true;
+                    ////if(objInx == 1)
+                    ////{
+                    //// GetEnvInfoByID(233,isPNGEnv,envTexArr);
+                    ////}
+                    bakedObjEnvTex.Add("if(objInx == "+tag.objInx+")");
+                    bakedObjEnvTex.Add("{");
+                    //!!! 此时texSys已经refresh过，可以用texInx
+                    bakedObjEnvTex.Add("    GetEnvInfoByID("+textags[i].texInx+",isPNGEnv,envTexArr);");
+                    bakedObjEnvTex.Add("}");
+                    break;
+                }
+                else
+                {
+                    continue;
+                }           
+            }
+            if(!foundEnv)
+            {
+                Debug.LogError("No envMap tex tag while obj renderMode==2!");
+            }
+        }
     }
 
     void AddBakeRenderMode(int inx, SDFBakerTag tag)

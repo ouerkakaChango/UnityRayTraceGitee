@@ -23,12 +23,19 @@ public struct HeightTexture
 }
 
 [System.Serializable]
+public struct EnvTexture
+{
+    public string name;
+    public Texture2DArray tex;
+    public bool isPNGEnv;
+}
+
+[System.Serializable]
 public struct NamedTexture
 {
     public string name;
-    public Texture2D tex;
+    public Texture tex;
     public ColorChannel channel;
-
 }
 
 public class TextureSystem : MonoBehaviour
@@ -37,6 +44,7 @@ public class TextureSystem : MonoBehaviour
     public TexSysTag[] tags;
 
     public List<string> bakedDeclares = new List<string>();
+    public List<string> bakedEnvTexSettings = new List<string>();
     // Start is called before the first frame update
     void Start()
     {
@@ -71,6 +79,16 @@ public class TextureSystem : MonoBehaviour
                     outTextures.Add(tag.plainTextures[i1]);
                 }
             }
+            else if (tag.type == TexTagType.envTexture)
+            {
+                for (int i1 = 0; i1 < tag.envTextures.Count; i1++)
+                {
+                    NamedTexture ttex = new NamedTexture();
+                    ttex.name = tag.envTextures[i1].name;
+                    ttex.tex = tag.envTextures[i1].tex;
+                    outTextures.Add(ttex);
+                }
+            }
         }
         BakeCode();
     }
@@ -88,6 +106,11 @@ public class TextureSystem : MonoBehaviour
             }
         }
         tags = tagList.ToArray();
+
+        for(int i=0;i<tags.Length;i++)
+        {
+            tags[i].texInx = i;
+        }
     }
 
     void AddPBRTexture(in List<PBRTexture> pbrTextures)
@@ -138,9 +161,15 @@ public class TextureSystem : MonoBehaviour
         }
     }
 
-    void BakeCode()
+    void ClearBake()
     {
         bakedDeclares.Clear();
+        bakedEnvTexSettings.Clear();
+    }
+
+    void BakeCode()
+    {
+        ClearBake();
 
         //such as: Texture2D<float4> SphereSDFTex;
         for (int i=0;i<outTextures.Count;i++)
@@ -150,10 +179,23 @@ public class TextureSystem : MonoBehaviour
             line = prefix + " " + outTextures[i].name+";";
             bakedDeclares.Add(line);
         }
+
+        for(int i=0;i<tags.Length;i++)
+        {
+            if(tags[i].type == TexTagType.envTexture)
+            {
+                AddBakeEnvTexSettings(tags[i]);
+            }
+        }
     }
 
     string GetPrefex(NamedTexture namedTexture)
     {
+        if((namedTexture.tex).GetType() == typeof(Texture2DArray))
+        {
+            return "Texture2DArray";
+        }
+
         var channel = namedTexture.channel;
         if (channel == ColorChannel.RGBA)
         {
@@ -175,6 +217,32 @@ public class TextureSystem : MonoBehaviour
         {
             Debug.Log(namedTexture.name + " channel " + channel + " not handled prefix,turn to defalt \'Texture<float4>\'");
             return "Texture2D<float4>";
+        }
+    }
+
+    void AddBakeEnvTexSettings(TexSysTag textag)
+    {
+        ////if(texInx == 233)
+        ////{
+        ////	isPNGEnv = false;
+        ////	envTexArr = xxx;
+        ////}
+        bakedEnvTexSettings.Add("if(texInx == "+textag.texInx+")");
+        bakedEnvTexSettings.Add("{");
+        bakedEnvTexSettings.Add("   isPNGEnv = "+Bake(textag.envTextures[0].isPNGEnv)+";");
+        bakedEnvTexSettings.Add("   envTexArr = " + textag.envTextures[0].name + ";");
+        bakedEnvTexSettings.Add("}");
+    }
+
+    string Bake(bool v)
+    {
+        if(v)
+        {
+            return "true";
+        }
+        else
+        {
+            return "false";
         }
     }
 }
