@@ -826,6 +826,8 @@ GameObject:
   - component: {fileID: 507070202}
   - component: {fileID: 507070201}
   - component: {fileID: 507070200}
+  - component: {fileID: 507070204}
+  - component: {fileID: 507070203}
   m_Layer: 0
   m_Name: nextLevelDoor
   m_TagString: Untagged
@@ -924,6 +926,36 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 507070198}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &507070203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507070198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97969487ef795894997912fe9affb974, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enterOnceEvents: 00000000
+  actions: 0400000003000000
+  f_params: []
+  str_params:
+  - Trigger next level Door
+--- !u!65 &507070204
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 507070198}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 3.29, z: 1}
+  m_Center: {x: 0, y: -0.85, z: 0}
 --- !u!1 &541193198
 GameObject:
   m_ObjectHideFlags: 0
@@ -2295,7 +2327,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enterOnceEvents: 00000000
-  actions: 0000000001000000
+  actions: 000000000100000002000000
   f_params:
   - 1
   str_params:
@@ -2955,6 +2987,7 @@ GameObject:
   - component: {fileID: 1928400447}
   - component: {fileID: 1928400448}
   - component: {fileID: 1928400449}
+  - component: {fileID: 1928400450}
   m_Layer: 0
   m_Name: Systems
   m_TagString: Untagged
@@ -3148,6 +3181,19 @@ MonoBehaviour:
   - float isShow;
   - float dy_radius;
   - float test2;
+--- !u!114 &1928400450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928400445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e57f28516c177b343be8369b83c83cd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextLevelObj: {fileID: 507070198}
 --- !u!1 &2041803218
 GameObject:
   m_ObjectHideFlags: 0

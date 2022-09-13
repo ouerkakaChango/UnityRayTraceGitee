@@ -288,17 +288,27 @@ public class SDFGameSceneTrace : MonoBehaviour
         computeShader.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
         computeShader.SetTexture(kInx, "perlinNoise1", ShaderToyTool.Instance.perlinNoise1);
         computeShader.SetTexture(kInx, "voronoiNoise1", ShaderToyTool.Instance.voronoiNoise1);
-        for (int i=0;i<autoCS.texSys.outTextures.Count;i++)
+        if (autoCS.texSys != null)
         {
-            computeShader.SetTexture(kInx, autoCS.texSys.outTextures[i].name, autoCS.texSys.outTextures[i].tex);
+            for (int i = 0; i < autoCS.texSys.outTextures.Count; i++)
+            {
+                computeShader.SetTexture(kInx, autoCS.texSys.outTextures[i].name, autoCS.texSys.outTextures[i].tex);
+            }
         }
-        //??? DynamicValSys
-        for (int i = 0; i < autoCS.dyValSys.outFloats.Count; i++)
+        else
         {
-            //var tName = autoCS.dyValSys.outFloats[i].name;
-            //var tF = autoCS.dyValSys.outFloats[i].GetVal();
-            computeShader.SetFloat(autoCS.dyValSys.outFloats[i].name, autoCS.dyValSys.outFloats[i].GetVal());
-            //Debug.Log("Dynamic: " + tName + " " + tF);
+            Debug.Log("Warning:No Texture Sys");
+        }
+        if (autoCS.dyValSys != null)
+        {
+            for (int i = 0; i < autoCS.dyValSys.outFloats.Count; i++)
+            {
+                computeShader.SetFloat(autoCS.dyValSys.outFloats[i].name, autoCS.dyValSys.outFloats[i].GetVal());
+            }
+        }
+        else
+        {
+            Debug.Log("Warning:No dyVal Sys");
         }
         //___
         //####

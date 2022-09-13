@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace XCGame
 {
@@ -13,6 +14,9 @@ namespace XCGame
     {
         SetDynamicVal,
         KeyBind_q,
+        EnableNextLevelDoor,
+        GotoNextLevel,
+        DebugLogMessage,
     }
     public class GeneralTrigger : MonoBehaviour
     {
@@ -20,6 +24,7 @@ namespace XCGame
         public List<TriggerAction> actions = new List<TriggerAction>();
         public List<float> f_params = new List<float>();
         public List<string> str_params = new List<string>();
+
         // Start is called before the first frame update
         void Start()
         {
@@ -68,8 +73,25 @@ namespace XCGame
             }
             else if (actions[inx] == TriggerAction.KeyBind_q)
             {
-                //???
+                //!!!
                 other.gameObject.GetComponent<SDFGameSceneTrace>().AddKeybind_q();
+            }
+            else if(actions[inx] == TriggerAction.EnableNextLevelDoor)
+            {
+                //!!!
+                var dyValSys = Camera.main.gameObject.GetComponent<AutoCS>().dyValSys;
+                var gameSys = dyValSys.gameObject.GetComponent<GameSceneSystem>();
+                var boxColi = gameSys.nextLevelObj.GetComponent<BoxCollider>();
+                boxColi.enabled = true;
+            }
+            else if (actions[inx] == TriggerAction.GotoNextLevel)
+            {
+                //???
+                SceneManager.LoadScene("TransferScene");
+            }
+            else if (actions[inx] == TriggerAction.DebugLogMessage)
+            {
+                Debug.Log("General Trigger: " + str_params[0]);
             }
         }
     }
