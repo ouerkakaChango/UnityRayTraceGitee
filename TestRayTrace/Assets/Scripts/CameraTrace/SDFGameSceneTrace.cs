@@ -172,9 +172,9 @@ public class SDFGameSceneTrace : MonoBehaviour
             }
             else
             {
-                keyboard.keyDic.Add("q", Dao_GetSmall);
-                keyboard.keyDic.Add("e", Dao_GetBig);
-                keyboard.keyDic.Add("1", TestChangeCamDir);
+                //keyboard.keyDic.Add("q", Dao_GetSmall);
+                //keyboard.keyDic.Add("e", Dao_GetBig);
+                //keyboard.keyDic.Add("1", TestChangeCamDir);
             }
         }
     }
@@ -217,13 +217,29 @@ public class SDFGameSceneTrace : MonoBehaviour
         daoScale *= 2;
     }
 
+    bool qToggle = true;
     public void TestChangeCamDir()
     {
-        Debug.Log("TestChangeCamDir");
-        //new rot: -0.86 -99.21 -68.3
-        gameObject.transform.rotation = Quaternion.Euler(-0.86f, -99.21f, -68.3f);
-        var mouseLook = GetComponent<XCCamMouseLook>();
-        mouseLook.RecordCamDir();
+        if (qToggle)
+        {
+            //Debug.Log("TestChangeCamDir");
+            //new rot: -0.86 -99.21 -68.3
+            gameObject.transform.rotation = Quaternion.Euler(-0.86f, -99.21f, -68.3f);
+            var mouseLook = GetComponent<XCCamMouseLook>();
+            mouseLook.RecordCamDir();
+        }
+        else
+        {
+            gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+            var mouseLook = GetComponent<XCCamMouseLook>();
+            mouseLook.RecordCamDir();
+        }
+        qToggle = !qToggle;
+    }
+
+    public void AddKeybind_q()
+    {
+        keyboard.keyDic.Add("q", TestChangeCamDir);
     }
 
     //##################################################################################################

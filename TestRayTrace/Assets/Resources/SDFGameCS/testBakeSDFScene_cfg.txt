@@ -23,12 +23,13 @@ Blocks:
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
-Texture2DArray qEnvTest;
 Texture2D<float> slice_whiteboardText;
+Texture2DArray qEnvTest;
 Texture2D<float> SDF_q;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
+float isShow;
 float dy_radius;
 float test2;
 //@@@
@@ -38,7 +39,7 @@ float test2;
 void GetEnvInfoByID(int texInx, out bool isPNGEnv, out Texture2DArray envTexArr)
 {
 	//@@@SDFBakerMgr TexSys_EnvTexSettings
-if(texInx == 0)
+if(texInx == 1)
 {
    isPNGEnv = true;
    envTexArr = qEnvTest;
@@ -51,7 +52,7 @@ void GetEnvTexArrByObj(int objInx, out bool isPNGEnv, out Texture2DArray envTexA
 	//@@@SDFBakerMgr ObjEnvTex
 if(objInx == 7)
 {
-    GetEnvInfoByID(0,isPNGEnv,envTexArr);
+    GetEnvInfoByID(1,isPNGEnv,envTexArr);
 }
 	//@@@
 }
@@ -381,13 +382,6 @@ float SDFPlanet(float3 p)
 //### 
 float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr BeforeObjSDF
-if(inx == 7 )
-{
-if (!IsInBBox(p, float3(-42.31, 3.45, -54.24), float3(-40.31, 5.45, -52.24)))
-{
-    return SDFBox(p, float3(-41.31, 4.45, -53.24), float3(1, 1, 1)) + 0.1;
-}
-}
 if(inx == 8||inx == 4||inx == 5||inx == 0||inx == 9||inx == 1)
 {
 if (!IsInBBox(p, float3(-56.05, -1.65, -58.16), float3(-52.05, 2.35, -54.16)))
@@ -453,7 +447,7 @@ else if (inx == 6 )
 {
 inx = -3;
 }
-else if (inx == 7 )
+else if (inx == 7 && isShow )
 {
 float3 localp = WorldToLocal(p, float3(-41.31, 4.45, -53.24), float3(281.6757, 187.4573, 334.7128), float3(2, 2, 2));
 float dh = abs(localp.y) - 0.1;

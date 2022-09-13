@@ -59,7 +59,7 @@ public class SDFBakerMgr : MonoBehaviour
         {
             var tag = tags[i];
 
-            DoPreAddAction(i);
+            DoPreAddAction(i, tag);
             bool hasBound = HasSDFBound(tag.gameObject);
             if(hasBound)
             {
@@ -95,9 +95,9 @@ public class SDFBakerMgr : MonoBehaviour
         EndBake();
     }
 
-    void DoPreAddAction(int i)
+    void DoPreAddAction(int i,SDFBakerTag tag)
     {
-        PreAdd(i, ref bakedSDFs);
+        PreAddSDF(i, ref bakedSDFs, tag);
         PreAdd(i, ref bakedSpecialObjects);
         PreAdd(i, ref bakedMaterials, "obj");
     }
@@ -234,6 +234,27 @@ public class SDFBakerMgr : MonoBehaviour
         else if(inx > 0)
         {
             lines.Add("else if ("+ inxName + " == "+inx+" )");
+            lines.Add("{");
+        }
+    }
+
+    void PreAddSDF(int inx, ref List<string> lines,SDFBakerTag tag)
+    {
+        string inxName = "inx";
+        bool ignoreElse = false;
+        string extra = "";
+        if(tag.needExtraCondition)
+        {
+            extra += tag.extraCondition;
+        }
+        if (inx == 0 || ignoreElse)
+        {
+            lines.Add("if(" + inxName + " == " + inx + extra + " )");
+            lines.Add("{");
+        }
+        else if (inx > 0)
+        {
+            lines.Add("else if (" + inxName + " == " + inx + extra + " )");
             lines.Add("{");
         }
     }

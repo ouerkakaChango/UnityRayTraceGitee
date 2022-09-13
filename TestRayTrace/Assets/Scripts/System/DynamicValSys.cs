@@ -60,4 +60,17 @@ public class DynamicValSys : MonoBehaviour
             bakedDeclares.Add(line);
         }
     }
+
+    public void Set(string name,float value)
+    {
+        for(int i=0;i<outFloats.Count;i++)
+        {
+            if(name == outFloats[i].name)
+            {
+                var newf = outFloats[i];
+                newf.val = value;
+                outFloats[i] = newf;
+            }
+        }
+    }
 }

@@ -8,7 +8,8 @@ public class SDFBakerTagEditor : Editor
 {
     SDFBakerTag Target;
     protected bool showMergeTag = false;
-    //showMergeTag = EditorGUILayout.Foldout(showMergeTag, "MergeSetting");
+    protected bool showExtraTag = false;
+
     void OnEnable()
     {
         Target = (SDFBakerTag)target;
@@ -63,7 +64,15 @@ public class SDFBakerTagEditor : Editor
                 Target.mergeType = nType;
             }
         }
+        showExtraTag = EditorGUILayout.Foldout(showExtraTag, "Extra");
+        if (showExtraTag)
+        {
+            SerializedProperty needExtraCondition = serializedObject.FindProperty("needExtraCondition");
+            EditorGUILayout.PropertyField(needExtraCondition, new GUIContent("needExtraCondition"), true);
 
+            SerializedProperty extraCondition = serializedObject.FindProperty("extraCondition");
+            EditorGUILayout.PropertyField(extraCondition, new GUIContent("extraCondition"), true);
+        }
         serializedObject.ApplyModifiedProperties();
 
     }

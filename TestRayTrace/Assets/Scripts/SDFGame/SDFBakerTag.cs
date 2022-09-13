@@ -54,6 +54,12 @@ public class SDFBakerTag : MonoBehaviour
     [ReadOnly]
     public int objInx;
 
+    //---Extra
+    [HideInInspector]
+    public bool needExtraCondition = false;
+    [HideInInspector]
+    public string extraCondition = "";
+    //___
     //#######################################################
 
     // Start is called before the first frame update

@@ -256,6 +256,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 0
   objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!65 &142421529
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -423,6 +425,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 1
   objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!65 &348777199
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -719,7 +723,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: abf373543fd65e24f934b328d5ed2a55, type: 3}
     channel: 3
   envTextures: []
-  texInx: 1
+  texInx: 0
 --- !u!114 &446652357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -759,6 +763,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 0
   objInx: 1
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!23 &446652359
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -867,6 +873,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 1
   objInx: 2
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!23 &507070201
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -961,6 +969,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 0
   objInx: 3
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!23 &541193201
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1084,6 +1094,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 1
   objInx: 4
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!65 &563013441
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1373,6 +1385,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 0
   objInx: 3
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!114 &764754548
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1454,6 +1468,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 1
   objInx: 5
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!65 &817168220
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1597,6 +1613,8 @@ MonoBehaviour:
   SDF_offset2D: -0.02
   mergeType: 0
   objInx: 5
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!1 &1004293003
 GameObject:
   m_ObjectHideFlags: 0
@@ -1643,6 +1661,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 1
   objInx: 3
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!65 &1004293005
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1954,6 +1974,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 0
   objInx: 6
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!23 &1283602067
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2106,6 +2128,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 2
   objInx: 8
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!1 &1355201445
 GameObject:
   m_ObjectHideFlags: 0
@@ -2119,6 +2143,9 @@ GameObject:
   - component: {fileID: 1355201449}
   - component: {fileID: 1355201450}
   - component: {fileID: 1355201448}
+  - component: {fileID: 1355201451}
+  - component: {fileID: 1355201453}
+  - component: {fileID: 1355201452}
   m_Layer: 0
   m_Name: SDF_q
   m_TagString: Untagged
@@ -2166,6 +2193,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 0
   objInx: 7
+  needExtraCondition: 1
+  extraCondition: ' && isShow'
 --- !u!114 &1355201448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2186,7 +2215,7 @@ MonoBehaviour:
   - name: qEnvTest
     tex: {fileID: 18700000, guid: d37b2c39ff60a64418373d4106357100, type: 2}
     isPNGEnv: 1
-  texInx: 0
+  texInx: 1
 --- !u!114 &1355201449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2194,7 +2223,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1355201445}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9b42619390817c409a4f2c513819b2b, type: 3}
   m_Name: 
@@ -2231,6 +2260,59 @@ MonoBehaviour:
     channel: 3
   envTextures: []
   texInx: 2
+--- !u!114 &1355201451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1355201445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 605a0e43f92c5eb42bae6ea7151685eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floatVals:
+  - type: 0
+    name: isShow
+    val: 0
+    cv:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+--- !u!114 &1355201452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1355201445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97969487ef795894997912fe9affb974, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enterOnceEvents: 00000000
+  actions: 0000000001000000
+  f_params:
+  - 1
+  str_params:
+  - isShow
+--- !u!65 &1355201453
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1355201445}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 3, y: 3, z: 3}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1491667009
 GameObject:
   m_ObjectHideFlags: 0
@@ -2356,6 +2438,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 1
   objInx: 8
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!114 &1491667015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2402,6 +2486,8 @@ GameObject:
   - component: {fileID: 1666331707}
   - component: {fileID: 1666331708}
   - component: {fileID: 1666331709}
+  - component: {fileID: 1666331710}
+  - component: {fileID: 1666331711}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2569,6 +2655,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91ac8431640d49a43869e926f5c1d5b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1666331710
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666331700}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &1666331711
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666331700}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1746485475
 GameObject:
   m_ObjectHideFlags: 0
@@ -2764,6 +2879,8 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 1
   objInx: 9
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!65 &1758613633
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2907,25 +3024,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
-  - name: qEnvTest
-    tex: {fileID: 18700000, guid: d37b2c39ff60a64418373d4106357100, type: 2}
-    channel: 0
   - name: slice_whiteboardText
     tex: {fileID: 2800000, guid: abf373543fd65e24f934b328d5ed2a55, type: 3}
     channel: 3
+  - name: qEnvTest
+    tex: {fileID: 18700000, guid: d37b2c39ff60a64418373d4106357100, type: 2}
+    channel: 0
   - name: SDF_q
     tex: {fileID: 2800000, guid: 44ca264073e61394fba8ae90a951e8a5, type: 3}
     channel: 3
   tags:
-  - {fileID: 1355201448}
   - {fileID: 446652356}
+  - {fileID: 1355201448}
   - {fileID: 1355201450}
   bakedDeclares:
-  - Texture2DArray qEnvTest;
   - Texture2D<float> slice_whiteboardText;
+  - Texture2DArray qEnvTest;
   - Texture2D<float> SDF_q;
   bakedEnvTexSettings:
-  - if(texInx == 0)
+  - if(texInx == 1)
   - '{'
   - '   isPNGEnv = true;'
   - '   envTexArr = qEnvTest;'
@@ -2943,6 +3060,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outFloats:
+  - type: 0
+    name: isShow
+    val: 0
+    cv:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
   - type: 1
     name: dy_radius
     val: 0
@@ -3016,8 +3142,10 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 0
   tags:
+  - {fileID: 1355201451}
   - {fileID: 2041803220}
   bakedDeclares:
+  - float isShow;
   - float dy_radius;
   - float test2;
 --- !u!1 &2041803218
@@ -3163,3 +3291,5 @@ MonoBehaviour:
   SDF_offset2D: 0
   mergeType: 0
   objInx: 10
+  needExtraCondition: 0
+  extraCondition: 
