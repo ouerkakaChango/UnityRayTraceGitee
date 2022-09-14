@@ -27,7 +27,7 @@ Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
 
 //#########################################################################################################
-#include "SDFGameScene_Detail2.hlsl"
+#include "SDFGameScene_(@SceneName).hlsl"
 //#########################################################################################################
 
 float3 GetSDFGameColor(in Ray ray)
@@ -39,16 +39,9 @@ float3 GetSDFGameColor(in Ray ray)
 	TraceScene(ray, minHit);
 	//___Trace
 
-if (minHit.bHit)
-{
-	re = RenderSceneObj(envSpecTex2DArr, ray, minHit);
-	re *= RenderSceneSDFShadow(ray, minHit);
-}
-else
-{
-	re = float3(0,0,0);
-	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
-}
+###BLOCK MainRender
+...
+###BLOCK
 
 	return re;
 }

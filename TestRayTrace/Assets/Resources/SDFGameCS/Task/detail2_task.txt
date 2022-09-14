@@ -1,6 +1,6 @@
 templates:
-C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Template/SDFGameTrace_Template.txt
-C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Template/SDFGameScene_Template.txt
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Template/SDFGameTrace_d2_Template.txt
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Template/SDFGameScene_d2_Template.txt
 
 outs:
 C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Outs/SDFGameTrace_detail2.compute

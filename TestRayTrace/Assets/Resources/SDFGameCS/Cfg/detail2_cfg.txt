@@ -1,3 +1,18 @@
 valMaps:
 SceneName Detail2
 BackGroundColor float3(0,0,0)
+
+Blocks:
+
+###BLOCK MainRender
+if (minHit.bHit)
+{ 
+	re = RenderSceneObj(envSpecTex2DArr, ray, minHit);
+	re *= RenderSceneSDFShadow(ray, minHit);
+}
+else
+{
+	re = (@BackGroundColor);
+	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+}
+###BLOCK
