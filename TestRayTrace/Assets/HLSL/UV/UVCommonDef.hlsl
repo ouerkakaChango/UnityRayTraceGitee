@@ -1,5 +1,6 @@
 #ifndef UVCOMMONDEF_HLSL
 #define UVCOMMONDEF_HLSL
+#include "../Transform/TransformCommonDef.hlsl"
 
 bool InBound(float2 p, float2 bound, float tolerence = 0.00001f)
 {

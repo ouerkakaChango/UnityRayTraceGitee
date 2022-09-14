@@ -95,16 +95,22 @@ public class AutoCS : MonoBehaviour
         //将templates,outs等写入config
         //调用外部控制台程序exe，进行config+templates => outs
 
-        if(bakerMgr!=null && texSys!=null && dyValSys)
+        if(texSys != null)
         {
             texSys.Refresh();
+        }
+        if(dyValSys!=null)
+        {
             dyValSys.Refresh();
+        }
+        if(bakerMgr!=null)
+        {
             bakerMgr.Bake();
             PreCompile();
         }
         else
         {
-            Debug.LogError("bakerMgr/texSys/dyValSys not give to autoCS");
+            Debug.LogError("bakerMgr not give to autoCS");
         }
         MakeTaskFile();
         CallExe();
@@ -210,126 +216,95 @@ public class AutoCS : MonoBehaviour
             }
         }
 
-        List<string> newLines = new List<string>(lines);
-        int offset = 0;
-
-        for(int i=0;i<orderList.Count;i++)
+        LinesReplaceHelper helper = new LinesReplaceHelper();
+        helper.Init(lines);
+        for (int i=0;i<orderList.Count;i++)
         {
             var order = orderList[i];
             string key = keyList[order.x];
             var range = rangeMap[key][order.y];
-            int oricount = 0, newcount = 0;
+            helper.BeginReplaceRange();
 
             if (key == "ObjSDF" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedLines
-                newcount = bakerMgr.bakedSDFs.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedSDFs);
+                helper.Replace(range, bakerMgr.bakedSDFs);
             }
             else if (key == "BeforeObjSDF" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = bakerMgr.bakedBeforeSDF.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedBeforeSDF);
+                helper.Replace(range, bakerMgr.bakedBeforeSDF);
             }
             else if (key == "ObjEnvTex" && ValidRange(range))
-            {//ObjEnvTex
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = bakerMgr.bakedObjEnvTex.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedObjEnvTex);
+            {
+                helper.Replace(range, bakerMgr.bakedObjEnvTex);
             }
             else if (key == "CheckInnerBound" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = bakerMgr.bakedCheckInnerBound.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedCheckInnerBound);
+                helper.Replace(range, bakerMgr.bakedCheckInnerBound);
             }
             else if (key == "TexSys" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = texSys.bakedDeclares.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, texSys.bakedDeclares);
+                if (texSys != null)
+                {
+                    helper.Replace(range, texSys.bakedDeclares);
+                }
+                else
+                {
+                    Debug.Log("Warning: no texSys but config has related BLOCK");
+                    helper.ClearRange(range);                   
+                }
             }
             else if (key == "TexSys_EnvTexSettings" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = texSys.bakedEnvTexSettings.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, texSys.bakedEnvTexSettings);
+                if (texSys != null)
+                {
+                    helper.Replace(range, texSys.bakedEnvTexSettings);
+                }
+                else
+                {
+                    Debug.Log("Warning: no texSys but config has related BLOCK");
+                    helper.ClearRange(range);
+                }
             }
             else if (key == "DyValSys" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = dyValSys.bakedDeclares.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, dyValSys.bakedDeclares);
+                if (dyValSys != null)
+                {
+                    helper.Replace(range, dyValSys.bakedDeclares);
+                }
+                else
+                {
+                    Debug.Log("Warning: no dyValSys but config has related BLOCK");
+                    helper.ClearRange(range);
+                }
             }
             else if (key == "SpecialObj" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = bakerMgr.bakedSpecialObjects.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedSpecialObjects);
+                helper.Replace(range, bakerMgr.bakedSpecialObjects);
             }
             else if (key == "ObjMaterial" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = bakerMgr.bakedMaterials.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedMaterials);
+                helper.Replace(range, bakerMgr.bakedMaterials);
             }
             else if (key == "ObjRenderMode" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = bakerMgr.bakedRenderModes.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedRenderModes);
+                helper.Replace(range, bakerMgr.bakedRenderModes);
             }
             else if (key == "ObjRender" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = bakerMgr.bakedRenders.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedRenders);
+                helper.Replace(range, bakerMgr.bakedRenders);
             }
             else if (key == "DirShadow" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                //删去(range.x,range.y)，插入 bakerMgr.bakedxxx
-                newcount = bakerMgr.bakedDirShadows.Count;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                newLines.InsertRange(offset + range.x + 1, bakerMgr.bakedDirShadows);
+                helper.Replace(range, bakerMgr.bakedDirShadows);
             }
             else if (key == "ValMaps" && ValidRange(range))
             {
-                oricount = range.y - range.x - 1;
-                newcount = 1;
-                newLines.RemoveRange(offset + range.x + 1, oricount);
-                string[] newlines = new string[1];
-                newlines[0] = "ObjNum " + bakerMgr.tags.Length;
-                newLines.InsertRange(offset + range.x + 1, newlines);
-
+                helper.Replace(range, "ObjNum " + bakerMgr.tags.Length);
             }
 
-            offset += newcount - oricount;
+            helper.EndReplaceRange();
         }
-        File.WriteAllLines(path, newLines);
+        File.WriteAllLines(path, helper.lines);
     }
 
     bool NeedEnd(Vector2Int range)

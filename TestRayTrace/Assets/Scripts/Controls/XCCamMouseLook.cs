@@ -15,7 +15,8 @@ public class XCCamMouseLook : MonoBehaviour
 
     void Start()
     {
-        RecordCamDir();
+        //RecordCamDir();
+        RecordZeroCamDir();
     }
 
     void Update()
@@ -44,5 +45,16 @@ public class XCCamMouseLook : MonoBehaviour
         camUp = transform.up;
         camForward = transform.forward;
         baseRot = transform.rotation;
+    }
+
+    public void RecordZeroCamDir()
+    {
+        Quaternion old = transform.rotation;
+        transform.rotation = Quaternion.identity;
+        camRight = transform.right;
+        camUp = transform.up;
+        camForward = transform.forward;
+        baseRot = transform.rotation;
+        transform.rotation = old;
     }
 }

@@ -1,0 +1,219 @@
+valMaps:
+//@@@SDFBakerMgr ValMaps
+ObjNum 1
+//@@@
+TraceThre 0.001
+NormalEpsilon 0.001
+
+Blocks:
+
+###BLOCK ExtraInclude
+#include "../../../HLSL/UV/UVCommonDef.hlsl"
+#include "../../../HLSL/TransferMath/TransferMath.hlsl"
+#include "../../../HLSL/Random/RandUtility.hlsl"
+#include "../../../HLSL/Noise/NoiseCommonDef.hlsl"
+#include "../../../HLSL/Transform/TransformCommonDef.hlsl" 
+#include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
+
+float daoScale;
+
+//@@@SDFBakerMgr TexSys
+//@@@
+
+//@@@SDFBakerMgr DyValSys
+//@@@
+
+void GetEnvInfoByID(int texInx, out bool isPNGEnv, out Texture2DArray envTexArr)
+{
+	//@@@SDFBakerMgr TexSys_EnvTexSettings
+	//@@@
+}
+
+void GetEnvTexArrByObj(int objInx, out bool isPNGEnv, out Texture2DArray envTexArr)
+{
+	//@@@SDFBakerMgr ObjEnvTex
+	//@@@
+}
+
+float GetPntlightAttenuation(float3 pos, float3 lightPos)
+{
+	//return 1;
+	float d = length(pos - lightPos);
+	return saturate(1 / (d*d));
+	//float d = length(pos - lightPos);
+	//return 1 / (1 + 0.2*d + 0.04*d*d);
+}
+###BLOCK
+
+###BLOCK ObjMaterial
+//@@@SDFBakerMgr ObjMaterial
+if(obj == 0 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+	//@@@
+###BLOCK
+
+###BLOCK ObjRenderMode
+//@@@SDFBakerMgr ObjRenderMode
+int renderMode[1];
+renderMode[0] = 0;
+return renderMode[obj];
+//@@@
+###BLOCK
+
+###BLOCK  ObjPreRender
+int inx = minHit.obj;
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+}
+//@@@
+###BLOCK
+
+###BLOCK ObjRender
+//@@@SDFBakerMgr ObjRender
+if(mode==0)
+{
+  float3 lightDirs[4];
+  float3 lightColors[4];
+  lightDirs[0] = normalize(minHit.P - float3(-3.83, 2.12, 0));
+  lightColors[0] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 2.12, 0));
+  lightDirs[1] = normalize(minHit.P - float3(-0.39, 2.12, 2.72));
+  lightColors[1] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(-0.39, 2.12, 2.72));
+  lightDirs[2] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
+  lightColors[2] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 2.12, -3.29));
+  lightDirs[3] = normalize(minHit.P - float3(3.357384, 2.12, 0));
+  lightColors[3] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 2.12, 0));
+  result = 0 * mat.albedo * mat.ao;
+  for(int i=0;i<4;i++)
+  {
+      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+  }
+}
+//@@@
+else if (mode == 1)
+{
+	result = PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
+}
+else if (mode == 2)
+{
+	//object reflection IBL
+	bool isPNGEnv;
+	Texture2DArray tempEnv;
+	GetEnvTexArrByObj(minHit.obj, isPNGEnv, tempEnv);
+	if(isPNGEnv)
+	{
+		result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir,1,1,true,true);
+	}
+	else
+	{
+		result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir);
+	}
+}
+else if (mode == 3)
+{
+	float3 lightPos = float3(0,4,0);
+	float3 lightColor = float3(1,1,1);
+	float3 l = normalize(lightPos - minHit.P);
+	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
+}
+###BLOCK
+
+###BLOCK  ObjPostRender
+if(camGammaMode == 1)
+{
+	
+}
+else{
+	result = result / (result + 1.0);
+	result = pow(result, 1/2.2); 
+}
+###BLOCK
+
+###BLOCK SDFShadow
+if(false)
+{
+//@@@SDFBakerMgr DirShadow
+float3 lightDirs[4];
+lightDirs[0] = normalize(minHit.P - float3(-3.83, 2.12, 0));
+lightDirs[1] = normalize(minHit.P - float3(-0.39, 2.12, 2.72));
+lightDirs[2] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
+lightDirs[3] = normalize(minHit.P - float3(3.357384, 2.12, 0));
+for(int i=0;i<4;i++)
+{
+	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
+}
+//@@@
+}
+sha = saturate(0.2 + sha);
+return sha;
+###BLOCK
+
+###BLOCK ExtraSDF
+float SDFFoTou(float3 p)
+{
+	float re = 0;
+	float r = 10.45 + 0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+	float3 center = float3(0, 0.5, 0);
+	re = length(p - center) - r;
+	re *= 0.5f;
+	return re;
+}
+float SDFPlanet(float3 p)
+{
+	float re = 0;
+	float r = 0.48;// +0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
+	float dis = fbm4(p.zxy*10);
+	r += 0.02*smoothstep(0.5f, 1.0f, dis);
+	float3 center = float3(0, r, 0);
+	 
+	re = length(p - center) - r;
+	re *= 0.5f;
+	return re;
+}
+###BLOCK
+
+###BLOCK ObjSDF
+//### 
+float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
+//@@@SDFBakerMgr BeforeObjSDF
+//@@@
+//@@@SDFBakerMgr ObjSDF
+if(inx == 0 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+}
+//@@@
+
+return re;
+###BLOCK
+
+###BLOCK BeforeObjSDFNormal
+	//normalEpsilon *= daoScale;
+###BLOCK
+
+###BLOCK ObjNormal
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+}
+//@@@
+	return GetObjSDFNormal(inx, p, traceInfo);
+###BLOCK
+
+###BLOCK BeforeTraceScene
+	//traceThre *= daoScale;
+###BLOCK
+
+###BLOCK CheckInnerBound
+//@@@SDFBakerMgr CheckInnerBound
+//@@@
+###BLOCK
+
+###BLOCK CheckInnerBound2
+//@@@SDFBakerMgr CheckInnerBound
+//@@@
+###

@@ -30,7 +30,7 @@ public class SDFBakerMgr : MonoBehaviour
     public List<string> bakedObjEnvTex = new List<string>();
 
     public SDFBakerTag[] tags;
-    SDFLightTag[] dirLightTags;
+    SDFLightTag[] lightTags;
 
     bool hide = false;
     // Start is called before the first frame update
@@ -121,18 +121,31 @@ public class SDFBakerMgr : MonoBehaviour
             }
         }
         tags = tagList.ToArray();
-
-        SDFLightTag[] lightTags = (SDFLightTag[])GameObject.FindObjectsOfType(typeof(SDFLightTag));
-        List<SDFLightTag> dirlightList = new List<SDFLightTag>();
-        for(int i=0;i<lightTags.Length;i++)
+        if(tags.Length == 0)
         {
-            if(IsDirectionalLight(lightTags[i].gameObject))
+            Debug.LogError("Bake must have at least 1 sdf tag ,Stop");
+        }
+
+        SDFLightTag[] allLightTags = (SDFLightTag[])GameObject.FindObjectsOfType(typeof(SDFLightTag));
+        List<SDFLightTag> lightList = new List<SDFLightTag>();
+        for(int i=0;i< allLightTags.Length;i++)
+        {
+            if(!allLightTags[i].isActiveAndEnabled)
             {
-                dirlightList.Add(lightTags[i]);
+                continue;
+            }
+            if(IsDirectionalLight(allLightTags[i].gameObject)||
+                IsPointLight(allLightTags[i].gameObject))
+            {
+                lightList.Add(allLightTags[i]);
+            }
+            else
+            {
+                Debug.LogError("this light type not support: " + allLightTags[i].gameObject);
             }
         }
-        dirLightTags = dirlightList.ToArray();
-        if(dirLightTags.Length==0)
+        lightTags = lightList.ToArray();
+        if(lightTags.Length==0)
         {
             Debug.LogError("No light has add SDF Light Tag,Stop");
         }
@@ -177,6 +190,24 @@ public class SDFBakerMgr : MonoBehaviour
         bakedRenderModes.Add("return renderMode[obj];");
     }
 
+    //    if(mode==0)
+    //{
+    //  float3 lightDirs[1];
+    //    float3 lightColors[1];
+
+    //    lightDirs[0] = float3(0.1363799, -0.720376, -0.6800438);
+    //    lightColors[0] = float3(1, 1, 1);
+
+    //    lightDirs[1] = normalize(minHit.P - pntlightPos[x]);
+    //    lightColors[1] = pntlightColor[x] * GetPntLightAttenuation(minHit.P,pntlightPos[x]);
+
+    //    result = 0.03 * mat.albedo* mat.ao;
+    //  for(int i=0;i<1;i++)
+    //  {
+    //      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+    //}
+    //}
+
     void EndBakeRenders()
     {
         //https://learnopengl-cn.github.io/07%20PBR/02%20Lighting/
@@ -184,20 +215,39 @@ public class SDFBakerMgr : MonoBehaviour
 
         bakedRenders.Add("if(mode==0)");
         bakedRenders.Add("{");
-        int dirLightNum = dirLightTags.Length;
-        bakedRenders.Add("  float3 lightDirs[" + dirLightNum + "];");
-        bakedRenders.Add("  float3 lightColors[" + dirLightNum + "];");
+        int lightNum = lightTags.Length;
+        bakedRenders.Add("  float3 lightDirs[" + lightNum + "];");
+        bakedRenders.Add("  float3 lightColors[" + lightNum + "];");
+        Vector3 lightDir, lightColor;
         //###
-        for (int i = 0; i < dirLightNum; i++)
+        for (int i = 0; i < lightNum; i++)
         {
-            Vector3 lightDir = GetLightDir(dirLightTags[i].gameObject);
-            Vector3 lightColor = GetLightColor(dirLightTags[i].gameObject);
-            bakedRenders.Add("  lightDirs[" + i + "] = " + Bake(lightDir) + ";");
-            bakedRenders.Add("  lightColors[" + i + "] = " + Bake(lightColor) + ";");
+            if (IsDirectionalLight(lightTags[i].gameObject))
+            {
+                ////lightDirs[0] = float3(0.1363799, -0.720376, -0.6800438);
+                ////lightColors[0] = float3(1, 1, 1);
+                lightDir = GetLightDir(lightTags[i].gameObject);
+                lightColor = GetLightColor(lightTags[i].gameObject);
+                bakedRenders.Add("  lightDirs[" + i + "] = " + Bake(lightDir) + ";");
+                bakedRenders.Add("  lightColors[" + i + "] = " + Bake(lightColor) + ";");
+            }
+            else if(IsPointLight(lightTags[i].gameObject))
+            {
+                ////lightDirs[1] = normalize(minHit.P - pntlightPos[x]);
+                ////lightColors[1] = pntlightColor[x] * GetPntLightAttenuation(minHit.P,pntlightPos[x]);
+                var lightPos = lightTags[i].gameObject.transform.position;
+                lightColor = GetLightColor(lightTags[i].gameObject);
+                bakedRenders.Add("  lightDirs[" + i + "] = normalize(minHit.P - "+Bake(lightPos) +");");
+                bakedRenders.Add("  lightColors[" + i + "] = " + Bake(lightColor) + " * GetPntlightAttenuation(minHit.P, "+Bake(lightPos)+");");
+            }
+            else
+            {
+                Debug.LogError("No support type");
+            }
         }
         //###
         bakedRenders.Add("  result = " + ambientIntensity + " * mat.albedo * mat.ao;");
-        bakedRenders.Add("  for(int i=0;i<" + dirLightNum + ";i++)");
+        bakedRenders.Add("  for(int i=0;i<" + lightNum + ";i++)");
         bakedRenders.Add("  {");
         bakedRenders.Add("      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);");
         bakedRenders.Add("  }");
@@ -212,13 +262,26 @@ public class SDFBakerMgr : MonoBehaviour
         //{
         //	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
         //}
-        bakedDirShadows.Add("float3 lightDirs[" + dirLightTags.Length + "];");
-        for(int i=0;i< dirLightTags.Length;i++)
+        bakedDirShadows.Add("float3 lightDirs[" + lightTags.Length + "];");
+        for(int i=0;i< lightTags.Length;i++)
         {
-            Vector3 lightDir = GetLightDir(dirLightTags[i].gameObject);
-            bakedDirShadows.Add("lightDirs["+i+"] = "+Bake(lightDir) +";");
+            Vector3 lightDir = Vector3.zero;
+            if (IsDirectionalLight(lightTags[i].gameObject))
+            {
+                lightDir = GetLightDir(lightTags[i].gameObject);
+                bakedDirShadows.Add("lightDirs[" + i + "] = " + Bake(lightDir) + ";");
+            }
+            else if(IsPointLight(lightTags[i].gameObject))
+            {
+                var lightPos = lightTags[i].gameObject.transform.position;
+                bakedDirShadows.Add("lightDirs[" + i + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
+            }
+            else
+            {
+                Debug.LogError("No support type");
+            }
         }
-        bakedDirShadows.Add("for(int i=0;i<"+ dirLightTags.Length + ";i++)");
+        bakedDirShadows.Add("for(int i=0;i<"+ lightTags.Length + ";i++)");
         bakedDirShadows.Add("{");
         bakedDirShadows.Add("	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);");
         bakedDirShadows.Add("}");

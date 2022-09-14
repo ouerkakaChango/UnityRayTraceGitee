@@ -16,6 +16,16 @@ namespace LightUtility
             return false;
         }
 
+        public static bool IsPointLight(GameObject obj)
+        {
+            var light = obj.GetComponent<Light>();
+            if (light)
+            {
+                return light.type == LightType.Point;
+            }
+            return false;
+        }
+
         public static Vector3 GetLightDir(GameObject obj)
         {
             return obj.transform.forward;
