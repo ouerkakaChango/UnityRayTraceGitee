@@ -78,7 +78,7 @@ re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0, 0, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -132,8 +132,8 @@ if(mode==0)
 {
 float3 lightDirs[4];
 float3 lightColors[4];
-lightDirs[0] = normalize(minHit.P - float3(-0.39, 2.12, 2.72));
-lightColors[0] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(-0.39, 2.12, 2.72));
+lightDirs[0] = normalize(minHit.P - float3(-0.07, 2.17, 3.42));
+lightColors[0] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-0.07, 2.17, 3.42));
 lightDirs[1] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
 lightColors[1] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 2.12, -3.29));
 lightDirs[2] = normalize(minHit.P - float3(3.357384, 2.12, 0));
@@ -196,7 +196,7 @@ if(false)
 {
 //@@@SDFBakerMgr DirShadow
 float3 lightDirs[4];
-lightDirs[0] = normalize(minHit.P - float3(-0.39, 2.12, 2.72));
+lightDirs[0] = normalize(minHit.P - float3(-0.07, 2.17, 3.42));
 lightDirs[1] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
 lightDirs[2] = normalize(minHit.P - float3(3.357384, 2.12, 0));
 lightDirs[3] = normalize(minHit.P - float3(-3.83, 2.12, 0));
@@ -247,11 +247,11 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
 }
 //@@@
 
