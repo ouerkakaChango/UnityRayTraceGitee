@@ -297,7 +297,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         }
         else
         {
-            Debug.Log("Warning:No Texture Sys");
+            //Debug.Log("Warning:No Texture Sys");
         }
         if (autoCS.dyValSys != null)
         {
@@ -308,7 +308,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         }
         else
         {
-            Debug.Log("Warning:No dyVal Sys");
+            //Debug.Log("Warning:No dyVal Sys");
         }
         //___
         //####

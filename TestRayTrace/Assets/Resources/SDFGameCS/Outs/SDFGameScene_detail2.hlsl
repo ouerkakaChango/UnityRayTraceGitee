@@ -1,4 +1,4 @@
-﻿#define OBJNUM 1
+﻿#define OBJNUM 2
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -30,16 +30,26 @@ float daoScale;
 //@@@SDFBakerMgr DyValSys
 //@@@
 
-void GetEnvInfoByID(int texInx, out bool isPNGEnv, out Texture2DArray envTexArr)
+void GetEnvInfoByID(int texInx, inout bool isPNGEnv, inout Texture2DArray envTexArr)
 {
 	//@@@SDFBakerMgr TexSys_EnvTexSettings
 	//@@@
+	if(texInx == 9999)
+	{
+		isPNGEnv = false;
+		envTexArr = envSpecTex2DArr;
+	}
 }
 
-void GetEnvTexArrByObj(int objInx, out bool isPNGEnv, out Texture2DArray envTexArr)
+void GetEnvTexArrByObj(int objInx, inout bool isPNGEnv, inout Texture2DArray envTexArr)
 {
 	//@@@SDFBakerMgr ObjEnvTex
 	//@@@
+	if(objInx == 9999)
+	{
+		isPNGEnv = false;
+		envTexArr = envSpecTex2DArr;
+	}
 }
 
 float GetPntlightAttenuation(float3 pos, float3 lightPos)
@@ -66,6 +76,12 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
+else if (obj == 1 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
 	//@@@
 	return re;
 }
@@ -73,8 +89,9 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[1];
+int renderMode[2];
 renderMode[0] = 0;
+renderMode[1] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -84,6 +101,9 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
+{
+}
+else if (inx == 1 )
 {
 }
 //@@@
@@ -112,14 +132,14 @@ if(mode==0)
 {
 float3 lightDirs[4];
 float3 lightColors[4];
-lightDirs[0] = normalize(minHit.P - float3(-3.83, 2.12, 0));
-lightColors[0] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 2.12, 0));
-lightDirs[1] = normalize(minHit.P - float3(-0.39, 2.12, 2.72));
-lightColors[1] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(-0.39, 2.12, 2.72));
-lightDirs[2] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
-lightColors[2] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 2.12, -3.29));
-lightDirs[3] = normalize(minHit.P - float3(3.357384, 2.12, 0));
-lightColors[3] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 2.12, 0));
+lightDirs[0] = normalize(minHit.P - float3(-0.39, 2.12, 2.72));
+lightColors[0] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(-0.39, 2.12, 2.72));
+lightDirs[1] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
+lightColors[1] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 2.12, -3.29));
+lightDirs[2] = normalize(minHit.P - float3(3.357384, 2.12, 0));
+lightColors[2] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 2.12, 0));
+lightDirs[3] = normalize(minHit.P - float3(-3.83, 2.12, 0));
+lightColors[3] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 2.12, 0));
 result = 0 * mat.albedo * mat.ao;
 for(int i=0;i<4;i++)
 {
@@ -134,7 +154,7 @@ else if (mode == 1)
 else if (mode == 2)
 {
 	//object reflection IBL
-	bool isPNGEnv;
+	bool isPNGEnv=false;
 	Texture2DArray tempEnv;
 	GetEnvTexArrByObj(minHit.obj, isPNGEnv, tempEnv);
 	if(isPNGEnv)
@@ -176,10 +196,10 @@ if(false)
 {
 //@@@SDFBakerMgr DirShadow
 float3 lightDirs[4];
-lightDirs[0] = normalize(minHit.P - float3(-3.83, 2.12, 0));
-lightDirs[1] = normalize(minHit.P - float3(-0.39, 2.12, 2.72));
-lightDirs[2] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
-lightDirs[3] = normalize(minHit.P - float3(3.357384, 2.12, 0));
+lightDirs[0] = normalize(minHit.P - float3(-0.39, 2.12, 2.72));
+lightDirs[1] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
+lightDirs[2] = normalize(minHit.P - float3(3.357384, 2.12, 0));
+lightDirs[3] = normalize(minHit.P - float3(-3.83, 2.12, 0));
 for(int i=0;i<4;i++)
 {
 	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
@@ -227,6 +247,10 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
+re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+}
+else if (inx == 1 )
+{
 re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 //@@@
@@ -249,6 +273,9 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 {
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
+{
+}
+else if (inx == 1 )
 {
 }
 //@@@
