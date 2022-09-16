@@ -87,7 +87,8 @@ namespace XCGame
             else if (actions[inx] == TriggerAction.GotoNextLevel)
             {
                 //???
-                SceneManager.LoadScene("TransferScene");
+                //SceneManager.LoadScene("TransferScene");
+                SceneManager.LoadScene("gameScene2");
             }
             else if (actions[inx] == TriggerAction.DebugLogMessage)
             {
