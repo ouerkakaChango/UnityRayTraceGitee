@@ -54,7 +54,7 @@ void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, 
 	###BLOCK
 }
 
-float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
+float3 RenderSceneObj(Ray ray, HitInfo minHit)
 {
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
 	int mode = GetObjRenderMode(minHit.obj);
@@ -66,6 +66,7 @@ float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
 	ObjPostRender(result, mode, mat, ray, minHit);
 	return result;
 }
+
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info);
 float SoftShadow_TraceScene(Ray ray, out HitInfo info);
@@ -353,4 +354,93 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 	}
 
 	return saturate(sha);
+}
+
+void Indir_TraceScene(Ray ray, out HitInfo info)
+{
+	float traceThre = TraceThre;
+
+	Init(info);
+
+	TraceInfo traceInfo;
+	Init(traceInfo,MaxSDF);
+
+	float objSDF[OBJNUM];
+	bool innerBoundFlag[OBJNUM];
+	float innerBoundStepScale[OBJNUM];
+	int objInx = -1;
+	float sdf = MaxSDF;
+	bool bInnerBound = false;
+
+	while (traceInfo.traceCount <= 40)
+	{
+		objInx = -1;
+		sdf = MaxSDF;
+		bInnerBound = false;
+		for (int inx = 0; inx < OBJNUM; inx++)
+		{
+			innerBoundFlag[inx] = false;
+			innerBoundStepScale[inx] = 1;
+		}
+
+		if(bInnerBound)
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				if(innerBoundFlag[inx])
+				{
+					objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo) * innerBoundStepScale[inx];
+					if (objSDF[inx] < sdf)
+					{
+						sdf = objSDF[inx];
+						objInx = inx;
+					}
+				}
+			}
+		}
+		else
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+				if (objSDF[inx] < sdf)
+				{
+					sdf = objSDF[inx];
+					objInx = inx;
+				}
+			}
+		}
+
+		if(objInx == -1)
+		{
+			break;
+		}
+
+		if (sdf > 100)
+		{
+			break;
+		}
+
+		if (sdf <= traceThre)
+		{
+			info.bHit = true;
+			info.obj = objInx;
+			info.N = GetObjNormal(objInx, ray.pos, traceInfo);
+			info.P = ray.pos;
+			break;
+		}
+		ray.pos += sdf * ray.dir;
+		Update(traceInfo,sdf);
+	}
+}
+
+###BLOCK ExtraFuncDependOnTraceScene
+		...
+###BLOCK
+
+void SetIndirectColor(inout float3 re, Ray ray, HitInfo minHit)
+{
+	###BLOCK IndirectColor
+	... 
+	###BLOCK
 }

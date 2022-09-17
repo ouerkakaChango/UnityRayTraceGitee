@@ -61,6 +61,7 @@ float GetPntlightAttenuation(float3 pos, float3 lightPos)
 	//return 1 / (1 + 0.2*d + 0.04*d*d);
 }
 
+
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
@@ -78,13 +79,13 @@ re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0, 0, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 2 )
 {
-re.albedo = float3(0, 0, 1);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -131,7 +132,7 @@ else{
 }
 }
 
-float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
+float3 RenderSceneObj(Ray ray, HitInfo minHit)
 {
 	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
 	int mode = GetObjRenderMode(minHit.obj);
@@ -186,6 +187,7 @@ else if (mode == 3)
 	ObjPostRender(result, mode, mat, ray, minHit);
 	return result;
 }
+
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info);
 float SoftShadow_TraceScene(Ray ray, out HitInfo info);
@@ -257,15 +259,15 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 //@@@
 
@@ -522,4 +524,149 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 	}
 
 	return saturate(sha);
+}
+
+void Indir_TraceScene(Ray ray, out HitInfo info)
+{
+	float traceThre = TraceThre;
+
+	Init(info);
+
+	TraceInfo traceInfo;
+	Init(traceInfo,MaxSDF);
+
+	float objSDF[OBJNUM];
+	bool innerBoundFlag[OBJNUM];
+	float innerBoundStepScale[OBJNUM];
+	int objInx = -1;
+	float sdf = MaxSDF;
+	bool bInnerBound = false;
+
+	while (traceInfo.traceCount <= 40)
+	{
+		objInx = -1;
+		sdf = MaxSDF;
+		bInnerBound = false;
+		for (int inx = 0; inx < OBJNUM; inx++)
+		{
+			innerBoundFlag[inx] = false;
+			innerBoundStepScale[inx] = 1;
+		}
+
+		if(bInnerBound)
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				if(innerBoundFlag[inx])
+				{
+					objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo) * innerBoundStepScale[inx];
+					if (objSDF[inx] < sdf)
+					{
+						sdf = objSDF[inx];
+						objInx = inx;
+					}
+				}
+			}
+		}
+		else
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+				if (objSDF[inx] < sdf)
+				{
+					sdf = objSDF[inx];
+					objInx = inx;
+				}
+			}
+		}
+
+		if(objInx == -1)
+		{
+			break;
+		}
+
+		if (sdf > 100)
+		{
+			break;
+		}
+
+		if (sdf <= traceThre)
+		{
+			info.bHit = true;
+			info.obj = objInx;
+			info.N = GetObjNormal(objInx, ray.pos, traceInfo);
+			info.P = ray.pos;
+			break;
+		}
+		ray.pos += sdf * ray.dir;
+		Update(traceInfo,sdf);
+	}
+}
+
+void SceneRenderIndirRay(in Ray ray, out float3 re, out HitInfo minHit)
+{
+	re = 0;
+	//---Trace
+	Init(minHit);
+	Indir_TraceScene(ray, minHit);
+	//___Trace
+
+	if (minHit.bHit)
+	{
+		re = RenderSceneObj(ray, minHit);
+	}
+}
+
+float3 IndirPointLightRender(float3 P, float3 N, float3 lightColor,float3 lightPos)
+{
+	float3 Li = lightColor * GetPntlightAttenuation(P,lightPos);
+	float3 L = normalize(lightPos - P);
+	return Li*saturate(dot(N,L));
+}
+
+void SetCheapIndirectColor(inout float3 re, Ray ray, HitInfo minHit)
+{
+	Ray ray_indirect;
+	ray_indirect.pos = minHit.P;
+	float3 indir = 0;
+	int spp = 8;
+	float3 lastV = 10*minHit.P;
+	lastV = abs(lastV);
+	for(int i=0;i<spp;i++)
+	{
+		if(true)
+		{
+			//float2 Xi = Hammersley(i, spp);
+			float2 Xi = float2(rand01(100*lastV.zyx),rand01(100*lastV));
+			float theta = 2*PI*Xi.x;
+			float phi = PI*(2*Xi.y-1);
+			float3 randDir = float3(
+				sin(phi)*cos(theta),
+				sin(phi)*sin(theta),
+				cos(phi)
+			);
+			//lastV = normalize(lastV+randDir);
+			randDir.z = abs(randDir.z);
+			ray_indirect.dir = Vec2NormalHemisphere(randDir,minHit.N);
+			
+		}
+		{
+			//ray_indirect.dir = reflect(ray.dir,minHit.N);
+		}
+		ray_indirect.pos = minHit.P + ray_indirect.dir*TraceThre*2;
+		HitInfo indirHit;
+		float3 indirLightColor;
+		SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit);
+		indir += IndirPointLightRender(minHit.P,minHit.N, indirLightColor, indirHit.P);
+	}
+	indir /= spp;
+	//re = indir;
+	re += indir;
+	//re = IndirPointLightRender(minHit.P,minHit.N, 1, float3(0,2,0));
+}
+
+void SetIndirectColor(inout float3 re, Ray ray, HitInfo minHit)
+{
+	//SetCheapIndirectColor(re, ray, minHit);
 }

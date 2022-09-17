@@ -164,9 +164,9 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 1796358842}
   - {fileID: 1007502731}
   - {fileID: 1647113767}
+  - {fileID: 1796358842}
 --- !u!4 &296496486
 Transform:
   m_ObjectHideFlags: 0
@@ -514,7 +514,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &1008065616
@@ -958,7 +958,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 2
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1647113768
@@ -1106,8 +1106,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_LocalRotation: {x: -0.014629329, y: 0.9690882, z: -0.23901337, w: -0.059386753}
-  m_LocalPosition: {x: 0.19976223, y: 0.7681115, z: 1.47}
+  m_LocalRotation: {x: 0.2588247, y: -0.0019579604, z: -0.00019230857, w: 0.96592236}
+  m_LocalPosition: {x: 0.17404872, y: 6.9335203, z: -8.990837}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1175,7 +1175,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1090c4c7b2894044f80ecdaf73b99902, type: 3}
   m_Name: 
@@ -1440,7 +1440,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 0
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &1878584168
