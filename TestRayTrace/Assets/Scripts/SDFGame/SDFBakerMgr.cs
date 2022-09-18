@@ -130,7 +130,7 @@ public class SDFBakerMgr : MonoBehaviour
         List<SDFLightTag> lightList = new List<SDFLightTag>();
         for(int i=0;i< allLightTags.Length;i++)
         {
-            if(!allLightTags[i].isActiveAndEnabled)
+            if(!allLightTags[i].isActiveAndEnabled || !allLightTags[i].gameObject.activeInHierarchy)
             {
                 continue;
             }
@@ -459,10 +459,25 @@ public class SDFBakerMgr : MonoBehaviour
         if(mf&&mr)
         {
             var meshName = mf.sharedMesh.name;
-            //Debug.Log(meshName);
+            Debug.Log(meshName);
             if(meshName == "Cube")
             {
                 AddBakeCube(obj);
+            }
+            else if(meshName == "Sphere")
+            {
+                //???
+                Debug.LogError("Need Bake Sphere");
+            }
+        }
+
+        if(mf)
+        {
+            var meshName = mf.sharedMesh.name;
+            if (meshName == "Sphere")
+            {
+                //???
+                Debug.LogError("Need Bake Invisible Sphere");
             }
         }
 

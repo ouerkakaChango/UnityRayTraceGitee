@@ -193,11 +193,11 @@ public class SDFGameSceneTrace : MonoBehaviour
         if (useFSR)
         {
             FSRProcessor.ProcessRT(ref cs_FSR, ref rt, ref easuRT, ref finalRT);
-            Graphics.Blit(finalRT, destination);
+            Graphics.Blit(finalRT, (RenderTexture)null);
         }
         else
         {
-            Graphics.Blit(rt, destination);
+            Graphics.Blit(rt, (RenderTexture)null);
         }
     }
 
@@ -329,7 +329,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     {
         if (rTex == null)
         {
-            rTex = new RenderTexture(camParam.w, camParam.h, 24);
+            rTex = new RenderTexture(camParam.w, camParam.h, 24, RenderTextureFormat.ARGBFloat);
             rTex.enableRandomWrite = true;
             rTex.Create();
             CreateRT(ref easuRT, FSR_Scale, camParam.w, camParam.h);
@@ -352,7 +352,7 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     void CreateRT(ref RenderTexture rTex, float scale, int w, int h)
     {
-        rTex = new RenderTexture((int)(w* scale), (int)(h* scale), 24);
+        rTex = new RenderTexture((int)(w* scale), (int)(h* scale), 24, RenderTextureFormat.ARGBFloat);
         rTex.enableRandomWrite = true;
         rTex.Create();
     }
@@ -365,23 +365,6 @@ public class SDFGameSceneTrace : MonoBehaviour
             cb.Dispose();
         }
     }
-
-    //static public void Tex2RT(ref RenderTexture rt, Texture2D tex, bool enableRW=true)
-    //{ 
-    //    rt = new RenderTexture(tex.width, tex.height, 24);
-    //    if (enableRW)
-    //    {
-    //        rt.enableRandomWrite = true;
-    //    }
-    //    var ori = RenderTexture.active;
-    //
-    //    RenderTexture.active = rt;
-    //
-    //    Graphics.Blit(tex, rt);
-    //    rt.Create();
-    //
-    //    RenderTexture.active = ori;
-    //}
 
     public float GetDaoScale()
     {

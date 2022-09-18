@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44789642, g: 0.49789345, b: 0.5754687, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 296496486}
   - component: {fileID: 296496485}
+  - component: {fileID: 296496487}
   m_Layer: 0
   m_Name: System
   m_TagString: Untagged
@@ -152,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1f5d13b1d98fa4ca18ee249cef77d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ambientIntensity: 0
+  ambientIntensity: 0.03
   bakedSDFs: []
   bakedSpecialObjects: []
   bakedMaterials: []
@@ -179,8 +180,29 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &296496487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296496484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38a12b99d3cda0f4eaf5dab605c29be0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outTextures:
+  - name: lightmap_ground
+    tex: {fileID: 2800000, guid: e04846de3767a2743b63f919a78824dc, type: 3}
+    channel: 1
+  tags:
+  - {fileID: 1007502732}
+  bakedDeclares:
+  - Texture2D<float3> lightmap_ground;
+  bakedEnvTexSettings: []
 --- !u!1 &328588540
 GameObject:
   m_ObjectHideFlags: 0
@@ -211,7 +233,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1878584169}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &328588542
 MonoBehaviour:
@@ -287,6 +309,74 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &333476167
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 333476168}
+  - component: {fileID: 333476170}
+  - component: {fileID: 333476169}
+  m_Layer: 0
+  m_Name: BoundSphere
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &333476168
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 333476167}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 50, y: 50, z: 50}
+  m_Children: []
+  m_Father: {fileID: 1278971372}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &333476169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 333476167}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+  SDF_offset: 0
+  renderMode: -1
+  shapeType: 0
+  specialID: -1
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
+  SDF_offset2D: 0
+  mergeType: 0
+  objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
+--- !u!33 &333476170
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 333476167}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &794877058
 GameObject:
   m_ObjectHideFlags: 0
@@ -317,7 +407,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1878584169}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &794877060
 MonoBehaviour:
@@ -406,6 +496,7 @@ GameObject:
   - component: {fileID: 1007502729}
   - component: {fileID: 1007502728}
   - component: {fileID: 1007502731}
+  - component: {fileID: 1007502732}
   m_Layer: 0
   m_Name: ground
   m_TagString: Untagged
@@ -517,6 +608,27 @@ MonoBehaviour:
   objInx: 0
   needExtraCondition: 0
   extraCondition: 
+--- !u!114 &1007502732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007502726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  pbrTextures: []
+  heightTextures: []
+  plainTextures:
+  - name: lightmap_ground
+    tex: {fileID: 2800000, guid: e04846de3767a2743b63f919a78824dc, type: 3}
+    channel: 1
+  envTextures: []
+  texInx: 0
 --- !u!1 &1008065616
 GameObject:
   m_ObjectHideFlags: 0
@@ -534,7 +646,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1008065617
 Light:
   m_ObjectHideFlags: 0
@@ -547,7 +659,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -605,11 +717,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1008065616}
   m_LocalRotation: {x: 0.6247431, y: -0.67061013, z: 0.3382613, w: 0.21344215}
-  m_LocalPosition: {x: -2.27, y: 2.23, z: -1.71}
+  m_LocalPosition: {x: -10.39, y: 2.23, z: -1.71}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1878584169}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 46.086, y: -191.34, z: -90.781}
 --- !u!114 &1008065619
 MonoBehaviour:
@@ -653,8 +765,9 @@ Transform:
   - {fileID: 1007502727}
   - {fileID: 1647113766}
   - {fileID: 1796358841}
+  - {fileID: 333476168}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1325658361
 GameObject:
@@ -686,7 +799,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1878584169}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!108 &1325658363
 Light:
@@ -791,7 +904,7 @@ Transform:
   m_Children:
   - {fileID: 1712849766}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1484205458
 GameObject:
@@ -823,7 +936,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1878584169}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1484205460
 MonoBehaviour:
@@ -1126,7 +1239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bakerMgr: {fileID: 296496485}
-  texSys: {fileID: 0}
+  texSys: {fileID: 296496487}
   dyValSys: {fileID: 0}
   templates:
   - Resources/SDFGameCS/Template/SDFGameTrace_d2_Template.txt
@@ -1470,11 +1583,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1008065618}
   - {fileID: 1325658362}
   - {fileID: 794877059}
   - {fileID: 328588541}
   - {fileID: 1484205459}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -98,6 +98,11 @@ namespace MathHelper
             return  new Vector2(Mathf.Pow(x.x, n.x), Mathf.Pow(x.y, n.y));
         }
 
+        public static Vector3 pow(Vector3 x, float n)
+        {
+            return new Vector3(Mathf.Pow(x.x, n), Mathf.Pow(x.y, n), Mathf.Pow(x.z, n));
+        }
+
         public static float sqrt(float x)
         {
             return Mathf.Sqrt(x);

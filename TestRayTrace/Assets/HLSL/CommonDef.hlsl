@@ -246,7 +246,9 @@ float Time01(float frequency=1.0f,float phi = 0.0f)
 
 SamplerState common_point_repeat_sampler;
 SamplerState common_linear_repeat_sampler;
+SamplerState common_point_clamp_sampler;
 SamplerState common_linear_clamp_sampler;
+SamplerState common_trilinear_repeat_sampler;
 
 float2 GetUV(RWTexture2D<float4> dst, uint3 id)
 {
@@ -338,11 +340,29 @@ float BilinearR(Texture2D tex, float2 floorPos, float2 fracPart)
 	//float x01 = tex[TexSafePos(floorPos + int2(0, 1), size)].r;
 	//float x11 = tex[TexSafePos(floorPos + int2(1, 1), size)].r;
 	float x00 = tex.SampleLevel(common_point_repeat_sampler, floorPos/size, 0).x;
-	float x10 = tex.SampleLevel(common_point_repeat_sampler, TexSafePos(floorPos + int2(1, 0), size) / size, 0).x;
-	float x01 = tex.SampleLevel(common_point_repeat_sampler, TexSafePos(floorPos + int2(0, 1), size) / size, 0).x;
-	float x11 = tex.SampleLevel(common_point_repeat_sampler, TexSafePos(floorPos + int2(1, 1), size) / size, 0).x;
+	float x10 = tex.SampleLevel(common_point_repeat_sampler, TexSafePos(floorPos + int2(1, 0), size) / (float2)size, 0).x;
+	float x01 = tex.SampleLevel(common_point_repeat_sampler, TexSafePos(floorPos + int2(0, 1), size) / (float2)size, 0).x;
+	float x11 = tex.SampleLevel(common_point_repeat_sampler, TexSafePos(floorPos + int2(1, 1), size) / (float2)size, 0).x;
 	float x0 = lerp(x00, x10, fracPart.x);
 	float x1 = lerp(x01, x11, fracPart.x);
+	return lerp(x0, x1, fracPart.y);
+}
+
+float3 BilinearRGB(Texture2D<float3> tex, float2 uv)
+{
+	uint2 size = GetSize(tex);
+	float2 realPos = uv * size;
+	int2 floorPos = floor(realPos);
+	float2 fracPart = saturate(realPos - floorPos);
+
+	int dis = 1;
+	float3 x00 = tex[floorPos];
+	float3 x10 = tex[TexSafePos(floorPos + int2(dis, 0), size)];
+	float3 x01 = tex[TexSafePos(floorPos + int2(0, dis), size)];
+	float3 x11 = tex[TexSafePos(floorPos + int2(dis, dis), size)];
+	float3 x0 = lerp(x00, x10, fracPart.x);
+	float3 x1 = lerp(x01, x11, fracPart.x);
+
 	return lerp(x0, x1, fracPart.y);
 }
 

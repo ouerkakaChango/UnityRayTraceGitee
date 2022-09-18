@@ -40,7 +40,7 @@ public struct NamedTexture
 
 public class TextureSystem : MonoBehaviour
 {
-    public List<NamedTexture> outTextures;
+    public List<NamedTexture> outTextures = new List<NamedTexture>();
     public TexSysTag[] tags;
 
     public List<string> bakedDeclares = new List<string>();

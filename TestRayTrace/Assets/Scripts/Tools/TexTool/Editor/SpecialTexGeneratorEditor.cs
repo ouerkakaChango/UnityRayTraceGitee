@@ -26,9 +26,14 @@ public class SpecialTexGeneratorEditor : Editor
 
         if (GUILayout.Button("GenerateAlphaMask"))
         {
-            Debug.Log("Generate");
             Target.CreateAlphaMask();
             TexHelper.SavePNG(Target.outTex, "Assets", "alphaMask");
+        }
+
+        if (GUILayout.Button("GenerateAlphaMaskHDR"))
+        {
+            Target.CreateAlphaMaskHDR();
+            TexHelper.SaveEXR(Target.outTex, "Assets", "alphaMaskHDR");
         }
 
         if (GUILayout.Button("GenerateSphereSDF"))
@@ -36,6 +41,12 @@ public class SpecialTexGeneratorEditor : Editor
             Target.CreateSphereSDF();
             TexHelper.SaveEXR(Target.outTex, "Assets", "sphereSDF");
             //TexHelper.SavePNG(Target.outTex, "Assets", "sphereSDF");
+        }
+
+        if (GUILayout.Button("GenerateTestLightmap"))
+        {
+            Target.CreateTestLightmap();
+            TexHelper.SaveEXR(Target.outTex, "Assets", "testLightmap");
         }
 
         if (GUILayout.Button("LogOutTexPixel"))

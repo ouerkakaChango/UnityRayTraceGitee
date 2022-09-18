@@ -16,7 +16,6 @@
 #include "../../../HLSL/PBR/PBR_GGX.hlsl"
 
 #include "../../../HLSL/UV/UVCommonDef.hlsl"
-#include "../../../HLSL/TransferMath/TransferMath.hlsl"
 #include "../../../HLSL/Random/RandUtility.hlsl"
 #include "../../../HLSL/Noise/NoiseCommonDef.hlsl"
 #include "../../../HLSL/Transform/TransformCommonDef.hlsl"
@@ -25,6 +24,7 @@
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
+Texture2D<float3> lightmap_ground;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
@@ -89,7 +89,7 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
-	//@@@
+//@@@
 	return re;
 }
 
@@ -118,6 +118,16 @@ else if (inx == 2 )
 {
 }
 //@@@
+
+	if(inx == 0)
+	{
+		//???
+		//float2 uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+		//float3 color = lightmap_ground.SampleLevel(common_point_clamp_sampler, uv, 0).rgb;
+		//float2 grid = frac(1024*uv);
+		//mat.albedo += float4(color,1);
+		//mat.albedo = float4(grid,0,1);
+	}
 }
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
@@ -127,8 +137,9 @@ if(camGammaMode == 1)
 	
 }
 else{
-	result = result / (result + 1.0);
-	result = pow(result, 1/2.2);
+	//gamma
+	//result = result / (result + 1.0);
+	//result = pow(result, 1/2.2);
 }
 }
 
@@ -151,7 +162,7 @@ lightDirs[2] = normalize(minHit.P - float3(3.357384, 2.12, 0));
 lightColors[2] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 2.12, 0));
 lightDirs[3] = normalize(minHit.P - float3(-3.83, 2.12, 0));
 lightColors[3] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 2.12, 0));
-result = 0 * mat.albedo * mat.ao;
+result = 0.03 * mat.albedo * mat.ao;
 for(int i=0;i<4;i++)
 {
 result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
@@ -178,6 +189,13 @@ else if (mode == 2)
 	}
 }
 else if (mode == 3)
+{
+	//lightmap mode
+	result = mat.albedo;
+	//result = pow(result,2.2);
+	//result = pow(result,2.2);
+}
+else if (mode == 333)
 {
 	float3 lightPos = float3(0,4,0);
 	float3 lightColor = float3(1,1,1);
