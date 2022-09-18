@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1f5d13b1d98fa4ca18ee249cef77d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ambientIntensity: 0.03
+  ambientIntensity: 0
   bakedSDFs: []
   bakedSpecialObjects: []
   bakedMaterials: []
@@ -595,7 +595,7 @@ MonoBehaviour:
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
-    roughness: 1
+    roughness: 0.4
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
@@ -923,7 +923,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1484205459
 Transform:
   m_ObjectHideFlags: 0
@@ -1061,9 +1061,9 @@ MonoBehaviour:
   mat_PBR:
     albedo: {r: 0, g: 0, b: 1, a: 1}
     metallic: 0
-    roughness: 1
+    roughness: 0.9
   SDF_offset: 0
-  renderMode: 0
+  renderMode: 4
   shapeType: 0
   specialID: -1
   fontCharacter: 0

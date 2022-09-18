@@ -42,8 +42,8 @@ float3 GetSDFGameColor(in Ray ray)
 if (minHit.bHit)
 {
 	re = RenderSceneObj(ray, minHit);
-	SetIndirectColor(re, ray, minHit);
-	re *= RenderSceneSDFShadow(ray, minHit);
+	//SetIndirectColor(re, ray, minHit);
+	//re *= RenderSceneSDFShadow(ray, minHit);
 }
 else
 {

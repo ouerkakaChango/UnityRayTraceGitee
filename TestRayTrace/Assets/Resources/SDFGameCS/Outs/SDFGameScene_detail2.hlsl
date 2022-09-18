@@ -3,7 +3,7 @@
 #define MaxSDF 100000
 #define MaxTraceDis 100
 #define MaxTraceTime 6400
-#define TraceThre 0.001
+#define TraceThre 0.0001
 #define NormalEpsilon 0.001
 
 #define SceneSDFShadowNormalBias 0.2
@@ -75,13 +75,13 @@ if(obj == 0 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.4;
 }
 else if (obj == 1 )
 {
 re.albedo = float3(0, 0, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.9;
 }
 else if (obj == 2 )
 {
@@ -98,7 +98,7 @@ int GetObjRenderMode(int obj)
 //@@@SDFBakerMgr ObjRenderMode
 int renderMode[3];
 renderMode[0] = 0;
-renderMode[1] = 0;
+renderMode[1] = 4;
 renderMode[2] = 0;
 return renderMode[obj];
 //@@@
@@ -152,18 +152,16 @@ float3 RenderSceneObj(Ray ray, HitInfo minHit)
 //@@@SDFBakerMgr ObjRender
 if(mode==0)
 {
-float3 lightDirs[4];
-float3 lightColors[4];
+float3 lightDirs[3];
+float3 lightColors[3];
 lightDirs[0] = normalize(minHit.P - float3(-0.07, 2.17, 3.42));
 lightColors[0] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-0.07, 2.17, 3.42));
 lightDirs[1] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
 lightColors[1] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 2.12, -3.29));
 lightDirs[2] = normalize(minHit.P - float3(3.357384, 2.12, 0));
 lightColors[2] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 2.12, 0));
-lightDirs[3] = normalize(minHit.P - float3(-3.83, 2.12, 0));
-lightColors[3] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 2.12, 0));
-result = 0.03 * mat.albedo * mat.ao;
-for(int i=0;i<4;i++)
+result = 0 * mat.albedo * mat.ao;
+for(int i=0;i<3;i++)
 {
 result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
 }
@@ -195,6 +193,15 @@ else if (mode == 3)
 	//result = pow(result,2.2);
 	//result = pow(result,2.2);
 }
+else if (mode == 4)
+{
+	//???
+	float3 lightPos = float3(0,2,0);
+	float3 lightColor = float3(1,1,1);
+	float3 l = normalize(lightPos - minHit.P);
+	float3 n = float3(0,0,-1);//minHit.N
+	result = 0.01 * (dot(n,l));
+}
 else if (mode == 333)
 {
 	float3 lightPos = float3(0,4,0);
@@ -225,12 +232,11 @@ float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 if(false)
 {
 //@@@SDFBakerMgr DirShadow
-float3 lightDirs[4];
+float3 lightDirs[3];
 lightDirs[0] = normalize(minHit.P - float3(-0.07, 2.17, 3.42));
 lightDirs[1] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
 lightDirs[2] = normalize(minHit.P - float3(3.357384, 2.12, 0));
-lightDirs[3] = normalize(minHit.P - float3(-3.83, 2.12, 0));
-for(int i=0;i<4;i++)
+for(int i=0;i<3;i++)
 {
 	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
 }
