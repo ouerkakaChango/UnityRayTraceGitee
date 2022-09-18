@@ -138,8 +138,8 @@ if(camGammaMode == 1)
 }
 else{
 	//gamma
-	//result = result / (result + 1.0);
-	//result = pow(result, 1/2.2);
+	result = result / (result + 1.0);
+	result = pow(result, 1/2.2);
 }
 }
 
@@ -198,9 +198,16 @@ else if (mode == 4)
 	//???
 	float3 lightPos = float3(0,2,0);
 	float3 lightColor = float3(1,1,1);
-	float3 l = normalize(lightPos - minHit.P);
+	float3 pos = minHit.P;
+	pos.z = 4;
+	//pos.x = 3;
+	//pos.y = 3;
+	float3 L = normalize(lightPos - pos);
 	float3 n = float3(0,0,-1);//minHit.N
-	result = 0.01 * (dot(n,l));
+	//float3 v = float3(0,0,-1);
+	//float3 h = normalize(l+v);
+	//result = 0.05*saturate(dot(n,h));
+	result = 0.05 * saturate(dot(n,L));
 }
 else if (mode == 333)
 {

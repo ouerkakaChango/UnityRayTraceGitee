@@ -329,7 +329,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     {
         if (rTex == null)
         {
-            rTex = new RenderTexture(camParam.w, camParam.h, 24, RenderTextureFormat.ARGBFloat);
+            rTex = new RenderTexture(camParam.w, camParam.h, 0, RenderTextureFormat.ARGBFloat);
             rTex.enableRandomWrite = true;
             rTex.Create();
             CreateRT(ref easuRT, FSR_Scale, camParam.w, camParam.h);

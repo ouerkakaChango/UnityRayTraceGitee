@@ -1,4 +1,4 @@
-﻿#define OBJNUM 11
+﻿#define OBJNUM 12
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -125,15 +125,21 @@ else if (obj == 8 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.2;
+re.roughness = 1;
 }
 else if (obj == 9 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.2;
 }
 else if (obj == 10 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 11 )
 {
 re.albedo = float3(0.8587747, 0, 1);
 re.metallic = 0;
@@ -146,7 +152,7 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[11];
+int renderMode[12];
 renderMode[0] = 4;
 renderMode[1] = 0;
 renderMode[2] = 0;
@@ -155,9 +161,10 @@ renderMode[4] = 4;
 renderMode[5] = 4;
 renderMode[6] = 0;
 renderMode[7] = 2;
-renderMode[8] = 0;
-renderMode[9] = 4;
-renderMode[10] = 0;
+renderMode[8] = 5;
+renderMode[9] = 0;
+renderMode[10] = 4;
+renderMode[11] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -199,6 +206,9 @@ else if (inx == 9 )
 {
 }
 else if (inx == 10 )
+{
+}
+else if (inx == 11 )
 {
 inx = -4;
 }
@@ -358,6 +368,19 @@ else if (mode == 3)
 	float3 l = normalize(lightPos - minHit.P);
 	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
 }
+else if (mode == 5)
+{
+	//???
+	float3 lightPos = float3(-54.0499992,0.349999994,-56.1599998);
+	float3 lightColor = float3(1,1,1);
+	//float3 pos = minHit.P;
+	//pos.z = 4;
+	//pos.x = 3;
+	//pos.y = 3;
+	float3 l = normalize(lightPos - minHit.P);
+	float3 n = float3(0,0,1);//minHit.N
+	result = 0.01 * (dot(n,l));
+}
 	ObjPostRender(result, mode, mat, ray, minHit);
 	return result;
 }
@@ -425,7 +448,7 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 //###
 float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr BeforeObjSDF
-if(inx == 8||inx == 4||inx == 5||inx == 0||inx == 9||inx == 1)
+if(inx == 9||inx == 4||inx == 5||inx == 0||inx == 10||inx == 1)
 {
 if (!IsInBBox(p, float3(-56.05, -1.65, -58.16), float3(-52.05, 2.35, -54.16)))
 {
@@ -524,13 +547,17 @@ re = min(re, d);
 }
 else if (inx == 8 )
 {
-re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
+re = min(re, 0 + SDFBox(p, float3(-53.56, 1.05, -60.30146), float3(2.5, 2.5, 0.5), float3(0, 0, 0)));
 }
 else if (inx == 9 )
 {
-re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
+re = min(re, 0 + SDFBox(p, float3(-54.05, 0.35, -56.16), float3(0.745, 1.11, 0.025), float3(338.16, 349.3067, -2.989319E-06)));
 }
 else if (inx == 10 )
+{
+re = min(re, 0 + SDFBox(p, float3(-54.76603, -0.02504051, -56.14224), float3(0.07071168, 1.511707, 0.0646275), float3(338.16, 349.3067, -2.989319E-06)));
+}
+else if (inx == 11 )
 {
 inx = -4;
 }
@@ -686,6 +713,9 @@ else if (inx == 9 )
 {
 }
 else if (inx == 10 )
+{
+}
+else if (inx == 11 )
 {
 inx = -4;
 }
