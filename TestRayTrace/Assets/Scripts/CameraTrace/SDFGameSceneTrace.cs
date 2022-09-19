@@ -123,7 +123,7 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     const int CoreX = 8;
     const int CoreY = 8;
-
+    public Vector2Int renderSize = new Vector2Int(1024, 720);
     RenderTexture rt;
     RenderTexture easuRT,finalRT;
     public bool useFSR = true;
@@ -160,7 +160,8 @@ public class SDFGameSceneTrace : MonoBehaviour
         else
         {
             maincamParam = new SDFGameCameraParam();
-
+            maincamParam.w = renderSize.x;
+            maincamParam.h = renderSize.y;
             QualitySettings.vSyncCount = 0;
             Co_GoIter = GoIter();
             StartCoroutine(Co_GoIter);

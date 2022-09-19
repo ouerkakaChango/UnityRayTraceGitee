@@ -265,6 +265,13 @@ if(mode == 4)
 //	mode = 0;
 //}
 
+if(inx == -2)
+{
+float2 uv2 = frac(minHit.P.xz/100);
+
+mat.albedo *= blueNoise.SampleLevel(common_linear_repeat_sampler, uv2, 0).r;
+}
+
 //grass color vary
 if(inx == -3)
 {
@@ -367,6 +374,10 @@ else if (mode == 3)
 	float3 lightColor = float3(1,1,1);
 	float3 l = normalize(lightPos - minHit.P);
 	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
+}
+else if (mode == 999)
+{
+	result = 0;
 }
 else
 {
@@ -560,6 +571,14 @@ if(inx == -1)
 	//re = min(re, sbox );
 	//re = min(re, trunkBox );
 	//re = min(re, SDFSphere(p, float3(0, 2, 0), 1) );
+	float3 center = eyePos;
+	center.y = 0;
+	if(p.y<center.y)
+	{
+	float d = SDFSphere(p,center, 301);
+	d = -d;
+	re = min(re,d);
+	}
 }
 else if(inx == -2)
 {
@@ -571,15 +590,14 @@ else if(inx == -2)
 		//###but for low height effect, this flaw may be accepted
 		//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(p.xz+0.3,0)));
 
-		//terrain = abs(p.y);
-
 		//Terrain Main
 		terrain = CosFBM(p.xz);
+		//terrain = 0;
 
 		//Detail
 		if(traceInfo.lastTrace<0.15)
 		{
-			terrain -= 0.1 * fbm4(float3(5 * p.xz,0));
+			//terrain -= 0.1 * fbm3(float3(5 * p.xz,0));
 			//terrain -= 0.1*smoothstep(0.4f, 0.8f, fbm4(float3(5 * p.xz,0)));
 			//terrain -= 0.0001 * CosFBM(1000 * p.xz);
 			//terrain -= 25 * TerrainDetailNoise(p.xz);
@@ -587,7 +605,8 @@ else if(inx == -2)
 		}
 
 		terrain = abs(p.y - terrain);
-		terrain *= 0.5;
+		terrain *= 0.6;
+		terrain-=0;
 	}
 	re = min(re, terrain );
 }

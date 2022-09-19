@@ -50,6 +50,15 @@ float fbm4(in float3 p)
 	return n;
 }
 
+float fbm3(in float3 p)
+{
+	float n = 0.0;
+	n += 1.000*noise(p*1.0);
+	n += 0.500*noise(p*2.0);
+	n += 0.250*noise(p*4.0);
+	return n;
+}
+
 float perlinNoiseFromTex(float2 uv)
 {
 	return perlinNoise1.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;

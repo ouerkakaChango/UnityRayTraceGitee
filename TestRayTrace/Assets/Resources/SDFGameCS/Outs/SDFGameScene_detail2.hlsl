@@ -67,17 +67,17 @@ float GetPntlightAttenuation(float3 pos, float3 lightPos)
 // return -log2( res )/k;
 //}
 
-//float smin( float a, float b, float k=0.1 )
-//{
-// float h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
-// return lerp( b, a, h ) - k*h*(1.0-h);
-//}
-
 float smin( float a, float b, float k=0.1 )
 {
-float h = max( k-abs(a-b), 0.0 )/k;
-return min( a, b ) - h*h*k*(1.0/4.0);
+float h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
+return lerp( b, a, h ) - k*h*(1.0-h);
 }
+
+//float smin( float a, float b, float k=0.1 )
+//{
+// float h = max( k-abs(a-b), 0.0 )/k;
+// return min( a, b ) - h*h*k*(1.0/4.0);
+//}
 
 void dinnerTable(inout float re, in float3 p)
 {
@@ -112,25 +112,25 @@ if(obj == 0 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.4;
 }
 else if (obj == 1 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.4;
+re.roughness = 0.3;
 }
 else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.3;
+re.roughness = 0.4;
 }
 else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.4;
+re.roughness = 1;
 }
 else if (obj == 4 )
 {
@@ -161,7 +161,6 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -1;
 }
 else if (inx == 1 )
 {
@@ -174,6 +173,7 @@ else if (inx == 3 )
 }
 else if (inx == 4 )
 {
+inx = -1;
 }
 //@@@
 
@@ -210,10 +210,10 @@ if(mode==0)
 {
 float3 lightDirs[5];
 float3 lightColors[5];
-lightDirs[0] = normalize(minHit.P - float3(0, 0.75, 0));
-lightColors[0] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(0, 0.75, 0));
-lightDirs[1] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-lightColors[1] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
+lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+lightColors[0] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
+lightDirs[1] = normalize(minHit.P - float3(0, 0.75, 0));
+lightColors[1] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(0, 0.75, 0));
 lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
 lightColors[2] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
 lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
@@ -288,8 +288,8 @@ if(false)
 {
 //@@@SDFBakerMgr DirShadow
 float3 lightDirs[5];
-lightDirs[0] = normalize(minHit.P - float3(0, 0.75, 0));
-lightDirs[1] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+lightDirs[1] = normalize(minHit.P - float3(0, 0.75, 0));
 lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
 lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
 lightDirs[4] = normalize(minHit.P - float3(-3.83, 8.15, 0));
@@ -340,23 +340,23 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -1;
+re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 else if (inx == 4 )
 {
-re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+inx = -1;
 }
 //@@@
 
@@ -388,7 +388,6 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -1;
 }
 else if (inx == 1 )
 {
@@ -401,6 +400,7 @@ else if (inx == 3 )
 }
 else if (inx == 4 )
 {
+inx = -1;
 }
 //@@@
 	return GetObjSDFNormal(inx, p, traceInfo);
