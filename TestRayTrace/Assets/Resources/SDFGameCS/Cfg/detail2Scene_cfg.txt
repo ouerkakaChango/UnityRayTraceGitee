@@ -1,6 +1,6 @@
 valMaps:
 //@@@SDFBakerMgr ValMaps
-ObjNum 9
+ObjNum 5
 //@@@
 TraceThre 0.0001
 NormalEpsilon 0.001
@@ -51,6 +51,44 @@ float GetPntlightAttenuation(float3 pos, float3 lightPos)
 	float d = length(pos - lightPos);
 	return saturate(1 / (d*d));
 	//return 1 / (1 + 0.01*d + 0.005*d*d);
+}
+
+//https://iquilezles.org/articles/smin/
+//float smin( float a, float b, float k=32 )
+//{
+//    float res = exp2( -k*a ) + exp2( -k*b );
+//    return -log2( res )/k;
+//}
+
+float smin( float a, float b, float k=0.1 )
+{
+    float h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
+    return lerp( b, a, h ) - k*h*(1.0-h);
+}
+
+//float smin( float a, float b, float k=0.1 )
+//{
+//    float h = max( k-abs(a-b), 0.0 )/k;
+//    return min( a, b ) - h*h*k*(1.0/4.0);
+//}
+
+void dinnerTable(inout float re, in float3 p)
+{
+float d3 = re;
+float d0 = re;
+float d8 = re;
+float d2 = re;
+float d5 = re;
+d3 = smin(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
+d0 = smin(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
+d8 = smin(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
+d2 = smin(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
+d5 = smin(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315), float3(0, 0, 0)));
+re = smin(re, d3);
+re = smin(re, d0);
+re = smin(re, d8);
+re = smin(re, d2);
+re = smin(re, d5);
 }
 
 ###BLOCK
@@ -123,53 +161,29 @@ void SetCheapIndirectColor(inout float3 re, Ray ray, HitInfo minHit)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0.4901961, 0.282353, 0);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0.4901961, 0.282353, 0);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 2 )
-{
-re.albedo = float3(0.490566, 0.28254, 0);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 3 )
-{
-re.albedo = float3(0.4901961, 0.282353, 0);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 4 )
-{
-re.albedo = float3(0.4901961, 0.282353, 0);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 5 )
-{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.4;
 }
-else if (obj == 6 )
+else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.3;
 }
-else if (obj == 7 )
+else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.4;
 }
-else if (obj == 8 )
+else if (obj == 4 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -180,16 +194,12 @@ re.roughness = 1;
 
 ###BLOCK ObjRenderMode
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[9];
+int renderMode[5];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
 renderMode[4] = 0;
-renderMode[5] = 0;
-renderMode[6] = 0;
-renderMode[7] = 0;
-renderMode[8] = 0;
 return renderMode[obj];
 //@@@
 ###BLOCK
@@ -199,6 +209,7 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -1;
 }
 else if (inx == 1 )
 {
@@ -212,23 +223,10 @@ else if (inx == 3 )
 else if (inx == 4 )
 {
 }
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-else if (inx == 7 )
-{
-}
-else if (inx == 8 )
-{
-}
 //@@@
 
 	//if(inx == 0)
 	//{
-	//	//???
 	//	float2 uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
 	//	float3 color = lightmap_ground.SampleLevel(common_linear_clamp_sampler, uv, 0).rgb;
 	//	SmoothWithDither(color,uv);
@@ -240,18 +238,20 @@ else if (inx == 8 )
 //@@@SDFBakerMgr ObjRender
 if(mode==0)
 {
-  float3 lightDirs[4];
-  float3 lightColors[4];
-  lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-  lightColors[0] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
-  lightDirs[1] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
-  lightColors[1] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
-  lightDirs[2] = normalize(minHit.P - float3(3.357384, 8.15, 0));
-  lightColors[2] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
-  lightDirs[3] = normalize(minHit.P - float3(-3.83, 8.15, 0));
-  lightColors[3] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
+  float3 lightDirs[5];
+  float3 lightColors[5];
+  lightDirs[0] = normalize(minHit.P - float3(0, 0.75, 0));
+  lightColors[0] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(0, 0.75, 0));
+  lightDirs[1] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+  lightColors[1] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
+  lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
+  lightColors[2] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
+  lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
+  lightColors[3] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
+  lightDirs[4] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+  lightColors[4] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
   result = 0 * mat.albedo * mat.ao;
-  for(int i=0;i<4;i++)
+  for(int i=0;i<5;i++)
   {
       result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
   }
@@ -316,12 +316,13 @@ else{
 if(false)
 {
 //@@@SDFBakerMgr DirShadow
-float3 lightDirs[4];
-lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-lightDirs[1] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
-lightDirs[2] = normalize(minHit.P - float3(3.357384, 8.15, 0));
-lightDirs[3] = normalize(minHit.P - float3(-3.83, 8.15, 0));
-for(int i=0;i<4;i++)
+float3 lightDirs[5];
+lightDirs[0] = normalize(minHit.P - float3(0, 0.75, 0));
+lightDirs[1] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
+lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
+lightDirs[4] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+for(int i=0;i<5;i++)
 {
 	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
 }
@@ -363,41 +364,34 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315), float3(0, 0, 0)));
+inx = -1;
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
-}
-else if (inx == 4 )
-{
-re = min(re, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
-}
-else if (inx == 5 )
-{
-re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
-}
-else if (inx == 6 )
-{
-re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
-}
-else if (inx == 7 )
-{
 re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
 }
-else if (inx == 8 )
+else if (inx == 4 )
 {
 re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 //@@@
+
+if(inx == -1)
+{
+//???
+float d = MaxSDF;
+dinnerTable(d,p);
+//d-=0.2;
+re = min(re,d);
+}
 
 return re;
 ###BLOCK
@@ -410,6 +404,7 @@ return re;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -1;
 }
 else if (inx == 1 )
 {
@@ -421,18 +416,6 @@ else if (inx == 3 )
 {
 }
 else if (inx == 4 )
-{
-}
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-else if (inx == 7 )
-{
-}
-else if (inx == 8 )
 {
 }
 //@@@

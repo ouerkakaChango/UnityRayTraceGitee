@@ -13,6 +13,7 @@ public class SDFPrefabBaker : MonoBehaviour
     [HideInInspector]
     public int specialID = -1;
     //???
+    [HideInInspector]
     public List<string> test, test2, test3;
     public string[] extraInclude;
     public string dumpDir;
@@ -233,6 +234,18 @@ public class SDFPrefabBaker : MonoBehaviour
         {
             re.AddRange(prefabs[i].lines);
             re.Add("");
+        }
+        return re;
+    }
+
+    public string GetTotalString()
+    {
+        var lines = GetAllPrefabHLSLLines();
+        string re = "";
+        for(int i=0;i<lines.Count;i++)
+        {
+            re += lines[i];
+            re += "\n";
         }
         return re;
     }

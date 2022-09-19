@@ -163,7 +163,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 22466670}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -181,7 +181,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 3
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &22466673
@@ -268,18 +268,14 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[9];
+  - int renderMode[5];
   bakedRenders: []
   bakedDirShadows: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 1231039147}
-  - {fileID: 566221532}
-  - {fileID: 1890238656}
-  - {fileID: 22466672}
-  - {fileID: 596599791}
+  - {fileID: 2089595670}
   - {fileID: 537032344}
   - {fileID: 1007502731}
   - {fileID: 1647113767}
@@ -493,6 +489,211 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 333476167}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &402165468
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 402165471}
+  - component: {fileID: 402165470}
+  - component: {fileID: 402165469}
+  - component: {fileID: 402165472}
+  m_Layer: 0
+  m_Name: testLight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &402165469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 402165468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!108 &402165470
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 402165468}
+  m_Enabled: 1
+  serializedVersion: 10
+  m_Type: 2
+  m_Shape: 0
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 1
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+--- !u!4 &402165471
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 402165468}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &402165472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 402165468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c728d84ecf18fef4aad8df9690e267af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoCS: {fileID: 1666331704}
+  specialID: -1
+  test:
+  - void dinnerTable(inout float re, in float3 p)
+  - '{'
+  - float d3 = re;
+  - float d0 = re;
+  - float d8 = re;
+  - float d2 = re;
+  - float d5 = re;
+  - d3 = min(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d0 = min(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d8 = min(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d2 = min(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d5 = min(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217,
+    1.7315), float3(0, 0, 0)));
+  - re = min(re, d3);
+  - re = min(re, d0);
+  - re = min(re, d8);
+  - re = min(re, d2);
+  - re = min(re, d5);
+  - '}'
+  test2: []
+  test3:
+  - void dinnerTable(inout float re, in float3 p)
+  - '{'
+  - float d3 = re;
+  - float d0 = re;
+  - float d8 = re;
+  - float d2 = re;
+  - float d5 = re;
+  - d3 = min(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d0 = min(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d8 = min(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d2 = min(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d5 = min(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217,
+    1.7315), float3(0, 0, 0)));
+  - re = min(re, d3);
+  - re = min(re, d0);
+  - re = min(re, d8);
+  - re = min(re, d2);
+  - re = min(re, d5);
+  - '}'
+  extraInclude: []
+  dumpDir: 
+  prefabs:
+  - prefabName: dinnerTable
+    lines:
+    - void dinnerTable(inout float re, in float3 p)
+    - '{'
+    - float d3 = re;
+    - float d0 = re;
+    - float d8 = re;
+    - float d2 = re;
+    - float d5 = re;
+    - d3 = min(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534,
+      0.1951089), float3(0, 0, 0)));
+    - d0 = min(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534,
+      0.1951089), float3(0, 0, 0)));
+    - d8 = min(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534,
+      0.1951089), float3(0, 0, 0)));
+    - d2 = min(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534,
+      0.1951089), float3(0, 0, 0)));
+    - d5 = min(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217,
+      1.7315), float3(0, 0, 0)));
+    - re = min(re, d3);
+    - re = min(re, d0);
+    - re = min(re, d8);
+    - re = min(re, d2);
+    - re = min(re, d5);
+    - '}'
+  groupPrefabName: dinnerTable
+  groups:
+  - {fileID: 596599791}
+  - {fileID: 22466672}
+  - {fileID: 1890238656}
+  - {fileID: 566221532}
+  - {fileID: 1231039147}
 --- !u!1 &537032342
 GameObject:
   m_ObjectHideFlags: 0
@@ -552,7 +753,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 5
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &537032345
@@ -657,7 +858,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 566221530}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -675,7 +876,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 1
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &566221533
@@ -767,7 +968,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 596599789}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -785,7 +986,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 4
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &596599792
@@ -1065,7 +1266,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 6
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1007502732
@@ -1235,7 +1436,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1231039145}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -1253,7 +1454,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 0
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1231039148
@@ -1642,7 +1843,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 7
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1647113768
@@ -2124,7 +2325,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 8
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &1878584168
@@ -2201,7 +2402,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1890238654}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -2219,7 +2420,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 2
+  objInx: 8
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1890238657
@@ -2280,6 +2481,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2089595669}
+  - component: {fileID: 2089595670}
   m_Layer: 0
   m_Name: Table
   m_TagString: Untagged
@@ -2306,3 +2508,31 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2089595670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2089595668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 1
+  specialID: -1
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
+  SDF_offset2D: 0
+  mergeType: 0
+  objInx: 0
+  needExtraCondition: 0
+  extraCondition: 

@@ -9,6 +9,7 @@ using System.Linq;
 public class SDFPrefabBakerEditor : Editor
 {
     SDFPrefabBaker Target;
+    protected bool showLines = false;
     protected bool showBakeFoldout = true;
     protected bool showBakeSpecialFoldout = false;
     protected bool showBakeGroupFoldout = false;
@@ -22,6 +23,12 @@ public class SDFPrefabBakerEditor : Editor
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
+
+        showLines = EditorGUILayout.Foldout(showLines, "Lines:");
+        if (showLines)
+        {
+            GUILayout.TextArea(Target.GetTotalString());
+        }
 
         if (GUILayout.Button("Add Bake To hlsl"))
         {
