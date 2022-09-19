@@ -1,4 +1,4 @@
-﻿#define OBJNUM 3
+﻿#define OBJNUM 9
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -24,7 +24,7 @@
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
-Texture2D<float4> lightmap_ground;
+Texture2D<float3> lightmap_ground;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
@@ -57,8 +57,7 @@ float GetPntlightAttenuation(float3 pos, float3 lightPos)
 	//return 1;
 	float d = length(pos - lightPos);
 	return saturate(1 / (d*d));
-	//float d = length(pos - lightPos);
-	//return 1 / (1 + 0.2*d + 0.04*d*d);
+	//return 1 / (1 + 0.01*d + 0.005*d*d);
 }
 
 
@@ -73,17 +72,53 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
+re.albedo = float3(0.4901961, 0.282353, 0);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 1 )
+{
+re.albedo = float3(0.4901961, 0.282353, 0);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 2 )
+{
+re.albedo = float3(0.490566, 0.28254, 0);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 3 )
+{
+re.albedo = float3(0.4901961, 0.282353, 0);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 4 )
+{
+re.albedo = float3(0.4901961, 0.282353, 0);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 5 )
+{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.4;
 }
-else if (obj == 1 )
+else if (obj == 6 )
 {
-re.albedo = float3(0, 0, 1);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.9;
+re.roughness = 0.3;
 }
-else if (obj == 2 )
+else if (obj == 7 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 0.4;
+}
+else if (obj == 8 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -96,10 +131,16 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[3];
-renderMode[0] = 3;
+int renderMode[9];
+renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
+renderMode[3] = 0;
+renderMode[4] = 0;
+renderMode[5] = 0;
+renderMode[6] = 0;
+renderMode[7] = 0;
+renderMode[8] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -117,16 +158,34 @@ else if (inx == 1 )
 else if (inx == 2 )
 {
 }
+else if (inx == 3 )
+{
+}
+else if (inx == 4 )
+{
+}
+else if (inx == 5 )
+{
+}
+else if (inx == 6 )
+{
+}
+else if (inx == 7 )
+{
+}
+else if (inx == 8 )
+{
+}
 //@@@
 
-	if(inx == 0)
-	{
-		//???
-		float2 uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
-		float3 color = lightmap_ground.SampleLevel(common_linear_clamp_sampler, uv, 0).rgb;
-		SmoothWithDither(color,uv);
-		mat.albedo = float4(color,1);
-	}
+	//if(inx == 0)
+	//{
+	//	//???
+	//	float2 uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+	//	float3 color = lightmap_ground.SampleLevel(common_linear_clamp_sampler, uv, 0).rgb;
+	//	SmoothWithDither(color,uv);
+	//	mat.albedo = float4(color,1);
+	//}
 }
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
@@ -151,16 +210,18 @@ float3 RenderSceneObj(Ray ray, HitInfo minHit)
 //@@@SDFBakerMgr ObjRender
 if(mode==0)
 {
-float3 lightDirs[3];
-float3 lightColors[3];
-lightDirs[0] = normalize(minHit.P - float3(-0.07, 2.17, 3.42));
-lightColors[0] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-0.07, 2.17, 3.42));
-lightDirs[1] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
-lightColors[1] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 2.12, -3.29));
-lightDirs[2] = normalize(minHit.P - float3(3.357384, 2.12, 0));
-lightColors[2] = float3(1, 0.8581352, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 2.12, 0));
+float3 lightDirs[4];
+float3 lightColors[4];
+lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+lightColors[0] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
+lightDirs[1] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
+lightColors[1] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
+lightDirs[2] = normalize(minHit.P - float3(3.357384, 8.15, 0));
+lightColors[2] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
+lightDirs[3] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+lightColors[3] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
 result = 0 * mat.albedo * mat.ao;
-for(int i=0;i<3;i++)
+for(int i=0;i<4;i++)
 {
 result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
 }
@@ -226,11 +287,12 @@ float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 if(false)
 {
 //@@@SDFBakerMgr DirShadow
-float3 lightDirs[3];
-lightDirs[0] = normalize(minHit.P - float3(-0.07, 2.17, 3.42));
-lightDirs[1] = normalize(minHit.P - float3(0.04, 2.12, -3.29));
-lightDirs[2] = normalize(minHit.P - float3(3.357384, 2.12, 0));
-for(int i=0;i<3;i++)
+float3 lightDirs[4];
+lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+lightDirs[1] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
+lightDirs[2] = normalize(minHit.P - float3(3.357384, 8.15, 0));
+lightDirs[3] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+for(int i=0;i<4;i++)
 {
 	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
 }
@@ -277,13 +339,37 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
 }
 else if (inx == 2 )
+{
+re = min(re, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
+}
+else if (inx == 3 )
+{
+re = min(re, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
+}
+else if (inx == 4 )
+{
+re = min(re, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
+}
+else if (inx == 5 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+}
+else if (inx == 6 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+}
+else if (inx == 7 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+}
+else if (inx == 8 )
 {
 re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
@@ -313,6 +399,24 @@ else if (inx == 1 )
 {
 }
 else if (inx == 2 )
+{
+}
+else if (inx == 3 )
+{
+}
+else if (inx == 4 )
+{
+}
+else if (inx == 5 )
+{
+}
+else if (inx == 6 )
+{
+}
+else if (inx == 7 )
+{
+}
+else if (inx == 8 )
 {
 }
 //@@@
