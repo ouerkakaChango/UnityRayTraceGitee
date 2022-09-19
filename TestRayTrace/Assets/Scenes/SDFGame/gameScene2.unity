@@ -197,11 +197,11 @@ MonoBehaviour:
   outTextures:
   - name: lightmap_ground
     tex: {fileID: 2800000, guid: e04846de3767a2743b63f919a78824dc, type: 3}
-    channel: 1
+    channel: 0
   tags:
   - {fileID: 1007502732}
   bakedDeclares:
-  - Texture2D<float3> lightmap_ground;
+  - Texture2D<float4> lightmap_ground;
   bakedEnvTexSettings: []
 --- !u!1 &328588540
 GameObject:
@@ -597,7 +597,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 0.4
   SDF_offset: 0
-  renderMode: 0
+  renderMode: 3
   shapeType: 0
   specialID: -1
   fontCharacter: 0
@@ -626,7 +626,7 @@ MonoBehaviour:
   plainTextures:
   - name: lightmap_ground
     tex: {fileID: 2800000, guid: e04846de3767a2743b63f919a78824dc, type: 3}
-    channel: 1
+    channel: 0
   envTextures: []
   texInx: 0
 --- !u!1 &1008065616
@@ -1063,7 +1063,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 0.9
   SDF_offset: 0
-  renderMode: 4
+  renderMode: 0
   shapeType: 0
   specialID: -1
   fontCharacter: 0

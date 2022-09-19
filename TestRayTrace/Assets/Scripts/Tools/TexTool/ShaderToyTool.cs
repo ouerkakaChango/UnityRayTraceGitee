@@ -8,7 +8,7 @@ public sealed class ShaderToyTool
 {
     public Texture2D noiseRGB;
     public Texture2D LUT_BRDF;
-    public Texture2D perlinNoise1, voronoiNoise1;
+    public Texture2D perlinNoise1, voronoiNoise1,blueNoise;
     private static readonly ShaderToyTool instance = new ShaderToyTool();
     static ShaderToyTool()
     {
@@ -19,9 +19,10 @@ public sealed class ShaderToyTool
         noiseRGB = new Texture2D(2, 2);
         noiseRGB.LoadImage(fileData);
 
-        TexHelper.LoadPNG(ref LUT_BRDF, "Assets/Raw/ShaderToy/LUT_BRDF.png");
-        TexHelper.LoadPNG(ref perlinNoise1, "Assets/Raw/ShaderToy/perlinNoise1.jpg");
-        TexHelper.LoadPNG(ref voronoiNoise1, "Assets/Raw/ShaderToy/voronoiNoise1.jpg");
+        TexHelper.LoadTextureFromDisk(ref LUT_BRDF, "Assets/Raw/ShaderToy/LUT_BRDF.png");
+        TexHelper.LoadTextureFromDisk(ref perlinNoise1, "Assets/Raw/ShaderToy/perlinNoise1.jpg");
+        TexHelper.LoadTextureFromDisk(ref voronoiNoise1, "Assets/Raw/ShaderToy/voronoiNoise1.jpg");
+        TexHelper.LoadTextureFromDisk(ref blueNoise, "Assets/Raw/ShaderToy/blueNoise.png");
     }
     public static ShaderToyTool Instance
     {

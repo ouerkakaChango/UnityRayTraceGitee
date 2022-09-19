@@ -288,6 +288,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         computeShader.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
         computeShader.SetTexture(kInx, "perlinNoise1", ShaderToyTool.Instance.perlinNoise1);
         computeShader.SetTexture(kInx, "voronoiNoise1", ShaderToyTool.Instance.voronoiNoise1);
+        computeShader.SetTexture(kInx, "blueNoise", ShaderToyTool.Instance.blueNoise);
         if (autoCS.texSys != null)
         {
             for (int i = 0; i < autoCS.texSys.outTextures.Count; i++)

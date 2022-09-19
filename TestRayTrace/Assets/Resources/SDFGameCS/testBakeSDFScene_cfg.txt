@@ -110,7 +110,7 @@ re.roughness = 0.15;
 }
 else if (obj == 8 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -146,7 +146,7 @@ renderMode[4] = 4;
 renderMode[5] = 4;
 renderMode[6] = 0;
 renderMode[7] = 2;
-renderMode[8] = 5;
+renderMode[8] = 0;
 renderMode[9] = 0;
 renderMode[10] = 4;
 renderMode[11] = 0;
@@ -335,18 +335,9 @@ else if (mode == 3)
 	float3 l = normalize(lightPos - minHit.P);
 	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
 }
-else if (mode == 5)
+else
 {
-	//???
-	float3 lightPos = float3(-54.0499992,0.349999994,-56.1599998);
-	float3 lightColor = float3(1,1,1);
-	//float3 pos = minHit.P;
-	//pos.z = 4;
-	//pos.x = 3;
-	//pos.y = 3;
-	float3 l = normalize(lightPos - minHit.P);
-	float3 n = float3(0,0,1);//minHit.N
-	result = 0.01 * (dot(n,l));
+	result = float3(1,0,1);
 }
 ###BLOCK
 
@@ -356,8 +347,8 @@ if(camGammaMode == 1)
 	
 }
 else{
-	result = result / (result + 1.0);
-	result = pow(result, 1/2.2); 
+	//result = result / (result + 1.0);
+	//result = pow(result, 1/2.2); 
 }
 ###BLOCK
 

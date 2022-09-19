@@ -2,7 +2,7 @@
 #define NOISECOMMONDEF_HLSL
 //https ://www.shadertoy.com/view/ldScDh
 Texture2D NoiseRGBTex;
-Texture2D perlinNoise1,voronoiNoise1;
+Texture2D perlinNoise1,voronoiNoise1,blueNoise;
 
 SamplerState noise_linear_repeat_sampler;
 float noise_texBase(in float3 x)
@@ -58,5 +58,12 @@ float perlinNoiseFromTex(float2 uv)
 float voronoiNoiseFromTex(float2 uv)
 {
 	return voronoiNoise1.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;
+}
+
+//https://www.shadertoy.com/view/NldfRl
+void SmoothWithDither(inout float3 color, in float2 uv)
+{
+	int2 fragCoord = uv * 1024;//blueNoise is 1024*1024
+	color += blueNoise.Load(int3(fragCoord & 1023, 0)).rgb * (1.0 / 256.0);//For our mornitor only support 32bit 
 }
 #endif

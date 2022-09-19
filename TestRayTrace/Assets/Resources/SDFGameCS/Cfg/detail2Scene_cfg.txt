@@ -17,7 +17,7 @@ Blocks:
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
-Texture2D<float3> lightmap_ground;
+Texture2D<float4> lightmap_ground;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
@@ -146,8 +146,8 @@ re.roughness = 1;
 ###BLOCK ObjRenderMode
 //@@@SDFBakerMgr ObjRenderMode
 int renderMode[3];
-renderMode[0] = 0;
-renderMode[1] = 4;
+renderMode[0] = 3;
+renderMode[1] = 0;
 renderMode[2] = 0;
 return renderMode[obj];
 //@@@
@@ -170,11 +170,10 @@ else if (inx == 2 )
 	if(inx == 0)
 	{
 		//???
-		//float2 uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
-		//float3 color = lightmap_ground.SampleLevel(common_point_clamp_sampler, uv, 0).rgb;
-		//float2 grid = frac(1024*uv);
-		//mat.albedo += float4(color,1);
-		//mat.albedo = float4(grid,0,1);
+		float2 uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+		float3 color = lightmap_ground.SampleLevel(common_linear_clamp_sampler, uv, 0).rgb;
+		SmoothWithDither(color,uv);
+		mat.albedo = float4(color,1);
 	}
 ###BLOCK
 
@@ -223,28 +222,16 @@ else if (mode == 3)
 	//result = pow(result,2.2);
 	//result = pow(result,2.2);
 }
-else if (mode == 4)
-{
-	//???
-	float3 lightPos = float3(0,2,0);
-	float3 lightColor = float3(1,1,1);
-	float3 pos = minHit.P;
-	pos.z = 4;
-	//pos.x = 3;
-	//pos.y = 3;
-	float3 L = normalize(lightPos - pos);
-	float3 n = float3(0,0,-1);//minHit.N
-	//float3 v = float3(0,0,-1);
-	//float3 h = normalize(l+v);
-	//result = 0.05*saturate(dot(n,h));
-	result = 0.05 * saturate(dot(n,L));
-}
 else if (mode == 333)
 {
 	float3 lightPos = float3(0,4,0);
 	float3 lightColor = float3(1,1,1);
 	float3 l = normalize(lightPos - minHit.P);
 	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
+}
+else
+{
+	result = float3(1,0,1);
 }
 ###BLOCK
 
@@ -255,8 +242,8 @@ if(camGammaMode == 1)
 }
 else{
 	//gamma
-	result = result / (result + 1.0);
-	result = pow(result, 1/2.2); 
+	//result = result / (result + 1.0);
+	//result = pow(result, 1/2.2); 
 }
 ###BLOCK
 

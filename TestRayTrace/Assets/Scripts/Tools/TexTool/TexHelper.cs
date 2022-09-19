@@ -34,7 +34,7 @@ namespace TextureHelper
             File.WriteAllBytes(folder + "/" + name + ".EXR", tex.EncodeToEXR());
         }
 
-        public static void LoadPNG(ref Texture2D tex, string path)
+        public static void LoadTextureFromDisk(ref Texture2D tex, string path)
         {
             var fileData = File.ReadAllBytes(path);
             tex = new Texture2D(2, 2);
