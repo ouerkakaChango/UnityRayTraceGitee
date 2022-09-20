@@ -438,7 +438,7 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 		...
 ###BLOCK
 
-void SetIndirectColor(inout float3 re, Ray ray, HitInfo minHit)
+void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit)
 {
 	###BLOCK IndirectColor
 	... 

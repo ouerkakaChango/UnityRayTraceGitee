@@ -2,7 +2,7 @@ valMaps:
 //@@@SDFBakerMgr ValMaps
 ObjNum 5
 //@@@
-TraceThre 0.0001
+TraceThre 0.001
 NormalEpsilon 0.001
 
 Blocks:
@@ -99,7 +99,8 @@ void SceneRenderIndirRay(in Ray ray, out float3 re, out HitInfo minHit)
 	re = 0;
 	//---Trace
 	Init(minHit);
-	Indir_TraceScene(ray, minHit);
+	TraceScene(ray, minHit);
+	//Indir_TraceScene(ray, minHit);
 	//___Trace
 
 	if (minHit.bHit)
@@ -110,50 +111,36 @@ void SceneRenderIndirRay(in Ray ray, out float3 re, out HitInfo minHit)
 
 float3 IndirPointLightRender(float3 P, float3 N, float3 lightColor,float3 lightPos)
 {
-	float3 Li = lightColor * GetPntlightAttenuation(P,lightPos);
+	float3 Li = lightColor * saturate(1*GetPntlightAttenuation(P,lightPos));
 	float3 L = normalize(lightPos - P);
 	return Li*saturate(dot(N,L));
 }
 
-void SetCheapIndirectColor(inout float3 re, Ray ray, HitInfo minHit)
+void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit)
 {
 	Ray ray_indirect;
 	ray_indirect.pos = minHit.P;
-	float3 indir = 0;
-	int spp = 8;
-	float3 lastV = 10*minHit.P;
-	lastV = abs(lastV);
-	for(int i=0;i<spp;i++)
+	float2 Xi = float2(rand01(seed),rand01(seed.zxy));
+	float theta = 2*PI*Xi.x;
+	float phi = PI*(2*Xi.y-1);
+	float3 randDir =  float3(
+		sin(phi)*cos(theta),
+		sin(phi)*sin(theta),
+		cos(phi)
+	);
+	randDir.z = abs(randDir.z);
+	ray_indirect.dir = Vec2NormalHemisphere(randDir,minHit.N);
+	//ray_indirect.dir = toNormalHemisphere(randP_hemiRound(seed), minHit.N);
+
 	{
-		if(true)
-		{
-			//float2 Xi = Hammersley(i, spp);
-			float2 Xi = float2(rand01(100*lastV.zyx),rand01(100*lastV));
-			float theta = 2*PI*Xi.x;
-			float phi = PI*(2*Xi.y-1);
-			float3 randDir =  float3(
-				sin(phi)*cos(theta),
-				sin(phi)*sin(theta),
-				cos(phi)
-			);
-			//lastV = normalize(lastV+randDir);
-			randDir.z = abs(randDir.z);
-			ray_indirect.dir = Vec2NormalHemisphere(randDir,minHit.N);
-			
-		}
-		{
-			//ray_indirect.dir = reflect(ray.dir,minHit.N);
-		}
-		ray_indirect.pos = minHit.P + ray_indirect.dir*TraceThre*2;
-		HitInfo indirHit;
-		float3 indirLightColor;
-		SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit);
-		indir += IndirPointLightRender(minHit.P,minHit.N, indirLightColor, indirHit.P);
+		//ray_indirect.dir = reflect(ray.dir,minHit.N);
 	}
-	indir /= spp;
-	//re = indir;
-	re += indir;
-	//re = IndirPointLightRender(minHit.P,minHit.N, 1, float3(0,2,0));
+	//minHit.N*TraceThre*2 ensure escape from 'judging surface'
+	ray_indirect.pos = minHit.P + ray_indirect.dir*TraceThre*2 + minHit.N*TraceThre*2;
+	HitInfo indirHit;
+	float3 indirLightColor;
+	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit);
+	re = IndirPointLightRender(minHit.P,minHit.N, indirLightColor, indirHit.P);
 }
 ###BLOCK
 
@@ -242,8 +229,8 @@ if(mode==0)
   float3 lightColors[5];
   lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
   lightColors[0] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
-  lightDirs[1] = normalize(minHit.P - float3(0, 0.75, 0));
-  lightColors[1] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(0, 0.75, 0));
+  lightDirs[1] = normalize(minHit.P - float3(0, 3.12, -0.91));
+  lightColors[1] = float3(0, 0.1708908, 1) * GetPntlightAttenuation(minHit.P, float3(0, 3.12, -0.91));
   lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
   lightColors[2] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
   lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
@@ -309,7 +296,7 @@ else{
 ###BLOCK
 
 ###BLOCK IndirectColor
-	//SetCheapIndirectColor(re, ray, minHit);
+	SetCheapIndirectColor(re, seed, ray, minHit);
 ###BLOCK
 
 ###BLOCK SDFShadow
@@ -318,7 +305,7 @@ if(false)
 //@@@SDFBakerMgr DirShadow
 float3 lightDirs[5];
 lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-lightDirs[1] = normalize(minHit.P - float3(0, 0.75, 0));
+lightDirs[1] = normalize(minHit.P - float3(0, 3.12, -0.91));
 lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
 lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
 lightDirs[4] = normalize(minHit.P - float3(-3.83, 8.15, 0));

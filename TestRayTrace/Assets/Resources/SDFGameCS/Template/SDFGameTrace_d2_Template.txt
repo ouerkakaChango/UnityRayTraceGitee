@@ -7,6 +7,8 @@
 int w;
 int h;
 
+int frameID;
+
 int camType; //0:normal 1:orthogonal
 int camGammaMode; //0:normal 1:notGamma
 //#########################################################################################################
@@ -23,6 +25,7 @@ float3 screenU;
 float3 screenV;
 
 RWTexture2D<float4> Result;
+RWTexture2D<float4> IndirectResult;
 Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
 
@@ -30,11 +33,10 @@ Texture2D<float4> envBgTex;
 #include "SDFGameScene_(@SceneName).hlsl"
 //#########################################################################################################
 
-float3 GetSDFGameColor(in Ray ray)
+float3 GetSDFGameColor(in Ray ray, out HitInfo minHit)
 {
 	float3 re = 0;
 	//---Trace
-	HitInfo minHit;
 	Init(minHit);
 	TraceScene(ray, minHit);
 	//___Trace
@@ -46,11 +48,19 @@ float3 GetSDFGameColor(in Ray ray)
 	return re;
 }
 
+float3 GetSDFGameIndirColor(in Ray ray,float3 seed, in HitInfo minHit)
+{
+float3 re = 0;
+###BLOCK IndirectRender
+...
+###BLOCK
+	return re;
+}
+
 #define SSAA_num 1
 [numthreads(8, 8, 1)]
 void Render(uint3 id : SV_DispatchThreadID)
 {
-	float3 re = 0;
 
 	int idx = id.x;
 	int idy = id.y;
@@ -59,8 +69,11 @@ void Render(uint3 id : SV_DispatchThreadID)
 	float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (idx - 0.5) + screenV * pixH * (idy - 0.5);
 	float SSAA_unitDis = 1.0f / SSAA_edge;
 	float3 SSAA_colors[SSAA_num];
+	float3 SSAA_indirColors[SSAA_num];
 
 	float3 camFoward = normalize(cross(screenU,screenV));
+
+	float3 seed = float3(id.xy,frameID);
 
 	[unroll(SSAA_edge)]
 	for (int j = 1; j <= SSAA_edge; j++)
@@ -78,17 +91,25 @@ void Render(uint3 id : SV_DispatchThreadID)
 			{
 				ray.dir = normalize(ray.pos - eyePos);
 			}
-
-			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray);
+			HitInfo minHit;
+			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray,minHit);
+			SSAA_indirColors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameIndirColor(ray,seed,minHit);
 		}
 	}
 
+	float3 re = 0;
 	for (int i = 0; i < SSAA_num; i++)
 	{
 		re += SSAA_colors[i];
 	}
-
 	re /= (float)SSAA_num;
-
 	Result[id.xy] = float4(re, 1);
+
+	re = 0;
+	for (int i = 0; i < SSAA_num; i++)
+	{
+		re += SSAA_indirColors[i];
+	}
+	re /= (float)SSAA_num;
+	IndirectResult[id.xy] = float4(re, 1);
 }

@@ -5,6 +5,7 @@ using FastGeo;
 using Ray = FastGeo.Ray;
 using Debugger;
 using static StringTool.StringHelper;
+using static MathHelper.XMathFunc;
 
 //可能之后加点物理相机 https://ciechanow.ski/cameras-and-lenses/
 public abstract class SDFCameraParam
@@ -121,17 +122,30 @@ public class SDFGameSceneTrace : MonoBehaviour
         public Matrix4x4 localToWorldMatrix;
     };
 
+    int frameID = 0;
     const int CoreX = 8;
     const int CoreY = 8;
     public Vector2Int renderSize = new Vector2Int(1024, 720);
-    RenderTexture rt;
+    public bool useIndirectRT = false;
+
+    //---Indirect
+    public Vector3 lastPos;
+    public Quaternion lastRot;
+    //___
+
+    public RenderTexture rt;
+    public RenderTexture directRT = null;
+    public RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
+    //FSR
     RenderTexture easuRT,finalRT;
+
     public bool useFSR = true;
     public float FSR_Scale = 2.0f;
 
     public string SceneName = "Detail1";
     public AutoCS autoCS;
     ComputeShader cs;
+    ComputeShader cs_blendResult;
     ComputeShader cs_FSR;
     public Texture2DArray envSpecTex2DArr;
     public Texture2D envBgTex;
@@ -163,6 +177,15 @@ public class SDFGameSceneTrace : MonoBehaviour
             maincamParam.w = renderSize.x;
             maincamParam.h = renderSize.y;
             QualitySettings.vSyncCount = 0;
+
+            if(useIndirectRT)
+            {
+                CreateRT(ref directRT, 1, renderSize.x, renderSize.y);
+                CreateRT(ref indirectRT, 1, renderSize.x, renderSize.y);
+                CreateRT(ref frontIndirectRT, 1, renderSize.x, renderSize.y);
+                CreateRT(ref newFrontIndirectRT, 1, renderSize.x, renderSize.y);
+            }
+
             Co_GoIter = GoIter();
             StartCoroutine(Co_GoIter);
 
@@ -182,7 +205,18 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     void Update()
     {
-
+        if(frameID>0)
+        {
+            Vector3 dPos = abs(transform.position - lastPos);
+            Vector3 dq = abs(transform.rotation.eulerAngles - lastRot.eulerAngles);
+            if(dPos.magnitude>0.05 || dq.magnitude>1)
+            {
+                //!!! refresh indirectRender
+                frameID = 0;          
+            }
+        }
+        lastPos = transform.position;
+        lastRot = transform.rotation;
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
@@ -283,6 +317,7 @@ public class SDFGameSceneTrace : MonoBehaviour
 
         //####
         //System Value
+        computeShader.SetInt("frameID", frameID);
         computeShader.SetFloat("daoScale", daoScale);
         computeShader.SetVector("_Time", Shader.GetGlobalVector("_Time"));
         computeShader.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
@@ -315,15 +350,49 @@ public class SDFGameSceneTrace : MonoBehaviour
         //___
         //####
 
-        computeShader.SetTexture(kInx, "Result", rTex);
+        if (useIndirectRT)
+        {
+            computeShader.SetTexture(kInx, "Result", directRT);
+            computeShader.SetTexture(kInx, "IndirectResult", indirectRT);
+        }
+        else
+        {
+            computeShader.SetTexture(kInx, "Result", rTex);
+        }
         computeShader.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
         computeShader.SetTexture(kInx, "envBgTex", envBgTex);
 
         camParam.InsertParamToComputeShader(ref computeShader);
 
-        computeShader.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
+        computeShader.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
         //### compute
         //#####################################;
+        if(useIndirectRT)
+        {
+            //???
+            //Blend dir+indir=>rTex
+            //###########
+            //### compute
+            kInx = cs_blendResult.FindKernel("BlendFnial");
+            cs_blendResult.SetInt("frameID", frameID);
+            cs_blendResult.SetTexture(kInx, "Result", rTex);
+            cs_blendResult.SetTexture(kInx, "Direct", directRT);
+            cs_blendResult.SetTexture(kInx, "Indirect", indirectRT);
+            cs_blendResult.SetTexture(kInx, "FrontIndirect", frontIndirectRT);
+            cs_blendResult.SetTexture(kInx, "NewFrontIndirect", newFrontIndirectRT);
+            cs_blendResult.SetTexture(kInx, "blueNoise", ShaderToyTool.Instance.blueNoise);
+            cs_blendResult.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+            //### compute
+            //###########
+            //Copy newFrontIndirectRT to frontIndirectRT
+            {
+                //Graphics.CopyTexture(newFrontIndirectRT, frontIndirectRT);
+                kInx = cs_blendResult.FindKernel("CopyToNewFront");
+                cs_blendResult.SetTexture(kInx, "Result", frontIndirectRT);
+                cs_blendResult.SetTexture(kInx, "NewFrontIndirect", newFrontIndirectRT);
+                cs_blendResult.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+            }
+        }
     }
     //####################################################################################
 
@@ -334,11 +403,18 @@ public class SDFGameSceneTrace : MonoBehaviour
             rTex = new RenderTexture(camParam.w, camParam.h, 0, RenderTextureFormat.ARGBFloat);
             rTex.enableRandomWrite = true;
             rTex.Create();
-            CreateRT(ref easuRT, FSR_Scale, camParam.w, camParam.h);
-            CreateRT(ref finalRT, FSR_Scale, camParam.w, camParam.h);
+            if (useFSR)
+            {
+                CreateRT(ref easuRT, FSR_Scale, camParam.w, camParam.h);
+                CreateRT(ref finalRT, FSR_Scale, camParam.w, camParam.h);
+            }
             var csResourcesPath = ChopEnd(autoCS.outs[0], ".compute");
             csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
             cs = (ComputeShader)Resources.Load(csResourcesPath);
+            if(useIndirectRT)
+            {
+                cs_blendResult = (ComputeShader)Resources.Load("LightingCS/BlendFinal");
+            }
             cs_FSR = (ComputeShader)Resources.Load("FSR/FSR");
         }
         if (rTex == rt)
@@ -352,9 +428,9 @@ public class SDFGameSceneTrace : MonoBehaviour
         autoCS.Generate();
     }
 
-    void CreateRT(ref RenderTexture rTex, float scale, int w, int h)
+    void CreateRT(ref RenderTexture rTex, float scale, int w, int h, int depth = 0)
     {
-        rTex = new RenderTexture((int)(w* scale), (int)(h* scale), 24, RenderTextureFormat.ARGBFloat);
+        rTex = new RenderTexture((int)(w* scale), (int)(h* scale), depth, RenderTextureFormat.ARGBFloat);
         rTex.enableRandomWrite = true;
         rTex.Create();
     }
@@ -403,6 +479,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             }
             yield return null;
             fps = fpsTimer.GetFPS();
+            frameID += 1;
         }
     }
 

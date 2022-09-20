@@ -1,0 +1,47 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel BlendFnial
+#pragma kernel CopyToNewFront
+
+#include "../../HLSL/CommonDef.hlsl"
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+Texture2D<float4> Direct;
+Texture2D<float4> Indirect;
+Texture2D<float4> FrontIndirect;
+RWTexture2D<float4> NewFrontIndirect;
+int frameID;
+
+Texture2D<float3> blueNoise;
+
+[numthreads(8, 8, 1)]
+void BlendFnial(uint3 id : SV_DispatchThreadID)
+{
+	float4 IndirectPart = 0;
+	if (frameID == 0)
+	{
+		IndirectPart = Indirect[id.xy];
+	}
+	else
+	{
+		//A(n/(n+1))+B(1/(n+1))
+		float n = frameID;
+		IndirectPart = n / (n + 1)*FrontIndirect[id.xy] + 1 / (n + 1)*Indirect[id.xy];
+		//IndirectPart = FrontIndirect[id.xy] + Indirect[id.xy];
+	}
+	float4 color = Direct[id.xy] + IndirectPart;
+
+	uint2 size = GetSize(Result);
+	float2 uv = id.xy/(float2)size;
+	int2 fragCoord = uv * 1024;//blueNoise is 1024*1024
+	color.rgb += blueNoise.Load(int3(fragCoord & 1023, 0)).rgb * (1.0 / 256.0);//For our mornitor only support 32bit 
+
+	Result[id.xy] = color;
+	NewFrontIndirect[id.xy] = IndirectPart;
+}
+
+[numthreads(8, 8, 1)]
+void CopyToNewFront(uint3 id : SV_DispatchThreadID)
+{
+	Result[id.xy] = NewFrontIndirect[id.xy];
+}

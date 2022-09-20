@@ -459,7 +459,7 @@ public class SDFBakerMgr : MonoBehaviour
         if(mf&&mr)
         {
             var meshName = mf.sharedMesh.name;
-            Debug.Log(meshName);
+            //Debug.Log(meshName);
             if(meshName == "Cube")
             {
                 AddBakeCube(obj);
