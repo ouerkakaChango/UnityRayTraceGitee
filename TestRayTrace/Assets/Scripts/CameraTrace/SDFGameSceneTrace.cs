@@ -127,10 +127,11 @@ public class SDFGameSceneTrace : MonoBehaviour
     const int CoreY = 8;
     public Vector2Int renderSize = new Vector2Int(1024, 720);
     public bool useIndirectRT = false;
+    public float indirectMultiplier = 1.0f;
 
     //---Indirect
-    public Vector3 lastPos;
-    public Quaternion lastRot;
+    Vector3 lastPos;
+    Quaternion lastRot;
     //___
 
     public RenderTexture rt;
@@ -388,6 +389,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             {
                 //Graphics.CopyTexture(newFrontIndirectRT, frontIndirectRT);
                 kInx = cs_blendResult.FindKernel("CopyToNewFront");
+                cs_blendResult.SetFloat("indirectMultiplier", indirectMultiplier);
                 cs_blendResult.SetTexture(kInx, "Result", frontIndirectRT);
                 cs_blendResult.SetTexture(kInx, "NewFrontIndirect", newFrontIndirectRT);
                 cs_blendResult.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);

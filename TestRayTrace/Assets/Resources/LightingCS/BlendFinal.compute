@@ -11,6 +11,7 @@ Texture2D<float4> Indirect;
 Texture2D<float4> FrontIndirect;
 RWTexture2D<float4> NewFrontIndirect;
 int frameID;
+float indirectMultiplier;
 
 Texture2D<float3> blueNoise;
 
@@ -29,7 +30,7 @@ void BlendFnial(uint3 id : SV_DispatchThreadID)
 		IndirectPart = n / (n + 1)*FrontIndirect[id.xy] + 1 / (n + 1)*Indirect[id.xy];
 		//IndirectPart = FrontIndirect[id.xy] + Indirect[id.xy];
 	}
-	float4 color = Direct[id.xy] + IndirectPart;
+	float4 color = Direct[id.xy] + indirectMultiplier*IndirectPart;
 
 	uint2 size = GetSize(Result);
 	float2 uv = id.xy/(float2)size;
