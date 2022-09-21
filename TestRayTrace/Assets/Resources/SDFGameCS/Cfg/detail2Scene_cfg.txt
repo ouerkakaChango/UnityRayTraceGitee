@@ -140,6 +140,8 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 	HitInfo indirHit;
 	float3 indirLightColor;
 	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit);
+	//???
+	indirLightColor *= RenderSceneSDFShadow(indirHit);
 	re = IndirPointLightRender(minHit.P,minHit.N, indirLightColor, indirHit.P);
 }
 ###BLOCK

@@ -82,7 +82,7 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 	return HardShadow_TraceScene(ray, hitInfo, maxLength);
 }
 
-float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
+float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
 	###BLOCK SDFShadow

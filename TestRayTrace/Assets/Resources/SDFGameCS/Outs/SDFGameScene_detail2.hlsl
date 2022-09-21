@@ -283,7 +283,7 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 	return HardShadow_TraceScene(ray, hitInfo, maxLength);
 }
 
-float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
+float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
 if(true)
@@ -865,6 +865,8 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 	HitInfo indirHit;
 	float3 indirLightColor;
 	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit);
+	//???
+	indirLightColor *= RenderSceneSDFShadow(indirHit);
 	re = IndirPointLightRender(minHit.P,minHit.N, indirLightColor, indirHit.P);
 }
 

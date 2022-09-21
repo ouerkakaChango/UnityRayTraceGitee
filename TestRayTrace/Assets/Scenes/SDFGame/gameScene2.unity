@@ -1954,9 +1954,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderSize: {x: 1024, y: 720}
   useIndirectRT: 1
-  indirectMultiplier: 5
-  lastPos: {x: 0, y: 0, z: 0}
-  lastRot: {x: 0, y: 0, z: 0, w: 0}
+  indirectMultiplier: 3
   rt: {fileID: 0}
   directRT: {fileID: 0}
   newFrontIndirectRT: {fileID: 0}

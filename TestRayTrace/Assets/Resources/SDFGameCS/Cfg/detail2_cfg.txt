@@ -9,7 +9,7 @@ if (minHit.bHit)
 { 
 	re = RenderSceneObj(ray, minHit);
 	//SetIndirectColor(re, ray, minHit);
-	re *= RenderSceneSDFShadow(ray, minHit);
+	re *= RenderSceneSDFShadow(minHit);
 }
 else
 {
