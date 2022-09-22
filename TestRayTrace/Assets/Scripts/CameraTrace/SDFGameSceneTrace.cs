@@ -134,9 +134,10 @@ public class SDFGameSceneTrace : MonoBehaviour
     Quaternion lastRot;
     //___
 
-    public RenderTexture rt;
-    public RenderTexture directRT = null;
-    public RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
+     RenderTexture rt;
+     RenderTexture directRT = null;
+     RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
+     RenderTexture uselessRT = null;
     //FSR
     RenderTexture easuRT,finalRT;
 
@@ -185,6 +186,10 @@ public class SDFGameSceneTrace : MonoBehaviour
                 CreateRT(ref indirectRT, 1, renderSize.x, renderSize.y);
                 CreateRT(ref frontIndirectRT, 1, renderSize.x, renderSize.y);
                 CreateRT(ref newFrontIndirectRT, 1, renderSize.x, renderSize.y);
+            }
+            else
+            {
+                CreateRT(ref uselessRT, 1, 1, 1);
             }
 
             Co_GoIter = GoIter();
@@ -351,6 +356,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         //___
         //####
 
+        computeShader.SetBool("useIndirectRT", useIndirectRT);
         if (useIndirectRT)
         {
             computeShader.SetTexture(kInx, "Result", directRT);
@@ -359,6 +365,8 @@ public class SDFGameSceneTrace : MonoBehaviour
         else
         {
             computeShader.SetTexture(kInx, "Result", rTex);
+            //!!! 反正不用到，但是参数要传进去，省得变shader代码
+            computeShader.SetTexture(kInx, "IndirectResult", uselessRT);
         }
         computeShader.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
         computeShader.SetTexture(kInx, "envBgTex", envBgTex);

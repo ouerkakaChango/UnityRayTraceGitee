@@ -211,15 +211,15 @@ if(mode==0)
 float3 lightDirs[5];
 float3 lightColors[5];
 lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-lightColors[0] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
+lightColors[0] = float3(2, 1.80447, 0) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
 lightDirs[1] = normalize(minHit.P - float3(0, 3.12, -0.91));
-lightColors[1] = float3(0, 0.1708908, 1) * GetPntlightAttenuation(minHit.P, float3(0, 3.12, -0.91));
+lightColors[1] = float3(0, 0.3417816, 2) * GetPntlightAttenuation(minHit.P, float3(0, 3.12, -0.91));
 lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
-lightColors[2] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
+lightColors[2] = float3(2, 1.80447, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
 lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
-lightColors[3] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
+lightColors[3] = float3(2, 1.80447, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
 lightDirs[4] = normalize(minHit.P - float3(-3.83, 8.15, 0));
-lightColors[4] = float3(1, 0.9022348, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
+lightColors[4] = float3(2, 1.80447, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
 result = 0 * mat.albedo * mat.ao;
 for(int i=0;i<5;i++)
 {

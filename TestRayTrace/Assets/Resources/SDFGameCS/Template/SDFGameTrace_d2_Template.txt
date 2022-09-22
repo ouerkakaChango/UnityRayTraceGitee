@@ -8,6 +8,7 @@ int w;
 int h;
 
 int frameID;
+bool useIndirectRT;
 
 int camType; //0:normal 1:orthogonal
 int camGammaMode; //0:normal 1:notGamma
@@ -93,7 +94,10 @@ void Render(uint3 id : SV_DispatchThreadID)
 			}
 			HitInfo minHit;
 			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray,minHit);
-			SSAA_indirColors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameIndirColor(ray,seed,minHit);
+			if(useIndirectRT)
+			{
+				SSAA_indirColors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameIndirColor(ray,seed,minHit);
+			}
 		}
 	}
 
@@ -105,6 +109,8 @@ void Render(uint3 id : SV_DispatchThreadID)
 	re /= (float)SSAA_num;
 	Result[id.xy] = float4(re, 1);
 
+	if(useIndirectRT)
+	{
 	re = 0;
 	for (int i = 0; i < SSAA_num; i++)
 	{
@@ -112,4 +118,5 @@ void Render(uint3 id : SV_DispatchThreadID)
 	}
 	re /= (float)SSAA_num;
 	IndirectResult[id.xy] = float4(re, 1);
+	}
 }
