@@ -366,6 +366,16 @@ float3 BilinearRGB(Texture2D<float3> tex, float2 uv)
 	return lerp(x0, x1, fracPart.y);
 }
 
+float SampleR(in Texture2D tex, float2 uv)
+{
+	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+}
+
+float SampleR(in Texture2D<float> tex, float2 uv)
+{
+	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+}
+
 //https://www.shadertoy.com/view/wt23Rt
 float3 RGBToHSV(float3 c) {
 	float4 K = float4(0., -1. / 3., 2. / 3., -1.),

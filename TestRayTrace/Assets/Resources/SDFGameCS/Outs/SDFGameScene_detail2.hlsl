@@ -1,4 +1,4 @@
-﻿#define OBJNUM 5
+﻿#define OBJNUM 7
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -24,6 +24,7 @@
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
+Texture2D<float> grayNoiseMedium;
 Texture2D<float3> lightmap_ground;
 //@@@
 
@@ -110,15 +111,15 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 0.4;
+re.albedo = float3(0.8784314, 0.6941177, 0.372549);
+re.metallic = 0.9;
+re.roughness = 0.5;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 0.3;
+re.albedo = float3(0.8784314, 0.6941177, 0.372549);
+re.metallic = 0.9;
+re.roughness = 0.1;
 }
 else if (obj == 2 )
 {
@@ -130,9 +131,21 @@ else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.3;
 }
 else if (obj == 4 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 0.9;
+}
+else if (obj == 5 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 6 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -145,12 +158,14 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[5];
+int renderMode[7];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
 renderMode[4] = 0;
+renderMode[5] = 0;
+renderMode[6] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -164,6 +179,7 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+inx = -2;
 }
 else if (inx == 2 )
 {
@@ -172,6 +188,12 @@ else if (inx == 3 )
 {
 }
 else if (inx == 4 )
+{
+}
+else if (inx == 5 )
+{
+}
+else if (inx == 6 )
 {
 inx = -1;
 }
@@ -184,6 +206,24 @@ inx = -1;
 	//	SmoothWithDither(color,uv);
 	//	mat.albedo = float4(color,1);
 	//}
+	if(inx == -2)
+	{
+
+		float3 center = float3(-2.81200004,2.68899989,-1.22000003);
+		float3 bound = 4*float3(0.07,0.05,0.05);
+		float2 uv = BoxedUV(minHit.P, center, bound, float3(0, 0, 0));
+
+		//change from https://www.shadertoy.com/view/tldfD8
+		float brushPower = 0.15;
+		float g = 0.1, l=0.;
+		g += -0.5+SampleR(grayNoiseMedium, uv*float2(.06,4.18));
+		l += brushPower;
+		l = exp(4.*l-1.5);
+		g = exp(1.2*g-1.5);
+		float v = .1*g+.2*l+2.*g*l;
+		mat.metallic = saturate(v*2);
+		mat.roughness = saturate((1-v)*0.5);
+	}
 }
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
@@ -212,8 +252,8 @@ float3 lightDirs[5];
 float3 lightColors[5];
 lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
 lightColors[0] = float3(2, 1.80447, 0) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
-lightDirs[1] = normalize(minHit.P - float3(0, 3.12, -0.91));
-lightColors[1] = float3(0, 0.3417816, 2) * GetPntlightAttenuation(minHit.P, float3(0, 3.12, -0.91));
+lightDirs[1] = normalize(minHit.P - float3(-2.302, 3.729, -1.16));
+lightColors[1] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-2.302, 3.729, -1.16));
 lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
 lightColors[2] = float3(2, 1.80447, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
 lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
@@ -260,6 +300,10 @@ else if (mode == 333)
 	float3 l = normalize(lightPos - minHit.P);
 	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
 }
+else if (mode == 1001)
+{
+	result = minHit.N;
+}
 else
 {
 	result = float3(1,0,1);
@@ -286,38 +330,33 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
-if(true)
-{
-float lightspace = 5;
-//@SDFBakerMgr DirShadow
-float3 lightPos[5];
-lightPos[0] = float3(-0.07, 8.15, 3.42);
-lightPos[1] = float3(0, 3.12, -0.91);
-lightPos[2] = float3(0.04, 8.15, -3.29);
-lightPos[3] = float3(3.357384, 8.15, 0);
-lightPos[4] = float3(-3.83, 8.15, 0);
-float3 lightDirs[5];
-lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-lightDirs[1] = normalize(minHit.P - float3(0, 3.12, -0.91));
-lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
-lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
-lightDirs[4] = normalize(minHit.P - float3(-3.83, 8.15, 0));
-for(int i=0;i<5;i++)
-{
-	//??? need bake
-	float maxLength = length(minHit.P - lightPos[i]);
-	float tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
-	//if(i==4 || i==3 || i==2 || i==-1)
-	//{
-	//	tsha = 1;
-	//}
-	lightspace -= (1-tsha);
-}
-lightspace /= 5;
-sha = lightspace;
-//@
-}
-//sha = saturate(0.2 + sha);
+//if(true)
+//{
+//float lightspace = 5;
+////@SDFBakerMgr DirShadow
+//float3 lightPos[5];
+//lightPos[0] = float3(-0.07, 8.15, 3.42);
+//lightPos[1] = float3(0, 3.12, -0.91);
+//lightPos[2] = float3(0.04, 8.15, -3.29);
+//lightPos[3] = float3(3.357384, 8.15, 0);
+//lightPos[4] = float3(-3.83, 8.15, 0);
+//float3 lightDirs[5];
+//lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+//lightDirs[1] = normalize(minHit.P - float3(0, 3.12, -0.91));
+//lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
+//lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
+//lightDirs[4] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+//for(int i=0;i<5;i++)
+//{
+//	//??? need bake
+//	float maxLength = length(minHit.P - lightPos[i]);
+//	float tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
+//	lightspace -= (1-tsha);
+//}
+//lightspace /= 5;
+//sha = lightspace;
+////@
+//}
 return sha;
 }
 
@@ -349,6 +388,16 @@ float SDFPlanet(float3 p)
 	return re;
 }
 
+//change from https://iquilezles.org/articles/distfunctions/
+float3 opCheapBend_XY( float3 p , in float3 center, float k=10.0f)
+{
+	p -= center;
+float c = cos(k*p.x);
+float s = sin(k*p.x);
+float2x2 m = {c,-s,s,c};
+return float3(mul(m,p.xy),p.z)+center;
+}
+
 float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 {
 //###
@@ -358,21 +407,29 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-2.579, 2.327, -1.197), float3(0.185, 0.09, 0.001), float3(25.30989, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+inx = -2;
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 4 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+}
+else if (inx == 5 )
+{
+re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+}
+else if (inx == 6 )
 {
 inx = -1;
 }
@@ -384,6 +441,14 @@ if(inx == -1)
 float d = MaxSDF;
 dinnerTable(d,p);
 //d-=0.2;
+re = min(re,d);
+}
+if (inx == -2)
+{
+
+float3 center = float3(-2.81200004,2.68899989,-1.22000003);
+//float3 p2 = opCheapBend_XY(p,center,1);
+float d = SDFBox(p,center,4*float3(0.07,0.05,0.05));
 re = min(re,d);
 }
 
@@ -409,6 +474,7 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+inx = -2;
 }
 else if (inx == 2 )
 {
@@ -417,6 +483,12 @@ else if (inx == 3 )
 {
 }
 else if (inx == 4 )
+{
+}
+else if (inx == 5 )
+{
+}
+else if (inx == 6 )
 {
 inx = -1;
 }

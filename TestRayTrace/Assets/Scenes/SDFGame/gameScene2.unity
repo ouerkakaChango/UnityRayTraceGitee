@@ -244,6 +244,7 @@ GameObject:
   - component: {fileID: 296496486}
   - component: {fileID: 296496485}
   - component: {fileID: 296496487}
+  - component: {fileID: 296496488}
   m_Layer: 0
   m_Name: System
   m_TagString: Untagged
@@ -268,13 +269,15 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[5];
+  - int renderMode[7];
   bakedRenders: []
   bakedDirShadows: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
+  - {fileID: 740148108}
+  - {fileID: 420418696}
   - {fileID: 537032344}
   - {fileID: 1007502731}
   - {fileID: 1647113767}
@@ -307,14 +310,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
+  - name: grayNoiseMedium
+    tex: {fileID: 2800000, guid: 16ba408a87324d748b8e148f4d5ce992, type: 3}
+    channel: 3
   - name: lightmap_ground
     tex: {fileID: 2800000, guid: e04846de3767a2743b63f919a78824dc, type: 3}
     channel: 1
   tags:
+  - {fileID: 420418697}
   - {fileID: 1007502732}
   bakedDeclares:
+  - Texture2D<float> grayNoiseMedium;
   - Texture2D<float3> lightmap_ground;
   bakedEnvTexSettings: []
+--- !u!114 &296496488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296496484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e57f28516c177b343be8369b83c83cd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextLevelObj: {fileID: 0}
+  trace: {fileID: 1666331705}
+  startActions: 05000000
 --- !u!1 &328588540
 GameObject:
   m_ObjectHideFlags: 0
@@ -432,7 +455,6 @@ GameObject:
   - component: {fileID: 402165471}
   - component: {fileID: 402165470}
   - component: {fileID: 402165469}
-  - component: {fileID: 402165472}
   m_Layer: 0
   m_Name: testLight
   m_TagString: Untagged
@@ -463,8 +485,8 @@ Light:
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
-  m_Color: {r: 0, g: 0.17089081, b: 1, a: 1}
-  m_Intensity: 2
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -522,110 +544,93 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 402165468}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.12, z: -0.91}
+  m_LocalPosition: {x: -2.302, y: 3.729, z: -1.16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &402165472
+--- !u!1 &420418694
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 420418695}
+  - component: {fileID: 420418696}
+  - component: {fileID: 420418697}
+  m_Layer: 0
+  m_Name: Special_bendTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &420418695
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420418694}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.812, y: 2.689, z: -1.22}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &420418696
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 402165468}
+  m_GameObject: {fileID: 420418694}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c728d84ecf18fef4aad8df9690e267af, type: 3}
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  autoCS: {fileID: 1666331704}
-  specialID: -1
-  test:
-  - void dinnerTable(inout float re, in float3 p)
-  - '{'
-  - float d3 = re;
-  - float d0 = re;
-  - float d8 = re;
-  - float d2 = re;
-  - float d5 = re;
-  - d3 = min(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534,
-    0.1951089), float3(0, 0, 0)));
-  - d0 = min(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534,
-    0.1951089), float3(0, 0, 0)));
-  - d8 = min(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534,
-    0.1951089), float3(0, 0, 0)));
-  - d2 = min(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534,
-    0.1951089), float3(0, 0, 0)));
-  - d5 = min(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217,
-    1.7315), float3(0, 0, 0)));
-  - re = min(re, d3);
-  - re = min(re, d0);
-  - re = min(re, d8);
-  - re = min(re, d2);
-  - re = min(re, d5);
-  - '}'
-  test2: []
-  test3:
-  - void dinnerTable(inout float re, in float3 p)
-  - '{'
-  - float d3 = re;
-  - float d0 = re;
-  - float d8 = re;
-  - float d2 = re;
-  - float d5 = re;
-  - d3 = min(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534,
-    0.1951089), float3(0, 0, 0)));
-  - d0 = min(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534,
-    0.1951089), float3(0, 0, 0)));
-  - d8 = min(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534,
-    0.1951089), float3(0, 0, 0)));
-  - d2 = min(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534,
-    0.1951089), float3(0, 0, 0)));
-  - d5 = min(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217,
-    1.7315), float3(0, 0, 0)));
-  - re = min(re, d3);
-  - re = min(re, d0);
-  - re = min(re, d8);
-  - re = min(re, d2);
-  - re = min(re, d5);
-  - '}'
-  extraInclude: []
-  dumpDir: 
-  prefabs:
-  - prefabName: dinnerTable
-    lines:
-    - void dinnerTable(inout float re, in float3 p)
-    - '{'
-    - float d3 = re;
-    - float d0 = re;
-    - float d8 = re;
-    - float d2 = re;
-    - float d5 = re;
-    - d3 = min(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534,
-      0.1951089), float3(0, 0, 0)));
-    - d0 = min(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534,
-      0.1951089), float3(0, 0, 0)));
-    - d8 = min(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534,
-      0.1951089), float3(0, 0, 0)));
-    - d2 = min(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534,
-      0.1951089), float3(0, 0, 0)));
-    - d5 = min(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217,
-      1.7315), float3(0, 0, 0)));
-    - re = min(re, d3);
-    - re = min(re, d0);
-    - re = min(re, d8);
-    - re = min(re, d2);
-    - re = min(re, d5);
-    - '}'
-  groupPrefabName: dinnerTable
-  groups:
-  - {fileID: 596599791}
-  - {fileID: 22466672}
-  - {fileID: 1890238656}
-  - {fileID: 566221532}
-  - {fileID: 1231039147}
+  mat_PBR:
+    albedo: {r: 0.8784314, g: 0.69411767, b: 0.37254903, a: 1}
+    metallic: 0.9
+    roughness: 0.1
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 1
+  specialID: -2
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
+  SDF_offset2D: 0
+  mergeType: 0
+  objInx: 1
+  needExtraCondition: 0
+  extraCondition: 
+--- !u!114 &420418697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420418694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  pbrTextures: []
+  heightTextures: []
+  plainTextures:
+  - name: grayNoiseMedium
+    tex: {fileID: 2800000, guid: 16ba408a87324d748b8e148f4d5ce992, type: 3}
+    channel: 3
+  envTextures: []
+  texInx: 0
 --- !u!1 &537032342
 GameObject:
   m_ObjectHideFlags: 0
@@ -685,7 +690,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 0
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &537032345
@@ -970,6 +975,116 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 596599789}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &740148106
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 740148107}
+  - component: {fileID: 740148110}
+  - component: {fileID: 740148109}
+  - component: {fileID: 740148108}
+  m_Layer: 0
+  m_Name: invi1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &740148107
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740148106}
+  m_LocalRotation: {x: 0.21907899, y: -0, z: -0, w: 0.9757071}
+  m_LocalPosition: {x: -2.579, y: 2.327, z: -1.197}
+  m_LocalScale: {x: 0.37, y: 0.18, z: 0.002}
+  m_Children: []
+  m_Father: {fileID: 1330409199}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 25.31, y: 0, z: 0}
+--- !u!114 &740148108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740148106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 0.87843144, g: 0.69411767, b: 0.37254903, a: 1}
+    metallic: 0.9
+    roughness: 0.5
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 0
+  specialID: -1
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
+  SDF_offset2D: 0
+  mergeType: 1
+  objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
+--- !u!23 &740148109
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740148106}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &740148110
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740148106}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &794877058
 GameObject:
   m_ObjectHideFlags: 0
@@ -1184,7 +1299,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 1
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1007502732
@@ -1207,7 +1322,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: e04846de3767a2743b63f919a78824dc, type: 3}
     channel: 1
   envTextures: []
-  texInx: 0
+  texInx: 1
 --- !u!1 &1008065616
 GameObject:
   m_ObjectHideFlags: 0
@@ -1314,6 +1429,135 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1134035864
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1134035866}
+  - component: {fileID: 1134035865}
+  m_Layer: 0
+  m_Name: Baker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1134035865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1134035864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c728d84ecf18fef4aad8df9690e267af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoCS: {fileID: 1666331704}
+  specialID: -1
+  test:
+  - void dinnerTable(inout float re, in float3 p)
+  - '{'
+  - float d3 = re;
+  - float d0 = re;
+  - float d8 = re;
+  - float d2 = re;
+  - float d5 = re;
+  - d3 = min(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d0 = min(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d8 = min(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d2 = min(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d5 = min(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217,
+    1.7315), float3(0, 0, 0)));
+  - re = min(re, d3);
+  - re = min(re, d0);
+  - re = min(re, d8);
+  - re = min(re, d2);
+  - re = min(re, d5);
+  - '}'
+  test2: []
+  test3:
+  - void dinnerTable(inout float re, in float3 p)
+  - '{'
+  - float d3 = re;
+  - float d0 = re;
+  - float d8 = re;
+  - float d2 = re;
+  - float d5 = re;
+  - d3 = min(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d0 = min(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d8 = min(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d2 = min(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534,
+    0.1951089), float3(0, 0, 0)));
+  - d5 = min(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217,
+    1.7315), float3(0, 0, 0)));
+  - re = min(re, d3);
+  - re = min(re, d0);
+  - re = min(re, d8);
+  - re = min(re, d2);
+  - re = min(re, d5);
+  - '}'
+  extraInclude: []
+  dumpDir: 
+  prefabs:
+  - prefabName: dinnerTable
+    lines:
+    - void dinnerTable(inout float re, in float3 p)
+    - '{'
+    - float d3 = re;
+    - float d0 = re;
+    - float d8 = re;
+    - float d2 = re;
+    - float d5 = re;
+    - d3 = min(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534,
+      0.1951089), float3(0, 0, 0)));
+    - d0 = min(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534,
+      0.1951089), float3(0, 0, 0)));
+    - d8 = min(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534,
+      0.1951089), float3(0, 0, 0)));
+    - d2 = min(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534,
+      0.1951089), float3(0, 0, 0)));
+    - d5 = min(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217,
+      1.7315), float3(0, 0, 0)));
+    - re = min(re, d3);
+    - re = min(re, d0);
+    - re = min(re, d8);
+    - re = min(re, d2);
+    - re = min(re, d5);
+    - '}'
+  groupPrefabName: dinnerTable
+  groups:
+  - {fileID: 596599791}
+  - {fileID: 22466672}
+  - {fileID: 1890238656}
+  - {fileID: 566221532}
+  - {fileID: 1231039147}
+--- !u!4 &1134035866
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1134035864}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1231039145
 GameObject:
   m_ObjectHideFlags: 0
@@ -1564,6 +1808,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1330409198
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1330409199}
+  m_Layer: 0
+  m_Name: Invitation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1330409199
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1330409198}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 740148107}
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1453774954
 GameObject:
   m_ObjectHideFlags: 0
@@ -1750,7 +2025,7 @@ MonoBehaviour:
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
-    roughness: 0.4
+    roughness: 0.9
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
@@ -1760,7 +2035,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 2
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1647113768
@@ -1955,18 +2230,13 @@ MonoBehaviour:
   renderSize: {x: 1024, y: 720}
   useIndirectRT: 0
   indirectMultiplier: 3
-  rt: {fileID: 0}
-  directRT: {fileID: 0}
-  newFrontIndirectRT: {fileID: 0}
-  frontIndirectRT: {fileID: 0}
-  indirectRT: {fileID: 0}
-  uselessRT: {fileID: 0}
   useFSR: 0
   FSR_Scale: 2
   SceneName: detail2
   autoCS: {fileID: 1666331704}
   envSpecTex2DArr: {fileID: 18700000, guid: d37b2c39ff60a64418373d4106357100, type: 2}
   envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
+  keyboard: {fileID: 0}
 --- !u!114 &1666331706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2251,7 +2521,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 3
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &1878584168
@@ -2459,6 +2729,6 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 4
+  objInx: 6
   needExtraCondition: 0
   extraCondition: 

@@ -17,6 +17,7 @@ namespace XCGame
         EnableNextLevelDoor,
         GotoNextLevel,
         DebugLogMessage,
+        TestKeyBind_qe,
     }
     public class GeneralTrigger : MonoBehaviour
     {

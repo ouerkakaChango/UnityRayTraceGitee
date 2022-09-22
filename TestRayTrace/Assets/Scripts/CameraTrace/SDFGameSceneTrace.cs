@@ -162,7 +162,8 @@ public class SDFGameSceneTrace : MonoBehaviour
     //___
 
     //--- Keyboard
-    KeyboardInputer keyboard;
+    [HideInInspector]
+    public KeyboardInputer keyboard;
     //___
 
     bool hasInited = false;
