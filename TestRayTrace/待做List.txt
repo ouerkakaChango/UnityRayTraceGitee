@@ -1,5 +1,6 @@
 【暂停，换用画图Slice】--1.手动公式，画出A-Z的SDF模型
 【CreateFontScene目前可支持此功能】--2.SDF-prefab编辑器，用于调整，保存A-Z的英文字体prefab
 【完成】3.完善innerBound自动Bake，阴影里的trace也要加上
-4.室内多点光源的阴影解决方案
-5.室内Indirect实现
+【完成，比较耗，可能后面做成预烘培ShadowMask】4.室内多点光源的阴影解决方案
+【完成，比较耗，暂不开启】5.室内Indirect实现
+6.Scene2的主体建模，不能再被“非主线任务”吸引了
