@@ -10,6 +10,11 @@ public class GameSceneSystem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if(trace==null)
+        {
+            Debug.Log("Warning:No trace for GameSceneSystem ");
+            return;
+        }
         var keyboard = trace.gameObject.GetComponent<KeyboardInputer>();
         for (int i = 0; i < startActions.Count; i++)
         {

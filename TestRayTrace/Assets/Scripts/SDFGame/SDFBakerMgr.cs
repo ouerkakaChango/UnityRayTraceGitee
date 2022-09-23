@@ -13,6 +13,8 @@ public class SDFBakerMgr : MonoBehaviour
     [HideInInspector]
     public List<string> bakedSDFs = new List<string>();
     [HideInInspector]
+    public List<string> bakedObjUVs = new List<string>();
+    [HideInInspector]
     public List<string> bakedSpecialObjects = new List<string>();
     [HideInInspector]
     public List<string> bakedMaterials = new List<string>();
@@ -98,13 +100,16 @@ public class SDFBakerMgr : MonoBehaviour
     void DoPreAddAction(int i,SDFBakerTag tag)
     {
         PreAddSDF(i, ref bakedSDFs, tag);
+        PreAdd(i, ref bakedObjUVs);
         PreAdd(i, ref bakedSpecialObjects);
         PreAdd(i, ref bakedMaterials, "obj");
+
     }
 
     void DoPostAddAction(int i)
     {
         PostAdd(i, ref bakedSDFs);
+        PostAdd(i, ref bakedObjUVs);
         PostAdd(i, ref bakedSpecialObjects);
         PostAdd(i, ref bakedMaterials);
     }
@@ -155,6 +160,7 @@ public class SDFBakerMgr : MonoBehaviour
     {
         bakedBeforeSDF.Clear();
         bakedSDFs.Clear();
+        bakedObjUVs.Clear();
 
         bakedMaterials.Clear();
 
@@ -492,9 +498,17 @@ public class SDFBakerMgr : MonoBehaviour
     {
         float offset = obj.GetComponent<SDFBakerTag>().SDF_offset;
         Vector3 bakeRot = obj.transform.rotation.eulerAngles;
-        string line = offset + " + SDFBox(p, " + Bake(obj.transform.position) + ", " + Bake(obj.transform.lossyScale*0.5f) + ", " + Bake(bakeRot) +")";
+        string center_str = Bake(obj.transform.position);
+        string bound_str = Bake(obj.transform.lossyScale * 0.5f);
+        string rot_str = Bake(bakeRot);
+        string line = offset + " + SDFBox(p, " + center_str + ", " + bound_str + ", " + rot_str + ")";
         line = "re = min(re, " + line + ");";
         bakedSDFs.Add(line);
+
+        //Bake ObjUV
+        //uv = BoxedUV(minHit.P, center, bound, rot);
+        line = "uv = BoxedUV(minHit.P, " + center_str + ", " + bound_str + ", " + rot_str + ");";
+        bakedObjUVs.Add(line);
 
         SetTagMergeType(obj, SDFMergeType.Box);
     }

@@ -266,6 +266,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ambientIntensity: 0
   bakedSDFs: []
+  bakedObjUVs: []
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
@@ -276,9 +277,9 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 740148108}
   - {fileID: 420418696}
   - {fileID: 537032344}
+  - {fileID: 740148108}
   - {fileID: 1007502731}
   - {fileID: 1647113767}
   - {fileID: 1796358842}
@@ -317,7 +318,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: e04846de3767a2743b63f919a78824dc, type: 3}
     channel: 1
   tags:
-  - {fileID: 420418697}
+  - {fileID: 0}
   - {fileID: 1007502732}
   bakedDeclares:
   - Texture2D<float> grayNoiseMedium;
@@ -560,7 +561,6 @@ GameObject:
   m_Component:
   - component: {fileID: 420418695}
   - component: {fileID: 420418696}
-  - component: {fileID: 420418697}
   m_Layer: 0
   m_Name: Special_bendTest
   m_TagString: Untagged
@@ -607,30 +607,9 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
---- !u!114 &420418697
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 420418694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 2
-  pbrTextures: []
-  heightTextures: []
-  plainTextures:
-  - name: grayNoiseMedium
-    tex: {fileID: 2800000, guid: 16ba408a87324d748b8e148f4d5ce992, type: 3}
-    channel: 3
-  envTextures: []
-  texInx: 0
 --- !u!1 &537032342
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,7 +669,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 2
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &537032345
@@ -1033,7 +1012,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 0
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &740148109
@@ -2229,7 +2208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderSize: {x: 1024, y: 720}
   useIndirectRT: 0
-  indirectMultiplier: 3
+  indirectMultiplier: 1
   useFSR: 0
   FSR_Scale: 2
   SceneName: detail2

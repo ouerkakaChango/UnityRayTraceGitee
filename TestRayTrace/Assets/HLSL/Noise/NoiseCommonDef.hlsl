@@ -2,7 +2,7 @@
 #define NOISECOMMONDEF_HLSL
 //https ://www.shadertoy.com/view/ldScDh
 Texture2D NoiseRGBTex;
-Texture2D perlinNoise1,voronoiNoise1,blueNoise;
+Texture2D perlinNoise1,voronoiNoise1,blueNoise, greyNoiseMedium;
 
 SamplerState noise_linear_repeat_sampler;
 float noise_texBase(in float3 x)

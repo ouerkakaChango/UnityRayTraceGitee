@@ -14,17 +14,17 @@
 #include "../../../HLSL/PBR/PBRCommonDef.hlsl"
 #include "../../../HLSL/PBR/PBR_IBL.hlsl"
 #include "../../../HLSL/PBR/PBR_GGX.hlsl"
-
 #include "../../../HLSL/UV/UVCommonDef.hlsl"
+
 #include "../../../HLSL/Random/RandUtility.hlsl"
 #include "../../../HLSL/Noise/NoiseCommonDef.hlsl"
 #include "../../../HLSL/Transform/TransformCommonDef.hlsl"
 #include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
+#include "../../../HLSL/MatLib/CommonMatLib.hlsl"
 
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
-Texture2D<float> grayNoiseMedium;
 Texture2D<float3> lightmap_ground;
 //@@@
 
@@ -113,19 +113,19 @@ if(obj == 0 )
 {
 re.albedo = float3(0.8784314, 0.6941177, 0.372549);
 re.metallic = 0.9;
-re.roughness = 0.5;
-}
-else if (obj == 1 )
-{
-re.albedo = float3(0.8784314, 0.6941177, 0.372549);
-re.metallic = 0.9;
 re.roughness = 0.1;
 }
-else if (obj == 2 )
+else if (obj == 1 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.4;
+}
+else if (obj == 2 )
+{
+re.albedo = float3(0.8784314, 0.6941177, 0.372549);
+re.metallic = 0.9;
+re.roughness = 0.5;
 }
 else if (obj == 3 )
 {
@@ -170,16 +170,87 @@ return renderMode[obj];
 //@@@
 }
 
+float2 GetObjUV(in HitInfo minHit)
+{
+	float2 uv = 0;
+	int inx = minHit.obj;
+	//@@@SDFBakerMgr ObjUV
+if(inx == 0 )
+{
+}
+else if (inx == 1 )
+{
+uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+}
+else if (inx == 2 )
+{
+uv = BoxedUV(minHit.P, float3(-2.579, 2.327, -1.197), float3(0.185, 0.09, 0.001), float3(25.30989, 0, 0));
+}
+else if (inx == 3 )
+{
+uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+}
+else if (inx == 4 )
+{
+uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
+}
+else if (inx == 5 )
+{
+uv = BoxedUV(minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+}
+else if (inx == 6 )
+{
+}
+	//@@@
+
+	//----------------------------------
+
+	//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+inx = -2;
+}
+else if (inx == 1 )
+{
+}
+else if (inx == 2 )
+{
+}
+else if (inx == 3 )
+{
+}
+else if (inx == 4 )
+{
+}
+else if (inx == 5 )
+{
+}
+else if (inx == 6 )
+{
+inx = -1;
+}
+	//@@@
+	//@
+	if(inx == -2)
+	{
+		float3 center = float3(-2.81200004,2.68899989,-1.22000003);
+		float3 bound = 4*float3(0.07,0.05,0.05);
+		uv = BoxedUV(minHit.P, center, bound, float3(0, 0, 0));
+	}
+	//@
+	return uv;
+}
+
 void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
 }
 else if (inx == 2 )
 {
@@ -208,22 +279,21 @@ inx = -1;
 	//}
 	if(inx == -2)
 	{
-
-		float3 center = float3(-2.81200004,2.68899989,-1.22000003);
-		float3 bound = 4*float3(0.07,0.05,0.05);
-		float2 uv = BoxedUV(minHit.P, center, bound, float3(0, 0, 0));
-
-		//change from https://www.shadertoy.com/view/tldfD8
-		float brushPower = 0.15;
-		float g = 0.1, l=0.;
-		g += -0.5+SampleR(grayNoiseMedium, uv*float2(.06,4.18));
-		l += brushPower;
-		l = exp(4.*l-1.5);
-		g = exp(1.2*g-1.5);
-		float v = .1*g+.2*l+2.*g*l;
-		mat.metallic = saturate(v*2);
-		mat.roughness = saturate((1-v)*0.5);
+		float2 uv = GetObjUV(minHit);
+		//???
+		////change from https://www.shadertoy.com/view/tldfD8
+		//float brushPower = 0.15;
+		//float g = 0.1, l=0.;
+		//g += -0.5+SampleR(grayNoiseMedium, uv*float2(.06,4.18));
+		//l += brushPower;
+		//l = exp(4.*l-1.5);
+		//g = exp(1.2*g-1.5);
+		//float v = .1*g+.2*l+2.*g*l;
+		//mat.metallic = saturate(v*2);
+		//mat.roughness = saturate((1-v)*0.5);
+		SetMatLib_BrushedMetal(mat,uv);
 	}
+	//mat.albedo = float3(GetObjUV(minHit),0);
 }
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
@@ -330,10 +400,10 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
-//if(true)
-//{
-//float lightspace = 5;
-////@SDFBakerMgr DirShadow
+if(true)
+{
+float lightspace = 5;
+//@SDFBakerMgr DirShadow
 //float3 lightPos[5];
 //lightPos[0] = float3(-0.07, 8.15, 3.42);
 //lightPos[1] = float3(0, 3.12, -0.91);
@@ -355,8 +425,8 @@ float RenderSceneSDFShadow(HitInfo minHit)
 //}
 //lightspace /= 5;
 //sha = lightspace;
-////@
-//}
+//@
+}
 return sha;
 }
 
@@ -407,15 +477,15 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(-2.579, 2.327, -1.197), float3(0.185, 0.09, 0.001), float3(25.30989, 0, 0)));
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-2.579, 2.327, -1.197), float3(0.185, 0.09, 0.001), float3(25.30989, 0, 0)));
 }
 else if (inx == 3 )
 {
@@ -471,10 +541,10 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
 }
 else if (inx == 2 )
 {
@@ -937,7 +1007,6 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 	HitInfo indirHit;
 	float3 indirLightColor;
 	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit);
-	//???
 	indirLightColor *= RenderSceneSDFShadow(indirHit);
 	re = IndirPointLightRender(minHit.P,minHit.N, indirLightColor, indirHit.P);
 }

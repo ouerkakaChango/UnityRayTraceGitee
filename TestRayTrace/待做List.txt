@@ -4,3 +4,6 @@
 【完成，比较耗，可能后面做成预烘培ShadowMask】4.室内多点光源的阴影解决方案
 【完成，比较耗，暂不开启】5.室内Indirect实现
 6.Scene2的主体建模，不能再被“非主线任务”吸引了
+7.做MaterialLibrary，目前主要支持Box
+7.1 实现Bake GetObjUV
+7.2 实现MatLibSys，收集MatLibTag,在ObjPreRender中Bake成代码

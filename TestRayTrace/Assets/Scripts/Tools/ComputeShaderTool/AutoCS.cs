@@ -168,6 +168,7 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("ObjRender", new List<Vector2Int>());
         rangeMap.Add("DirShadow", new List<Vector2Int>());
         rangeMap.Add("ObjSDF", new List<Vector2Int>());
+        rangeMap.Add("ObjUV", new List<Vector2Int>());
         rangeMap.Add("SpecialObj", new List<Vector2Int>());
         rangeMap.Add("BeforeObjSDF", new List<Vector2Int>());
         rangeMap.Add("TexSys", new List<Vector2Int>());
@@ -228,6 +229,10 @@ public class AutoCS : MonoBehaviour
             if (key == "ObjSDF" && ValidRange(range))
             {
                 helper.Replace(range, bakerMgr.bakedSDFs);
+            }
+            else if (key == "ObjUV" && ValidRange(range))
+            {
+                helper.Replace(range, bakerMgr.bakedObjUVs);
             }
             else if (key == "BeforeObjSDF" && ValidRange(range))
             {

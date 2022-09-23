@@ -14,6 +14,7 @@
 #include "../../../HLSL/PBR/PBRCommonDef.hlsl"
 #include "../../../HLSL/PBR/PBR_IBL.hlsl"
 #include "../../../HLSL/PBR/PBR_GGX.hlsl"
+#include "../../../HLSL/UV/UVCommonDef.hlsl"
 
 ###BLOCK ExtraInclude
 ...
@@ -36,6 +37,13 @@ Material_PBR GetObjMaterial_PBR(int obj)
 int GetObjRenderMode(int obj)
 {
 	###BLOCK ObjRenderMode
+	... 
+	###BLOCK
+}
+
+float2 GetObjUV(in HitInfo minHit)
+{
+	###BLOCK ObjUV
 	... 
 	###BLOCK
 }
