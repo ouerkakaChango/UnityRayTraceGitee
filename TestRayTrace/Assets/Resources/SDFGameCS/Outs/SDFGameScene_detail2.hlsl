@@ -1,4 +1,4 @@
-﻿#define OBJNUM 7
+﻿#define OBJNUM 6
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -111,41 +111,35 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0.8784314, 0.6941177, 0.372549);
-re.metallic = 0.9;
-re.roughness = 0.1;
-}
-else if (obj == 1 )
-{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.4;
 }
-else if (obj == 2 )
+else if (obj == 1 )
 {
 re.albedo = float3(0.8784314, 0.6941177, 0.372549);
 re.metallic = 0.9;
 re.roughness = 0.5;
 }
-else if (obj == 3 )
+else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.3;
 }
-else if (obj == 4 )
+else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.9;
 }
-else if (obj == 5 )
+else if (obj == 4 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
-else if (obj == 6 )
+else if (obj == 5 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -158,14 +152,13 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[7];
+int renderMode[6];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
 renderMode[4] = 0;
 renderMode[5] = 0;
-renderMode[6] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -177,28 +170,25 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
+uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-2.579, 2.327, -1.197), float3(0.185, 0.09, 0.001), float3(25.30989, 0, 0));
 }
 else if (inx == 2 )
 {
-uv = BoxedUV(minHit.P, float3(-2.579, 2.327, -1.197), float3(0.185, 0.09, 0.001), float3(25.30989, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
 }
 else if (inx == 3 )
 {
-uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
 }
 else if (inx == 4 )
 {
-uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
-}
-else if (inx == 5 )
-{
 uv = BoxedUV(minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 }
-else if (inx == 6 )
+else if (inx == 5 )
 {
 }
 	//@@@
@@ -208,7 +198,6 @@ else if (inx == 6 )
 	//@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
 }
 else if (inx == 1 )
 {
@@ -223,9 +212,6 @@ else if (inx == 4 )
 {
 }
 else if (inx == 5 )
-{
-}
-else if (inx == 6 )
 {
 inx = -1;
 }
@@ -244,10 +230,21 @@ inx = -1;
 void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
 int inx = minHit.obj;
+//@@@SDFBakerMgr ObjMatLib
+if(inx==2)
+{
+	float2 uv = GetObjUV(minHit);
+	SetMatLib_BrushedMetal(mat,uv);
+}
+if(inx==1)
+{
+	float2 uv = GetObjUV(minHit);
+	SetMatLib_BrushedMetal(mat,uv);
+}
+//@@@
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
 }
 else if (inx == 1 )
 {
@@ -263,9 +260,6 @@ else if (inx == 4 )
 }
 else if (inx == 5 )
 {
-}
-else if (inx == 6 )
-{
 inx = -1;
 }
 //@@@
@@ -280,7 +274,6 @@ inx = -1;
 	if(inx == -2)
 	{
 		float2 uv = GetObjUV(minHit);
-		//???
 		////change from https://www.shadertoy.com/view/tldfD8
 		//float brushPower = 0.15;
 		//float g = 0.1, l=0.;
@@ -293,6 +286,12 @@ inx = -1;
 		//mat.roughness = saturate((1-v)*0.5);
 		SetMatLib_BrushedMetal(mat,uv);
 	}
+	//???
+	//if(inx==2)
+	//{
+	//	float2 uv = GetObjUV(minHit);
+	//	SetMatLib_BrushedMetal(mat,uv);
+	//}
 	//mat.albedo = float3(GetObjUV(minHit),0);
 }
 
@@ -477,29 +476,25 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -2;
+re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-2.579, 2.327, -1.197), float3(0.185, 0.09, 0.001), float3(25.30989, 0, 0)));
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(-2.579, 2.327, -1.197), float3(0.185, 0.09, 0.001), float3(25.30989, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
 }
 else if (inx == 4 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
-}
-else if (inx == 5 )
-{
 re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
-else if (inx == 6 )
+else if (inx == 5 )
 {
 inx = -1;
 }
@@ -541,7 +536,6 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
 }
 else if (inx == 1 )
 {
@@ -556,9 +550,6 @@ else if (inx == 4 )
 {
 }
 else if (inx == 5 )
-{
-}
-else if (inx == 6 )
 {
 inx = -1;
 }

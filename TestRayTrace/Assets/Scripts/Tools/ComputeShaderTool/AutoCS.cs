@@ -16,6 +16,9 @@ public class AutoCS : MonoBehaviour
     public SDFBakerMgr bakerMgr = null;
     public TextureSystem texSys = null;
     public DynamicValSys dyValSys = null;
+    //public MatLibSystem matLibSys = null;
+    //0:MatLibSystem
+    public List<BaseSystem> systems = new List<BaseSystem>();
     public List<string> templates = new List<string>();
     public List<string> outs = new List<string>();
     public List<string> cfgs = new List<string>();
@@ -103,6 +106,10 @@ public class AutoCS : MonoBehaviour
         {
             dyValSys.Refresh();
         }
+        for(int i=0;i<systems.Count;i++)
+        {
+            systems[i].Refresh();
+        }
         if(bakerMgr!=null)
         {
             bakerMgr.Bake();
@@ -176,6 +183,14 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("CheckInnerBound", new List<Vector2Int>());
         rangeMap.Add("ObjEnvTex", new List<Vector2Int>());
         rangeMap.Add("TexSys_EnvTexSettings", new List<Vector2Int>());
+        //14
+        int exInx = 14;
+        rangeMap.Add("ObjMatLib", new List<Vector2Int>());
+
+        //---extra target sys
+        Dictionary<string, int> targetSysDic = new Dictionary<string, int>();
+        targetSysDic.Add("ObjMatLib",0);
+        //___
 
         var keyList = rangeMap.Keys.ToList();
         List<Vector2Int> orderList = new List<Vector2Int>();
@@ -217,6 +232,7 @@ public class AutoCS : MonoBehaviour
             }
         }
 
+        var keysArr = rangeMap.Keys.ToArray();
         LinesReplaceHelper helper = new LinesReplaceHelper();
         helper.Init(lines);
         for (int i=0;i<orderList.Count;i++)
@@ -306,6 +322,20 @@ public class AutoCS : MonoBehaviour
             {
                 helper.Replace(range, "ObjNum " + bakerMgr.tags.Length);
             }
+            else
+            {
+                for(int i1= exInx; i1<keysArr.Length;i1++)
+                {
+                    if (key == keysArr[i1] && ValidRange(range))
+                    {
+                        helper.Replace(range, systems[targetSysDic[key]].GetLinesOf(key));
+                    }
+                }
+            }
+            //else if(key == "ObjMatLib" && ValidRange(range))
+            //{
+            //    helper.Replace(range, systems[0].GetLinesOf("ObjMatLib"));
+            //}
 
             helper.EndReplaceRange();
         }
