@@ -1,4 +1,4 @@
-﻿#define OBJNUM 9
+﻿#define OBJNUM 10
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -25,6 +25,7 @@
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
+Texture2D<float3> invi1;
 Texture2D<float3> lightmap_ground;
 //@@@
 
@@ -111,9 +112,9 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0, 0, 0);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.4;
 }
 else if (obj == 1 )
 {
@@ -129,21 +130,21 @@ re.roughness = 1;
 }
 else if (obj == 3 )
 {
-re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 0.4;
-}
-else if (obj == 4 )
-{
 re.albedo = float3(0.8584906, 0.7477921, 0.3199092);
 re.metallic = 0.9;
 re.roughness = 0.5;
 }
-else if (obj == 5 )
+else if (obj == 4 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.3;
+}
+else if (obj == 5 )
+{
+re.albedo = float3(0, 0, 0);
+re.metallic = 0;
+re.roughness = 1;
 }
 else if (obj == 6 )
 {
@@ -159,6 +160,12 @@ re.roughness = 1;
 }
 else if (obj == 8 )
 {
+re.albedo = float3(0.8584906, 0.7477921, 0.3199092);
+re.metallic = 0.9;
+re.roughness = 0.5;
+}
+else if (obj == 9 )
+{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
@@ -170,7 +177,7 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[9];
+int renderMode[10];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
@@ -180,6 +187,7 @@ renderMode[5] = 0;
 renderMode[6] = 0;
 renderMode[7] = 0;
 renderMode[8] = 0;
+renderMode[9] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -191,7 +199,7 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
+uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
 }
 else if (inx == 1 )
 {
@@ -199,19 +207,19 @@ uv = BoxedUV(minHit.P, float3(-2.371201, 2.37087, -1.158671), float3(0.00838451,
 }
 else if (inx == 2 )
 {
-uv = BoxedUV(minHit.P, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576));
+uv = BoxedUV(minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
 }
 else if (inx == 3 )
 {
-uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576));
 }
 else if (inx == 4 )
 {
-uv = BoxedUV(minHit.P, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576));
+uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
 }
 else if (inx == 5 )
 {
-uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576));
 }
 else if (inx == 6 )
 {
@@ -222,6 +230,9 @@ else if (inx == 7 )
 uv = BoxedUV(minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 }
 else if (inx == 8 )
+{
+}
+else if (inx == 9 )
 {
 }
 	//@@@
@@ -255,6 +266,9 @@ else if (inx == 7 )
 }
 else if (inx == 8 )
 {
+}
+else if (inx == 9 )
+{
 inx = -1;
 }
 	//@@@
@@ -273,12 +287,30 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==4)
+if(inx==3)
+{
+	float2 uv = GetObjUV(minHit);
+	SetMatLib_BrushedMetal(mat,uv, 0);
+}
+if(inx==8)
 {
 	float2 uv = GetObjUV(minHit);
 	SetMatLib_BrushedMetal(mat,uv, 0);
 }
 //@@@
+
+//@@@SDFBakerMgr ObjImgAttach
+if (inx == 3)
+{
+float2 uv = GetObjUV(minHit);
+if (IsInBBox(uv, float2(0.3, 0.2), float2(0.7, 0.8)))
+{
+float2 uv2 = RemapUV(uv, float2(0, 0) ,float2(1, 1) ,float2(0.3, 0.2) ,float2(0.7, 0.8));
+mat.albedo = SampleRGB(invi1, uv2);
+}
+}
+//@@@
+
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
@@ -305,6 +337,9 @@ else if (inx == 7 )
 {
 }
 else if (inx == 8 )
+{
+}
+else if (inx == 9 )
 {
 inx = -1;
 }
@@ -333,11 +368,15 @@ inx = -1;
 		SetMatLib_BrushedMetal(mat,uv);
 	}
 	//???
-	if(inx==2)
-	{
-		mat.metallic = lerp(mat.metallic,1,0.5);
-		mat.roughness = lerp(mat.roughness,0.5,0.5);
-	}
+	//if(inx==3)
+	//{
+	//	float2 uv = GetObjUV(minHit);
+	//	if(IsInBBox(uv,float2(0.2,0.2),float2(0.6,0.8)))
+	//	{
+	//		float2 uv2 = RemapUV(uv,float2(0.2,0.2),float2(0.6,0.8));
+	//		mat.albedo = SampleRGB(blueNoise,uv2);
+	//	}
+	//}
 	//mat.albedo = float3(GetObjUV(minHit),0);
 }
 
@@ -522,7 +561,7 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246)));
+re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
@@ -530,19 +569,19 @@ re = min(re, 0 + SDFBox(p, float3(-2.371201, 2.37087, -1.158671), float3(0.00838
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576)));
+re = min(re, 0 + SDFBox(p, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246)));
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576)));
 }
 else if (inx == 4 )
 {
-re = min(re, 0 + SDFBox(p, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576)));
+re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 5 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576)));
 }
 else if (inx == 6 )
 {
@@ -553,6 +592,9 @@ else if (inx == 7 )
 re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 else if (inx == 8 )
+{
+}
+else if (inx == 9 )
 {
 inx = -1;
 }
@@ -617,6 +659,9 @@ else if (inx == 7 )
 {
 }
 else if (inx == 8 )
+{
+}
+else if (inx == 9 )
 {
 inx = -1;
 }

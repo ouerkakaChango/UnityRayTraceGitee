@@ -246,6 +246,7 @@ GameObject:
   - component: {fileID: 296496487}
   - component: {fileID: 296496488}
   - component: {fileID: 296496489}
+  - component: {fileID: 296496490}
   m_Layer: 0
   m_Name: System
   m_TagString: Untagged
@@ -271,21 +272,22 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[9];
+  - int renderMode[10];
   bakedRenders: []
   bakedDirShadows: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 669583705}
-  - {fileID: 629090791}
-  - {fileID: 1024496421}
   - {fileID: 537032344}
+  - {fileID: 629090791}
+  - {fileID: 669583705}
   - {fileID: 740148108}
   - {fileID: 1007502731}
+  - {fileID: 1024496421}
   - {fileID: 1647113767}
   - {fileID: 1796358842}
+  - {fileID: 2064857877}
   - {fileID: 2089595670}
 --- !u!4 &296496486
 Transform:
@@ -314,12 +316,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
+  - name: invi1
+    tex: {fileID: 2800000, guid: b921f3d98043a1b499c2fe66b27bae7f, type: 3}
+    channel: 1
   - name: lightmap_ground
     tex: {fileID: 2800000, guid: e04846de3767a2743b63f919a78824dc, type: 3}
     channel: 1
   tags:
+  - {fileID: 740148113}
   - {fileID: 1007502732}
   bakedDeclares:
+  - Texture2D<float3> invi1;
   - Texture2D<float3> lightmap_ground;
   bakedEnvTexSettings: []
 --- !u!114 &296496488
@@ -351,11 +358,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tags:
   - {fileID: 740148111}
+  - {fileID: 2064857876}
   bakedObjMatLib:
-  - if(inx==2)
+  - if(inx==3)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - "\tSetMatLib_BrushedMetal(mat,uv, 0);"
+  - '}'
+  - if(inx==8)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - "\tSetMatLib_BrushedMetal(mat,uv, 0);"
+  - '}'
+--- !u!114 &296496490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296496484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d33f639c4be5c4a4bb4f0b82fd229451, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tags:
+  - {fileID: 740148112}
+  bakedObjImgAttach:
+  - if (inx == 3)
+  - '{'
+  - '    float2 uv = GetObjUV(minHit);'
+  - '    if (IsInBBox(uv, float2(0.3, 0.2), float2(0.7, 0.8)))'
+  - '    {'
+  - '        float2 uv2 = RemapUV(uv, float2(0, 0) ,float2(1, 1) ,float2(0.3, 0.2)
+    ,float2(0.7, 0.8));'
+  - '        mat.albedo = SampleRGB(invi1, uv2);'
+  - '    }'
   - '}'
 --- !u!1 &328588540
 GameObject:
@@ -687,7 +725,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 3
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &537032345
@@ -1140,7 +1178,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 0
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &669583706
@@ -1205,8 +1243,10 @@ GameObject:
   - component: {fileID: 740148109}
   - component: {fileID: 740148108}
   - component: {fileID: 740148111}
+  - component: {fileID: 740148112}
+  - component: {fileID: 740148113}
   m_Layer: 0
-  m_Name: invi1
+  m_Name: invi_main
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1253,7 +1293,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 4
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &740148109
@@ -1275,7 +1315,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: f4f510f0a819fca48b2566572900ce4f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1320,6 +1360,45 @@ MonoBehaviour:
   matTypeName: BrushedMetal
   floatParams:
   - 0
+--- !u!114 &740148112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740148106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 389fed5238cba394598cb613a30e1523, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attachType: 0
+  img: {fileID: 740148113}
+  src_uvmin: {x: 0, y: 0}
+  src_uvmax: {x: 1, y: 1}
+  tar_uvmin: {x: 0.3, y: 0.2}
+  tar_uvmax: {x: 0.7, y: 0.8}
+--- !u!114 &740148113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740148106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  pbrTextures: []
+  heightTextures: []
+  plainTextures:
+  - name: invi1
+    tex: {fileID: 2800000, guid: b921f3d98043a1b499c2fe66b27bae7f, type: 3}
+    channel: 1
+  envTextures: []
+  texInx: 0
 --- !u!1 &794877058
 GameObject:
   m_ObjectHideFlags: 0
@@ -1549,7 +1628,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 5
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1007502732
@@ -1572,7 +1651,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: e04846de3767a2743b63f919a78824dc, type: 3}
     channel: 1
   envTextures: []
-  texInx: 0
+  texInx: 1
 --- !u!1 &1008065616
 GameObject:
   m_ObjectHideFlags: 0
@@ -1737,7 +1816,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 2
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1024496422
@@ -2197,6 +2276,7 @@ Transform:
   m_Children:
   - {fileID: 740148107}
   - {fileID: 669583704}
+  - {fileID: 2064857875}
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2568,6 +2648,7 @@ MonoBehaviour:
   dyValSys: {fileID: 0}
   systems:
   - {fileID: 296496489}
+  - {fileID: 296496490}
   templates:
   - Resources/SDFGameCS/Template/SDFGameTrace_d2_Template.txt
   - Resources/SDFGameCS/Template/SDFGameScene_d2_Template.txt
@@ -3031,6 +3112,132 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1890238654}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &2064857874
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2064857875}
+  - component: {fileID: 2064857879}
+  - component: {fileID: 2064857878}
+  - component: {fileID: 2064857877}
+  - component: {fileID: 2064857876}
+  m_Layer: 0
+  m_Name: invi1 (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2064857875
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064857874}
+  m_LocalRotation: {x: -0.7001861, y: 0.0057002297, z: -0.0043180874, w: 0.71392465}
+  m_LocalPosition: {x: -2.5756, y: 2.3846, z: -1.1736}
+  m_LocalScale: {x: 0.14309113, y: 0.08117957, z: 0.13378187}
+  m_Children: []
+  m_Father: {fileID: 1330409199}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: -88.622, y: 36.156, z: -36.044}
+--- !u!114 &2064857876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064857874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: BrushedMetal
+  floatParams:
+  - 0
+--- !u!114 &2064857877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064857874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 0.8584906, g: 0.74779207, b: 0.31990921, a: 1}
+    metallic: 0.9
+    roughness: 0.5
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 0
+  specialID: -1
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
+  SDF_offset2D: 0
+  mergeType: 1
+  objInx: 8
+  needExtraCondition: 0
+  extraCondition: 
+--- !u!23 &2064857878
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064857874}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 1807cfcd3b3bf12429c72d998bcccd88, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &2064857879
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064857874}
+  m_Mesh: {fileID: -1454488712387095915, guid: 508dbae9426dd9846aee998d83c25e1c, type: 3}
 --- !u!1 &2089595668
 GameObject:
   m_ObjectHideFlags: 0
@@ -3092,6 +3299,6 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 8
+  objInx: 9
   needExtraCondition: 0
   extraCondition: 

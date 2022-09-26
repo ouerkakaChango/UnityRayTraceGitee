@@ -607,6 +607,11 @@ CastInfo CastBBox(in Ray ray, in float3 min, in float3 max)
 //	return false;
 //}
 
+bool IsInBBox(in float2 pos, in float2 boxMin, in float2 boxMax)
+{
+	return gt(pos, boxMin) && lt(pos, boxMax);
+}
+
 bool IsInBBox(in float3 pos, in float3 boxMin, in float3 boxMax)
 {
 	return gt(pos, boxMin) && lt(pos, boxMax);

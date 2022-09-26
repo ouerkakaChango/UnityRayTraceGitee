@@ -63,4 +63,24 @@ void BoxedTB(out float3 T, out float3 B, float3 p, float3 center, float3 bound, 
 	}
 	//never reach!
 }
+
+float2 RemapTarUV(float2 inUV, float2 uvmin, float2 uvmax)
+{
+	float u = (inUV.x - uvmin.x) / (uvmax.x - uvmin.x);
+	float v = (inUV.y - uvmin.y) / (uvmax.y - uvmin.y);
+	return float2(u, v);
+}
+
+float2 RemapSrcUV(float2 inUV, float2 uvmin, float2 uvmax)
+{
+	float u = inUV.x*(uvmax.x - uvmin.x) + uvmin.x;
+	float v = inUV.y*(uvmax.y - uvmin.y) + uvmin.y;
+	return float2(u, v);
+}
+
+float2 RemapUV(float2 inUV, float2 src_uvmin, float2 src_uvmax, float2 tar_uvmin, float2 tar_uvmax)
+{
+	float2 stand_uv = RemapTarUV(inUV, tar_uvmin, tar_uvmax);
+	return RemapSrcUV(stand_uv, src_uvmin, src_uvmax);
+}
 #endif

@@ -186,10 +186,12 @@ public class AutoCS : MonoBehaviour
         //14
         int exInx = 14;
         rangeMap.Add("ObjMatLib", new List<Vector2Int>());
+        rangeMap.Add("ObjImgAttach", new List<Vector2Int>());
 
         //---extra target sys
         Dictionary<string, int> targetSysDic = new Dictionary<string, int>();
         targetSysDic.Add("ObjMatLib",0);
+        targetSysDic.Add("ObjImgAttach", 1);
         //___
 
         var keyList = rangeMap.Keys.ToList();

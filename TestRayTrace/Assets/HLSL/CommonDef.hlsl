@@ -376,6 +376,21 @@ float SampleR(in Texture2D<float> tex, float2 uv)
 	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
 }
 
+float3 SampleRGB(in Texture2D tex, float2 uv)
+{
+	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).rgb;
+}
+
+float SampleRGB(in Texture2D<float3> tex, float2 uv)
+{
+	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).rgb;
+}
+
+float SampleRGBA(in Texture2D<float4> tex, float2 uv)
+{
+	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).rgba;
+}
+
 //https://www.shadertoy.com/view/wt23Rt
 float3 RGBToHSV(float3 c) {
 	float4 K = float4(0., -1. / 3., 2. / 3., -1.),
