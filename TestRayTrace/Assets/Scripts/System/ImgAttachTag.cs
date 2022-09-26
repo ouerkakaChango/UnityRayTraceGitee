@@ -65,6 +65,13 @@ public class ImgAttachTag : MonoBehaviour
             lines.Add("        float4 co = SampleRGBA("+tex.name+", uv2);");
             lines.Add("        mat.albedo = lerp(mat.albedo,co.rgb,co.a);");
         }
+        //else if (tex.channel == ColorChannel.A)
+        //{
+        //    //        float4 co = SampleRGBA(texName, uv2);
+        //    //        mat.albedo = lerp(mat.albedo,co.rgb,co.a);
+        //    lines.Add("        float4 co = SampleRGBA(" + tex.name + ", uv2);");
+        //    lines.Add("        mat.albedo = lerp(mat.albedo,1,co.a);");
+        //}
         else
         {
             Debug.LogError("Not handled");

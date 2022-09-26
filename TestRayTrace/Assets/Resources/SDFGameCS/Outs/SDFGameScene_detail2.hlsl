@@ -1,4 +1,4 @@
-﻿#define OBJNUM 10
+﻿#define OBJNUM 9
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -25,8 +25,7 @@
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
-Texture2D<float3> invi1;
-Texture2D<float3> lightmap_ground;
+Texture2D<float4> invi1;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
@@ -160,12 +159,6 @@ re.roughness = 1;
 }
 else if (obj == 8 )
 {
-re.albedo = float3(0.8584906, 0.7477921, 0.3199092);
-re.metallic = 0.9;
-re.roughness = 0.5;
-}
-else if (obj == 9 )
-{
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
@@ -177,7 +170,7 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[10];
+int renderMode[9];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
@@ -187,7 +180,6 @@ renderMode[5] = 0;
 renderMode[6] = 0;
 renderMode[7] = 0;
 renderMode[8] = 0;
-renderMode[9] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -232,9 +224,6 @@ uv = BoxedUV(minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(
 else if (inx == 8 )
 {
 }
-else if (inx == 9 )
-{
-}
 	//@@@
 
 	//----------------------------------
@@ -266,9 +255,6 @@ else if (inx == 7 )
 }
 else if (inx == 8 )
 {
-}
-else if (inx == 9 )
-{
 inx = -1;
 }
 	//@@@
@@ -292,11 +278,6 @@ if(inx==3)
 	float2 uv = GetObjUV(minHit);
 	SetMatLib_BrushedMetal(mat,uv, 0);
 }
-if(inx==8)
-{
-	float2 uv = GetObjUV(minHit);
-	SetMatLib_BrushedMetal(mat,uv, 0);
-}
 //@@@
 
 //@@@SDFBakerMgr ObjImgAttach
@@ -306,7 +287,8 @@ float2 uv = GetObjUV(minHit);
 if (IsInBBox(uv, float2(0.3, 0.2), float2(0.7, 0.8)))
 {
 float2 uv2 = RemapUV(uv, float2(0, 0) ,float2(1, 1) ,float2(0.3, 0.2) ,float2(0.7, 0.8));
-mat.albedo = SampleRGB(invi1, uv2);
+float4 co = SampleRGBA(invi1, uv2);
+mat.albedo = lerp(mat.albedo,co.rgb,co.a);
 }
 }
 //@@@
@@ -337,9 +319,6 @@ else if (inx == 7 )
 {
 }
 else if (inx == 8 )
-{
-}
-else if (inx == 9 )
 {
 inx = -1;
 }
@@ -593,9 +572,6 @@ re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), flo
 }
 else if (inx == 8 )
 {
-}
-else if (inx == 9 )
-{
 inx = -1;
 }
 //@@@
@@ -659,9 +635,6 @@ else if (inx == 7 )
 {
 }
 else if (inx == 8 )
-{
-}
-else if (inx == 9 )
 {
 inx = -1;
 }

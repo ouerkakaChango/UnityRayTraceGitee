@@ -80,6 +80,10 @@ public class MatLibSystem : BaseSystem
         //	SetMatLib_BrushedMetal(mat,uv);
         //}
         var sdftag = tag.gameObject.GetComponent<SDFBakerTag>();
+        if(sdftag == null)
+        {
+            Debug.LogError(tag.gameObject.name + " don't have sdf baker tag!");
+        }
         int objInx = sdftag.objInx;
 
         var floatParams = tag.floatParams;
