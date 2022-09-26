@@ -6,10 +6,9 @@
 #include "../UV/UVCommonDef.hlsl"
 #include "../Noise/NoiseCommonDef.hlsl"
 
-void SetMatLib_BrushedMetal(inout Material_PBR mat, float2 uv)
+void SetMatLib_BrushedMetal(inout Material_PBR mat, float2 uv, float brushPower = 0.15)
 {
 	//change from https://www.shadertoy.com/view/tldfD8
-	float brushPower = 0.15;
 	float g = 0.1, l=0.;
 	g += -0.5+SampleR(greyNoiseMedium, uv*float2(.06,4.18));
 	l += brushPower;

@@ -1,6 +1,6 @@
 valMaps:
 //@@@SDFBakerMgr ValMaps
-ObjNum 6
+ObjNum 9
 //@@@
 TraceThre 0.001
 NormalEpsilon 0.001
@@ -149,35 +149,53 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0, 0, 0);
 re.metallic = 0;
-re.roughness = 0.4;
+re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0.8784314, 0.6941177, 0.372549);
-re.metallic = 0.9;
-re.roughness = 0.5;
+re.albedo = float3(0, 0, 0);
+re.metallic = 0;
+re.roughness = 1;
 }
 else if (obj == 2 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0, 0, 0);
 re.metallic = 0;
-re.roughness = 0.3;
+re.roughness = 1;
 }
 else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.9;
+re.roughness = 0.4;
 }
 else if (obj == 4 )
+{
+re.albedo = float3(0.8584906, 0.7477921, 0.3199092);
+re.metallic = 0.9;
+re.roughness = 0.5;
+}
+else if (obj == 5 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 0.3;
+}
+else if (obj == 6 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 0.9;
+}
+else if (obj == 7 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
-else if (obj == 5 )
+else if (obj == 8 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -188,13 +206,16 @@ re.roughness = 1;
 
 ###BLOCK ObjRenderMode
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[6];
+int renderMode[9];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
 renderMode[4] = 0;
 renderMode[5] = 0;
+renderMode[6] = 0;
+renderMode[7] = 0;
+renderMode[8] = 0;
 return renderMode[obj];
 //@@@
 ###BLOCK
@@ -205,25 +226,37 @@ return renderMode[obj];
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(-2.579, 2.327, -1.197), float3(0.185, 0.09, 0.001), float3(25.30989, 0, 0));
+uv = BoxedUV(minHit.P, float3(-2.371201, 2.37087, -1.158671), float3(0.00838451, 0.09840991, 0.007551101), float3(3.093163, 1.942568, 359.1576));
 }
 else if (inx == 2 )
 {
-uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576));
 }
 else if (inx == 3 )
 {
-uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
 }
 else if (inx == 4 )
 {
-uv = BoxedUV(minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576));
 }
 else if (inx == 5 )
+{
+uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+}
+else if (inx == 6 )
+{
+uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
+}
+else if (inx == 7 )
+{
+uv = BoxedUV(minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+}
+else if (inx == 8 )
 {
 }
 	//@@@
@@ -248,6 +281,15 @@ else if (inx == 4 )
 }
 else if (inx == 5 )
 {
+}
+else if (inx == 6 )
+{
+}
+else if (inx == 7 )
+{
+}
+else if (inx == 8 )
+{
 inx = -1;
 }
 	//@@@
@@ -265,15 +307,10 @@ inx = -1;
 ###BLOCK  ObjPreRender
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==2)
+if(inx==4)
 {
 	float2 uv = GetObjUV(minHit);
-	SetMatLib_BrushedMetal(mat,uv);
-}
-if(inx==1)
-{
-	float2 uv = GetObjUV(minHit);
-	SetMatLib_BrushedMetal(mat,uv);
+	SetMatLib_BrushedMetal(mat,uv, 0);
 }
 //@@@
 //@@@SDFBakerMgr SpecialObj
@@ -293,6 +330,15 @@ else if (inx == 4 )
 {
 }
 else if (inx == 5 )
+{
+}
+else if (inx == 6 )
+{
+}
+else if (inx == 7 )
+{
+}
+else if (inx == 8 )
 {
 inx = -1;
 }
@@ -321,11 +367,11 @@ inx = -1;
 		SetMatLib_BrushedMetal(mat,uv);
 	}
 	//???
-	//if(inx==2)
-	//{
-	//	float2 uv = GetObjUV(minHit);
-	//	SetMatLib_BrushedMetal(mat,uv);
-	//}
+	if(inx==2)
+	{
+		mat.metallic = lerp(mat.metallic,1,0.5);
+		mat.roughness = lerp(mat.roughness,0.5,0.5);
+	}
 	//mat.albedo = float3(GetObjUV(minHit),0);
 ###BLOCK
 
@@ -336,15 +382,15 @@ if(mode==0)
   float3 lightDirs[5];
   float3 lightColors[5];
   lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-  lightColors[0] = float3(2, 1.80447, 0) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
-  lightDirs[1] = normalize(minHit.P - float3(-2.302, 3.729, -1.16));
-  lightColors[1] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-2.302, 3.729, -1.16));
+  lightColors[0] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
+  lightDirs[1] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
+  lightColors[1] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-1.713, 2.707, -2.17));
   lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
-  lightColors[2] = float3(2, 1.80447, 0) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
+  lightColors[2] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
   lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
-  lightColors[3] = float3(2, 1.80447, 0) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
+  lightColors[3] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
   lightDirs[4] = normalize(minHit.P - float3(-3.83, 8.15, 0));
-  lightColors[4] = float3(2, 1.80447, 0) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
+  lightColors[4] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
   result = 0 * mat.albedo * mat.ao;
   for(int i=0;i<5;i++)
   {
@@ -484,25 +530,37 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(-2.579, 2.327, -1.197), float3(0.185, 0.09, 0.001), float3(25.30989, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-2.371201, 2.37087, -1.158671), float3(0.00838451, 0.09840991, 0.007551101), float3(3.093163, 1.942568, 359.1576)));
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576)));
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
 }
 else if (inx == 4 )
 {
-re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576)));
 }
 else if (inx == 5 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0)));
+}
+else if (inx == 6 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+}
+else if (inx == 7 )
+{
+re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+}
+else if (inx == 8 )
 {
 inx = -1;
 }
@@ -550,6 +608,15 @@ else if (inx == 4 )
 {
 }
 else if (inx == 5 )
+{
+}
+else if (inx == 6 )
+{
+}
+else if (inx == 7 )
+{
+}
+else if (inx == 8 )
 {
 inx = -1;
 }

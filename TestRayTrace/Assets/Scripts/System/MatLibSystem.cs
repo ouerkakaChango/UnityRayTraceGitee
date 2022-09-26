@@ -81,10 +81,24 @@ public class MatLibSystem : BaseSystem
         //}
         var sdftag = tag.gameObject.GetComponent<SDFBakerTag>();
         int objInx = sdftag.objInx;
+
+        var floatParams = tag.floatParams;
+
         bakedObjMatLib.Add("if(inx=="+objInx+")");
         bakedObjMatLib.Add("{");
         bakedObjMatLib.Add("	float2 uv = GetObjUV(minHit);");
-        bakedObjMatLib.Add("	SetMatLib_BrushedMetal(mat,uv);");
+        if (floatParams.Count == 0)
+        {
+            bakedObjMatLib.Add("	SetMatLib_BrushedMetal(mat,uv);");
+        }
+        else if(floatParams.Count == 1)
+        {
+            bakedObjMatLib.Add("	SetMatLib_BrushedMetal(mat,uv, "+floatParams[0]+");");
+        }
+        else
+        {
+            Debug.LogError("Not handled: BakeBrushedMetal params num > 1");
+        }
         bakedObjMatLib.Add("}");
     }
 }

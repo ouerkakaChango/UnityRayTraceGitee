@@ -5,6 +5,7 @@ using UnityEngine;
 public class MatLibTag : MonoBehaviour
 {
     public string matTypeName = "null";
+    public List<float> floatParams = new List<float>();
     // Start is called before the first frame update
     void Start()
     {
