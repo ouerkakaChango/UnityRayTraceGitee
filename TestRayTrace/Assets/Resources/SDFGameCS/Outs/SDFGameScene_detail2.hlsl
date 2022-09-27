@@ -3,8 +3,8 @@
 #define MaxSDF 100000
 #define MaxTraceDis 100
 #define MaxTraceTime 6400
-#define TraceThre 0.001
-#define NormalEpsilon 0.001
+#define TraceThre 0.0001
+#define NormalEpsilon 0.0001
 
 #define SceneSDFShadowNormalBias 0.001
 
@@ -25,9 +25,9 @@
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
-Texture2D<float3> WoodTexture;
 Texture2D<float3> N_paper;
 Texture2D<float4> invi1;
+Texture2D<float3> WoodTexture;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
@@ -388,46 +388,6 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==0)
-{
-float2 uv = GetObjUV(minHit);
-uv = float2(1, 1)*uv+float2(0, 0);
-float3 T,B;
-	GetObjTB(T,B, minHit);
-SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);
-}
-if(inx==3)
-{
-float2 uv = GetObjUV(minHit);
-uv = float2(1, 1)*uv+float2(0, 0);
-float3 T,B;
-	GetObjTB(T,B, minHit);
-SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);
-}
-if(inx==2)
-{
-float2 uv = GetObjUV(minHit);
-uv = float2(1, 1)*uv+float2(0, 0);
-float3 T,B;
-	GetObjTB(T,B, minHit);
-SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);
-}
-if(inx==12)
-{
-float2 uv = GetObjUV(minHit);
-uv = float2(1, 1)*uv+float2(0, 0);
-float3 T,B;
-	GetObjTB(T,B, minHit);
-SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);
-}
-if(inx==9)
-{
-float2 uv = GetObjUV(minHit);
-uv = float2(5, 5)*uv+float2(0, 0);
-float3 T,B;
-	GetObjTB(T,B, minHit);
-SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);
-}
 if(inx==5)
 {
 	float2 uv = GetObjUV(minHit);
@@ -439,6 +399,14 @@ if(inx==6)
 {
 	float2 uv = GetObjUV(minHit);
 	SetMatLib_BrushedMetal(mat,uv, 0);
+}
+if(inx==7)
+{
+float2 uv = GetObjUV(minHit);
+uv = float2(5, 5)*uv+float2(0, 0);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);
 }
 if(inx==8)
 {

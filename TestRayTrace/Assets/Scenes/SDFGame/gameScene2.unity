@@ -241,7 +241,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 22466670}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
   m_Name: 
@@ -341,23 +341,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
-  - name: WoodTexture
-    tex: {fileID: 2800000, guid: 0b86b0d82d3b1fa4d86df05b0d1eedc2, type: 3}
-    channel: 1
   - name: N_paper
     tex: {fileID: 2800000, guid: 3f2ea3910af41804396e1036204466df, type: 3}
     channel: 1
   - name: invi1
     tex: {fileID: 2800000, guid: 99f94e5a5f77c1245b7738ca2a080539, type: 3}
     channel: 0
+  - name: WoodTexture
+    tex: {fileID: 2800000, guid: 0b86b0d82d3b1fa4d86df05b0d1eedc2, type: 3}
+    channel: 1
   tags:
-  - {fileID: 1231039150}
   - {fileID: 669583708}
   - {fileID: 740148113}
+  - {fileID: 1231039150}
   bakedDeclares:
-  - Texture2D<float3> WoodTexture;
   - Texture2D<float3> N_paper;
   - Texture2D<float4> invi1;
+  - Texture2D<float3> WoodTexture;
   bakedEnvTexSettings: []
 --- !u!114 &296496488
 MonoBehaviour:
@@ -388,26 +388,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tags:
   - {fileID: 22466675}
-  - {fileID: 596599794}
   - {fileID: 566221535}
-  - {fileID: 1890238659}
-  - {fileID: 1231039151}
+  - {fileID: 596599794}
   - {fileID: 669583709}
   - {fileID: 740148111}
   - {fileID: 1024496424}
+  - {fileID: 1231039151}
+  - {fileID: 1890238659}
   bakedObjMatLib:
   - if(inx==0)
   - '{'
   - ' float2 uv = GetObjUV(minHit);'
-  - ' uv = float2(5, 5)*uv+float2(0, 0);'
-  - ' float3 T,B;'
-  - "\tGetObjTB(T,B, minHit);"
-  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
-  - '}'
-  - if(inx==3)
-  - '{'
-  - ' float2 uv = GetObjUV(minHit);'
-  - ' uv = float2(5, 5)*uv+float2(0, 0);'
+  - ' uv = float2(1, 1)*uv+float2(0, 0);'
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
   - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
@@ -415,23 +407,15 @@ MonoBehaviour:
   - if(inx==2)
   - '{'
   - ' float2 uv = GetObjUV(minHit);'
-  - ' uv = float2(5, 5)*uv+float2(0, 0);'
+  - ' uv = float2(1, 1)*uv+float2(0, 0);'
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
   - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
   - '}'
-  - if(inx==12)
+  - if(inx==3)
   - '{'
   - ' float2 uv = GetObjUV(minHit);'
-  - ' uv = float2(5, 5)*uv+float2(0, 0);'
-  - ' float3 T,B;'
-  - "\tGetObjTB(T,B, minHit);"
-  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
-  - '}'
-  - if(inx==9)
-  - '{'
-  - ' float2 uv = GetObjUV(minHit);'
-  - ' uv = float2(5, 5)*uv+float2(0, 0);'
+  - ' uv = float2(1, 1)*uv+float2(0, 0);'
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
   - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
@@ -454,6 +438,22 @@ MonoBehaviour:
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
   - "\tminHit.N = SampleNormalMap(N_paper, float2(3, 3)*uv+float2(0, 0), minHit.N,T,B,1);"
+  - '}'
+  - if(inx==9)
+  - '{'
+  - ' float2 uv = GetObjUV(minHit);'
+  - ' uv = float2(5, 5)*uv+float2(0, 0);'
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
+  - '}'
+  - if(inx==12)
+  - '{'
+  - ' float2 uv = GetObjUV(minHit);'
+  - ' uv = float2(1, 1)*uv+float2(0, 0);'
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
   - '}'
 --- !u!114 &296496490
 MonoBehaviour:
@@ -994,7 +994,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 566221530}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
   m_Name: 
@@ -1125,7 +1125,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 596599789}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
   m_Name: 
@@ -1380,7 +1380,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: 3f2ea3910af41804396e1036204466df, type: 3}
     channel: 1
   envTextures: []
-  texInx: 1
+  texInx: 0
 --- !u!114 &669583709
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1571,7 +1571,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: 99f94e5a5f77c1245b7738ca2a080539, type: 3}
     channel: 0
   envTextures: []
-  texInx: 2
+  texInx: 1
 --- !u!1 &774306904
 GameObject:
   m_ObjectHideFlags: 0
@@ -1826,14 +1826,19 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1007502726}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matTypeName: BrushedMetal
-  floatParams: []
-  texParams: []
+  matTypeName: Marquetry
+  floatParams:
+  - 5
+  - 5
+  - 0
+  - 0
+  texParams:
+  - {fileID: 1231039150}
 --- !u!23 &1007502729
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2431,7 +2436,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: 0b86b0d82d3b1fa4d86df05b0d1eedc2, type: 3}
     channel: 1
   envTextures: []
-  texInx: 0
+  texInx: 2
 --- !u!114 &1231039151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2439,7 +2444,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1231039145}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
   m_Name: 
@@ -3467,7 +3472,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1890238654}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
   m_Name: 
