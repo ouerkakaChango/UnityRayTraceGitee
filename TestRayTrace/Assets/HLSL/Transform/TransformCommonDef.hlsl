@@ -64,6 +64,13 @@ float3 RotByEuler(float3 p, float3 eulerAngle)
 	return p;
 }
 
+float2 rotate(float2 p, float a)
+{
+	float c = cos(a), s = sin(a);
+	float2x2 mat = { c,-s,s,c };
+	return mul(mat, p);
+}
+
 //https://www.gatevidyalay.com/3d-shearing-in-computer-graphics-definition-examples/#:~:text=in%20Computer%20Graphics%2D-,In%20Computer%20graphics%2C,as%20well%20as%20Z%20direction.
 float3 ShearX(float3 p, float shy, float shz)
 {

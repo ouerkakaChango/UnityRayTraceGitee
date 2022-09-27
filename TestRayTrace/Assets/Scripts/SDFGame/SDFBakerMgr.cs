@@ -265,6 +265,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedRenders.Add("}");
     }
 
+    //??? ´ý¸Ä
     void EndBakeShadows()
     {
         //float3 lightDirs[1];

@@ -216,7 +216,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         {
             Vector3 dPos = abs(transform.position - lastPos);
             Vector3 dq = abs(transform.rotation.eulerAngles - lastRot.eulerAngles);
-            if(dPos.magnitude>0.05 || dq.magnitude>1)
+            if(dPos.magnitude>0.0 || dq.magnitude>0)
             {
                 //!!! refresh indirectRender
                 frameID = 0;          
@@ -334,6 +334,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         computeShader.SetTexture(kInx, "voronoiNoise1", ShaderToyTool.Instance.voronoiNoise1);
         computeShader.SetTexture(kInx, "blueNoise", ShaderToyTool.Instance.blueNoise);
         computeShader.SetTexture(kInx, "greyNoiseMedium", ShaderToyTool.Instance.greyNoiseMedium);
+        computeShader.SetTexture(kInx, "RGBANoiseMedium", ShaderToyTool.Instance.RGBANoiseMedium);
         if (autoCS.texSys != null)
         {
             for (int i = 0; i < autoCS.texSys.outTextures.Count; i++)
@@ -387,6 +388,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             //### compute
             kInx = cs_blendResult.FindKernel("BlendFnial");
             cs_blendResult.SetInt("frameID", frameID);
+            cs_blendResult.SetFloat("indirectMultiplier", indirectMultiplier);
             cs_blendResult.SetTexture(kInx, "Result", rTex);
             cs_blendResult.SetTexture(kInx, "Direct", directRT);
             cs_blendResult.SetTexture(kInx, "Indirect", indirectRT);
@@ -400,7 +402,6 @@ public class SDFGameSceneTrace : MonoBehaviour
             {
                 //Graphics.CopyTexture(newFrontIndirectRT, frontIndirectRT);
                 kInx = cs_blendResult.FindKernel("CopyToNewFront");
-                cs_blendResult.SetFloat("indirectMultiplier", indirectMultiplier);
                 cs_blendResult.SetTexture(kInx, "Result", frontIndirectRT);
                 cs_blendResult.SetTexture(kInx, "NewFrontIndirect", newFrontIndirectRT);
                 cs_blendResult.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);

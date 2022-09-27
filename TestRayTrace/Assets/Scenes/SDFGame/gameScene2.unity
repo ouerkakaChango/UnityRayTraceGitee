@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 22466674}
   - component: {fileID: 22466673}
   - component: {fileID: 22466672}
+  - component: {fileID: 22466675}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -163,7 +164,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 22466670}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -233,6 +234,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 22466670}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &22466675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 22466670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: Marquetry
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  texParams:
+  - {fileID: 1231039150}
 --- !u!1 &296496484
 GameObject:
   m_ObjectHideFlags: 0
@@ -273,22 +294,26 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[9];
+  - int renderMode[13];
   bakedRenders: []
   bakedDirShadows: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
+  - {fileID: 22466672}
   - {fileID: 537032344}
+  - {fileID: 566221532}
+  - {fileID: 596599791}
   - {fileID: 629090791}
   - {fileID: 669583705}
   - {fileID: 740148108}
   - {fileID: 1007502731}
   - {fileID: 1024496421}
+  - {fileID: 1231039147}
   - {fileID: 1647113767}
   - {fileID: 1796358842}
-  - {fileID: 2089595670}
+  - {fileID: 1890238656}
 --- !u!4 &296496486
 Transform:
   m_ObjectHideFlags: 0
@@ -316,16 +341,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
+  - name: WoodTexture
+    tex: {fileID: 2800000, guid: 0b86b0d82d3b1fa4d86df05b0d1eedc2, type: 3}
+    channel: 1
   - name: N_paper
-    tex: {fileID: 2800000, guid: 847f97acd6c0a5b4ba9a06fc595d1216, type: 3}
+    tex: {fileID: 2800000, guid: 3f2ea3910af41804396e1036204466df, type: 3}
     channel: 1
   - name: invi1
     tex: {fileID: 2800000, guid: 99f94e5a5f77c1245b7738ca2a080539, type: 3}
     channel: 0
   tags:
+  - {fileID: 1231039150}
   - {fileID: 669583708}
   - {fileID: 740148113}
   bakedDeclares:
+  - Texture2D<float3> WoodTexture;
   - Texture2D<float3> N_paper;
   - Texture2D<float4> invi1;
   bakedEnvTexSettings: []
@@ -357,20 +387,73 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tags:
+  - {fileID: 22466675}
+  - {fileID: 596599794}
+  - {fileID: 566221535}
+  - {fileID: 1890238659}
+  - {fileID: 1231039151}
   - {fileID: 669583709}
   - {fileID: 740148111}
+  - {fileID: 1024496424}
   bakedObjMatLib:
+  - if(inx==0)
+  - '{'
+  - ' float2 uv = GetObjUV(minHit);'
+  - ' uv = float2(5, 5)*uv+float2(0, 0);'
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
+  - '}'
+  - if(inx==3)
+  - '{'
+  - ' float2 uv = GetObjUV(minHit);'
+  - ' uv = float2(5, 5)*uv+float2(0, 0);'
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
+  - '}'
   - if(inx==2)
+  - '{'
+  - ' float2 uv = GetObjUV(minHit);'
+  - ' uv = float2(5, 5)*uv+float2(0, 0);'
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
+  - '}'
+  - if(inx==12)
+  - '{'
+  - ' float2 uv = GetObjUV(minHit);'
+  - ' uv = float2(5, 5)*uv+float2(0, 0);'
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
+  - '}'
+  - if(inx==9)
+  - '{'
+  - ' float2 uv = GetObjUV(minHit);'
+  - ' uv = float2(5, 5)*uv+float2(0, 0);'
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
+  - '}'
+  - if(inx==5)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
   - "\tminHit.N = SampleNormalMap(N_paper, float2(3, 3)*uv+float2(0, 0), minHit.N,T,B,1);"
   - '}'
-  - if(inx==3)
+  - if(inx==6)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - "\tSetMatLib_BrushedMetal(mat,uv, 0);"
+  - '}'
+  - if(inx==8)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - "\tminHit.N = SampleNormalMap(N_paper, float2(3, 3)*uv+float2(0, 0), minHit.N,T,B,1);"
   - '}'
 --- !u!114 &296496490
 MonoBehaviour:
@@ -387,7 +470,7 @@ MonoBehaviour:
   tags:
   - {fileID: 740148112}
   bakedObjImgAttach:
-  - if (inx == 3)
+  - if (inx == 6)
   - '{'
   - '    float2 uv = GetObjUV(minHit);'
   - '    if (IsInBBox(uv, float2(0.1, 0.1), float2(0.9, 0.9)))'
@@ -603,12 +686,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 402165468}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -1.713, y: 2.707, z: -2.17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_Father: {fileID: 1878584169}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &420418694
 GameObject:
@@ -639,7 +722,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &420418696
 MonoBehaviour:
@@ -728,7 +811,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 0
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &537032345
@@ -805,6 +888,7 @@ GameObject:
   - component: {fileID: 566221534}
   - component: {fileID: 566221533}
   - component: {fileID: 566221532}
+  - component: {fileID: 566221535}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -833,7 +917,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 566221530}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -903,6 +987,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 566221530}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &566221535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 566221530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: Marquetry
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  texParams:
+  - {fileID: 1231039150}
 --- !u!1 &596599789
 GameObject:
   m_ObjectHideFlags: 0
@@ -915,6 +1019,7 @@ GameObject:
   - component: {fileID: 596599793}
   - component: {fileID: 596599792}
   - component: {fileID: 596599791}
+  - component: {fileID: 596599794}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -943,7 +1048,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 596599789}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -1013,6 +1118,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 596599789}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &596599794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 596599789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: Marquetry
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  texParams:
+  - {fileID: 1231039150}
 --- !u!1 &629090789
 GameObject:
   m_ObjectHideFlags: 0
@@ -1071,7 +1196,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 1
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &629090792
@@ -1183,7 +1308,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 2
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &669583706
@@ -1252,10 +1377,10 @@ MonoBehaviour:
   heightTextures: []
   plainTextures:
   - name: N_paper
-    tex: {fileID: 2800000, guid: 847f97acd6c0a5b4ba9a06fc595d1216, type: 3}
+    tex: {fileID: 2800000, guid: 3f2ea3910af41804396e1036204466df, type: 3}
     channel: 1
   envTextures: []
-  texInx: 0
+  texInx: 1
 --- !u!114 &669583709
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1340,7 +1465,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 3
+  objInx: 6
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &740148109
@@ -1446,7 +1571,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: 99f94e5a5f77c1245b7738ca2a080539, type: 3}
     channel: 0
   envTextures: []
-  texInx: 1
+  texInx: 2
 --- !u!1 &774306904
 GameObject:
   m_ObjectHideFlags: 0
@@ -1546,12 +1671,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 774306904}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -3.526, y: 2.707, z: -2.17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_Father: {fileID: 1878584169}
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &794877058
 GameObject:
@@ -1783,7 +1908,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 4
+  objInx: 7
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1007502732
@@ -1972,7 +2097,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 5
+  objInx: 8
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1024496422
@@ -2172,7 +2297,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1231039145
 GameObject:
@@ -2186,6 +2311,8 @@ GameObject:
   - component: {fileID: 1231039149}
   - component: {fileID: 1231039148}
   - component: {fileID: 1231039147}
+  - component: {fileID: 1231039150}
+  - component: {fileID: 1231039151}
   m_Layer: 0
   m_Name: mainTable
   m_TagString: Untagged
@@ -2214,7 +2341,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1231039145}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -2222,7 +2349,7 @@ MonoBehaviour:
   mat_PBR:
     albedo: {r: 0.49019608, g: 0.28235295, b: 0, a: 1}
     metallic: 0
-    roughness: 1
+    roughness: 0.35
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
@@ -2232,7 +2359,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 5
+  objInx: 9
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1231039148
@@ -2284,6 +2411,47 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1231039145}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1231039150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1231039145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  pbrTextures: []
+  heightTextures: []
+  plainTextures:
+  - name: WoodTexture
+    tex: {fileID: 2800000, guid: 0b86b0d82d3b1fa4d86df05b0d1eedc2, type: 3}
+    channel: 1
+  envTextures: []
+  texInx: 0
+--- !u!114 &1231039151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1231039145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: Marquetry
+  floatParams:
+  - 5
+  - 5
+  - 0
+  - 0
+  texParams:
+  - {fileID: 1231039150}
 --- !u!1 &1278971371
 GameObject:
   m_ObjectHideFlags: 0
@@ -2455,7 +2623,7 @@ Transform:
   - {fileID: 669583704}
   - {fileID: 2064857875}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1453774954
 GameObject:
@@ -2653,7 +2821,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 6
+  objInx: 10
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1647113768
@@ -3142,7 +3310,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 7
+  objInx: 11
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &1878584168
@@ -3176,6 +3344,8 @@ Transform:
   - {fileID: 794877059}
   - {fileID: 328588541}
   - {fileID: 1484205459}
+  - {fileID: 402165471}
+  - {fileID: 774306907}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3191,6 +3361,7 @@ GameObject:
   - component: {fileID: 1890238658}
   - component: {fileID: 1890238657}
   - component: {fileID: 1890238656}
+  - component: {fileID: 1890238659}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -3219,7 +3390,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1890238654}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 
@@ -3237,7 +3408,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 8
+  objInx: 12
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1890238657
@@ -3289,6 +3460,26 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1890238654}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1890238659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1890238654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: Marquetry
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  texParams:
+  - {fileID: 1231039150}
 --- !u!1 &2064857874
 GameObject:
   m_ObjectHideFlags: 0
@@ -3413,7 +3604,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2089595668}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
   m_Name: 

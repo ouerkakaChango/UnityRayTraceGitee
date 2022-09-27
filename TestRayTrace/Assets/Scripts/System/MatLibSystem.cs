@@ -69,6 +69,10 @@ public class MatLibSystem : BaseSystem
             {
                 tag.BakeNormalMap(ref bakedObjMatLib);
             }
+            else if (tag.matTypeName == "Marquetry")
+            {
+                tag.BakeMarquetry(ref bakedObjMatLib);
+            }
             else
             {
                 Debug.LogError("unhandled material : " + tag.matTypeName+" in objct : "+tag.gameObject.name);
