@@ -17,6 +17,7 @@ Blocks:
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
+Texture2D<float3> N_paper;
 Texture2D<float4> invi1;
 //@@@
 
@@ -163,7 +164,7 @@ else if (obj == 2 )
 {
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.5;
 }
 else if (obj == 3 )
 {
@@ -318,9 +319,9 @@ if(inx==3)
 if (inx == 3)
 {
     float2 uv = GetObjUV(minHit);
-    if (IsInBBox(uv, float2(0.3, 0.2), float2(0.7, 0.8)))
+    if (IsInBBox(uv, float2(0.1, 0.1), float2(0.9, 0.9)))
     {
-        float2 uv2 = RemapUV(uv, float2(0, 0) ,float2(1, 1) ,float2(0.3, 0.2) ,float2(0.7, 0.8));
+        float2 uv2 = RemapUV(uv, float2(0, 0) ,float2(1, 1) ,float2(0.1, 0.1) ,float2(0.9, 0.9));
         float4 co = SampleRGBA(invi1, uv2);
         mat.albedo = lerp(mat.albedo,co.rgb,co.a);
     }
@@ -380,7 +381,7 @@ inx = -1;
 		//mat.roughness = saturate((1-v)*0.5);
 		SetMatLib_BrushedMetal(mat,uv);
 	}
-	//???
+
 	//if(inx==3)
 	//{
 	//	float2 uv = GetObjUV(minHit);
@@ -391,26 +392,36 @@ inx = -1;
 	//	}
 	//}
 	//mat.albedo = float3(GetObjUV(minHit),0);
+	if(inx == 2)
+	{
+		float2 uv = GetObjUV(minHit);
+		float3 T,B;
+		BoxedTB(T,B,minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
+		//mat.albedo = SampleNormalMap(N_paper, 2*uv, minHit.N,T,B);
+		minHit.N = SampleNormalMap(N_paper, 2*uv, minHit.N,T,B);
+	}
 ###BLOCK
 
 ###BLOCK ObjRender
 //@@@SDFBakerMgr ObjRender
 if(mode==0)
 {
-  float3 lightDirs[5];
-  float3 lightColors[5];
-  lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-  lightColors[0] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
-  lightDirs[1] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
-  lightColors[1] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-1.713, 2.707, -2.17));
-  lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
-  lightColors[2] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
-  lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
-  lightColors[3] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
-  lightDirs[4] = normalize(minHit.P - float3(-3.83, 8.15, 0));
-  lightColors[4] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
+  float3 lightDirs[6];
+  float3 lightColors[6];
+  lightDirs[0] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
+  lightColors[0] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-3.526, 2.707, -2.17));
+  lightDirs[1] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+  lightColors[1] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
+  lightDirs[2] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
+  lightColors[2] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-1.713, 2.707, -2.17));
+  lightDirs[3] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
+  lightColors[3] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
+  lightDirs[4] = normalize(minHit.P - float3(3.357384, 8.15, 0));
+  lightColors[4] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
+  lightDirs[5] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+  lightColors[5] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
   result = 0 * mat.albedo * mat.ao;
-  for(int i=0;i<5;i++)
+  for(int i=0;i<6;i++)
   {
       result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
   }

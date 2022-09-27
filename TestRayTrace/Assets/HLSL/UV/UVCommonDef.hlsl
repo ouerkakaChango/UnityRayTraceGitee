@@ -48,18 +48,18 @@ void BoxedTB(out float3 T, out float3 B, float3 p, float3 center, float3 bound, 
 
 	if (InBound(p.xy, bound.xy) && abs(p.z) >= bound.z)
 	{
-		T = InvRotByEuler(float3(1, 0, 0), rotEuler);
-		B = InvRotByEuler(float3(0, 1, 0), rotEuler);
+		T = RotByEuler(float3(1, 0, 0), rotEuler);
+		B = RotByEuler(float3(0, 1, 0), rotEuler);
 	}
 	else if (InBound(p.xz, bound.xz) && abs(p.y) >= bound.y)
 	{
-		T = InvRotByEuler(float3(1, 0, 0), rotEuler);
-		B = InvRotByEuler(float3(0, 0, 1), rotEuler);
+		T = RotByEuler(float3(1, 0, 0), rotEuler);
+		B = RotByEuler(float3(0, 0, 1), rotEuler);
 	}
 	else if (InBound(p.yz, bound.yz) && abs(p.x) >= bound.x)
 	{
-		T = InvRotByEuler(float3(0, 1, 0), rotEuler);
-		B = InvRotByEuler(float3(0, 0, 1), rotEuler);
+		T = RotByEuler(float3(0, 1, 0), rotEuler);
+		B = RotByEuler(float3(0, 0, 1), rotEuler);
 	}
 	//never reach!
 }
@@ -82,5 +82,13 @@ float2 RemapUV(float2 inUV, float2 src_uvmin, float2 src_uvmax, float2 tar_uvmin
 {
 	float2 stand_uv = RemapTarUV(inUV, tar_uvmin, tar_uvmax);
 	return RemapSrcUV(stand_uv, src_uvmin, src_uvmax);
+}
+
+float3 SampleNormalMap(in Texture2D<float3> normalmap, float2 uv, float3 N, float3 T,float3 B)
+{
+	float3 n_tan = normalmap.SampleLevel(common_linear_repeat_sampler, uv, 0).rgb;
+	n_tan = normalize(2 * n_tan - 1);
+	float3 n_world = normalize(n_tan.x*T + n_tan.y*B + n_tan.z*N);
+	return normalize(lerp(N, n_world,2));
 }
 #endif
