@@ -144,7 +144,7 @@ else if (obj == 5 )
 {
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.5;
 }
 else if (obj == 6 )
 {
@@ -259,21 +259,79 @@ else if (inx == 8 )
 inx = -1;
 }
 	//@@@
-	//@
 	if(inx == -2)
 	{
 		float3 center = float3(-2.81200004,2.68899989,-1.22000003);
 		float3 bound = 4*float3(0.07,0.05,0.05);
 		uv = BoxedUV(minHit.P, center, bound, float3(0, 0, 0));
 	}
-	//@
 	return uv;
+}
+
+void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
+{
+	int inx = minHit.obj;
+//@@@SDFBakerMgr ObjTB
+if(inx == 0 )
+{
+BoxedTB(T,B,minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+}
+else if (inx == 1 )
+{
+BoxedTB(T,B,minHit.P, float3(-2.371201, 2.37087, -1.158671), float3(0.00838451, 0.09840991, 0.007551101), float3(3.093163, 1.942568, 359.1576));
+}
+else if (inx == 2 )
+{
+BoxedTB(T,B,minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
+}
+else if (inx == 3 )
+{
+BoxedTB(T,B,minHit.P, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576));
+}
+else if (inx == 4 )
+{
+BoxedTB(T,B,minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+}
+else if (inx == 5 )
+{
+BoxedTB(T,B,minHit.P, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576));
+}
+else if (inx == 6 )
+{
+BoxedTB(T,B,minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
+}
+else if (inx == 7 )
+{
+BoxedTB(T,B,minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+}
+else if (inx == 8 )
+{
+}
+//@@@
+		//if(inx == x)
+		//{
+		//	BoxedTB(T,B,minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
+		//}
 }
 
 void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
+if(inx==5)
+{
+	float2 uv = GetObjUV(minHit);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(N_paper, float2(3, 3)*uv+float2(0, 0), minHit.N,T,B,1);
+}
+if(inx==2)
+{
+	float2 uv = GetObjUV(minHit);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(N_paper, float2(3, 3)*uv+float2(0, 0), minHit.N,T,B,1);
+}
 if(inx==3)
 {
 	float2 uv = GetObjUV(minHit);
@@ -358,14 +416,13 @@ inx = -1;
 	//	}
 	//}
 	//mat.albedo = float3(GetObjUV(minHit),0);
-	if(inx == 2)
-	{
-		float2 uv = GetObjUV(minHit);
-		float3 T,B;
-		BoxedTB(T,B,minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
-		//mat.albedo = SampleNormalMap(N_paper, 2*uv, minHit.N,T,B);
-		minHit.N = SampleNormalMap(N_paper, 2*uv, minHit.N,T,B);
-	}
+	//if(inx == 2)
+	//{
+	//	float2 uv = GetObjUV(minHit);
+	//	float3 T,B;
+	//	GetObjTB(T,B, minHit);
+	//	minHit.N = SampleNormalMap(N_paper, 4*uv, minHit.N,T,B,1.3);
+	//}
 }
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)

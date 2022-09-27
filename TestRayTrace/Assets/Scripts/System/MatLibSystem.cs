@@ -63,46 +63,16 @@ public class MatLibSystem : BaseSystem
             var tag = tags[i];
             if(tag.matTypeName == "BrushedMetal")
             {
-                BakeBrushedMetal(tag);
+                tag.BakeBrushedMetal(ref bakedObjMatLib);
+            }
+            else if (tag.matTypeName == "N")
+            {
+                tag.BakeNormalMap(ref bakedObjMatLib);
             }
             else
             {
-                Debug.LogError("unhandled material : " + tag.matTypeName);
+                Debug.LogError("unhandled material : " + tag.matTypeName+" in objct : "+tag.gameObject.name);
             }
         }
-    }
-
-    void BakeBrushedMetal(MatLibTag tag)
-    {
-        //if(inx==2)
-        //{
-        //	float2 uv = GetObjUV(minHit);
-        //	SetMatLib_BrushedMetal(mat,uv);
-        //}
-        var sdftag = tag.gameObject.GetComponent<SDFBakerTag>();
-        if(sdftag == null)
-        {
-            Debug.LogError(tag.gameObject.name + " don't have sdf baker tag!");
-        }
-        int objInx = sdftag.objInx;
-
-        var floatParams = tag.floatParams;
-
-        bakedObjMatLib.Add("if(inx=="+objInx+")");
-        bakedObjMatLib.Add("{");
-        bakedObjMatLib.Add("	float2 uv = GetObjUV(minHit);");
-        if (floatParams.Count == 0)
-        {
-            bakedObjMatLib.Add("	SetMatLib_BrushedMetal(mat,uv);");
-        }
-        else if(floatParams.Count == 1)
-        {
-            bakedObjMatLib.Add("	SetMatLib_BrushedMetal(mat,uv, "+floatParams[0]+");");
-        }
-        else
-        {
-            Debug.LogError("Not handled: BakeBrushedMetal params num > 1");
-        }
-        bakedObjMatLib.Add("}");
     }
 }

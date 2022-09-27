@@ -48,6 +48,14 @@ float2 GetObjUV(in HitInfo minHit)
 	###BLOCK
 }
 
+void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
+{
+	int inx = minHit.obj;
+	###BLOCK ObjTB
+	... 
+	###BLOCK
+}
+
 void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
 	###BLOCK ObjPreRender

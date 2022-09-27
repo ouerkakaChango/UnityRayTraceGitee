@@ -15,6 +15,8 @@ public class SDFBakerMgr : MonoBehaviour
     [HideInInspector]
     public List<string> bakedObjUVs = new List<string>();
     [HideInInspector]
+    public List<string> bakedObjTBs = new List<string>();
+    [HideInInspector]
     public List<string> bakedSpecialObjects = new List<string>();
     [HideInInspector]
     public List<string> bakedMaterials = new List<string>();
@@ -101,6 +103,7 @@ public class SDFBakerMgr : MonoBehaviour
     {
         PreAddSDF(i, ref bakedSDFs, tag);
         PreAdd(i, ref bakedObjUVs);
+        PreAdd(i, ref bakedObjTBs);
         PreAdd(i, ref bakedSpecialObjects);
         PreAdd(i, ref bakedMaterials, "obj");
 
@@ -110,6 +113,7 @@ public class SDFBakerMgr : MonoBehaviour
     {
         PostAdd(i, ref bakedSDFs);
         PostAdd(i, ref bakedObjUVs);
+        PostAdd(i, ref bakedObjTBs);
         PostAdd(i, ref bakedSpecialObjects);
         PostAdd(i, ref bakedMaterials);
     }
@@ -161,6 +165,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedBeforeSDF.Clear();
         bakedSDFs.Clear();
         bakedObjUVs.Clear();
+        bakedObjTBs.Clear();
 
         bakedMaterials.Clear();
 
@@ -509,6 +514,11 @@ public class SDFBakerMgr : MonoBehaviour
         //uv = BoxedUV(minHit.P, center, bound, rot);
         line = "uv = BoxedUV(minHit.P, " + center_str + ", " + bound_str + ", " + rot_str + ");";
         bakedObjUVs.Add(line);
+
+        //Bake ObjTB
+        //BoxedTB(T,B,minHit.P, center, bound, rot));
+        line = "BoxedTB(T,B,minHit.P, " + center_str + ", " + bound_str + ", " + rot_str + ");";
+        bakedObjTBs.Add(line);
 
         SetTagMergeType(obj, SDFMergeType.Box);
     }
