@@ -40,4 +40,17 @@ float3 IS_SampleSpecularH(float3 N, float roughness, float x1, float x2)
 	return Vec2NormalHemisphere(H, N);
 }
 
+float3 IS_SampleDiffuseH(float3 N, float roughness, float x1, float x2)
+{
+	float theta = 2*PI*x1;
+	float phi = PI*(2*x2-1);
+	float3 randDir =  float3(
+		sin(phi)*cos(theta),
+		sin(phi)*sin(theta),
+		cos(phi)
+	);
+	randDir.z = abs(randDir.z);
+	return Vec2NormalHemisphere(randDir, N);
+}
+
 #endif

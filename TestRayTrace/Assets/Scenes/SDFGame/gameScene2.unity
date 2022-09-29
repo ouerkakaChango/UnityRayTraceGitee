@@ -182,7 +182,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &22466673
@@ -301,7 +301,6 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 1313816211}
   - {fileID: 22466672}
   - {fileID: 537032344}
   - {fileID: 566221532}
@@ -312,6 +311,7 @@ MonoBehaviour:
   - {fileID: 1007502731}
   - {fileID: 1024496421}
   - {fileID: 1231039147}
+  - {fileID: 1313816211}
   - {fileID: 1647113767}
   - {fileID: 1796358842}
   - {fileID: 1890238656}
@@ -394,19 +394,19 @@ MonoBehaviour:
   - {fileID: 1024496424}
   - {fileID: 1231039151}
   bakedObjMatLib:
-  - if(inx==6)
+  - if(inx==5)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
   - "\tminHit.N = SampleNormalMap(N_paper, float2(3, 3)*uv+float2(0, 0), minHit.N,T,B,1);"
   - '}'
-  - if(inx==7)
+  - if(inx==6)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - "\tSetMatLib_BrushedMetal(mat,uv, 0);"
   - '}'
-  - if(inx==8)
+  - if(inx==7)
   - '{'
   - ' float2 uv = GetObjUV(minHit);'
   - ' uv = float2(5, 5)*uv+float2(0, 0);'
@@ -414,14 +414,14 @@ MonoBehaviour:
   - "\tGetObjTB(T,B, minHit);"
   - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
   - '}'
-  - if(inx==9)
+  - if(inx==8)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
   - "\tminHit.N = SampleNormalMap(N_paper, float2(3, 3)*uv+float2(0, 0), minHit.N,T,B,1);"
   - '}'
-  - if(inx==10)
+  - if(inx==9)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' uv = float2(5, 5)*uv+float2(0, 0);'
@@ -442,7 +442,7 @@ MonoBehaviour:
   tags:
   - {fileID: 740148112}
   bakedObjImgAttach:
-  - if (inx == 7)
+  - if (inx == 6)
   - '{'
   - '    float2 uv = GetObjUV(minHit);'
   - '    if (IsInBBox(uv, float2(0.1, 0.1), float2(0.9, 0.9)))'
@@ -787,7 +787,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 2
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &537032345
@@ -911,7 +911,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 3
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &566221533
@@ -1042,7 +1042,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 4
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &596599792
@@ -1172,7 +1172,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 5
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &629090792
@@ -1284,7 +1284,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 6
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &669583706
@@ -1441,7 +1441,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 7
+  objInx: 6
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &740148109
@@ -1893,7 +1893,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 8
+  objInx: 7
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1007502732
@@ -2084,7 +2084,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 9
+  objInx: 8
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1024496422
@@ -2336,7 +2336,7 @@ MonoBehaviour:
   mat_PBR:
     albedo: {r: 0.49019608, g: 0.28235295, b: 0, a: 1}
     metallic: 0
-    roughness: 0.9
+    roughness: 1
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
@@ -2346,7 +2346,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 10
+  objInx: 9
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1231039148
@@ -2518,7 +2518,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 0
+  objInx: 10
   needExtraCondition: 0
   extraCondition: 
 --- !u!135 &1313816212
@@ -3084,8 +3084,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_LocalRotation: {x: -0.32858527, y: -0.0051244195, z: 0.0017440987, w: -0.9444588}
-  m_LocalPosition: {x: 0.35534003, y: 4.2091007, z: -7.477337}
+  m_LocalRotation: {x: 0.20501049, y: 0.424892, z: -0.09929959, w: 0.8761148}
+  m_LocalPosition: {x: -3.6564674, y: 3.2533824, z: -2.357739}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3132,7 +3132,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   renderSize: {x: 1024, y: 720}
-  useIndirectRT: 1
+  useIndirectRT: 0
   indirectMultiplier: 1
   useFSR: 0
   FSR_Scale: 2
@@ -3160,7 +3160,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1090c4c7b2894044f80ecdaf73b99902, type: 3}
   m_Name: 
