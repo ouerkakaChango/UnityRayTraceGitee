@@ -7,8 +7,7 @@ Blocks:
 ###BLOCK MainRender
 if (minHit.bHit)
 { 
-	re = RenderSceneObj(ray, minHit);
-	//SetIndirectColor(re, ray, minHit);
+	re = RenderSceneObj(ray, minHit, mat);
 	re *= RenderSceneSDFShadow(minHit);
 }
 else
@@ -20,7 +19,7 @@ else
 
 ###BLOCK IndirectRender
 	//re = 0.11;
-	SetIndirectColor(re, seed, ray, minHit);
+	SetIndirectColor(re, seed, ray, minHit, mat);
 
 	//test
 	//int2 spos = seed.xy;

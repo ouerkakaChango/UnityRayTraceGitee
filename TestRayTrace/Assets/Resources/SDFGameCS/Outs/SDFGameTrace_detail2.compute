@@ -3,6 +3,7 @@
 
 #include "../../../HLSL/UnityCommonDef.hlsl"
 #include "../../../HLSL/RayMath.hlsl"
+#include "../../../HLSL/PBR/PBRCommonDef.hlsl"
 
 int w;
 int h;
@@ -34,8 +35,9 @@ Texture2D<float4> envBgTex;
 #include "SDFGameScene_Detail2.hlsl"
 //#########################################################################################################
 
-float3 GetSDFGameColor(in Ray ray, out HitInfo minHit)
+float3 GetSDFGameColor(in Ray ray, out HitInfo minHit, out Material_PBR mat)
 {
+	Init(mat);
 	float3 re = 0;
 	//---Trace
 	Init(minHit);
@@ -44,8 +46,7 @@ float3 GetSDFGameColor(in Ray ray, out HitInfo minHit)
 
 if (minHit.bHit)
 {
-	re = RenderSceneObj(ray, minHit);
-	//SetIndirectColor(re, ray, minHit);
+	re = RenderSceneObj(ray, minHit, mat);
 	re *= RenderSceneSDFShadow(minHit);
 }
 else
@@ -57,11 +58,11 @@ else
 	return re;
 }
 
-float3 GetSDFGameIndirColor(in Ray ray,float3 seed, in HitInfo minHit)
+float3 GetSDFGameIndirColor(in Ray ray,float3 seed, in HitInfo minHit, in Material_PBR mat)
 {
 float3 re = 0;
 	//re = 0.11;
-	SetIndirectColor(re, seed, ray, minHit);
+	SetIndirectColor(re, seed, ray, minHit, mat);
 
 	//test
 	//int2 spos = seed.xy;
@@ -107,10 +108,11 @@ void Render(uint3 id : SV_DispatchThreadID)
 				ray.dir = normalize(ray.pos - eyePos);
 			}
 			HitInfo minHit;
-			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray,minHit);
+			Material_PBR mat;
+			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray,minHit, mat);
 			if(useIndirectRT)
 			{
-				SSAA_indirColors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameIndirColor(ray,seed,minHit);
+				SSAA_indirColors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameIndirColor(ray,seed,minHit,mat);
 			}
 		}
 	}

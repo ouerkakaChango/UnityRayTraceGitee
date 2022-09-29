@@ -585,21 +585,12 @@ public class SDFBakerMgr : MonoBehaviour
             if(meshName == "Cube")
             {
                 AddBakeCube(obj);
+                return;
             }
             else if(meshName == "Sphere")
             {
-                //???
-                Debug.LogError("Need Bake Sphere");
-            }
-        }
-
-        if(mf)
-        {
-            var meshName = mf.sharedMesh.name;
-            if (meshName == "Sphere")
-            {
-                //???
-                Debug.LogError("Need Bake Invisible Sphere");
+                AddBakeSphere(obj);
+                return;
             }
         }
 
@@ -607,7 +598,10 @@ public class SDFBakerMgr : MonoBehaviour
         if(quadBezier)
         {
             AddBakeQuadBezier(obj);
+            return;
         }
+
+        Debug.LogError("Nothing Baked!");
     }
 
     void AddBakeCube(GameObject obj)
@@ -632,6 +626,15 @@ public class SDFBakerMgr : MonoBehaviour
         bakedObjTBs.Add(line);
 
         SetTagMergeType(obj, SDFMergeType.Box);
+    }
+
+    void AddBakeSphere(GameObject obj)
+    {
+        float offset = obj.GetComponent<SDFBakerTag>().SDF_offset;
+        string center_str = Bake(obj.transform.position);
+        string line = offset + " + SDFSphere(p, " + center_str + ", " + obj.transform.localScale.x*0.5 + ")";
+        line = "re = min(re, " + line + ");";
+        bakedSDFs.Add(line);
     }
 
     void AddBakeQuadBezier(GameObject obj)

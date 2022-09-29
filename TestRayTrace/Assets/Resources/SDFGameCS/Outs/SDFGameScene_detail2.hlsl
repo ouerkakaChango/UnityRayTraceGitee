@@ -1,4 +1,4 @@
-﻿#define OBJNUM 13
+﻿#define OBJNUM 14
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -105,10 +105,7 @@ re = smin(re, d5);
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
-	re.albedo = float3(1, 1, 1);
-	re.metallic = 0.0f;
-	re.roughness = 0.8f;
-	re.ao = 1;
+	Init(re);
 
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
@@ -169,21 +166,27 @@ else if (obj == 9 )
 {
 re.albedo = float3(0.4901961, 0.282353, 0);
 re.metallic = 0;
-re.roughness = 0.35;
+re.roughness = 0.9;
 }
 else if (obj == 10 )
 {
 re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 0.9;
+re.metallic = 0.9;
+re.roughness = 0.1;
 }
 else if (obj == 11 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
+re.roughness = 0.9;
 }
 else if (obj == 12 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 13 )
 {
 re.albedo = float3(0.490566, 0.28254, 0);
 re.metallic = 0;
@@ -196,7 +199,7 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[13];
+int renderMode[14];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
@@ -210,6 +213,7 @@ renderMode[9] = 0;
 renderMode[10] = 0;
 renderMode[11] = 0;
 renderMode[12] = 0;
+renderMode[13] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -261,13 +265,16 @@ uv = BoxedUV(minHit.P, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315
 }
 else if (inx == 10 )
 {
-uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
 }
 else if (inx == 11 )
 {
-uv = BoxedUV(minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
 }
 else if (inx == 12 )
+{
+uv = BoxedUV(minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+}
+else if (inx == 13 )
 {
 uv = BoxedUV(minHit.P, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
 }
@@ -313,6 +320,9 @@ else if (inx == 11 )
 {
 }
 else if (inx == 12 )
+{
+}
+else if (inx == 13 )
 {
 }
 	//@@@
@@ -371,13 +381,16 @@ BoxedTB(T,B,minHit.P, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315)
 }
 else if (inx == 10 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
 }
 else if (inx == 11 )
 {
-BoxedTB(T,B,minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+BoxedTB(T,B,minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
 }
 else if (inx == 12 )
+{
+BoxedTB(T,B,minHit.P, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+}
+else if (inx == 13 )
 {
 BoxedTB(T,B,minHit.P, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
 }
@@ -414,6 +427,12 @@ if(inx==8)
 float3 T,B;
 	GetObjTB(T,B, minHit);
 	minHit.N = SampleNormalMap(N_paper, float2(3, 3)*uv+float2(0, 0), minHit.N,T,B,1);
+}
+if(inx==9)
+{
+	float2 uv = GetObjUV(minHit);
+uv = float2(5, 5)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(WoodTexture, uv);
 }
 //@@@
 
@@ -468,6 +487,9 @@ else if (inx == 11 )
 {
 }
 else if (inx == 12 )
+{
+}
+else if (inx == 13 )
 {
 }
 //@@@
@@ -535,9 +557,9 @@ else{
 }
 }
 
-float3 RenderSceneObj(Ray ray, HitInfo minHit)
+float3 RenderSceneObj(Ray ray, HitInfo minHit, out Material_PBR mat)
 {
-	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
+	mat = GetObjMaterial_PBR(minHit.obj);
 	int mode = GetObjRenderMode(minHit.obj);
 	ObjPreRender(mode, mat, ray, minHit);
 	float3 result = 0;
@@ -794,13 +816,17 @@ re = min(re, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.
 }
 else if (inx == 10 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
+re = min(re, 0 + SDFSphere(p, float3(-0.845, 2.679, -1.433), 0.5));
 }
 else if (inx == 11 )
 {
-re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0)));
 }
 else if (inx == 12 )
+{
+re = min(re, 0 + SDFBox(p, float3(-6.25, 1.04, 2.59), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+}
+else if (inx == 13 )
 {
 re = min(re, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
 }
@@ -877,6 +903,9 @@ else if (inx == 11 )
 {
 }
 else if (inx == 12 )
+{
+}
+else if (inx == 13 )
 {
 }
 //@@@
@@ -1282,7 +1311,7 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 	}
 }
 
-void SceneRenderIndirRay(in Ray ray, out float3 re, out HitInfo minHit)
+void SceneRenderIndirRay(in Ray ray, out float3 re, out HitInfo minHit, out Material_PBR indirSourceMat)
 {
 	re = 0;
 	//---Trace
@@ -1293,7 +1322,7 @@ void SceneRenderIndirRay(in Ray ray, out float3 re, out HitInfo minHit)
 
 	if (minHit.bHit)
 	{
-		re = RenderSceneObj(ray, minHit);
+		re = RenderSceneObj(ray, minHit, indirSourceMat);
 	}
 }
 
@@ -1304,7 +1333,7 @@ float3 IndirPointLightRender(float3 P, float3 N, float3 lightColor,float3 lightP
 	return Li*saturate(dot(N,L));
 }
 
-void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit)
+void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit, Material_PBR mat)
 {
 	Ray ray_indirect;
 	ray_indirect.pos = minHit.P;
@@ -1317,22 +1346,49 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 		cos(phi)
 	);
 	randDir.z = abs(randDir.z);
-	ray_indirect.dir = Vec2NormalHemisphere(randDir,minHit.N);
-	//ray_indirect.dir = toNormalHemisphere(randP_hemiRound(seed), minHit.N);
+	//ray_indirect.dir = Vec2NormalHemisphere(randDir,minHit.N);
+	float3 d1 = Vec2NormalHemisphere(randDir,minHit.N);
+	float3 d2 = reflect(ray.dir,minHit.N);
+	ray_indirect.dir = lerp(d2, d1, mat.roughness);
+	//___
 
 	{
 		//ray_indirect.dir = reflect(ray.dir,minHit.N);
+		//ray_indirect.dir = toNormalHemisphere(randP_hemiRound(seed), minHit.N);
 	}
 	//minHit.N*TraceThre*2 ensure escape from 'judging surface'
 	ray_indirect.pos = minHit.P + ray_indirect.dir*TraceThre*2 + minHit.N*TraceThre*2;
 	HitInfo indirHit;
 	float3 indirLightColor;
-	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit);
+	Material_PBR indirSourceMat;
+	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit, indirSourceMat);
 	indirLightColor *= RenderSceneSDFShadow(indirHit);
-	re = IndirPointLightRender(minHit.P,minHit.N, indirLightColor, indirHit.P);
+	//???
+	float pdf_GGX = 0;
+	float a = mat.roughness;
+	a = max(0.001f, a*a);
+	
+	float3 L = ray_indirect.dir;
+	float3 H = normalize(-ray.dir+L);
+	float NdotH = dot(minHit.N, H);
+	float nomi = a * a * NdotH;
+	float NdotH2 = NdotH * NdotH;
+	
+	float denom = (NdotH2 * (a*a - 1.0) + 1.0);
+	denom = PI * denom * denom;
+	pdf_GGX = nomi / denom;
+	pdf_GGX /= 4 * dot(L, H);	
+	pdf_GGX = max(pdf_GGX, 0.001f);
+	float pdf_specular = pdf_GGX;
+	indirLightColor/=pdf_specular;
+	//___
+
+	//re = IndirPointLightRender(minHit.P,minHit.N, indirLightColor, indirHit.P);
+	float3 Li = indirLightColor * GetPntlightAttenuation(minHit.P,indirHit.P);
+	re = PBR_GGX(mat, minHit.N, -ray.dir, L, Li);
 }
 
-void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit)
+void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit, Material_PBR mat)
 {
-	SetCheapIndirectColor(re, seed, ray, minHit);
+	SetCheapIndirectColor(re, seed, ray, minHit, mat);
 }

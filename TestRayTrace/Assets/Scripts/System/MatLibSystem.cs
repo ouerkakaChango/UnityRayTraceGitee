@@ -65,6 +65,10 @@ public class MatLibSystem : BaseSystem
             {
                 tag.BakeBrushedMetal(ref bakedObjMatLib);
             }
+            else if (tag.matTypeName == "D")
+            {
+                tag.BakeDiffuseMap(ref bakedObjMatLib);
+            }
             else if (tag.matTypeName == "N")
             {
                 tag.BakeNormalMap(ref bakedObjMatLib);

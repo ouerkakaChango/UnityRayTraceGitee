@@ -10,6 +10,14 @@ struct Material_PBR
 	float ao;
 };
 
+void Init(out Material_PBR mat)
+{
+	mat.albedo = 1;
+	mat.metallic = 0;
+	mat.roughness = 1;
+	mat.ao = 1;
+}
+
 //#######################################################################################
 
 //https://learnopengl-cn.github.io/07%20PBR/03%20IBL/01%20Diffuse%20irradiance/

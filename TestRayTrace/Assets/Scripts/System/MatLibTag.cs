@@ -52,6 +52,28 @@ public class MatLibTag : MonoBehaviour
         lines.Add("}");
     }
 
+    public void BakeDiffuseMap(ref List<string> lines)
+    {
+        //if(inx == 2)
+        //{
+        //	float2 uv = GetObjUV(minHit);
+        //  uv = s*uv+t;
+        //	mat.albedo *= SampleRGB(texName, uv);
+        //}
+
+        Vector2 uv_scale = new Vector2(floatParams[0], floatParams[1]);
+        Vector2 uv_offset = new Vector2(floatParams[2], floatParams[3]);
+        string texName = texParams[0].plainTextures[0].name;
+
+        int objInx = SafeGetObjInx();
+        lines.Add("if(inx==" + objInx + ")");
+        lines.Add("{");
+        lines.Add("	float2 uv = GetObjUV(minHit);");
+        lines.Add(" uv = "+ Bake(uv_scale) + "*uv+" + Bake(uv_offset) + ";");
+        lines.Add("	mat.albedo *= SampleRGB("+texName+", uv);");
+        lines.Add("}");
+    }
+
     public void BakeNormalMap(ref List<string> lines)
     {
         //if(inx == 2)
@@ -59,7 +81,7 @@ public class MatLibTag : MonoBehaviour
         //	float2 uv = GetObjUV(minHit);
         //	float3 T,B;
         //	GetObjTB(T,B, minHit);
-        //	minHit.N = SampleNormalMap(N_paper, 4*uv, minHit.N,T,B,1.3);
+        //	minHit.N = SampleNormalMap(N_paper, s*uv+t, minHit.N,T,B,1.3);
         //}
 
         Vector2 uv_scale = new Vector2(floatParams[0], floatParams[1]);

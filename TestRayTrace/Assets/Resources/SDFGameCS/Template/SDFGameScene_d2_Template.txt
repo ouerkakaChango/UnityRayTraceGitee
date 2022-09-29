@@ -23,10 +23,7 @@
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
-	re.albedo = float3(1, 1, 1);
-	re.metallic = 0.0f;
-	re.roughness = 0.8f;
-	re.ao = 1;
+	Init(re);
 
 	###BLOCK ObjMaterial
 	... 
@@ -70,9 +67,9 @@ void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, 
 	###BLOCK
 }
 
-float3 RenderSceneObj(Ray ray, HitInfo minHit)
+float3 RenderSceneObj(Ray ray, HitInfo minHit, out Material_PBR mat)
 {
-	Material_PBR mat = GetObjMaterial_PBR(minHit.obj);
+	mat = GetObjMaterial_PBR(minHit.obj);
 	int mode = GetObjRenderMode(minHit.obj);
 	ObjPreRender(mode, mat, ray, minHit);
 	float3 result = 0;
@@ -562,7 +559,7 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 		...
 ###BLOCK
 
-void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit)
+void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit, Material_PBR mat)
 {
 	###BLOCK IndirectColor
 	... 
