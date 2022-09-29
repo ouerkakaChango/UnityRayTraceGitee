@@ -544,22 +544,14 @@ float3 RenderSceneObj(Ray ray, HitInfo minHit)
 //@@@SDFBakerMgr ObjRender
 if(mode==0)
 {
-float3 lightDirs[6];
-float3 lightColors[6];
-lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-lightColors[0] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
-lightDirs[1] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
-lightColors[1] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-1.713, 2.707, -2.17));
-lightDirs[2] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
-lightColors[2] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-3.526, 2.707, -2.17));
-lightDirs[3] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
-lightColors[3] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
-lightDirs[4] = normalize(minHit.P - float3(3.357384, 8.15, 0));
-lightColors[4] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
-lightDirs[5] = normalize(minHit.P - float3(-3.83, 8.15, 0));
-lightColors[5] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
+float3 lightDirs[2];
+float3 lightColors[2];
+lightDirs[0] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
+lightColors[0] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-1.713, 2.707, -2.17));
+lightDirs[1] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
+lightColors[1] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-3.526, 2.707, -2.17));
 result = 0 * mat.albedo * mat.ao;
-for(int i=0;i<6;i++)
+for(int i=0;i<2;i++)
 {
 result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
 }
@@ -630,30 +622,34 @@ float RenderSceneSDFShadow(HitInfo minHit)
 	float sha = 1;
 if(true)
 {
-float lightspace = 5;
-//@SDFBakerMgr DirShadow
-float3 lightPos[5];
-lightPos[0] = float3(-0.07, 8.15, 3.42);
-lightPos[1] = float3(0, 3.12, -0.91);
-lightPos[2] = float3(0.04, 8.15, -3.29);
-lightPos[3] = float3(3.357384, 8.15, 0);
-lightPos[4] = float3(-3.83, 8.15, 0);
-float3 lightDirs[5];
-lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-lightDirs[1] = normalize(minHit.P - float3(0, 3.12, -0.91));
-lightDirs[2] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
-lightDirs[3] = normalize(minHit.P - float3(3.357384, 8.15, 0));
-lightDirs[4] = normalize(minHit.P - float3(-3.83, 8.15, 0));
-for(int i=0;i<5;i++)
+//@@@SDFBakerMgr DirShadow
+int lightType[2];
+lightType[0] = 1;
+lightType[1] = 1;
+float3 lightPos[2];
+lightPos[0] = float3(-1.713, 2.707, -2.17);
+lightPos[1] = float3(-3.526, 2.707, -2.17);
+float3 lightDirs[2];
+lightDirs[0] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
+lightDirs[1] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
+float lightspace = 2;
+float maxLength = MaxSDF;
+for (int i = 0; i < 2; i++)
 {
-	//??? need bake
-	float maxLength = length(minHit.P - lightPos[i]);
-	float tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
-	lightspace -= (1-tsha);
+float maxLength = MaxSDF;
+if(lightType[i]==0)
+{
+maxLength = MaxSDF;
 }
-lightspace /= 5;
+if(lightType[i]==1)
+{
+maxLength = length(minHit.P - lightPos[i]);
+}
+lightspace -= (1 - GetDirHardShadow(lightDirs[i], minHit, maxLength));
+}
+lightspace /= 2;
 sha = lightspace;
-//@
+//@@@
 }
 return sha;
 }

@@ -323,7 +323,7 @@ public class AutoCS : MonoBehaviour
             }
             else if (key == "DirShadow" && ValidRange(range))
             {
-                helper.Replace(range, bakerMgr.bakedDirShadows);
+                helper.Replace(range, bakerMgr.bakedShadows);
             }
             else if (key == "ValMaps" && ValidRange(range))
             {

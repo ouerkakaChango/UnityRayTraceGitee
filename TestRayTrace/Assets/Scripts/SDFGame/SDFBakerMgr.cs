@@ -25,7 +25,7 @@ public class SDFBakerMgr : MonoBehaviour
     [HideInInspector]
     public List<string> bakedRenders = new List<string>();
     [HideInInspector]
-    public List<string> bakedDirShadows = new List<string>();
+    public List<string> bakedShadows = new List<string>();
     [HideInInspector]
     public List<string> bakedBeforeSDF = new List<string>();    //used for SDF Bounds
     [HideInInspector]
@@ -173,7 +173,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedRenderModes.Add("int renderMode[" + tags.Length + "];");
 
         bakedRenders.Clear();
-        bakedDirShadows.Clear();
+        bakedShadows.Clear();
 
         bakedSpecialObjects.Clear();
 
@@ -268,35 +268,107 @@ public class SDFBakerMgr : MonoBehaviour
     //??? ´ý¸Ä
     void EndBakeShadows()
     {
-        //float3 lightDirs[1];
-        //lightDirs[0] = float3(0, -0.7071068, 0.7071068);
-        //for(int i=0;i<1;i++)
+        //int lightType[5];
+        //....
+        //float3 lightPos[5];
+        //lightPos[0] = float3(-0.07, 8.15, 3.42);
+        //lightPos[1] = float3(0, 3.12, -0.91);
+        //lightPos[2] = float3(0.04, 8.15, -3.29);
+        //lightPos[3] = float3(3.357384, 8.15, 0);
+        //lightPos[4] = float3(-3.83, 8.15, 0);
+        //float3 lightDirs[5];
+        //lightDirs[0] = normalize(minHit.P - lightPos[0]);
+        //lightDirs[1] = normalize(minHit.P - lightPos[1]);
+        //lightDirs[2] = normalize(minHit.P - lightPos[2]);));
+        //lightDirs[3] = normalize(minHit.P - lightPos[3]);));
+        //lightDirs[4] = normalize(minHit.P - lightPos[4]);
+        //float lightspace = 5;
+        //for (int i = 0; i < 5; i++)
         //{
-        //	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
+        //      float maxLength = MaxSDF;
+        //     if(lightType[i]==1)
+        //    {
+        //          maxLength = length(minHit.P - lightPos[i]);
+        //      }
+        //    float tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
+        //    lightspace -= (1 - tsha);
         //}
-        bakedDirShadows.Add("float3 lightDirs[" + lightTags.Length + "];");
-        for(int i=0;i< lightTags.Length;i++)
+        //lightspace /= 5;
+        //sha = lightspace;
+        int n = lightTags.Length;
+        bakedShadows.Add("int lightType[" + n + "];");
+        for (int i = 0; i < n; i++)
+        {
+            if (IsDirectionalLight(lightTags[i].gameObject))
+            {
+                bakedShadows.Add("lightType[" + i + "] = 0;");
+            }
+            else if (IsPointLight(lightTags[i].gameObject))
+            {
+                bakedShadows.Add("lightType[" + i + "] = 1;");
+            }
+        }
+
+        bakedShadows.Add("float3 lightPos[" + n + "];");
+        for (int i = 0; i < n; i++)
+        {
+            Vector3 lp = lightTags[i].gameObject.transform.position;
+            bakedShadows.Add("lightPos[" + i + "] = "+Bake(lp)+";");
+        }
+
+        bakedShadows.Add("float3 lightDirs[" + n + "];");
+        for(int i=0;i< n; i++)
         {
             Vector3 lightDir = Vector3.zero;
             if (IsDirectionalLight(lightTags[i].gameObject))
             {
                 lightDir = GetLightDir(lightTags[i].gameObject);
-                bakedDirShadows.Add("lightDirs[" + i + "] = " + Bake(lightDir) + ";");
+                bakedShadows.Add("lightDirs[" + i + "] = " + Bake(lightDir) + ";");
             }
             else if(IsPointLight(lightTags[i].gameObject))
             {
-                var lightPos = lightTags[i].gameObject.transform.position;
-                bakedDirShadows.Add("lightDirs[" + i + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
+                Vector3 lightPos = lightTags[i].gameObject.transform.position;
+                bakedShadows.Add("lightDirs[" + i + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
             }
             else
             {
                 Debug.LogError("No support type");
             }
         }
-        bakedDirShadows.Add("for(int i=0;i<"+ lightTags.Length + ";i++)");
-        bakedDirShadows.Add("{");
-        bakedDirShadows.Add("	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);");
-        bakedDirShadows.Add("}");
+        //float lightspace = 5;
+        //float maxLength = MaxSDF;
+        //for (int i = 0; i < 5; i++)
+        //{
+        //      if(lightType[i]==0)
+        //      {
+        //          maxLength = MaxSDF;
+        //      }
+        //     if(lightType[i]==1)
+        //    {
+        //          maxLength = length(minHit.P - lightPos[i]);
+        //      }
+        //    lightspace -= (1 - GetDirHardShadow(lightDirs[i], minHit, maxLength));
+        //}
+        //lightspace /= 5;
+        //sha = lightspace;
+
+        bakedShadows.Add("float lightspace = "+ n + ";");
+        bakedShadows.Add("float maxLength = MaxSDF;");
+        bakedShadows.Add("for (int i = 0; i < "+n+"; i++)");
+        bakedShadows.Add("{");
+        bakedShadows.Add("  float maxLength = MaxSDF;");
+        bakedShadows.Add("  if(lightType[i]==0)");
+        bakedShadows.Add("  {");
+        bakedShadows.Add("      maxLength = MaxSDF;");
+        bakedShadows.Add("  }");
+        bakedShadows.Add("  if(lightType[i]==1)");
+        bakedShadows.Add("  {");
+        bakedShadows.Add("      maxLength = length(minHit.P - lightPos[i]);");
+        bakedShadows.Add("  }");
+        bakedShadows.Add("  lightspace -= (1 - GetDirHardShadow(lightDirs[i], minHit, maxLength));");
+        bakedShadows.Add("}");
+        bakedShadows.Add("lightspace /= "+n+";");
+        bakedShadows.Add("sha = lightspace;");
     }
 
     void PreAdd(int inx, ref List<string> lines, string inxName = "inx", bool ignoreElse = false)
