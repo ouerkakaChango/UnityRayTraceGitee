@@ -544,14 +544,22 @@ float3 RenderSceneObj(Ray ray, HitInfo minHit)
 //@@@SDFBakerMgr ObjRender
 if(mode==0)
 {
-float3 lightDirs[2];
-float3 lightColors[2];
-lightDirs[0] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
-lightColors[0] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-1.713, 2.707, -2.17));
-lightDirs[1] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
-lightColors[1] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-3.526, 2.707, -2.17));
+float3 lightDirs[6];
+float3 lightColors[6];
+lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+lightColors[0] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
+lightDirs[1] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
+lightColors[1] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-1.713, 2.707, -2.17));
+lightDirs[2] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
+lightColors[2] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-3.526, 2.707, -2.17));
+lightDirs[3] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
+lightColors[3] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
+lightDirs[4] = normalize(minHit.P - float3(3.357384, 8.15, 0));
+lightColors[4] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
+lightDirs[5] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+lightColors[5] = float3(1, 1, 1) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
 result = 0 * mat.albedo * mat.ao;
-for(int i=0;i<2;i++)
+for(int i=0;i<6;i++)
 {
 result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
 }
@@ -605,16 +613,26 @@ else
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
 float Expensive_HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
-float SoftShadow_TraceScene(Ray ray, out HitInfo info);
+float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
 
 float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
 {
 	Ray ray;
 	ray.pos = minHit.P;
 	ray.dir = -lightDir;
-	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;//SceneSDFShadowNormalBias * minHit.N;
+	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
 	HitInfo hitInfo;
 	return HardShadow_TraceScene(ray, hitInfo, maxLength);
+}
+
+float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
+{
+	Ray ray;
+	ray.pos = minHit.P;
+	ray.dir = -lightDir;
+	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
+	HitInfo hitInfo;
+	return SoftShadow_TraceScene(ray, hitInfo, maxLength);
 }
 
 float RenderSceneSDFShadow(HitInfo minHit)
@@ -623,18 +641,31 @@ float RenderSceneSDFShadow(HitInfo minHit)
 if(true)
 {
 //@@@SDFBakerMgr DirShadow
-int lightType[2];
-lightType[0] = 1;
+int lightType[6];
+lightType[0] = -2;
 lightType[1] = 1;
-float3 lightPos[2];
-lightPos[0] = float3(-1.713, 2.707, -2.17);
-lightPos[1] = float3(-3.526, 2.707, -2.17);
-float3 lightDirs[2];
-lightDirs[0] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
-lightDirs[1] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
-float lightspace = 2;
+lightType[2] = 1;
+lightType[3] = -2;
+lightType[4] = -2;
+lightType[5] = -2;
+float3 lightPos[6];
+lightPos[0] = float3(-0.07, 8.15, 3.42);
+lightPos[1] = float3(-1.713, 2.707, -2.17);
+lightPos[2] = float3(-3.526, 2.707, -2.17);
+lightPos[3] = float3(0.04, 8.15, -3.29);
+lightPos[4] = float3(3.357384, 8.15, 0);
+lightPos[5] = float3(-3.83, 8.15, 0);
+float3 lightDirs[6];
+lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+lightDirs[1] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
+lightDirs[2] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
+lightDirs[3] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
+lightDirs[4] = normalize(minHit.P - float3(3.357384, 8.15, 0));
+lightDirs[5] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+float lightspace = 6;
 float maxLength = MaxSDF;
-for (int i = 0; i < 2; i++)
+float tsha = 1;
+for (int i = 0; i < 6; i++)
 {
 float maxLength = MaxSDF;
 if(lightType[i]==0)
@@ -645,9 +676,17 @@ if(lightType[i]==1)
 {
 maxLength = length(minHit.P - lightPos[i]);
 }
-lightspace -= (1 - GetDirHardShadow(lightDirs[i], minHit, maxLength));
+if(lightType[i]<0)
+{
+tsha = 1;
 }
-lightspace /= 2;
+else
+{
+tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);;
+}
+lightspace -= (1 - tsha);
+}
+lightspace /= 6;
 sha = lightspace;
 //@@@
 }
@@ -1092,7 +1131,7 @@ float Expensive_HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength
 }
 
 //https://www.shadertoy.com/view/MsfGRr
-float SoftShadow_TraceScene(Ray ray, out HitInfo info)
+float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 {
 	Init(info);
 	float sha = 1.0;
@@ -1142,6 +1181,10 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
+		if(traceInfo.traceSum>maxLength)
+		{
+			break;
+		}
 	}
 
 	return saturate(sha);

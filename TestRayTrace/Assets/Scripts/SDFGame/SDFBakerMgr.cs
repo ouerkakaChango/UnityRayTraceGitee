@@ -297,16 +297,26 @@ public class SDFBakerMgr : MonoBehaviour
         //sha = lightspace;
         int n = lightTags.Length;
         bakedShadows.Add("int lightType[" + n + "];");
+        int type = -999;
         for (int i = 0; i < n; i++)
         {
             if (IsDirectionalLight(lightTags[i].gameObject))
             {
-                bakedShadows.Add("lightType[" + i + "] = 0;");
+                type = 0;
             }
             else if (IsPointLight(lightTags[i].gameObject))
             {
-                bakedShadows.Add("lightType[" + i + "] = 1;");
+                type = 1;
             }
+            else
+            {
+                Debug.LogError("light type not handle");
+            }
+            if (!lightTags[i].bakeShadow)
+            {
+                type = -type - 1;
+            }
+            bakedShadows.Add("lightType[" + i + "] = "+type+";");
         }
 
         bakedShadows.Add("float3 lightPos[" + n + "];");
@@ -337,6 +347,7 @@ public class SDFBakerMgr : MonoBehaviour
         }
         //float lightspace = 5;
         //float maxLength = MaxSDF;
+        //float tsha = 1;
         //for (int i = 0; i < 5; i++)
         //{
         //      if(lightType[i]==0)
@@ -347,13 +358,22 @@ public class SDFBakerMgr : MonoBehaviour
         //    {
         //          maxLength = length(minHit.P - lightPos[i]);
         //      }
-        //    lightspace -= (1 - GetDirHardShadow(lightDirs[i], minHit, maxLength));
+        //      if(lightType[i]<0)
+        //      {
+        //          tsha = 1;
+        //      }
+        //      else
+        //      {
+        //          tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
+        //      }
+        //    lightspace -= (1 - tsha);
         //}
         //lightspace /= 5;
         //sha = lightspace;
 
         bakedShadows.Add("float lightspace = "+ n + ";");
         bakedShadows.Add("float maxLength = MaxSDF;");
+        bakedShadows.Add("float tsha = 1;");
         bakedShadows.Add("for (int i = 0; i < "+n+"; i++)");
         bakedShadows.Add("{");
         bakedShadows.Add("  float maxLength = MaxSDF;");
@@ -365,7 +385,15 @@ public class SDFBakerMgr : MonoBehaviour
         bakedShadows.Add("  {");
         bakedShadows.Add("      maxLength = length(minHit.P - lightPos[i]);");
         bakedShadows.Add("  }");
-        bakedShadows.Add("  lightspace -= (1 - GetDirHardShadow(lightDirs[i], minHit, maxLength));");
+        bakedShadows.Add("  if(lightType[i]<0)");
+        bakedShadows.Add("  {");
+        bakedShadows.Add("      tsha = 1;");
+        bakedShadows.Add("  }");
+        bakedShadows.Add("  else");
+        bakedShadows.Add("  {");
+        bakedShadows.Add("      tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);;");
+        bakedShadows.Add("  }");
+        bakedShadows.Add("  lightspace -= (1 - tsha);");
         bakedShadows.Add("}");
         bakedShadows.Add("lightspace /= "+n+";");
         bakedShadows.Add("sha = lightspace;");

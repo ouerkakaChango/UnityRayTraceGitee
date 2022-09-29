@@ -86,16 +86,26 @@ float3 RenderSceneObj(Ray ray, HitInfo minHit)
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
 float Expensive_HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
-float SoftShadow_TraceScene(Ray ray, out HitInfo info);
+float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
 
 float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
 {
 	Ray ray;
 	ray.pos = minHit.P;
 	ray.dir = -lightDir;
-	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;//SceneSDFShadowNormalBias * minHit.N;
+	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
 	HitInfo hitInfo;
 	return HardShadow_TraceScene(ray, hitInfo, maxLength);
+}
+
+float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
+{
+	Ray ray;
+	ray.pos = minHit.P;
+	ray.dir = -lightDir;
+	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
+	HitInfo hitInfo;
+	return SoftShadow_TraceScene(ray, hitInfo, maxLength);
 }
 
 float RenderSceneSDFShadow(HitInfo minHit)
@@ -411,7 +421,7 @@ float Expensive_HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength
 }
 
 //https://www.shadertoy.com/view/MsfGRr
-float SoftShadow_TraceScene(Ray ray, out HitInfo info)
+float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 {
 	Init(info);
 	float sha = 1.0;
@@ -461,6 +471,10 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info)
 
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
+		if(traceInfo.traceSum>maxLength)
+		{
+			break;
+		}
 	}
 
 	return saturate(sha);
