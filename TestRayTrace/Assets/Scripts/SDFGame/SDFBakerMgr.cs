@@ -282,19 +282,6 @@ public class SDFBakerMgr : MonoBehaviour
         //lightDirs[2] = normalize(minHit.P - lightPos[2]);));
         //lightDirs[3] = normalize(minHit.P - lightPos[3]);));
         //lightDirs[4] = normalize(minHit.P - lightPos[4]);
-        //float lightspace = 5;
-        //for (int i = 0; i < 5; i++)
-        //{
-        //      float maxLength = MaxSDF;
-        //     if(lightType[i]==1)
-        //    {
-        //          maxLength = length(minHit.P - lightPos[i]);
-        //      }
-        //    float tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
-        //    lightspace -= (1 - tsha);
-        //}
-        //lightspace /= 5;
-        //sha = lightspace;
         int n = lightTags.Length;
         bakedShadows.Add("int lightType[" + n + "];");
         int type = -999;
@@ -345,6 +332,15 @@ public class SDFBakerMgr : MonoBehaviour
                 Debug.LogError("No support type");
             }
         }
+
+        //int shadowType[5];
+        //....
+        bakedShadows.Add("int shadowType[" + n + "];");
+        for(int i=0;i< n; i++)
+        {
+            bakedShadows.Add("shadowType[" + i + "] =" + (int)lightTags[i].shadowType + ";");
+        }
+
         //float lightspace = 5;
         //float maxLength = MaxSDF;
         //float tsha = 1;
@@ -364,7 +360,14 @@ public class SDFBakerMgr : MonoBehaviour
         //      }
         //      else
         //      {
+        //           if(shadowType[i]==0)
+        //            {
         //          tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
+        //              }
+        //           if(shadowType[i]==1)
+        //            {
+        //          tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
+        //              }
         //      }
         //    lightspace -= (1 - tsha);
         //}
@@ -391,7 +394,14 @@ public class SDFBakerMgr : MonoBehaviour
         bakedShadows.Add("  }");
         bakedShadows.Add("  else");
         bakedShadows.Add("  {");
-        bakedShadows.Add("      tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);;");
+        bakedShadows.Add("      if(shadowType[i]==0)");
+        bakedShadows.Add("      {");
+        bakedShadows.Add("          tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);");
+        bakedShadows.Add("      }");
+        bakedShadows.Add("      if(shadowType[i]==1)");
+        bakedShadows.Add("      {");
+        bakedShadows.Add("          tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);");
+        bakedShadows.Add("      }");
         bakedShadows.Add("  }");
         bakedShadows.Add("  lightspace -= (1 - tsha);");
         bakedShadows.Add("}");

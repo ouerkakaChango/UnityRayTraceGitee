@@ -663,6 +663,13 @@ lightDirs[2] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
 lightDirs[3] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
 lightDirs[4] = normalize(minHit.P - float3(3.357384, 8.15, 0));
 lightDirs[5] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+int shadowType[6];
+shadowType[0] =0;
+shadowType[1] =1;
+shadowType[2] =1;
+shadowType[3] =0;
+shadowType[4] =0;
+shadowType[5] =0;
 float lightspace = 6;
 float maxLength = MaxSDF;
 float tsha = 1;
@@ -683,7 +690,14 @@ for (int i = 0; i < 6; i++)
   }
   else
   {
-      tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);;
+      if(shadowType[i]==0)
+      {
+          tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
+      }
+      if(shadowType[i]==1)
+      {
+          tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
+      }
   }
   lightspace -= (1 - tsha);
 }

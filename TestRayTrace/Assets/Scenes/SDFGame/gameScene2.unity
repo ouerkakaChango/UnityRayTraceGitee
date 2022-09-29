@@ -296,7 +296,7 @@ MonoBehaviour:
   bakedRenderModes:
   - int renderMode[13];
   bakedRenders: []
-  bakedDirShadows: []
+  bakedShadows: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
@@ -387,39 +387,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tags:
-  - {fileID: 22466675}
-  - {fileID: 566221535}
-  - {fileID: 596599794}
   - {fileID: 669583709}
   - {fileID: 740148111}
+  - {fileID: 1007502728}
   - {fileID: 1024496424}
-  - {fileID: 1231039151}
-  - {fileID: 1890238659}
   bakedObjMatLib:
-  - if(inx==0)
-  - '{'
-  - ' float2 uv = GetObjUV(minHit);'
-  - ' uv = float2(1, 1)*uv+float2(0, 0);'
-  - ' float3 T,B;'
-  - "\tGetObjTB(T,B, minHit);"
-  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
-  - '}'
-  - if(inx==2)
-  - '{'
-  - ' float2 uv = GetObjUV(minHit);'
-  - ' uv = float2(1, 1)*uv+float2(0, 0);'
-  - ' float3 T,B;'
-  - "\tGetObjTB(T,B, minHit);"
-  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
-  - '}'
-  - if(inx==3)
-  - '{'
-  - ' float2 uv = GetObjUV(minHit);'
-  - ' uv = float2(1, 1)*uv+float2(0, 0);'
-  - ' float3 T,B;'
-  - "\tGetObjTB(T,B, minHit);"
-  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
-  - '}'
   - if(inx==5)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
@@ -432,14 +404,7 @@ MonoBehaviour:
   - "\tfloat2 uv = GetObjUV(minHit);"
   - "\tSetMatLib_BrushedMetal(mat,uv, 0);"
   - '}'
-  - if(inx==8)
-  - '{'
-  - "\tfloat2 uv = GetObjUV(minHit);"
-  - ' float3 T,B;'
-  - "\tGetObjTB(T,B, minHit);"
-  - "\tminHit.N = SampleNormalMap(N_paper, float2(3, 3)*uv+float2(0, 0), minHit.N,T,B,1);"
-  - '}'
-  - if(inx==9)
+  - if(inx==7)
   - '{'
   - ' float2 uv = GetObjUV(minHit);'
   - ' uv = float2(5, 5)*uv+float2(0, 0);'
@@ -447,13 +412,12 @@ MonoBehaviour:
   - "\tGetObjTB(T,B, minHit);"
   - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
   - '}'
-  - if(inx==12)
+  - if(inx==8)
   - '{'
-  - ' float2 uv = GetObjUV(minHit);'
-  - ' uv = float2(1, 1)*uv+float2(0, 0);'
+  - "\tfloat2 uv = GetObjUV(minHit);"
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
-  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, WoodTexture);'
+  - "\tminHit.N = SampleNormalMap(N_paper, float2(3, 3)*uv+float2(0, 0), minHit.N,T,B,1);"
   - '}'
 --- !u!114 &296496490
 MonoBehaviour:
@@ -525,6 +489,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bakeShadow: 0
+  shadowType: 0
 --- !u!108 &328588543
 Light:
   m_ObjectHideFlags: 0
@@ -617,6 +583,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bakeShadow: 1
+  shadowType: 1
 --- !u!108 &402165470
 Light:
   m_ObjectHideFlags: 0
@@ -1602,6 +1570,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bakeShadow: 1
+  shadowType: 1
 --- !u!108 &774306906
 Light:
   m_ObjectHideFlags: 0
@@ -1722,6 +1692,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bakeShadow: 0
+  shadowType: 0
 --- !u!108 &794877061
 Light:
   m_ObjectHideFlags: 0
@@ -2043,6 +2015,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bakeShadow: 1
+  shadowType: 0
 --- !u!1 &1024496419
 GameObject:
   m_ObjectHideFlags: 0
@@ -2597,6 +2571,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bakeShadow: 0
+  shadowType: 0
 --- !u!1 &1330409198
 GameObject:
   m_ObjectHideFlags: 0
@@ -2705,6 +2681,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bakeShadow: 0
+  shadowType: 0
 --- !u!108 &1484205461
 Light:
   m_ObjectHideFlags: 0

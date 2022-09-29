@@ -367,12 +367,47 @@ else{
 if(true)
 {
 //@@@SDFBakerMgr DirShadow
+int lightType[1];
+lightType[0] = 0;
+float3 lightPos[1];
+lightPos[0] = float3(-51.9, 13, -40.4);
 float3 lightDirs[1];
 lightDirs[0] = float3(0.3534208, -0.4141579, -0.8387889);
-for(int i=0;i<1;i++)
+int shadowType[1];
+shadowType[0] =0;
+float lightspace = 1;
+float maxLength = MaxSDF;
+float tsha = 1;
+for (int i = 0; i < 1; i++)
 {
-	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
+  float maxLength = MaxSDF;
+  if(lightType[i]==0)
+  {
+      maxLength = MaxSDF;
+  }
+  if(lightType[i]==1)
+  {
+      maxLength = length(minHit.P - lightPos[i]);
+  }
+  if(lightType[i]<0)
+  {
+      tsha = 1;
+  }
+  else
+  {
+      if(shadowType[i]==0)
+      {
+          tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
+      }
+      if(shadowType[i]==1)
+      {
+          tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
+      }
+  }
+  lightspace -= (1 - tsha);
 }
+lightspace /= 1;
+sha = lightspace;
 //@@@
 }
 sha = saturate(0.2 + sha);
