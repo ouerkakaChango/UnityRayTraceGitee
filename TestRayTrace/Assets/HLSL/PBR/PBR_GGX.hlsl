@@ -68,4 +68,35 @@ float3 PBR_GGX(Material_PBR param, float3 n, float3 v, float3 l, float3 Li, floa
 
 	return Lo;
 }
+
+float3 MPBR_GGX(Material_PBR param, float3 n, float3 v, float3 l, float3 Li, float diffuseRate = 1.0f, float specularRate = 1.0f)
+{
+	float3 h = normalize(l + v);
+
+	//Calculate F
+	float3 F0 = 0.04;
+	F0 = lerp(F0, param.albedo, param.metallic);
+	float3 F = fresnelSchlick(max(dot(h, v), 0.0), F0);
+
+	//Calculate diffuse
+	float3 kD = 1.0 - F;
+	float3 diffuse = (1.0 - param.metallic) * kD * param.albedo / PI;
+
+	//Calculate specular
+	float G = GeometrySmith(n, v, l, param.roughness);
+	float3 nominator;
+	float NDF = DistributionGGX(n, h, param.roughness);
+	nominator = 1 ;
+	float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0);
+	float3 specular = 0.1;
+	if (abs(denominator) > 0.000001)
+	{
+		specular = nominator / denominator;
+	}
+
+	float3 Lo = diffuse * diffuseRate * 0 +specular * specularRate;
+	Lo *= Li * max(dot(n, l), 0);
+
+	return Lo;
+}
 #endif

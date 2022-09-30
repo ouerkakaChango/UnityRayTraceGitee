@@ -50,18 +50,23 @@ void BoxedTB(out float3 T, out float3 B, float3 p, float3 center, float3 bound, 
 	{
 		T = RotByEuler(float3(1, 0, 0), rotEuler);
 		B = RotByEuler(float3(0, 1, 0), rotEuler);
+		return;
 	}
 	else if (InBound(p.xz, bound.xz) && abs(p.y) >= bound.y)
 	{
 		T = RotByEuler(float3(1, 0, 0), rotEuler);
 		B = RotByEuler(float3(0, 0, 1), rotEuler);
+		return;
 	}
 	else if (InBound(p.yz, bound.yz) && abs(p.x) >= bound.x)
 	{
 		T = RotByEuler(float3(0, 1, 0), rotEuler);
 		B = RotByEuler(float3(0, 0, 1), rotEuler);
+		return;
 	}
 	//never reach!
+	T = float3(1, 0, 0);
+	B = float3(0, 1, 0);
 }
 
 float2 RemapTarUV(float2 inUV, float2 uvmin, float2 uvmax)

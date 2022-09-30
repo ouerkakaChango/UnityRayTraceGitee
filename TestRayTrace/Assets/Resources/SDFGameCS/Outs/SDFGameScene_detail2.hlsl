@@ -3,8 +3,8 @@
 #define MaxSDF 100000
 #define MaxTraceDis 100
 #define MaxTraceTime 6400
-#define TraceThre 0.0001
-#define NormalEpsilon 0.0001
+#define TraceThre 0.001
+#define NormalEpsilon 0.001
 
 #define SceneSDFShadowNormalBias 0.001
 
@@ -113,29 +113,27 @@ float n = n21(p);
 return float2(n, n21(p+n));
 }
 
-float2 swirl (float2 uv, float seed, inout float3 swirl_n)
+float2 swirl (float2 uv, float seed, inout float acc_frc, inout float2 acc_rot)
 {
+float tm = 0.; //iTime * .005 + 4.;
+
 // point
 float n = n21(float2(seed,seed));
-float2 center = float2(0.5, 0.5) + float2(cos( n * 423.1), sin(n * 254.3)) * 0.5;
-	center = float2(0.5, 0.5);
+float2 pnt = 0.5 + float2(cos(tm + n * 423.1), sin(tm + n * 254.3) * .5);
 
 // rotate point
-float2 dif = uv - center;
-float len = abs(dif.y);
-	//!!!
-	float FORCE = 2.4; // the larger the smaller the swirl
-	float ROTATION = 3.5;
-	//(cos(len * 10.) * .5 + .5)
-float dz = 0.2+10*len/(sqrt(2)/2);//lerp(0, 1, exp(len * -FORCE));
-float theta = dz * sin(n * 624.8) * ROTATION;
-float2 rotedPnt = dif;//rotate(dif, theta);
+float2 dif = uv - pnt;
+float len = length(dif);
+float frc = smoothstep(.0, 1., exp(len * -2.4) * (cos(len * 10.) * .5 + .5));
+float swl = frc * sin(tm + n * 624.8) * 3.5;
+float2 rot = rotate(dif, swl);
 
 // for normal map
-swirl_n.z += dz;
-swirl_n.xy += 0.1;//rotedPnt*dz ;
+acc_frc += frc;
+acc_rot += rot * frc;
 
-return (rotedPnt + center);
+// rotated uv
+return rot + pnt;
 }
 
 
@@ -226,8 +224,8 @@ re.roughness = 0.9;
 else if (obj == 13 )
 {
 re.albedo = float3(0.8588235, 0.7490196, 0.3215686);
-re.metallic = 0.5;
-re.roughness = 0.3;
+re.metallic = 0.9;
+re.roughness = 0.5;
 }
 else if (obj == 14 )
 {
@@ -597,20 +595,20 @@ else if (inx == 14 )
 		//???
 		float2 uv = GetObjUV(minHit);
 		//---
-		// reclusively swirl uv
-		float3 swirl_n = 0;
+		float acc_frc = .0;
+		float2 acc_rot = 0;
 		float2 sv = uv;
-		float POINTS = 1;
-		for (int i = 0; i < POINTS; i++)
-		{
-		 sv = swirl(sv, frac(float(i+1) * 123.45), swirl_n);
-		}
-		float3 normal = normalize(swirl_n);
+		for (int i = 0; i < 20; i++)
+			sv = swirl(sv, frac(float(i+1) * 123.45), acc_frc, acc_rot);
+
+// normal map
+float3 roughness = float3(n22(sv), 1.) * .02;
+float3 normal = normalize(float3(acc_rot, acc_frc * .01) + roughness);
 		//___
-		//mat.albedo = normal;
 		float3 T,B;
 		GetObjTB(T,B, minHit);
-		minHit.N = ApplyNTangent(normal,minHit.N,T,B);
+		normal = ApplyNTangent(normal,minHit.N,T,B, 0.5);
+		minHit.N = normal;//normalize(0.1*float3(1,0,0)+minHit.N);
 	}
 }
 
@@ -693,6 +691,28 @@ else if (mode == 333)
 else if (mode == 1001)
 {
 	result = minHit.N;
+}
+else if(mode == 444)
+{
+float3 lightDirs[6];
+float3 lightColors[6];
+lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+lightColors[0] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
+lightDirs[1] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
+lightColors[1] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-1.713, 2.707, -2.17));
+lightDirs[2] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
+lightColors[2] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-3.526, 2.707, -2.17));
+lightDirs[3] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
+lightColors[3] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
+lightDirs[4] = normalize(minHit.P - float3(3.357384, 8.15, 0));
+lightColors[4] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
+lightDirs[5] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+lightColors[5] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
+result = 0 * mat.albedo * mat.ao;
+for(int i=0;i<6;i++)
+{
+result += MPBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+}
 }
 else
 {
