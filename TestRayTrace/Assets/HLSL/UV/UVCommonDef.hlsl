@@ -88,7 +88,6 @@ float3 ApplyNTangent(float3 n_tan, float3 N, float3 T, float3 B, float3 intensit
 {
 	float3 n_world = normalize(n_tan.x*T + n_tan.y*B + n_tan.z*N);
 	return normalize(lerp(N, n_world, intensity));
-
 }
 
 float3 SampleNormalMap(in Texture2D<float3> normalmap, float2 uv, float3 N, float3 T,float3 B, float3 intensity = 1)

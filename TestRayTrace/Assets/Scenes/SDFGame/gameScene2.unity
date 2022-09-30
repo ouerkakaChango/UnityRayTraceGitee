@@ -182,7 +182,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &22466673
@@ -301,8 +301,8 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 489230599}
   - {fileID: 22466672}
+  - {fileID: 489230599}
   - {fileID: 537032344}
   - {fileID: 566221532}
   - {fileID: 596599791}
@@ -512,7 +512,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -774,7 +774,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 1
-  objInx: 0
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &489230600
@@ -1839,7 +1839,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -2766,7 +2766,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -2952,7 +2952,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -3049,8 +3049,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {r: 1, g: 1, b: 1, a: 1}
-    metallic: 0
+    albedo: {r: 0.85882354, g: 0.7490196, b: 0.32156864, a: 1}
+    metallic: 0.9
     roughness: 0.9
   SDF_offset: 0
   renderMode: 0
@@ -3209,8 +3209,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_LocalRotation: {x: 0.23200941, y: -0.39299574, z: 0.10337387, w: 0.88376456}
-  m_LocalPosition: {x: 5.3394847, y: 5.5376863, z: -3.0517368}
+  m_LocalRotation: {x: 0.04638784, y: 0.55760384, z: -0.03098181, w: 0.82823086}
+  m_LocalPosition: {x: -3.235136, y: 3.0186, z: -1.4836061}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3285,7 +3285,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1090c4c7b2894044f80ecdaf73b99902, type: 3}
   m_Name: 
@@ -3519,8 +3519,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1796358837}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -6.25, y: 1.04, z: 2.59}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -2.45, y: 2.88, z: -0.964}
+  m_LocalScale: {x: 0.40686, y: 0.40686, z: 0.40686}
   m_Children: []
   m_Father: {fileID: 1278971372}
   m_RootOrder: 2
@@ -3538,9 +3538,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {r: 1, g: 1, b: 1, a: 1}
-    metallic: 0
-    roughness: 1
+    albedo: {r: 0.85882354, g: 0.7490196, b: 0.32156864, a: 1}
+    metallic: 0.5
+    roughness: 0.3
   SDF_offset: 0
   renderMode: 0
   shapeType: 0

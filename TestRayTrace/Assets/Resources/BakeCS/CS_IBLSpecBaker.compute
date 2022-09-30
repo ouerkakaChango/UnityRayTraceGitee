@@ -76,7 +76,7 @@ void Bake(uint3 id : SV_DispatchThreadID)
 		float HdotV = max(dot(H, V), 0.0);
 		if (NdotL > 0.0)
 		{
-			float D = DistributionGGX(NdotH, bakeRough);
+			float D = DistributionGGX(N, H, bakeRough);
 			float pdf = (D * NdotH / (4.0 * HdotV)) + 0.0001;
 
 			//float resolution = 512.0; // resolution of source cubemap (per face)

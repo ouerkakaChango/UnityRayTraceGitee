@@ -67,7 +67,7 @@ void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, 
 	###BLOCK
 }
 
-float3 RenderSceneObj(Ray ray, HitInfo minHit, out Material_PBR mat)
+float3 RenderSceneObj(Ray ray, inout HitInfo minHit, out Material_PBR mat)
 {
 	mat = GetObjMaterial_PBR(minHit.obj);
 	int mode = GetObjRenderMode(minHit.obj);
