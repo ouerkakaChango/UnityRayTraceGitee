@@ -389,12 +389,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tags:
+  - {fileID: 1647113771}
+  - {fileID: 1796358843}
   - {fileID: 669583709}
   - {fileID: 740148111}
   - {fileID: 1007502728}
   - {fileID: 1024496424}
   - {fileID: 1231039151}
   bakedObjMatLib:
+  - if(inx==12)
+  - '{'
+  - ' float2 uv = GetObjUV(minHit);'
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - ' SetMatLib_SwirlGold(mat, minHit, uv, T, B, 0.5, 30);'
+  - '}'
+  - if(inx==13)
+  - '{'
+  - ' float2 uv = GetObjUV(minHit);'
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - ' SetMatLib_SwirlGold(mat, minHit, uv, T, B, 0.5, 10);'
+  - '}'
   - if(inx==6)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
@@ -3015,6 +3031,7 @@ GameObject:
   - component: {fileID: 1647113769}
   - component: {fileID: 1647113768}
   - component: {fileID: 1647113767}
+  - component: {fileID: 1647113771}
   m_Layer: 0
   m_Name: WallPositiveZ
   m_TagString: Untagged
@@ -3126,6 +3143,23 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1647113765}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1647113771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1647113765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: SwirlGold
+  floatParams:
+  - 0.5
+  - 30
+  texParams: []
 --- !u!1 &1666331700
 GameObject:
   m_ObjectHideFlags: 0
@@ -3442,6 +3476,7 @@ GameObject:
   - component: {fileID: 1796358839}
   - component: {fileID: 1796358838}
   - component: {fileID: 1796358842}
+  - component: {fileID: 1796358843}
   m_Layer: 0
   m_Name: testCube
   m_TagString: Untagged
@@ -3553,6 +3588,23 @@ MonoBehaviour:
   objInx: 13
   needExtraCondition: 0
   extraCondition: 
+--- !u!114 &1796358843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796358837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: SwirlGold
+  floatParams:
+  - 0.5
+  - 10
+  texParams: []
 --- !u!1 &1878584168
 GameObject:
   m_ObjectHideFlags: 0

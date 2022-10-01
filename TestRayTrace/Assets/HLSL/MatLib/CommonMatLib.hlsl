@@ -128,4 +128,53 @@ void SetMatLib_Marquetry(inout Material_PBR mat, inout HitInfo minHit, float2 uv
 
 //#############################################################################
 
+float swril_n21(float2 p)
+{
+	return frac(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453);
+}
+
+
+float2 swril_n22(float2 p)
+{
+	float n = swril_n21(p);
+	return float2(n, swril_n21(p + n));
+}
+
+float2 swirl(float2 uv, float seed, inout float acc_frc, inout float2 acc_rot)
+{
+	float tm = 0.; //iTime * .005 + 4.;
+
+	// point
+	float n = swril_n21(float2(seed, seed));
+	float2 pnt = 0.5 + float2(cos(tm + n * 423.1), sin(tm + n * 254.3) * .5);
+
+	// rotate point
+	float2  dif = uv - pnt;
+	float len = length(dif);
+	float frc = smoothstep(.0, 1., exp(len * -2.4) * (cos(len * 10.) * .5 + .5));
+	float swl = frc * sin(tm + n * 624.8) * 3.5;
+	float2  rot = rotate(dif, swl);
+
+	// for normal map
+	acc_frc += frc;
+	acc_rot += rot * frc;
+
+	// rotated uv
+	return rot + pnt;
+}
+
+void SetMatLib_SwirlGold(inout Material_PBR mat, inout HitInfo minHit, float2 uv, float3 T, float3 B, float intensity = 0.5, int points = 20)
+{
+	float acc_frc = .0;
+	float2  acc_rot = 0;
+	float2  sv = uv;
+	for (int i = 0; i < points; i++)
+		sv = swirl(sv, frac(float(i + 1) * 123.45), acc_frc, acc_rot);
+
+	// normal map
+	float3 roughness = float3(swril_n22(sv), 1.) * .02;
+	float3 normal = normalize(float3(acc_rot, acc_frc * .01) + roughness);
+	normal = ApplyNTangent(normal, minHit.N, T, B, intensity);
+	minHit.N = normal;
+}
 #endif

@@ -93,41 +93,6 @@ re = smin(re, d2);
 re = smin(re, d5);
 }
 
-float n21 (float2 p)
-{
-    return frac(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453);
-}
-
-
-float2 n22 (float2 p)
-{
-    float n = n21(p);
-    return float2(n, n21(p+n));
-}
-
-float2 swirl (float2 uv, float seed, inout float acc_frc, inout float2 acc_rot)
-{
-    float tm = 0.; //iTime * .005 + 4.;
-
-    // point
-    float n = n21(float2(seed,seed));
-    float2 pnt = 0.5 + float2(cos(tm + n * 423.1), sin(tm + n * 254.3) * .5);
-
-    // rotate point
-    float2  dif = uv - pnt;
-    float len = length(dif);
-    float frc = smoothstep(.0, 1., exp(len * -2.4) * (cos(len * 10.) * .5 + .5));
-    float swl = frc * sin(tm + n * 624.8) * 3.5; 
-    float2  rot = rotate(dif, swl);
-
-    // for normal map
-    acc_frc += frc;
-    acc_rot += rot * frc; 
-
-    // rotated uv
-    return rot + pnt;
-}
-
 ###BLOCK
 
 ###BLOCK ExtraFuncDependOnTraceScene
@@ -547,6 +512,20 @@ BoxedTB(T,B,minHit.P, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951
 ###BLOCK  ObjPreRender
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
+if(inx==12)
+{
+ float2 uv = GetObjUV(minHit);
+ float3 T,B;
+	GetObjTB(T,B, minHit);
+ SetMatLib_SwirlGold(mat, minHit, uv, T, B, 0.5, 30);
+}
+if(inx==13)
+{
+ float2 uv = GetObjUV(minHit);
+ float3 T,B;
+	GetObjTB(T,B, minHit);
+ SetMatLib_SwirlGold(mat, minHit, uv, T, B, 0.5, 10);
+}
 if(inx==6)
 {
 	float2 uv = GetObjUV(minHit);
@@ -683,26 +662,13 @@ else if (inx == 14 )
 	//	GetObjTB(T,B, minHit);
 	//	minHit.N = SampleNormalMap(N_paper, 4*uv, minHit.N,T,B,1.3);
 	//}
-	if(inx == 13)
-	{
-		//???
-		float2 uv = GetObjUV(minHit);
-		//---
-		float acc_frc = .0;
-		float2  acc_rot = 0;
-		float2  sv = uv;
-		for (int i = 0; i < 20; i++)
-			sv = swirl(sv, frac(float(i+1) * 123.45), acc_frc, acc_rot);
-
-    // normal map
-    float3 roughness = float3(n22(sv), 1.) * .02;
-    float3 normal = normalize(float3(acc_rot, acc_frc * .01) + roughness);
-		//___
-		float3 T,B;
-		GetObjTB(T,B, minHit);
-		normal = ApplyNTangent(normal,minHit.N,T,B, 0.5);
-		minHit.N = normal;//normalize(0.1*float3(1,0,0)+minHit.N);
-	}
+	//if(inx == 13)
+	//{
+	//	float2 uv = GetObjUV(minHit);
+	//	float3 T,B;
+	//	GetObjTB(T,B, minHit);
+	//	SetMatLib_SwirlGold(mat,minHit,uv,T,B);
+	//}
 ###BLOCK
 
 ###BLOCK ObjRender

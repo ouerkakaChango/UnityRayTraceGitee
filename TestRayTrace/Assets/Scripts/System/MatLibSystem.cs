@@ -77,6 +77,10 @@ public class MatLibSystem : BaseSystem
             {
                 tag.BakeMarquetry(ref bakedObjMatLib);
             }
+            else if (tag.matTypeName == "SwirlGold")
+            {
+                tag.BakeSwirlGold(ref bakedObjMatLib);
+            }
             else
             {
                 Debug.LogError("unhandled material : " + tag.matTypeName+" in objct : "+tag.gameObject.name);

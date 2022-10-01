@@ -134,6 +134,37 @@ public class MatLibTag : MonoBehaviour
         lines.Add("}");
     }
 
+    public void BakeSwirlGold(ref List<string> lines)
+    {
+        //if(inx == 13)
+        //{
+        //	float2 uv = GetObjUV(minHit);
+        //	float3 T,B;
+        //	GetObjTB(T,B, minHit);
+        //	SetMatLib_SwirlGold(mat,minHit,uv,T,B);
+        //}
+
+        int objInx = SafeGetObjInx();
+        lines.Add("if(inx==" + objInx + ")");
+        lines.Add("{");
+        lines.Add(" float2 uv = GetObjUV(minHit);");
+        lines.Add(" float3 T,B;");
+        lines.Add("	GetObjTB(T,B, minHit);");
+        if (floatParams.Count == 0)
+        {
+            lines.Add(" SetMatLib_SwirlGold(mat, minHit, uv, T, B);");
+        }
+        else if (floatParams.Count == 2)
+        {
+            lines.Add(" SetMatLib_SwirlGold(mat, minHit, uv, T, B, " + floatParams[0] + ", " + floatParams[1] + ");");
+        }
+        else
+        {
+            Debug.LogError("Incorrect params num for SwirlGold");
+        }
+        lines.Add("}");
+    }
+
     string Bake(Vector2 v)
     {
         return "float2(" + v.x + ", " + v.y + ")";
