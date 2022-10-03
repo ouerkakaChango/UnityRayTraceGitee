@@ -89,11 +89,12 @@ namespace XCGame
             {
                 //???
                 //SceneManager.LoadScene("TransferScene");
-                SceneManager.LoadScene("gameScene2");
+                var nextName = str_params[0];
+                SceneManager.LoadScene(nextName);
             }
             else if (actions[inx] == TriggerAction.DebugLogMessage)
             {
-                Debug.Log("General Trigger: " + str_params[0]);
+                //Debug.Log("General Trigger: " + str_params[0]);
             }
         }
     }

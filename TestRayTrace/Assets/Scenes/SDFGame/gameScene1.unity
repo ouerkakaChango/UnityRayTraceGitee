@@ -939,10 +939,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enterOnceEvents: 00000000
-  actions: 0400000003000000
+  actions: 03000000
   f_params: []
   str_params:
-  - Trigger next level Door
+  - gameScene2
 --- !u!65 &507070204
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1877,6 +1877,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bakeShadow: 1
+  shadowType: 0
 --- !u!1 &1052979403
 GameObject:
   m_ObjectHideFlags: 0
@@ -2718,6 +2720,7 @@ MonoBehaviour:
   bakerMgr: {fileID: 1928400447}
   texSys: {fileID: 1928400448}
   dyValSys: {fileID: 1928400449}
+  systems: []
   templates:
   - Resources/SDFGameCS/CS_SDFGameTemplate.txt
   - Resources/SDFGameCS/SDFGameSceneTemplate.txt
@@ -3138,12 +3141,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ambientIntensity: 0.04
   bakedSDFs: []
+  bakedObjUVs: []
+  bakedObjTBs: []
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
   - int renderMode[12];
   bakedRenders: []
-  bakedDirShadows: []
+  bakedShadows: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   bakedObjEnvTex: []

@@ -57,6 +57,7 @@ public class SDFSliceGizmo : MonoBehaviour
         if(mf == null)
         {
             mf = gameObject.AddComponent<MeshFilter>();
+            //??? 自动设置mesh为quad_1x1
         }
         var mr = gameObject.GetComponent<MeshRenderer>();
         if(mr == null)

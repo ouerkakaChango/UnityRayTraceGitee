@@ -176,7 +176,7 @@ namespace ImageProcess
                 }
             }
 
-            Debug.Log(elemList.Count);
+            //Debug.Log(elemList.Count);
             int num = elemList.Count;
 
             int baseLoopCount = num/16;
@@ -187,7 +187,7 @@ namespace ImageProcess
             CopyUtility.CreateRT(ref result, ref sdfArr, RenderTextureFormat.RFloat);
 
 
-            //??? 用cs，把elemList通过ComputeBuffer传进去
+            //用cs，把elemList通过ComputeBuffer传进去
             ComputeBuffer buffer_elemArr = null;
             ComputeShaderHelper.PreComputeBuffer(ref buffer_elemArr, sizeof(uint) * 2, elemList.ToArray());
 
@@ -215,7 +215,7 @@ namespace ImageProcess
                 }
                 cs.SetInt("start", start);
                 cs.SetInt("end", end);
-                Debug.Log("dispatch " + i + " start " + start + " end " + end);
+                //Debug.Log("dispatch " + i + " start " + start + " end " + end);
                 cs.Dispatch(kInx, w / 8, h / 8, 1);
             }
 
