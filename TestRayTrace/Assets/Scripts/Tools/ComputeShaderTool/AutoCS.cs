@@ -9,6 +9,7 @@ using static StringTool.StringHelper;
 using Debug = UnityEngine.Debug;
 
 using XUtility;
+using static Debugger.Log;
 
 //[ExecuteInEditMode]
 public class AutoCS : MonoBehaviour
@@ -155,7 +156,7 @@ public class AutoCS : MonoBehaviour
     void PreCompile()
     {
         //Debug.Log("AutoCS PreCompile");
-        for(int i=0;i<cfgs.Count;i++)
+        for (int i=0;i<cfgs.Count;i++)
         {
             PreCompile(FullPath(cfgs[i]), i);
         }
@@ -244,7 +245,7 @@ public class AutoCS : MonoBehaviour
             string key = keyList[order.x];
             var range = rangeMap[key][order.y];
             helper.BeginReplaceRange();
-
+        
             if (key == "ObjSDF" && ValidRange(range))
             {
                 helper.Replace(range, bakerMgr.bakedSDFs);
@@ -335,17 +336,27 @@ public class AutoCS : MonoBehaviour
                 {
                     if (key == keysArr[i1] && ValidRange(range))
                     {
-                        helper.Replace(range, systems[targetSysDic[key]].GetLinesOf(key));
+                        int sysInx = targetSysDic[key];
+                        if (sysInx < 0)
+                        {
+                            Debug.LogError("Error inx");
+                        }
+                        else if (sysInx >= systems.Count)
+                        {
+                            Debug.Log("Warning: system not right: " + key + " .Lines will be cleaned. Check AutoCS system settings");
+                            helper.Replace(range, "");
+                        }
+                        else
+                        {
+                            helper.Replace(range, systems[sysInx].GetLinesOf(key));
+                        }
                     }
                 }
             }
-            //else if(key == "ObjMatLib" && ValidRange(range))
-            //{
-            //    helper.Replace(range, systems[0].GetLinesOf("ObjMatLib"));
-            //}
-
+        
             helper.EndReplaceRange();
         }
+
         File.WriteAllLines(path, helper.lines);
     }
 

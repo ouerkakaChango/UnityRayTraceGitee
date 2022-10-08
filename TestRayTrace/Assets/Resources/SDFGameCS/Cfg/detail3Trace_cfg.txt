@@ -1,0 +1,30 @@
+valMaps:
+SceneName Detail3
+BackGroundColor float3(0,0,0)
+
+Blocks:
+
+###BLOCK MainRender
+if (minHit.bHit)
+{ 
+	re = RenderSceneObj(ray, minHit, mat);
+	re *= RenderSceneSDFShadow(minHit);
+}
+else
+{
+	re = (@BackGroundColor);
+	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+}
+###BLOCK
+
+###BLOCK IndirectRender
+	//re = 0.11;
+	SetIndirectColor(re, seed, ray, minHit, mat);
+
+	//test
+	//int2 spos = seed.xy;
+	//uint2 size = GetSize(Result);
+	//re = float3(spos/(float2)size,0);
+	//float2 suv = spos/(float2)size;
+
+###BLOCK

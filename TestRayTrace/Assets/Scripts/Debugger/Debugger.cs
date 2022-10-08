@@ -57,5 +57,15 @@ namespace Debugger
             }
             Debug.Log(re);
         }
+
+        public static void DebugLines(List<string> lines)
+        {
+            string re = "Lines: ";
+            for (int i = 0; i < lines.Count; i++)
+            {
+                re += lines[i] + " \n ";
+            }
+            Debug.Log(re);
+        }
     }
 }

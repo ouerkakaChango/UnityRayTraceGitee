@@ -141,10 +141,10 @@ public class SDFGameSceneTrace : MonoBehaviour
     //FSR
     RenderTexture easuRT,finalRT;
 
-    public bool useFSR = true;
+    public bool useFSR = false;
     public float FSR_Scale = 2.0f;
 
-    public string SceneName = "Detail1";
+    public string SceneName = "Undefined";
     public AutoCS autoCS;
     ComputeShader cs;
     ComputeShader cs_blendResult;
@@ -199,7 +199,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             keyboard = GetComponent<KeyboardInputer>();
             if (keyboard == null)
             {
-                Debug.Log("Warning: KeyboardInputer null!!!");
+                Debug.Log("Warning: KeyboardInputer null.");
             }
             else
             {

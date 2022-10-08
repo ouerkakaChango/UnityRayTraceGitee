@@ -1,0 +1,138 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Render
+
+#include "../../../HLSL/UnityCommonDef.hlsl"
+#include "../../../HLSL/RayMath.hlsl"
+#include "../../../HLSL/PBR/PBRCommonDef.hlsl"
+
+int w;
+int h;
+
+int frameID;
+bool useIndirectRT;
+
+int camType; //0:normal 1:orthogonal
+int camGammaMode; //0:normal 1:notGamma
+//#########################################################################################################
+int Inx2D(int i, int j)
+{
+	return i + w * j;
+}
+//#########################################################################################################
+float3 screenLeftDownPix;
+float3 eyePos;
+float pixW;
+float pixH;
+float3 screenU;
+float3 screenV;
+
+RWTexture2D<float4> Result;
+RWTexture2D<float4> IndirectResult;
+Texture2DArray envSpecTex2DArr;
+Texture2D<float4> envBgTex;
+
+//#########################################################################################################
+#include "SDFGameScene_Detail3.hlsl"
+//#########################################################################################################
+
+float3 GetSDFGameColor(in Ray ray, out HitInfo minHit, out Material_PBR mat)
+{
+	Init(mat);
+	float3 re = 0;
+	//---Trace
+	Init(minHit);
+	TraceScene(ray, minHit);
+	//___Trace
+
+if (minHit.bHit)
+{
+	re = RenderSceneObj(ray, minHit, mat);
+	re *= RenderSceneSDFShadow(minHit);
+}
+else
+{
+	re = float3(0,0,0);
+	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+}
+
+	return re;
+}
+
+float3 GetSDFGameIndirColor(in Ray ray,float3 seed, in HitInfo minHit, in Material_PBR mat)
+{
+float3 re = 0;
+	//re = 0.11;
+	SetIndirectColor(re, seed, ray, minHit, mat);
+
+	//test
+	//int2 spos = seed.xy;
+	//uint2 size = GetSize(Result);
+	//re = float3(spos/(float2)size,0);
+	//float2 suv = spos/(float2)size;
+
+	return re;
+}
+
+#define SSAA_num 1
+[numthreads(8, 8, 1)]
+void Render(uint3 id : SV_DispatchThreadID)
+{
+
+	int idx = id.x;
+	int idy = id.y;
+
+	int SSAA_edge = (int)sqrt(SSAA_num);
+	float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (idx - 0.5) + screenV * pixH * (idy - 0.5);
+	float SSAA_unitDis = 1.0f / SSAA_edge;
+	float3 SSAA_colors[SSAA_num];
+	float3 SSAA_indirColors[SSAA_num];
+
+	float3 camFoward = normalize(cross(screenU,screenV));
+
+	float3 seed = float3(id.xy,frameID);
+
+	[unroll(SSAA_edge)]
+	for (int j = 1; j <= SSAA_edge; j++)
+	{
+		[unroll(SSAA_edge)]
+		for (int i = 1; i <= SSAA_edge; i++)
+		{
+			Ray ray;
+			ray.pos = pixLeftDownPos + screenU * pixW * i * SSAA_unitDis + screenV * pixH * j * SSAA_unitDis;
+			if(camType == 1)
+			{
+				ray.dir = camFoward;
+			}
+			else
+			{
+				ray.dir = normalize(ray.pos - eyePos);
+			}
+			HitInfo minHit;
+			Material_PBR mat;
+			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray,minHit, mat);
+			if(useIndirectRT)
+			{
+				SSAA_indirColors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameIndirColor(ray,seed,minHit,mat);
+			}
+		}
+	}
+
+	float3 re = 0;
+	for (int i = 0; i < SSAA_num; i++)
+	{
+		re += SSAA_colors[i];
+	}
+	re /= (float)SSAA_num;
+	Result[id.xy] = float4(re, 1);
+
+	if(useIndirectRT)
+	{
+	re = 0;
+	for (int i = 0; i < SSAA_num; i++)
+	{
+		re += SSAA_indirColors[i];
+	}
+	re /= (float)SSAA_num;
+	IndirectResult[id.xy] = float4(re, 1);
+	}
+}
