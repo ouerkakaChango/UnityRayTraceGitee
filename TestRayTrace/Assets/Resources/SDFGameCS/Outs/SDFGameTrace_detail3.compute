@@ -4,6 +4,7 @@
 #include "../../../HLSL/UnityCommonDef.hlsl"
 #include "../../../HLSL/RayMath.hlsl"
 #include "../../../HLSL/PBR/PBRCommonDef.hlsl"
+#include "../../../HLSL/MatLib/CommonBgMat.hlsl"
 
 int w;
 int h;
@@ -51,8 +52,9 @@ if (minHit.bHit)
 }
 else
 {
-	re = float3(0,0,0);
+	re = float3(1,1,1);
 	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+	//re = stars(ray.pos, ray.dir);
 }
 
 	return re;

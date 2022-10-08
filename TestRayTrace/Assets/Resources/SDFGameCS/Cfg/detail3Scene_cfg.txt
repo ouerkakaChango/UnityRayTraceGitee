@@ -1,6 +1,6 @@
 valMaps:
 //@@@SDFBakerMgr ValMaps
-ObjNum 1
+ObjNum 2
 //@@@
 TraceThre 0.001
 NormalEpsilon 0.001
@@ -53,11 +53,6 @@ float GetPntlightAttenuation(float3 pos, float3 lightPos)
 }
 
 //https://iquilezles.org/articles/smin/
-//float smin( float a, float b, float k=32 )
-//{
-//    float res = exp2( -k*a ) + exp2( -k*b );
-//    return -log2( res )/k;
-//}
 
 float smin( float a, float b, float k=0.1 )
 {
@@ -65,29 +60,68 @@ float smin( float a, float b, float k=0.1 )
     return lerp( b, a, h ) - k*h*(1.0-h);
 }
 
-//float smin( float a, float b, float k=0.1 )
+float DigSeg (float2 q)
+{
+  return step (abs (q.x), 0.12) * step (abs (q.y), 0.6);
+}
+
+#define DSG(q) k = kk;  kk = k / 2;  if (kk * 2 != k) d += DigSeg (q)
+
+float ShowDig (float2 q, int iv)
+{
+  float d;
+  int k, kk;
+  float2 vp = float2 (0.5, 0.5), vm = float2 (-0.5, 0.5), vo = float2 (1., 0.);
+  if (iv == -1) k = 8;
+  else if (iv < 2) k = (iv == 0) ? 119 : 36;
+  else if (iv < 4) k = (iv == 2) ? 93 : 109;
+  else if (iv < 6) k = (iv == 4) ? 46 : 107;
+  else if (iv < 8) k = (iv == 6) ? 122 : 37;
+  else             k = (iv == 8) ? 127 : 47;
+  q = (q - 0.5);
+  d = 0.;
+  kk = k;
+  DSG (q.yx - vo);  DSG (q.xy - vp);  DSG (q.xy - vm);  DSG (q.yx);
+  DSG (q.xy + vm);  DSG (q.xy + vp);  DSG (q.yx + vo);
+  return d;
+}
+
+//float2 mfmod(float2 a, float2 b)
 //{
-//    float h = max( k-abs(a-b), 0.0 )/k;
-//    return min( a, b ) - h*h*k*(1.0/4.0);
+//  float2 c = frac(abs(a/b))*abs(b);
+//  return (a < 0) ? -c : c;   /* if ( a < 0 ) c = 0-c */
 //}
 
-void dinnerTable(inout float re, in float3 p)
+float ShowInt(float2 q, int iv, int maxLen=4)
 {
-float d3 = re;
-float d0 = re;
-float d8 = re;
-float d2 = re;
-float d5 = re;
-d3 = smin(d3, 0 + SDFBox(p, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
-d0 = smin(d0, 0 + SDFBox(p, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
-d8 = smin(d8, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
-d2 = smin(d2, 0 + SDFBox(p, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0)));
-d5 = smin(d5, 0 + SDFBox(p, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315), float3(0, 0, 0)));
-re = smin(re, d3);
-re = smin(re, d0);
-re = smin(re, d8);
-re = smin(re, d2);
-re = smin(re, d5);
+	//???
+	q.x *= -1;
+	int base = 10;
+	int tnum = iv;
+	int resi;
+	float re = 0;
+	float2 offset = float2(2,0);
+	int i=0;
+	if(iv<0)
+	{
+		tnum = abs(tnum);
+	}
+	for(;i<maxLen;i++)
+	{
+		resi = tnum%base;
+		re += ShowDig(q - offset*i,resi);
+		tnum -= resi;
+		tnum /= base;
+		if(tnum == 0)
+		{
+			break;
+		}
+	}
+	if(iv<0)
+	{
+		re += ShowDig(q - offset*(i+1),-1);
+	}
+	return re;
 }
 
 ###BLOCK
@@ -206,7 +240,13 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.5471698, 0.5471698, 0.5471698);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 1 )
+{
+re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -215,8 +255,9 @@ re.roughness = 1;
 
 ###BLOCK ObjRenderMode
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[1];
+int renderMode[2];
 renderMode[0] = 0;
+renderMode[1] = 0;
 return renderMode[obj];
 //@@@
 ###BLOCK
@@ -227,7 +268,10 @@ return renderMode[obj];
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(50, 0, 50), float3(50, 0.5, 50), float3(0, 0, 0));
+}
+else if (inx == 1 )
+{
+uv = BoxedUV(minHit.P, float3(5, 0, 5), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 }
 	//@@@
 
@@ -235,6 +279,10 @@ uv = BoxedUV(minHit.P, float3(50, 0, 50), float3(50, 0.5, 50), float3(0, 0, 0));
 
 	//@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
+{
+inx = -1;
+}
+else if (inx == 1 )
 {
 }
 	//@@@
@@ -246,7 +294,10 @@ return uv;
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(50, 0, 50), float3(50, 0.5, 50), float3(0, 0, 0));
+}
+else if (inx == 1 )
+{
+BoxedTB(T,B,minHit.P, float3(5, 0, 5), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 }
 //@@@
 ###BLOCK
@@ -264,8 +315,26 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -1;
+}
+else if (inx == 1 )
+{
 }
 //@@@
+
+//???
+float2 q = minHit.P.xz;
+float dis = 20;
+float m = floor(minHit.P.y/dis);
+float tm = m;
+if(tm<0)
+{
+//tm+=1;
+}
+if(ShowInt(q,m))
+{
+	mat.albedo = float3(0,1,0);
+}
 
 ###BLOCK
 
@@ -320,28 +389,6 @@ else if (mode == 333)
 else if (mode == 1001)
 {
 	result = minHit.N;
-}
-else if(mode == 444)
-{
-  float3 lightDirs[6];
-  float3 lightColors[6];
-  lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-  lightColors[0] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
-  lightDirs[1] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
-  lightColors[1] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-1.713, 2.707, -2.17));
-  lightDirs[2] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
-  lightColors[2] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-3.526, 2.707, -2.17));
-  lightDirs[3] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
-  lightColors[3] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
-  lightDirs[4] = normalize(minHit.P - float3(3.357384, 8.15, 0));
-  lightColors[4] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
-  lightDirs[5] = normalize(minHit.P - float3(-3.83, 8.15, 0));
-  lightColors[5] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
-  result = 0 * mat.albedo * mat.ao;
-  for(int i=0;i<6;i++)
-  {
-      result += MPBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
-  }
 }
 else
 {
@@ -457,24 +504,28 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(50, 0, 50), float3(50, 0.5, 50), float3(0, 0, 0)));
+inx = -1;
+}
+else if (inx == 1 )
+{
+re = min(re, 0 + SDFBox(p, float3(5, 0, 5), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 //@@@
 
 if(inx == -1)
-{
-float d = MaxSDF;
-dinnerTable(d,p);
-//d-=0.2;
-re = min(re,d);
-}
-if (inx == -2)
-{
-
-float3 center = float3(-2.81200004,2.68899989,-1.22000003);
-//float3 p2 = opCheapBend_XY(p,center,1);
-float d = SDFBox(p,center,4*float3(0.07,0.05,0.05));
-re = min(re,d);
+{//???
+if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	{
+	//1.infinite box
+	float dis = 20;
+	float m = floor(p.y/dis);
+	float centerY = m * dis;
+	float floorBound = 0.1;
+	float d1 = abs(p.y - centerY) - floorBound;
+	float d2 = abs(p.y - (m+1) * dis) - floorBound;
+	float d = min(d1, d2);
+	re = min(re, d);
+	}
 }
 
 return re;
@@ -487,6 +538,10 @@ return re;
 ###BLOCK ObjNormal
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
+{
+inx = -1;
+}
+else if (inx == 1 )
 {
 }
 //@@@

@@ -1,8 +1,12 @@
 valMaps:
 SceneName Detail3
-BackGroundColor float3(0,0,0)
+BackGroundColor float3(1,1,1)
 
 Blocks:
+
+###BLOCK ExtraDef
+#include "../../../HLSL/MatLib/CommonBgMat.hlsl"
+###BLOCK
 
 ###BLOCK MainRender
 if (minHit.bHit)
@@ -14,6 +18,7 @@ else
 {
 	re = (@BackGroundColor);
 	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+	//re = stars(ray.pos, ray.dir);
 }
 ###BLOCK
 

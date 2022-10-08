@@ -4,6 +4,9 @@
 #include "../../../HLSL/UnityCommonDef.hlsl"
 #include "../../../HLSL/RayMath.hlsl"
 #include "../../../HLSL/PBR/PBRCommonDef.hlsl"
+###BLOCK ExtraDef
+...
+###BLOCK
 
 int w;
 int h;
