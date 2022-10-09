@@ -271,7 +271,7 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(5, 0, 5), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 }
 	//@@@
 
@@ -297,7 +297,7 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
-BoxedTB(T,B,minHit.P, float3(5, 0, 5), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 }
 //@@@
 ###BLOCK
@@ -394,6 +394,7 @@ else
 {
 	result = float3(1,0,1);
 }
+SmoothWithDither(result, suv);
 ###BLOCK
 
 ###BLOCK  ObjPostRender
@@ -512,10 +513,11 @@ inx = -1;
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(5, 0, 5), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 //@@@
 
+//???
 if(inx == -1)
 {
 if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
@@ -525,18 +527,47 @@ if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	float m = floor(p.y/dis);
 	float centerY = m * dis;
 	float floorBound = 0.1;
-	float d1 = abs(p.y - centerY) - floorBound;
-	float d2 = abs(p.y - (m+1) * dis) - floorBound;
-	float dFloor = min(d1, d2);
+	float df1 = abs(p.y - centerY) - floorBound;
+	float df2 = abs(p.y - (m+1) * dis) - floorBound;
+	float dFloor = min(df1, df2);
 
-	float grid = 10;
+	float grid = 30;
 	float2 m1 = floor(p.xz/grid);
 	float2 c = grid*(m1+0.5);
 	float3 center = float3(c.x,centerY,c.y);
 
-	float dPillar = length(p.xz-center.xz) - 3;
+	float3 lp = p - float3(15,0,15);
+	float grid2 = 30;
+	float2 m2 = floor(lp.xz/grid2);
+	float2 c2 = grid*(m2+0.5);
+	float3 center2 = float3(c2.x,centerY,c2.y);
+	float dPillar = length(lp.xz-center2.xz) - 8;
 
-	float d = max(dFloor,-dPillar);
+	//---arc thing
+	lp = p - center;
+	float r = length(lp.xz);
+	float s = min(abs(lp.x),abs(lp.z));
+	float dCross = s-1.5;
+	float2 dir1 = normalize(float2(1,1));
+	float d2 = dot(lp.xz,dir1);
+	float dSub1 = sqrt(r*r - d2*d2);
+	dSub1 -= 2.5;
+
+
+	float dTube = abs(r-5)-0.1;
+	float dCutTube = max(dTube,abs(lp.y)-3);
+	//___arc thing
+
+	float d = dCutTube; 
+	d = max(d,-dCross);
+	d = max(d,-dSub1);
+	d = min(dFloor, d); 
+	if(length(p.xz)>10)
+	{//don't sub (0,0,0), there's floor number
+		d = max(d, -dPillar);
+	}
+
+	//float d = max(dFloor,-dPillar);
 	re = min(re, d);
 	}
 }

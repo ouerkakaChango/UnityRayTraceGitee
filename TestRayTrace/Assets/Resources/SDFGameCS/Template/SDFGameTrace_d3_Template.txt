@@ -14,6 +14,8 @@ int h;
 int frameID;
 bool useIndirectRT;
 
+float2 suv;
+
 int camType; //0:normal 1:orthogonal
 int camGammaMode; //0:normal 1:notGamma
 //#########################################################################################################
@@ -80,6 +82,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 	float3 camFoward = normalize(cross(screenU,screenV));
 
 	float3 seed = float3(id.xy,frameID);
+	suv = float2(id.x/(float)w,id.y/(float)h);
 
 	[unroll(SSAA_edge)]
 	for (int j = 1; j <= SSAA_edge; j++)
@@ -99,7 +102,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 			}
 			HitInfo minHit;
 			Material_PBR mat;
-			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray,minHit, mat);
+			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray, minHit, mat);
 			if(useIndirectRT)
 			{
 				SSAA_indirColors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameIndirColor(ray,seed,minHit,mat);
