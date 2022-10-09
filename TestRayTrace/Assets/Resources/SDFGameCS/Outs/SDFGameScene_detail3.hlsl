@@ -112,9 +112,7 @@ float ShowInt(float2 q, int iv, int maxLen=4)
 	int i=0;
 	if(iv<0)
 	{
-	//re += ShowDig(q,-1);
-	//i=1;
-	tnum = abs(tnum);
+		tnum = abs(tnum);
 	}
 	for(;i<maxLen;i++)
 	{
@@ -129,9 +127,8 @@ float ShowInt(float2 q, int iv, int maxLen=4)
 	}
 	if(iv<0)
 	{
-	re += ShowDig(q - offset*(i+1),-1);
+		re += ShowDig(q - offset*(i+1),-1);
 	}
-	//re = min(re,ShowDig(q,tnum%base));
 	return re;
 }
 
@@ -354,7 +351,7 @@ float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
-if(false)
+if(true)
 {
 //@@@SDFBakerMgr DirShadow
 int lightType[1];
@@ -441,6 +438,10 @@ float2x2 m = {c,-s,s,c};
 return float3(mul(m,p.xy),p.z)+center;
 }
 
+float opSmoothSubtraction( float d1, float d2, float k =1.0f) {
+float h = clamp( 0.5 - 0.5*(d2+d1)/k, 0.0, 1.0 );
+return lerp( d2, -d1, h ) + k*h*(1.0-h); }
+
 float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 {
 //###
@@ -459,7 +460,7 @@ re = min(re, 0 + SDFBox(p, float3(5, 0, 5), float3(0.5, 0.5, 0.5), float3(0, 0, 
 //@@@
 
 if(inx == -1)
-{//???
+{
 if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
 	//1.infinite box
@@ -469,7 +470,16 @@ if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	float floorBound = 0.1;
 	float d1 = abs(p.y - centerY) - floorBound;
 	float d2 = abs(p.y - (m+1) * dis) - floorBound;
-	float d = min(d1, d2);
+	float dFloor = min(d1, d2);
+
+	float grid = 10;
+	float2 m1 = floor(p.xz/grid);
+	float2 c = grid*(m1+0.5);
+	float3 center = float3(c.x,centerY,c.y);
+
+	float dPillar = length(p.xz-center.xz) - 3;
+
+	float d = max(dFloor,-dPillar);
 	re = min(re, d);
 	}
 }
