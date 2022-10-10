@@ -48,6 +48,8 @@ float2 GetObjUV(in HitInfo minHit)
 void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 {
 	int inx = minHit.obj;
+	T=0;
+	B=0;
 	###BLOCK ObjTB
 	... 
 	###BLOCK

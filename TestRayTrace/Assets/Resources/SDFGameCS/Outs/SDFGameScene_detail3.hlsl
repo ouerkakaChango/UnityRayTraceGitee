@@ -1,4 +1,4 @@
-﻿#define OBJNUM 2
+﻿#define OBJNUM 3
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -25,6 +25,7 @@
 float daoScale;
 
 //@@@SDFBakerMgr TexSys
+Texture2D<float3> woodTex;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
@@ -102,7 +103,7 @@ return d;
 
 float ShowInt(float2 q, int iv, int maxLen=4)
 {
-	//???
+	//!!!
 	q.x *= -1;
 	int base = 10;
 	int tnum = iv;
@@ -141,11 +142,17 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0.5471698, 0.5471698, 0.5471698);
+re.albedo = float3(0.5490196, 0.5490196, 0.5490196);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 2 )
 {
 re.albedo = float3(1, 0, 0);
 re.metallic = 0;
@@ -158,9 +165,10 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[2];
+int renderMode[3];
 renderMode[0] = 0;
 renderMode[1] = 0;
+renderMode[2] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -175,6 +183,9 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+}
+else if (inx == 2 )
+{
 uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 }
 	//@@@
@@ -184,35 +195,54 @@ uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 	//@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 1 )
 {
+inx = -1;
+}
+else if (inx == 2 )
+{
 }
 	//@@@
-
+	if(inx == -1)
+	{
+		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(0.2,1,0.2));
+	}
 return uv;
 }
 
 void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 {
 	int inx = minHit.obj;
+	T=0;
+	B=0;
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
 }
-else if (inx == 1 )
+if(inx == 1 )
+{
+}
+if(inx == 2 )
 {
 BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return;
 }
 //@@@
+basis_unstable(minHit.N, T, B);
 }
 
 void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-
+if(inx==1)
+{
+	float2 uv = GetObjUV(minHit);
+uv = float2(0.25, 0.25)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(woodTex, uv);
+}
 //@@@
 
 //@@@SDFBakerMgr ObjImgAttach
@@ -222,22 +252,21 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 1 )
+{
+inx = -1;
+}
+else if (inx == 2 )
 {
 }
 //@@@
 
-//???
 float2 q = minHit.P.xz;
 float dis = 20;
 float m = floor(minHit.P.y/dis);
-float tm = m;
-if(tm<0)
-{
-//tm+=1;
-}
+
 if(ShowInt(q,m))
 {
 	mat.albedo = float3(0,1,0);
@@ -315,6 +344,12 @@ else if (mode == 333)
 else if (mode == 1001)
 {
 	result = minHit.N;
+}
+else if (mode == 1002)
+{
+	float3 T,B;
+	GetObjTB(T, B, minHit);
+	result = T;
 }
 else
 {
@@ -452,49 +487,38 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 1 )
+{
+inx = -1;
+}
+else if (inx == 2 )
 {
 re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 //@@@
 
-//???
 if(inx == -1)
 {
 if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
-	//1.infinite box
 	float dis = 20;
 	float m = floor(p.y/dis);
 	float centerY = m * dis;
-	float floorBound = 0.1;
-	float df1 = abs(p.y - centerY) - floorBound;
-	float df2 = abs(p.y - (m+1) * dis) - floorBound;
-	float dFloor = min(df1, df2);
 
 	float grid = 30;
 	float2 m1 = floor(p.xz/grid);
 	float2 c = grid*(m1+0.5);
 	float3 center = float3(c.x,centerY,c.y);
-
-	float3 lp = p - float3(15,0,15);
-	float grid2 = 30;
-	float2 m2 = floor(lp.xz/grid2);
-	float2 c2 = grid*(m2+0.5);
-	float3 center2 = float3(c2.x,centerY,c2.y);
-	float dPillar = length(lp.xz-center2.xz) - 8;
-
-	//---arc thing
-	lp = p - center;
+	float3 lp = p - center;
 	float r = length(lp.xz);
 	float s = min(abs(lp.x),abs(lp.z));
 	float crossWidth = 1.5;
 	float dCross = s-crossWidth;
+
 	float2 dir1 = normalize(float2(1,1));
 	float d2 = dot(lp.xz,dir1);
-
 	float dSub1 = sqrt(r*r - d2*d2);
 	float cutWidth = 2.5;
 	dSub1 -= cutWidth;
@@ -509,21 +533,42 @@ if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	float sub2CutThick = 0.9;
 	float sub2BookOffsetFromMid = 0.7;
 	float dSub2 = max (max (abs (r - tubeR*0.9) - sub2CutThick, abs (abs ((lp.y-tubeHeight*0.5)) - sub2BookOffsetFromMid) - sub2BookHeight), crossWidth*1.2 - s);
-	//___arc thing
 
 	float d = dCutTube;
 	d = max(d,-dCross);
 	d = max(d,-dSub2);
-	//d = max(d,-dSub1); //have problem with sub1
-
-	d = min(dFloor, d);
-	if(length(p.xz)>10)
-	{//don't sub (0,0,0), there's floor number
-		d = max(d, -dPillar);
-	}
-
-	//float d = max(dFloor,-dPillar);
 	re = min(re, d);
+	}
+}
+if(inx == -2)
+{
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	{
+		float dis = 20;
+		float m = floor(p.y/dis);
+		float centerY = m * dis;
+		float floorBound = 0.1;
+		float df1 = abs(p.y - centerY) - floorBound;
+		float df2 = abs(p.y - (m+1) * dis) - floorBound;
+		float dFloor = min(df1, df2);
+
+		float grid = 30;
+		float2 m1 = floor(p.xz/grid);
+		float2 c = grid*(m1+0.5);
+		float3 center = float3(c.x,centerY,c.y);
+
+		float3 lp = p - float3(15,0,15);
+		float grid2 = 30;
+		float2 m2 = floor(lp.xz/grid2);
+		float2 c2 = grid*(m2+0.5);
+		float3 center2 = float3(c2.x,centerY,c2.y);
+		float dPillar = length(lp.xz-center2.xz) - 8;
+
+		if(length(p.xz)>10)
+		{//don't sub (0,0,0), there's floor number
+			dFloor = max(dFloor, -dPillar);
+		}
+		re = min(re,dFloor);
 	}
 }
 
@@ -546,9 +591,13 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 1 )
+{
+inx = -1;
+}
+else if (inx == 2 )
 {
 }
 //@@@

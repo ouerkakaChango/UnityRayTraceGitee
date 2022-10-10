@@ -110,6 +110,11 @@ public class MatLibTag : MonoBehaviour
         //}
         Vector2 uv_scale = new Vector2(floatParams[0], floatParams[1]);
         Vector2 uv_offset = new Vector2(floatParams[2], floatParams[3]);
+        if(texParams.Count!=1)
+        {
+            Debug.LogError("BakeMarquetry: Error, need 1 tex for Marquetry wood");
+            return;
+        }
         string texName = texParams[0].plainTextures[0].name;
 
         int objInx = SafeGetObjInx();

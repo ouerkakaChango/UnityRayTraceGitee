@@ -103,7 +103,7 @@ public class SDFBakerMgr : MonoBehaviour
     {
         PreAddSDF(i, ref bakedSDFs, tag);
         PreAdd(i, ref bakedObjUVs);
-        PreAdd(i, ref bakedObjTBs);
+        PreAdd(i, ref bakedObjTBs,"inx",true);
         PreAdd(i, ref bakedSpecialObjects);
         PreAdd(i, ref bakedMaterials, "obj");
 
@@ -624,6 +624,7 @@ public class SDFBakerMgr : MonoBehaviour
         //BoxedTB(T,B,minHit.P, center, bound, rot));
         line = "BoxedTB(T,B,minHit.P, " + center_str + ", " + bound_str + ", " + rot_str + ");";
         bakedObjTBs.Add(line);
+        bakedObjTBs.Add("return;");
 
         SetTagMergeType(obj, SDFMergeType.Box);
     }

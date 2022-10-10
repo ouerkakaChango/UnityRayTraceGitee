@@ -102,4 +102,14 @@ float3 SampleNormalMap(in Texture2D<float3> normalmap, float2 uv, float3 N, floa
 	return ApplyNTangent(n_tan, N, T, B, intensity);
 }
 
+float2 SimpleUVFromPos(float3 P, float3 N, float3 scale = 1)
+{
+	float2 uv = scale.y*P.xz;
+	float2 uv2 = scale.z*P.xy;
+	uv = lerp(uv2, uv, abs(N.y));
+	float2 uv3 = scale.x*P.zy;
+	uv = lerp(uv, uv3, abs(N.x));
+	return uv;
+}
+
 #endif
