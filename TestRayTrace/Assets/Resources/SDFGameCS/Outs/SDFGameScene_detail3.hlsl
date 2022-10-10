@@ -247,6 +247,7 @@ if(ShowInt(q,m))
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
+SmoothWithDither(result, suv);
 if(camGammaMode == 1)
 {
 	
@@ -319,7 +320,6 @@ else
 {
 	result = float3(1,0,1);
 }
-SmoothWithDither(result, suv);
 	ObjPostRender(result, mode, mat, ray, minHit);
 	return result;
 }
@@ -490,20 +490,32 @@ if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	lp = p - center;
 	float r = length(lp.xz);
 	float s = min(abs(lp.x),abs(lp.z));
-	float dCross = s-1.5;
+	float crossWidth = 1.5;
+	float dCross = s-crossWidth;
 	float2 dir1 = normalize(float2(1,1));
 	float d2 = dot(lp.xz,dir1);
+
 	float dSub1 = sqrt(r*r - d2*d2);
-	dSub1 -= 2.5;
+	float cutWidth = 2.5;
+	dSub1 -= cutWidth;
 
+	float tubeThick = 0.5;
+	float tubeR = 5;
+	float dTube = abs(r-tubeR)-tubeThick;
+	float tubeHeight = 3;
+	float dCutTube = max(dTube,abs(lp.y)-tubeHeight);
 
-	float dTube = abs(r-5)-0.1;
-	float dCutTube = max(dTube,abs(lp.y)-3);
+	float sub2BookHeight = 0.6;
+	float sub2CutThick = 0.9;
+	float sub2BookOffsetFromMid = 0.7;
+	float dSub2 = max (max (abs (r - tubeR*0.9) - sub2CutThick, abs (abs ((lp.y-tubeHeight*0.5)) - sub2BookOffsetFromMid) - sub2BookHeight), crossWidth*1.2 - s);
 	//___arc thing
 
 	float d = dCutTube;
 	d = max(d,-dCross);
-	d = max(d,-dSub1);
+	d = max(d,-dSub2);
+	//d = max(d,-dSub1); //have problem with sub1
+
 	d = min(dFloor, d);
 	if(length(p.xz)>10)
 	{//don't sub (0,0,0), there's floor number
