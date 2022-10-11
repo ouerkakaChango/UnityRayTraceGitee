@@ -7,7 +7,7 @@ using Debugger;
 public class Dao_BaseControl : MonoBehaviour
 {
     float speed = 20.0f;
-    float maxSpeed = 80.0f;
+    public float maxSpeed = 80.0f;
     float minSpeed = 1.0f;
     float deltaSpeed = 500; //1s
 

@@ -1,4 +1,4 @@
-﻿#define OBJNUM 3
+﻿#define OBJNUM 4
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -133,6 +133,43 @@ float ShowInt(float2 q, int iv, int maxLen=4)
 	return re;
 }
 
+float Hashfv2(float2 p)
+{
+	return frac(sin(dot(p, float2(37., 39.))) * 43758.54);
+}
+
+float Hashfv3 (float3 p)
+{
+return frac (sin (dot (p, float3 (37., 39., 41.))) * 43758.54);
+}
+
+
+float3 HsvToRgb (float3 c)
+{
+return c.z * lerp (1, clamp (abs (frac (c.xxx + float3 (1., 2./3., 1./3.)) * 6. - 3.) - 1., 0., 1.), c.y);
+}
+
+float SmoothBump (float lo, float hi, float w, float x)
+{
+return (1. - smoothstep (hi - w, hi + w, x)) * smoothstep (lo - w, lo + w, x);
+}
+
+float2 Hashv2v2 (float2 p)
+{
+float2 cHashVA2 = float2 (37., 39.);
+return frac (sin (dot (p, cHashVA2) + float2 (0., cHashVA2.x)) * 43758.54);
+}
+
+float Noisefv2 (float2 p)
+{
+float2 t, ip, fp;
+ip = floor (p);
+fp = frac (p);
+fp = fp * fp * (3. - 2. * fp);
+t = lerp (Hashv2v2 (ip), Hashv2v2 (ip + float2 (0., 1.)), fp.y);
+return lerp (t.x, t.y, fp.x);
+}
+
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -142,17 +179,23 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0.5490196, 0.5490196, 0.5490196);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.5490196, 0.5490196, 0.5490196);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 2 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 3 )
 {
 re.albedo = float3(1, 0, 0);
 re.metallic = 0;
@@ -165,10 +208,11 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[3];
+int renderMode[4];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
+renderMode[3] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -186,6 +230,9 @@ else if (inx == 1 )
 }
 else if (inx == 2 )
 {
+}
+else if (inx == 3 )
+{
 uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 }
 	//@@@
@@ -195,13 +242,17 @@ uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 	//@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
+inx = -3;
 }
 else if (inx == 1 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 2 )
+{
+inx = -1;
+}
+else if (inx == 3 )
 {
 }
 	//@@@
@@ -226,6 +277,9 @@ if(inx == 1 )
 }
 if(inx == 2 )
 {
+}
+if(inx == 3 )
+{
 BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return;
 }
@@ -237,7 +291,7 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==1)
+if(inx==2)
 {
 	float2 uv = GetObjUV(minHit);
 uv = float2(0.25, 0.25)*uv+float2(0, 0);
@@ -252,25 +306,91 @@ uv = float2(0.25, 0.25)*uv+float2(0, 0);
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
+inx = -3;
 }
 else if (inx == 1 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 2 )
+{
+inx = -1;
+}
+else if (inx == 3 )
 {
 }
 //@@@
 
-float2 q = minHit.P.xz;
+//book shelf center
+float grid = 30;
+float2 m1 = floor(minHit.P.xz/grid);
+float2 c = grid*(m1+0.5);
 float dis = 20;
 float m = floor(minHit.P.y/dis);
+float centerY = m * dis;
+float3 center = float3(c.x,centerY,c.y);
+float3 cId = float3(m1.x,m,m1.y);
+float3 h_bookShelf = 3.0;
+float h_lift = 0.2;
+float3 q = minHit.P - center - float3(0,h_lift,0);
 
-if(ShowInt(q,m))
+
+//--- inx:-3 infibiteBooks shade
+if(inx == -3)
+{
+	float r = length (q.xz);
+float a = (r > 0) ? (atan2 (q.z, q.x) / PI + 1)*0.5 : 0;
+
+	float3 bookColor = 0;
+	float layHeight = (h_bookShelf - h_lift)*0.5;
+	float bookNum = 256;
+	a *= bookNum;
+float s = Hashfv2 (float2 (floor(a), 1. + centerY)); //hash each book,layer
+	float bookMaxHeight = 0.6;
+	float bookHeightVary = 0.2;
+float y = frac (q.y / layHeight) / (bookMaxHeight - bookHeightVary * s);
+if (y < 1.) {
+a= frac(a);
+bookColor = HsvToRgb (float3 (	
+				frac (Hashfv3 (cId) + 0.6 * s),
+				0.7,
+				0.7 * (0.5 + 0.5 * SmoothBump (0.05, 0.95, 0.02, a))
+			));
+	 float3 c_bookLine = float3(173,163,111)/256.0;
+	 float3 c_bookName = c_bookLine*0.8;
+	 float k_bookLine = SmoothBump (0.2, 0.25, 0.01, y);
+	 float k_bookName = step (abs (y - 0.5), 0.15) *
+			step (abs (a - 0.5), 0.25) *
+			step (0.5, Noisefv2 (cId.xz * float2 (19., 31.) + floor (float2 (16. * a, 80. * q.y))));
+bookColor = lerp (
+		lerp (bookColor, c_bookLine, k_bookLine),
+c_bookName,
+		 k_bookName
+		 );
+		 mat.roughness = lerp (
+		lerp (mat.roughness, 0.1, k_bookLine),
+0.1,
+		 k_bookName
+		 );
+		 mat.metallic = lerp (
+		lerp (mat.metallic, 0.9, k_bookLine),
+0.9,
+		 k_bookName
+		 );
+minHit.N.xz = rotate (minHit.N.xz, 0.5 * PI * (a - 0.5)); //bend norm for each book
+}
+
+	mat.albedo = bookColor;
+}
+//___
+
+//--- Attach Floor Number
+
+if(ShowInt(q.xz,m))
 {
 	mat.albedo = float3(0,1,0);
 }
+//___ Attach Floor Number
 
 }
 
@@ -487,13 +607,17 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -2;
+inx = -3;
 }
 else if (inx == 1 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 2 )
+{
+inx = -1;
+}
+else if (inx == 3 )
 {
 re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
@@ -571,6 +695,47 @@ if(inx == -2)
 		re = min(re,dFloor);
 	}
 }
+if(inx == -3)
+{
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	{
+		float dis = 20;
+	float m = floor(p.y/dis);
+	float centerY = m * dis;
+
+	float grid = 30;
+	float2 m1 = floor(p.xz/grid);
+	float2 c = grid*(m1+0.5);
+	float3 center = float3(c.x,centerY,c.y);
+	float3 lp = p - center;
+	float r = length(lp.xz);
+	float s = min(abs(lp.x),abs(lp.z));
+	float crossWidth = 1.5*1.2;
+	float dCross = s-crossWidth;
+
+	float2 dir1 = normalize(float2(1,1));
+	float d2 = dot(lp.xz,dir1);
+	float dSub1 = sqrt(r*r - d2*d2);
+	float cutWidth = 2.5;
+	dSub1 -= cutWidth;
+
+	float tubeThick = 0.1;
+	float tubeR = 5;
+	float dTube = abs(r-tubeR)-tubeThick;
+	float tubeHeight = 3*0.95;
+	float dCutTube = max(dTube,abs(lp.y)-tubeHeight);
+
+	float sub2BookHeight = 0.6;
+	float sub2CutThick = 0.9;
+	float sub2BookOffsetFromMid = 0.7;
+	float dSub2 = max (max (abs (r - tubeR*0.9) - sub2CutThick, abs (abs ((lp.y-tubeHeight*0.5)) - sub2BookOffsetFromMid) - sub2BookHeight), crossWidth*1.2 - s);
+
+	float d = dCutTube;
+	d = max(d,-dCross);
+	//d = max(d,-dSub2);
+	re = min(re, d);
+	}
+}
 
 return re;
 }
@@ -591,13 +756,17 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
+inx = -3;
 }
 else if (inx == 1 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 2 )
+{
+inx = -1;
+}
+else if (inx == 3 )
 {
 }
 //@@@
