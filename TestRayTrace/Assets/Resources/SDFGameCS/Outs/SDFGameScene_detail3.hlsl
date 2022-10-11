@@ -1,12 +1,10 @@
-﻿#define OBJNUM 4
+﻿#define OBJNUM 3
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
 #define MaxTraceTime 6400
 #define TraceThre 0.001
 #define NormalEpsilon 0.001
-
-#define SceneSDFShadowNormalBias 0.001
 
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFSoftShadowK 16
@@ -195,12 +193,6 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
-else if (obj == 3 )
-{
-re.albedo = float3(1, 0, 0);
-re.metallic = 0;
-re.roughness = 1;
-}
 //@@@
 	return re;
 }
@@ -208,11 +200,10 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[4];
+int renderMode[3];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
-renderMode[3] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -231,10 +222,6 @@ else if (inx == 1 )
 else if (inx == 2 )
 {
 }
-else if (inx == 3 )
-{
-uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-}
 	//@@@
 
 	//----------------------------------
@@ -251,9 +238,6 @@ inx = -2;
 else if (inx == 2 )
 {
 inx = -1;
-}
-else if (inx == 3 )
-{
 }
 	//@@@
 	if(inx == -1)
@@ -278,11 +262,6 @@ if(inx == 1 )
 if(inx == 2 )
 {
 }
-if(inx == 3 )
-{
-BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return;
-}
 //@@@
 basis_unstable(minHit.N, T, B);
 }
@@ -291,12 +270,6 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==2)
-{
-	float2 uv = GetObjUV(minHit);
-uv = float2(0.25, 0.25)*uv+float2(0, 0);
-	mat.albedo *= SampleRGB(woodTex, uv);
-}
 //@@@
 
 //@@@SDFBakerMgr ObjImgAttach
@@ -315,9 +288,6 @@ inx = -2;
 else if (inx == 2 )
 {
 inx = -1;
-}
-else if (inx == 3 )
-{
 }
 //@@@
 
@@ -379,6 +349,11 @@ c_bookName,
 		 );
 minHit.N.xz = rotate (minHit.N.xz, 0.5 * PI * (a - 0.5)); //bend norm for each book
 }
+	else
+	{
+		mat.metallic = 1;
+		mat.roughness = 0;
+	}
 
 	mat.albedo = bookColor;
 }
@@ -474,6 +449,49 @@ else if (mode == 1002)
 else
 {
 	result = float3(1,0,1);
+}
+
+int inx = minHit.obj;
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+inx = -3;
+}
+else if (inx == 1 )
+{
+inx = -2;
+}
+else if (inx == 2 )
+{
+inx = -1;
+}
+//@@@
+
+if(inx <0 )
+{//???
+	//fake infinite pointLight
+	float3 offset[5];
+	offset[0] = 0;
+	offset[1] = float3(1,0,0);
+	offset[2] = float3(-1,0,0);
+	offset[3] = float3(0,0,1);
+	offset[4] = float3(0,0,-1);
+	for(int i=0;i<1;i++)
+	{
+	//book shelf center
+	float3 grid = float3(30,20,30);
+	float3 m = floor(minHit.P/grid);
+	float3 c = grid*(m+float3(0.5,0,0.5))+offset[i]*grid;
+	float3 infLPos = c + float3(0,2,0);
+	float3 infL = normalize(infLPos - minHit.P);
+	float3 infC = 10*HsvToRgb (float3(
+					Hashfv3 (m+float3(3,56,7)),
+					1,
+					1
+				))* GetPntlightAttenuation(minHit.P,infLPos);
+
+	result += PBR_GGX(mat, minHit.N, -ray.dir, infL, infC);
+	}
 }
 	ObjPostRender(result, mode, mat, ray, minHit);
 	return result;
@@ -617,10 +635,6 @@ else if (inx == 2 )
 {
 inx = -1;
 }
-else if (inx == 3 )
-{
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
-}
 //@@@
 
 if(inx == -1)
@@ -688,10 +702,10 @@ if(inx == -2)
 		float3 center2 = float3(c2.x,centerY,c2.y);
 		float dPillar = length(lp.xz-center2.xz) - 8;
 
-		if(length(p.xz)>10)
-		{//don't sub (0,0,0), there's floor number
-			dFloor = max(dFloor, -dPillar);
-		}
+		//if(length(p.xz)>10)
+		//{//don't sub (0,0,0), there's floor number
+		//	dFloor = max(dFloor, -dPillar);
+		//}
 		re = min(re,dFloor);
 	}
 }
@@ -765,9 +779,6 @@ inx = -2;
 else if (inx == 2 )
 {
 inx = -1;
-}
-else if (inx == 3 )
-{
 }
 //@@@
 	return GetObjSDFNormal(inx, p, traceInfo);
