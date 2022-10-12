@@ -276,8 +276,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mat_PBR:
     albedo: {r: 0.54901963, g: 0.54901963, b: 0.54901963, a: 1}
-    metallic: 0
-    roughness: 1
+    metallic: 0.9
+    roughness: 0.1
   SDF_offset: 0
   renderMode: 0
   shapeType: 1
@@ -1062,7 +1062,7 @@ MonoBehaviour:
   - ' uv = float2(1, 1)*uv+float2(0, 0);'
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
-  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, woodTex, 5, 0.5);'
+  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, woodTex, 9.6, 0.123);'
   - '}'
 --- !u!114 &2040918651
 MonoBehaviour:

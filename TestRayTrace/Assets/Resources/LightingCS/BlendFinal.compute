@@ -35,7 +35,7 @@ void BlendFnial(uint3 id : SV_DispatchThreadID)
 	uint2 size = GetSize(Result);
 	float2 uv = id.xy/(float2)size;
 	int2 fragCoord = uv * 1024;//blueNoise is 1024*1024
-	color.rgb += blueNoise.Load(int3(fragCoord & 1023, 0)).rgb * (1.0 / 256.0);//For our mornitor only support 32bit 
+	//color.rgb += blueNoise.Load(int3(fragCoord & 1023, 0)).rgb * (1.0 / 256.0);//For our mornitor only support 32bit 
 
 	Result[id.xy] = color;
 	NewFrontIndirect[id.xy] = IndirectPart;

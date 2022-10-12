@@ -178,8 +178,8 @@ Material_PBR GetObjMaterial_PBR(int obj)
 if(obj == 0 )
 {
 re.albedo = float3(0.5490196, 0.5490196, 0.5490196);
-re.metallic = 0;
-re.roughness = 1;
+re.metallic = 0.9;
+re.roughness = 0.1;
 }
 else if (obj == 1 )
 {
@@ -1297,6 +1297,7 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 	}
 	float3 Li = indirLightColor * GetPntlightAttenuation(minHit.P,indirHit.P);
 	re = PBR_GGX(mat, minHit.N, -ray.dir, L, Li);
+	re = max(re,0);
 }
 
 void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit, Material_PBR mat)
