@@ -858,8 +858,11 @@ if(inx == -4)
 	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
 		float3 center = GetGridCenter(p,float3(30,20,30),float3(0,0,15));
-
-		float dinfPillar = length(p.xz-center.xz) - 0.5;
+		float3 lp = p-center;
+		float r = 0.5;
+		float disToCenter = 12.5;
+		float dis = length(abs(lp.xz)-disToCenter);
+		float dinfPillar = dis - r;
 		re = min(re, dinfPillar);
 	}
 }
