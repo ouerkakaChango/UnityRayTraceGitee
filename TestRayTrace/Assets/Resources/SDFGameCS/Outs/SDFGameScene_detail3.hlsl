@@ -1,4 +1,4 @@
-﻿#define OBJNUM 3
+﻿#define OBJNUM 4
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -168,6 +168,34 @@ t = lerp (Hashv2v2 (ip), Hashv2v2 (ip + float2 (0., 1.)), fp.y);
 return lerp (t.x, t.y, fp.x);
 }
 
+float3 GetGridCenter(float3 p, float3 grid, float3 offset = 0)
+{
+	p -= offset;
+	float dis = grid.y;
+	float m = round(p.y/dis);
+	float centerY = m * dis;
+	
+	float2 grid2 = grid.xz;
+	float2 m1 = floor(p.xz/grid2);
+	float2 c = grid2*(m1+0.5);
+	return float3(c.x,centerY,c.y)+offset;
+}
+
+float3 GetGridCenterWithID(float3 p, float3 grid, out float3 id,float3 offset = 0)
+{
+	p -= offset;
+	float dis = grid.y;
+	float m = round(p.y/dis);
+	float centerY = m * dis;
+	
+	float2 grid2 = grid.xz;
+	float2 m1 = floor(p.xz/grid2);
+	float2 c = grid2*(m1+0.5);
+
+	id = float3(m1.x,m,m1.y);
+	return float3(c.x,centerY,c.y)+offset;
+}
+
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -177,7 +205,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0.5490196, 0.5490196, 0.5490196);
+re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0.9;
 re.roughness = 0.1;
 }
@@ -193,6 +221,12 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
+else if (obj == 3 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
 //@@@
 	return re;
 }
@@ -200,10 +234,11 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[3];
+int renderMode[4];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
+renderMode[3] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -222,6 +257,9 @@ else if (inx == 1 )
 else if (inx == 2 )
 {
 }
+else if (inx == 3 )
+{
+}
 	//@@@
 
 	//----------------------------------
@@ -238,6 +276,10 @@ inx = -1;
 else if (inx == 2 )
 {
 inx = -3;
+}
+else if (inx == 3 )
+{
+inx = -4;
 }
 	//@@@
 	if(inx == -1)
@@ -260,6 +302,9 @@ if(inx == 1 )
 {
 }
 if(inx == 2 )
+{
+}
+if(inx == 3 )
 {
 }
 //@@@
@@ -296,6 +341,10 @@ inx = -1;
 else if (inx == 2 )
 {
 inx = -3;
+}
+else if (inx == 3 )
+{
+inx = -4;
 }
 //@@@
 
@@ -473,10 +522,14 @@ else if (inx == 2 )
 {
 inx = -3;
 }
+else if (inx == 3 )
+{
+inx = -4;
+}
 //@@@
 
-if(inx <0 )
-{//???
+if(inx <0 && inx>=-3 )
+{
 	//fake infinite pointLight
 	float3 offset[5];
 	offset[0] = 0;
@@ -643,20 +696,18 @@ else if (inx == 2 )
 {
 inx = -3;
 }
+else if (inx == 3 )
+{
+inx = -4;
+}
 //@@@
-
+//-------------------------------
 if(inx == -1)
 {
 if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
-	float dis = 20;
-	float m = floor(p.y/dis);
-	float centerY = m * dis;
-
-	float grid = 30;
-	float2 m1 = floor(p.xz/grid);
-	float2 c = grid*(m1+0.5);
-	float3 center = float3(c.x,centerY,c.y);
+	float3 grid = float3(30,20,30);
+	float3 center = GetGridCenter(p,grid);
 	float3 lp = p - center;
 	float r = length(lp.xz);
 	float s = min(abs(lp.x),abs(lp.z));
@@ -686,29 +737,20 @@ if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	re = min(re, d);
 	}
 }
+//-------------------------------
 if(inx == -2)
 {
 	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
-		float dis = 20;
-		float m = floor(p.y/dis);
-		float centerY = m * dis;
+		float3 grid = float3(30,20,30);
+		float3 center = GetGridCenter(p,grid);
 		float floorBound = 0.1;
-		float df1 = abs(p.y - centerY) - floorBound;
-		float df2 = abs(p.y - (m+1) * dis) - floorBound;
+		float df1 = abs(p.y - center.y) - floorBound;
+		float df2 = abs(p.y - (center.y+grid.y)) - floorBound;
 		float dFloor = min(df1, df2);
 
-		float grid = 30;
-		float2 m1 = floor(p.xz/grid);
-		float2 c = grid*(m1+0.5);
-		float3 center = float3(c.x,centerY,c.y);
-
-		float3 lp = p - float3(15,0,15);
-		float grid2 = 30;
-		float2 m2 = floor(lp.xz/grid2);
-		float2 c2 = grid*(m2+0.5);
-		float3 center2 = float3(c2.x,centerY,c2.y);
-		float dPillar = length(lp.xz-center2.xz) - 8;
+		float3 center2 = GetGridCenter(p,grid,float3(15,0,15));
+		float dPillar = length(p.xz-center2.xz) - 8;
 
 		//if(length(p.xz)>10)
 		//{//don't sub (0,0,0), there's floor number
@@ -717,18 +759,12 @@ if(inx == -2)
 		re = min(re,dFloor);
 	}
 }
+//-------------------------------
 if(inx == -3)
 {
 	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
-		float dis = 20;
-	float m = floor(p.y/dis);
-	float centerY = m * dis;
-
-	float grid = 30;
-	float2 m1 = floor(p.xz/grid);
-	float2 c = grid*(m1+0.5);
-	float3 center = float3(c.x,centerY,c.y);
+	float3 center = GetGridCenter(p,float3(30,20,30));
 	float3 lp = p - center;
 	float r = length(lp.xz);
 	float s = min(abs(lp.x),abs(lp.z));
@@ -756,6 +792,17 @@ if(inx == -3)
 	d = max(d,-dCross);
 	//d = max(d,-dSub2);
 	re = min(re, d);
+	}
+}
+//-------------------------------
+if(inx == -4)
+{
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	{
+		float3 center = GetGridCenter(p,float3(30,20,30),float3(0,0,15));
+
+		float dinfPillar = length(p.xz-center.xz) - 0.5;
+		re = min(re, dinfPillar);
 	}
 }
 
@@ -787,6 +834,10 @@ inx = -1;
 else if (inx == 2 )
 {
 inx = -3;
+}
+else if (inx == 3 )
+{
+inx = -4;
 }
 //@@@
 	return GetObjSDFNormal(inx, p, traceInfo);
@@ -901,6 +952,8 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 			innerBoundStepScale[inx] = 1;
 		}
 
+//@@@SDFBakerMgr CheckInnerBound
+//@@@
 
 		if(bInnerBound)
 		{
@@ -921,6 +974,34 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 		{
 			for (int inx = 0; inx < OBJNUM; inx++)
 			{
+int ori = inx;
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+inx = -2;
+}
+else if (inx == 1 )
+{
+inx = -1;
+}
+else if (inx == 2 )
+{
+inx = -3;
+}
+else if (inx == 3 )
+{
+inx = -4;
+}
+//@@@
+if(inx == -2)
+{
+	inx = ori;
+	continue;
+}
+else
+{
+	inx = ori;
+}
 				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
 				if (objSDF[inx] < sdf)
 				{
@@ -935,7 +1016,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 			break;
 		}
 
-		if (sdf > MaxTraceDis*0.05)
+		if (sdf > MaxTraceDis*0.01)
 		{
 			break;
 		}

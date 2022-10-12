@@ -285,6 +285,9 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 		{
 			for (int inx = 0; inx < OBJNUM; inx++)
 			{
+				//###BLOCK HardShadow_BeforeLoopBody
+				//...
+				//###BLOCK
 				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
 				if (objSDF[inx] < sdf)
 				{
@@ -299,7 +302,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 			break;
 		}
 
-		if (sdf > MaxTraceDis*0.05)
+		if (sdf > MaxTraceDis*0.01)
 		{
 			break;
 		}

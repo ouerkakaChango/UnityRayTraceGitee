@@ -275,7 +275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {r: 0.54901963, g: 0.54901963, b: 0.54901963, a: 1}
+    albedo: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     metallic: 0.9
     roughness: 0.1
   SDF_offset: 0
@@ -809,8 +809,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1965962561}
-  m_LocalRotation: {x: -0.2837579, y: 0.06093159, z: -0.018074201, w: -0.9567874}
-  m_LocalPosition: {x: 0.31030846, y: 4.7877574, z: -6.1391735}
+  m_LocalRotation: {x: -0.10359989, y: -0.02178181, z: 0.002265486, w: -0.994378}
+  m_LocalPosition: {x: 0.016430087, y: 3.8659194, z: -5.7308836}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -963,6 +963,65 @@ MonoBehaviour:
   objInx: 2
   needExtraCondition: 0
   extraCondition: 
+--- !u!1 &2013768847
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2013768848}
+  - component: {fileID: 2013768849}
+  m_Layer: 0
+  m_Name: InfinitePillars
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2013768848
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013768847}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 10.062239, y: -4.7168765, z: 7.5266743}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2111678685}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2013768849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013768847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 1
+  specialID: -4
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
+  SDF_offset2D: 0
+  mergeType: 0
+  objInx: 3
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!1 &2040918646
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,7 +1061,7 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[3];
+  - int renderMode[4];
   bakedRenders: []
   bakedShadows: []
   bakedBeforeSDF: []
@@ -1012,6 +1071,7 @@ MonoBehaviour:
   - {fileID: 645779223}
   - {fileID: 1087498736}
   - {fileID: 2012684371}
+  - {fileID: 2013768849}
 --- !u!4 &2040918648
 Transform:
   m_ObjectHideFlags: 0
@@ -1115,6 +1175,7 @@ Transform:
   - {fileID: 1087498735}
   - {fileID: 645779222}
   - {fileID: 2012684370}
+  - {fileID: 2013768848}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
