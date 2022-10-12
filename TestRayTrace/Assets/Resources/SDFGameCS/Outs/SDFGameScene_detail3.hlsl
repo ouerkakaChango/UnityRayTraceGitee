@@ -177,13 +177,13 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.5490196, 0.5490196, 0.5490196);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0.5490196, 0.5490196, 0.5490196);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -229,15 +229,15 @@ else if (inx == 2 )
 	//@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -3;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -1;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -3;
 }
 	//@@@
 	if(inx == -1)
@@ -270,6 +270,14 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
+if(inx==1)
+{
+float2 uv = GetObjUV(minHit);
+uv = float2(1, 1)*uv+float2(0, 0);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+SetMatLib_Marquetry(mat, minHit, uv, T, B, woodTex, 9.6, 0.123);
+}
 //@@@
 
 //@@@SDFBakerMgr ObjImgAttach
@@ -279,15 +287,15 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -3;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -1;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -3;
 }
 //@@@
 
@@ -455,15 +463,15 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -3;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -1;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -3;
 }
 //@@@
 
@@ -625,15 +633,15 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -3;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -1;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -3;
 }
 //@@@
 
@@ -704,7 +712,7 @@ if(inx == -2)
 
 		//if(length(p.xz)>10)
 		//{//don't sub (0,0,0), there's floor number
-		//	dFloor = max(dFloor, -dPillar);
+			dFloor = max(dFloor, -dPillar);
 		//}
 		re = min(re,dFloor);
 	}
@@ -770,15 +778,15 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -3;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -1;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -3;
 }
 //@@@
 	return GetObjSDFNormal(inx, p, traceInfo);
@@ -882,7 +890,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 	float sdf = MaxSDF;
 	bool bInnerBound = false;
 
-	while (traceInfo.traceCount <= MaxTraceTime*0.01)
+	while (traceInfo.traceCount <= MaxTraceTime*0.1)
 	{
 		objInx = -1;
 		sdf = MaxSDF;
@@ -932,7 +940,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 			break;
 		}
 
-		if (sdf <= TraceThre*2)
+		if (sdf <= TraceThre)
 		{
 			info.bHit = true;
 			info.obj = objInx;

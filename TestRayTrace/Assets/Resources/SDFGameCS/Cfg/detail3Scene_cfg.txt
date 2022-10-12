@@ -278,13 +278,13 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.5490196, 0.5490196, 0.5490196);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0.5490196, 0.5490196, 0.5490196);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -327,15 +327,15 @@ else if (inx == 2 )
 	//@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -3;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -1;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -3;
 }
 	//@@@
 	if(inx == -1)
@@ -363,6 +363,14 @@ basis_unstable(minHit.N, T, B);
 ###BLOCK  ObjPreRender
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
+if(inx==1)
+{
+ float2 uv = GetObjUV(minHit);
+ uv = float2(1, 1)*uv+float2(0, 0);
+ float3 T,B;
+	GetObjTB(T,B, minHit);
+ SetMatLib_Marquetry(mat, minHit, uv, T, B, woodTex, 9.6, 0.123);
+}
 //@@@
 
 //@@@SDFBakerMgr ObjImgAttach
@@ -372,15 +380,15 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -3;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -1;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -3;
 }
 //@@@
 
@@ -529,15 +537,15 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -3;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -1;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -3;
 }
 //@@@
 
@@ -682,15 +690,15 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -3;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -1;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -3;
 }
 //@@@
 
@@ -761,7 +769,7 @@ if(inx == -2)
 
 		//if(length(p.xz)>10)
 		//{//don't sub (0,0,0), there's floor number
-		//	dFloor = max(dFloor, -dPillar);
+			dFloor = max(dFloor, -dPillar);
 		//}
 		re = min(re,dFloor);
 	}
@@ -819,15 +827,15 @@ return re;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -3;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -1;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -3;
 }
 //@@@
 	return GetObjSDFNormal(inx, p, traceInfo);

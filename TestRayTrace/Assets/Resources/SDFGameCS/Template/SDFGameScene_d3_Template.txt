@@ -251,7 +251,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 	float sdf = MaxSDF;
 	bool bInnerBound = false;
 
-	while (traceInfo.traceCount <= MaxTraceTime*0.01)
+	while (traceInfo.traceCount <= MaxTraceTime*0.1)
 	{
 		objInx = -1;
 		sdf = MaxSDF;
@@ -304,7 +304,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 			break;
 		}
 
-		if (sdf <= TraceThre*2)
+		if (sdf <= TraceThre)
 		{
 			info.bHit = true;
 			info.obj = objInx;

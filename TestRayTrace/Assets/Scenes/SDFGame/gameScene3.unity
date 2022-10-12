@@ -287,7 +287,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &760834262
@@ -456,7 +456,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 2
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1087498737
@@ -466,19 +466,19 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1087498734}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   matTypeName: Marquetry
   floatParams:
-  - 0.25
-  - 0.25
+  - 1
+  - 1
   - 0
   - 0
-  - -10
-  - -10
+  - 9.6
+  - 0.123
   texParams:
   - {fileID: 1087498738}
 --- !u!114 &1087498738
@@ -960,7 +960,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 0
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2040918646
@@ -1009,9 +1009,9 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 2012684371}
   - {fileID: 645779223}
   - {fileID: 1087498736}
+  - {fileID: 2012684371}
 --- !u!4 &2040918648
 Transform:
   m_ObjectHideFlags: 0
@@ -1053,8 +1053,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe99e65b93aa2214fb1959533dfc4e6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tags: []
-  bakedObjMatLib: []
+  tags:
+  - {fileID: 1087498737}
+  bakedObjMatLib:
+  - if(inx==1)
+  - '{'
+  - ' float2 uv = GetObjUV(minHit);'
+  - ' uv = float2(1, 1)*uv+float2(0, 0);'
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - ' SetMatLib_Marquetry(mat, minHit, uv, T, B, woodTex, 5, 0.5);'
+  - '}'
 --- !u!114 &2040918651
 MonoBehaviour:
   m_ObjectHideFlags: 0
