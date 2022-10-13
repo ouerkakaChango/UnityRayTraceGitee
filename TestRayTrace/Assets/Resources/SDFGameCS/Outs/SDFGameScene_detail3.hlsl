@@ -59,99 +59,6 @@ float GetPntlightAttenuation(float3 pos, float3 lightPos)
 	//return 1 / (1 + 0.01*d + 0.005*d*d);
 }
 
-//https://iquilezles.org/articles/smin/
-
-float smin( float a, float b, float k=0.1 )
-{
-float h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
-return lerp( b, a, h ) - k*h*(1.0-h);
-}
-
-float DigSeg (float2 q)
-{
-return step (abs (q.x), 0.12) * step (abs (q.y), 0.6);
-}
-
-#define DSG(q) k = kk; kk = k / 2; if (kk * 2 != k) d += DigSeg (q)
-
-float ShowDig (float2 q, int iv)
-{
-float d;
-int k, kk;
-float2 vp = float2 (0.5, 0.5), vm = float2 (-0.5, 0.5), vo = float2 (1., 0.);
-if (iv == -1) k = 8;
-else if (iv < 2) k = (iv == 0) ? 119 : 36;
-else if (iv < 4) k = (iv == 2) ? 93 : 109;
-else if (iv < 6) k = (iv == 4) ? 46 : 107;
-else if (iv < 8) k = (iv == 6) ? 122 : 37;
-else k = (iv == 8) ? 127 : 47;
-q = (q - 0.5);
-d = 0.;
-kk = k;
-DSG (q.yx - vo); DSG (q.xy - vp); DSG (q.xy - vm); DSG (q.yx);
-DSG (q.xy + vm); DSG (q.xy + vp); DSG (q.yx + vo);
-return d;
-}
-
-//float2 mfmod(float2 a, float2 b)
-//{
-// float2 c = frac(abs(a/b))*abs(b);
-// return (a < 0) ? -c : c; /* if ( a < 0 ) c = 0-c */
-//}
-
-float ShowInt(float2 q, int iv, int maxLen=4)
-{
-	//!!!
-	q.x *= -1;
-	int base = 10;
-	int tnum = iv;
-	int resi;
-	float re = 0;
-	float2 offset = float2(2,0);
-	int i=0;
-	if(iv<0)
-	{
-		tnum = abs(tnum);
-	}
-	for(;i<maxLen;i++)
-	{
-		resi = tnum%base;
-		re += ShowDig(q - offset*i,resi);
-		tnum -= resi;
-		tnum /= base;
-		if(tnum == 0)
-		{
-			break;
-		}
-	}
-	if(iv<0)
-	{
-		re += ShowDig(q - offset*(i+1),-1);
-	}
-	return re;
-}
-
-float Hashfv2(float2 p)
-{
-	return frac(sin(dot(p, float2(37., 39.))) * 43758.54);
-}
-
-float Hashfv3 (float3 p)
-{
-return frac (sin (dot (p, float3 (37., 39., 41.))) * 43758.54);
-}
-
-
-float3 HsvToRgb (float3 c)
-{
-return c.z * lerp (1, clamp (abs (frac (c.xxx + float3 (1., 2./3., 1./3.)) * 6. - 3.) - 1., 0., 1.), c.y);
-}
-
-float SmoothBump (float lo, float hi, float w, float x)
-{
-return (1. - smoothstep (hi - w, hi + w, x)) * smoothstep (lo - w, lo + w, x);
-}
-
 float2 Hashv2v2 (float2 p)
 {
 float2 cHashVA2 = float2 (37., 39.);
@@ -168,52 +75,7 @@ t = lerp (Hashv2v2 (ip), Hashv2v2 (ip + float2 (0., 1.)), fp.y);
 return lerp (t.x, t.y, fp.x);
 }
 
-float3 GetGridCenter_DownMode(float3 p, float3 grid, float3 offset = 0)
-{
-	p -= offset;
-	float dis = grid.y;
-	float m = round(p.y/dis);
-	float centerY = m * dis;
-	
-	float2 grid2 = grid.xz;
-	float2 m1 = floor(p.xz/grid2);
-	float2 c = grid2*(m1+0.5);
-	return float3(c.x,centerY,c.y)+offset;
-}
-
-float3 GetGridCenterWithID_DownMode(float3 p, float3 grid, out float3 id,float3 offset = 0)
-{
-	p -= offset;
-	float dis = grid.y;
-	float m = round(p.y/dis);
-	float centerY = m * dis;
-	
-	float2 grid2 = grid.xz;
-	float2 m1 = floor(p.xz/grid2);
-	float2 c = grid2*(m1+0.5);
-
-	id = float3(m1.x,m,m1.y);
-	return float3(c.x,centerY,c.y)+offset;
-}
-
-float3 GetGridCenter_MidMode(float3 p, float3 grid, float3 offset = 0)
-{
-	float3 m = floor(p/grid);
-	return grid*(m+float3(0.5,0,0.5))+offset;
-}
-
-float3 GetGridCenterWithID_MidMode(float3 p, float3 grid, out float3 id,float3 offset = 0)
-{
-	id = floor(p/grid);
-	return grid*(id+float3(0.5,0,0.5))+offset;
-}
-
-float2 gmod(float2 a, float2 b)
-{
-float2 c = frac(abs(a/b))*abs(b);
-return c;//(a < 0) ? -c : c; /* if ( a < 0 ) c = 0-c */
-}
-
+int GetSpecialID(int inx);
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -223,19 +85,19 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0.5849056, 0.5552883, 0.4331613);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 1 )
-{
 re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0.9;
 re.roughness = 0.1;
 }
-else if (obj == 2 )
+else if (obj == 1 )
 {
 re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 2 )
+{
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -247,13 +109,13 @@ re.roughness = 1;
 }
 else if (obj == 4 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
 re.metallic = 0;
 re.roughness = 1;
 }
 else if (obj == 5 )
 {
-re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
+re.albedo = float3(0.5849056, 0.5552883, 0.4331613);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -300,34 +162,7 @@ else if (inx == 5 )
 }
 	//@@@
 
-	//----------------------------------
-
-	//@@@SDFBakerMgr SpecialObj
-if(inx == 0 )
-{
-inx = -6;
-}
-else if (inx == 1 )
-{
-inx = -2;
-}
-else if (inx == 2 )
-{
-inx = -5;
-}
-else if (inx == 3 )
-{
-inx = -1;
-}
-else if (inx == 4 )
-{
-inx = -3;
-}
-else if (inx == 5 )
-{
-inx = -4;
-}
-	//@@@
+	inx = GetSpecialID(inx);
 	if(inx == -1)
 	{
 		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(0.2,1,0.2));
@@ -367,7 +202,7 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==3)
+if(inx==2)
 {
 float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
@@ -381,32 +216,7 @@ SetMatLib_Marquetry(mat, minHit, uv, T, B, woodTex, 9.6, 0.123);
 
 //@@@
 
-//@@@SDFBakerMgr SpecialObj
-if(inx == 0 )
-{
-inx = -6;
-}
-else if (inx == 1 )
-{
-inx = -2;
-}
-else if (inx == 2 )
-{
-inx = -5;
-}
-else if (inx == 3 )
-{
-inx = -1;
-}
-else if (inx == 4 )
-{
-inx = -3;
-}
-else if (inx == 5 )
-{
-inx = -4;
-}
-//@@@
+inx = GetSpecialID(inx);
 
 //book shelf center
 float grid = 30;
@@ -432,14 +242,14 @@ float a = (r > 0) ? (atan2 (q.z, q.x) / PI + 1)*0.5 : 0;
 	float layHeight = (h_bookShelf - h_lift)*0.5;
 	float bookNum = 256;
 	a *= bookNum;
-float s = Hashfv2 (float2 (floor(a), 1. + centerY)); //hash each book,layer
+float s = hash_f2 (float2 (floor(a), 1. + centerY)); //hash each book,layer
 	float bookMaxHeight = 0.6;
 	float bookHeightVary = 0.2;
 float y = frac (q.y / layHeight) / (bookMaxHeight - bookHeightVary * s);
 if (y < 1.) {
 a= frac(a);
-bookColor = HsvToRgb (float3 (	
-				frac (Hashfv3 (cId) + 0.6 * s),
+bookColor = HSVToRGB (float3 (	
+				frac (hash_f3 (cId) + 0.6 * s),
 				0.7,
 				0.7 * (0.5 + 0.5 * SmoothBump (0.05, 0.95, 0.02, a))
 			));
@@ -568,33 +378,8 @@ else
 	result = float3(1,0,1);
 }
 
-int inx = minHit.obj;
-//@@@SDFBakerMgr SpecialObj
-if(inx == 0 )
-{
-inx = -6;
-}
-else if (inx == 1 )
-{
-inx = -2;
-}
-else if (inx == 2 )
-{
-inx = -5;
-}
-else if (inx == 3 )
-{
-inx = -1;
-}
-else if (inx == 4 )
-{
-inx = -3;
-}
-else if (inx == 5 )
-{
-inx = -4;
-}
-//@@@
+int inx = GetSpecialID(minHit.obj);
+
 
 if(inx <0 &&inx!=-5 && inx!=-6)
 {
@@ -615,8 +400,8 @@ if(inx <0 &&inx!=-5 && inx!=-6)
 	float3 c = GetGridCenterWithID_MidMode(minHit.P, grid, m, offset[i]);
 	float3 infLPos = c + float3(0,2,0);
 	float3 infL = normalize(infLPos - minHit.P);
-	float3 infC = 10*HsvToRgb (float3(
-					Hashfv3 (m+float3(3,56,7)),
+	float3 infC = 10*HSVToRGB (float3(
+					hash_f3 (m+float3(3,56,7)),
 					1,
 					1
 				))* GetPntlightAttenuation(minHit.P,infLPos);
@@ -668,33 +453,7 @@ float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
-int inx = minHit.obj;
-//@@@SDFBakerMgr SpecialObj
-if(inx == 0 )
-{
-inx = -6;
-}
-else if (inx == 1 )
-{
-inx = -2;
-}
-else if (inx == 2 )
-{
-inx = -5;
-}
-else if (inx == 3 )
-{
-inx = -1;
-}
-else if (inx == 4 )
-{
-inx = -3;
-}
-else if (inx == 5 )
-{
-inx = -4;
-}
-//@@@
+int inx = GetSpecialID(minHit.obj);
 if(inx == -6)
 {
 	return 1;
@@ -754,28 +513,6 @@ return sha;
 
 //tutorial: iq modeling https://www.youtube.com/watch?v=-pdSjBPH3zM
 
-float SDFFoTou(float3 p)
-{
-	float re = 0;
-	float r = 10.45 + 0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
-	float3 center = float3(0, 0.5, 0);
-	re = length(p - center) - r;
-	re *= 0.5f;
-	return re;
-}
-float SDFPlanet(float3 p)
-{
-	float re = 0;
-	float r = 0.48;// +0.05*sin(16 * p.y)*sin(16 * p.x + 10 * _Time.y)*sin(16 * p.z);
-	float dis = fbm4(p.zxy*10);
-	r += 0.02*smoothstep(0.5f, 1.0f, dis);
-	float3 center = float3(0, r, 0);
-	
-	re = length(p - center) - r;
-	re *= 0.5f;
-	return re;
-}
-
 //change from https://iquilezles.org/articles/distfunctions/
 float3 opCheapBend_XY( float3 p , in float3 center, float k=10.0f)
 {
@@ -799,27 +536,27 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -6;
+inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -2;
+inx = -5;
 }
 else if (inx == 2 )
 {
-inx = -5;
+inx = -1;
 }
 else if (inx == 3 )
 {
-inx = -1;
+inx = -3;
 }
 else if (inx == 4 )
 {
-inx = -3;
+inx = -4;
 }
 else if (inx == 5 )
 {
-inx = -4;
+inx = -6;
 }
 //@@@
 //-------------------------------
@@ -964,7 +701,7 @@ if(inx == -6)
 	//	float3 grid = float3(30,20,30);
 	//	float3 cId;
 	//	float3 center = GetGridCenterWithID_DownMode(p,grid,cId,float3(15,0,15));
-	//	float stAng = 0.5 * PI * floor (4. * Hashfv2 (cId.xz + float2 (27.1, 37.1)));
+	//	float stAng = 0.5 * PI * floor (4. * hash_f2 (cId.xz + float2 (27.1, 37.1)));
 	//	float dStair = re;
 	//	float3 offsets[9];
 	//	offsets[0] = 0;
@@ -1007,32 +744,7 @@ float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonS
 
 float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 {
-//@@@SDFBakerMgr SpecialObj
-if(inx == 0 )
-{
-inx = -6;
-}
-else if (inx == 1 )
-{
-inx = -2;
-}
-else if (inx == 2 )
-{
-inx = -5;
-}
-else if (inx == 3 )
-{
-inx = -1;
-}
-else if (inx == 4 )
-{
-inx = -3;
-}
-else if (inx == 5 )
-{
-inx = -4;
-}
-//@@@
+	inx = GetSpecialID(inx);
 	return GetObjSDFNormal(inx, p, traceInfo);
 }
 
@@ -1168,32 +880,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 			for (int inx = 0; inx < OBJNUM; inx++)
 			{
 int ori = inx;
-//@@@SDFBakerMgr SpecialObj
-if(inx == 0 )
-{
-inx = -6;
-}
-else if (inx == 1 )
-{
-inx = -2;
-}
-else if (inx == 2 )
-{
-inx = -5;
-}
-else if (inx == 3 )
-{
-inx = -1;
-}
-else if (inx == 4 )
-{
-inx = -3;
-}
-else if (inx == 5 )
-{
-inx = -4;
-}
-//@@@
+inx = GetSpecialID(inx);
 if(inx == -2 || inx == -6)
 {
 	inx = ori;
@@ -1488,21 +1175,7 @@ void SceneRenderIndirRay(in Ray ray, out float3 re, out HitInfo minHit, out Mate
 	}
 }
 
-float3 IndirPointLightRender(float3 P, float3 N, float3 lightColor,float3 lightPos)
-{
-	float3 Li = lightColor * saturate(1*GetPntlightAttenuation(P,lightPos));
-	float3 L = normalize(lightPos - P);
-	return Li*saturate(dot(N,L));
-}
-
 float3 Sample_MIS_H(float3 Xi, float3 N, in Material_PBR mat, float p_diffuse) {
-//float r_diffuse = (1.0 - material.metallic);
-//float r_specular = 1.0;
-//float r_sum = r_diffuse + r_specular;
-	//
-//float p_diffuse = r_diffuse / r_sum;
-//float p_specular = r_specular / r_sum;
-
 float rd = Xi.z;
 
 if(rd <= p_diffuse) {
@@ -1545,24 +1218,8 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 	indirLightColor *= RenderSceneSDFShadow(indirHit);
 	//---
 	float3 L = ray_indirect.dir;
-	float m_NL = saturate(dot(minHit.N,L));
-	float pdf_diffuse = m_NL / PI;
-
-	float pdf_GGX = 0;
-	float a = mat.roughness;
-	a = max(0.001f, a*a);
-	
-	//float3 H = normalize(-ray.dir+L);
-	float m_NH = saturate(dot(minHit.N, H));
-	float nomi = a * a * m_NH;
-	float m_NH2 = m_NH * m_NH;
-	
-	float denom = (m_NH2 * (a*a - 1.0) + 1.0);
-	denom = PI * denom * denom;
-	pdf_GGX = nomi / denom;
-	pdf_GGX /= 4 * dot(L, H);	
-	pdf_GGX = max(pdf_GGX, 0.001f);
-	float pdf_specular = pdf_GGX;
+	float pdf_diffuse = IS_DiffusePDF(L,minHit);
+	float pdf_specular = IS_SpecularPDF(L,H,mat,minHit);
 
 	float pdf = p_diffuse * pdf_diffuse
 				+ p_specular * pdf_specular;
@@ -1573,10 +1230,6 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 		indirLightColor = 0;
 	}
 	//___
-
-	{
-		//re = IndirPointLightRender(minHit.P,minHit.N, indirLightColor, indirHit.P);
-	}
 	float3 Li = indirLightColor * GetPntlightAttenuation(minHit.P,indirHit.P);
 	re = PBR_GGX(mat, minHit.N, -ray.dir, L, Li);
 	re = max(re,0);
@@ -1585,4 +1238,35 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit, Material_PBR mat)
 {
 	SetCheapIndirectColor(re, seed, ray, minHit, mat);
+}
+
+int GetSpecialID(int inx)
+{
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+inx = -2;
+}
+else if (inx == 1 )
+{
+inx = -5;
+}
+else if (inx == 2 )
+{
+inx = -1;
+}
+else if (inx == 3 )
+{
+inx = -3;
+}
+else if (inx == 4 )
+{
+inx = -4;
+}
+else if (inx == 5 )
+{
+inx = -6;
+}
+//@@@
+return inx;
 }

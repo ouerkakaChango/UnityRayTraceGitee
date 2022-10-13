@@ -415,4 +415,18 @@ float3 HSVToRGB(float3 c) {
 	return c.z*lerp(K.xxx, saturate(abs(frac(c.x + K.xyz)*6. - K.w) - K.x), c.y);
 }
 
+//glsl version mod,change from cg-language implementation --xc
+float2 gmod(float2 a, float2 b)
+{
+	float2 c = frac(abs(a / b))*abs(b);
+	return c;//(a < 0) ? -c : c;   /* if ( a < 0 ) c = 0-c */
+}
+
+//(edgeLow,edgeHigh,smoothRange,x)
+//(0.1,0.9,0.02,x)
+float SmoothBump(float lo, float hi, float w, float x)
+{
+	return (1. - smoothstep(hi - w, hi + w, x)) * smoothstep(lo - w, lo + w, x);
+}
+
 #endif

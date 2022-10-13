@@ -8,7 +8,7 @@
 
 //https://www.shadertoy.com/view/4sSSW3
 //http://orbit.dtu.dk/fedora/objects/orbit:113874/datastreams/file_75b66578-222e-4c7d-abdf-f7e255100209/content
-//by my personal verify,not very useful in most case.
+//by my personal verify,sometimes it works,sometimes not very useful.
 void basis_unstable(in float3 n, out float3 f, out float3 r)
 {
 	if (n.z < -0.999999)
@@ -23,6 +23,13 @@ void basis_unstable(in float3 n, out float3 f, out float3 r)
 		f = float3(1. - n.x * n.x * a, b, -n.x);
 		r = float3(b, 1. - n.y * n.y * a, -n.y);
 	}
+}
+
+//https://iquilezles.org/articles/smin/
+float smin(float a, float b, float k = 0.1)
+{
+	float h = clamp(0.5 + 0.5*(b - a) / k, 0.0, 1.0);
+	return lerp(b, a, h) - k * h*(1.0 - h);
 }
 
 float SDFSphere(float3 p, float3 center, float radius)
@@ -264,5 +271,106 @@ float SDFTriangle2D(float2 p, float2 A, float2 B, float2 C)
 	return min(min(lenap, lenbp), lencp);
 
 }
+
+//---Grid-------------------------------------------------------
+float3 GetGridCenter_DownMode(float3 p, float3 grid, float3 offset = 0)
+{
+	p -= offset;
+	float dis = grid.y;
+	float m = round(p.y / dis);
+	float centerY = m * dis;
+
+	float2 grid2 = grid.xz;
+	float2 m1 = floor(p.xz / grid2);
+	float2 c = grid2 * (m1 + 0.5);
+	return float3(c.x, centerY, c.y) + offset;
+}
+
+float3 GetGridCenterWithID_DownMode(float3 p, float3 grid, out float3 id, float3 offset = 0)
+{
+	p -= offset;
+	float dis = grid.y;
+	float m = round(p.y / dis);
+	float centerY = m * dis;
+
+	float2 grid2 = grid.xz;
+	float2 m1 = floor(p.xz / grid2);
+	float2 c = grid2 * (m1 + 0.5);
+
+	id = float3(m1.x, m, m1.y);
+	return float3(c.x, centerY, c.y) + offset;
+}
+
+float3 GetGridCenter_MidMode(float3 p, float3 grid, float3 offset = 0)
+{
+	float3 m = floor(p / grid);
+	return grid * (m + float3(0.5, 0, 0.5)) + offset;
+}
+
+float3 GetGridCenterWithID_MidMode(float3 p, float3 grid, out float3 id, float3 offset = 0)
+{
+	id = floor(p / grid);
+	return grid * (id + float3(0.5, 0, 0.5)) + offset;
+}
+//___Grid_____________________________________________________________
+
+//---ShowInt-------------------------------------------------------
+float DigSeg(float2 q)
+{
+	return step(abs(q.x), 0.12) * step(abs(q.y), 0.6);
+}
+
+#define DSG(q) k = kk;  kk = k / 2;  if (kk * 2 != k) d += DigSeg (q)
+
+float ShowDig(float2 q, int iv)
+{
+	float d;
+	int k, kk;
+	float2 vp = float2 (0.5, 0.5), vm = float2 (-0.5, 0.5), vo = float2 (1., 0.);
+	if (iv == -1) k = 8;
+	else if (iv < 2) k = (iv == 0) ? 119 : 36;
+	else if (iv < 4) k = (iv == 2) ? 93 : 109;
+	else if (iv < 6) k = (iv == 4) ? 46 : 107;
+	else if (iv < 8) k = (iv == 6) ? 122 : 37;
+	else             k = (iv == 8) ? 127 : 47;
+	q = (q - 0.5);
+	d = 0.;
+	kk = k;
+	DSG(q.yx - vo);  DSG(q.xy - vp);  DSG(q.xy - vm);  DSG(q.yx);
+	DSG(q.xy + vm);  DSG(q.xy + vp);  DSG(q.yx + vo);
+	return d;
+}
+
+float ShowInt(float2 q, int iv, int maxLen = 4)
+{
+	q.x *= -1;
+	int base = 10;
+	int tnum = iv;
+	int resi;
+	float re = 0;
+	float2 offset = float2(2, 0);
+	int i = 0;
+	if (iv < 0)
+	{
+		tnum = abs(tnum);
+	}
+	for (; i < maxLen; i++)
+	{
+		resi = tnum % base;
+		re += ShowDig(q - offset * i, resi);
+		tnum -= resi;
+		tnum /= base;
+		if (tnum == 0)
+		{
+			break;
+		}
+	}
+	if (iv < 0)
+	{
+		re += ShowDig(q - offset * (i + 1), -1);
+	}
+	return re;
+}
+//___ShowInt___________________________________________
 
 #endif

@@ -56,25 +56,6 @@ float GetPntlightAttenuation(float3 pos, float3 lightPos)
 	//return 1 / (1 + 0.01*d + 0.005*d*d);
 }
 
-//https://iquilezles.org/articles/smin/
-//float smin( float a, float b, float k=32 )
-//{
-//    float res = exp2( -k*a ) + exp2( -k*b );
-//    return -log2( res )/k;
-//}
-
-float smin( float a, float b, float k=0.1 )
-{
-    float h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
-    return lerp( b, a, h ) - k*h*(1.0-h);
-}
-
-//float smin( float a, float b, float k=0.1 )
-//{
-//    float h = max( k-abs(a-b), 0.0 )/k;
-//    return min( a, b ) - h*h*k*(1.0/4.0);
-//}
-
 void dinnerTable(inout float re, in float3 p)
 {
 float d3 = re;
@@ -464,63 +445,77 @@ else if (inx == 15 )
 if(inx == 0 )
 {
 BoxedTB(T,B,minHit.P, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+return;
 }
-else if (inx == 1 )
+if(inx == 1 )
 {
 BoxedTB(T,B,minHit.P, float3(0, 4.14, 4.86), float3(3.33305, 2.025228, 0.475035), float3(0, 0, 0));
+return;
 }
-else if (inx == 2 )
+if(inx == 2 )
 {
 BoxedTB(T,B,minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+return;
 }
-else if (inx == 3 )
+if(inx == 3 )
 {
 BoxedTB(T,B,minHit.P, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+return;
 }
-else if (inx == 4 )
+if(inx == 4 )
 {
 BoxedTB(T,B,minHit.P, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+return;
 }
-else if (inx == 5 )
+if(inx == 5 )
 {
 BoxedTB(T,B,minHit.P, float3(-2.371201, 2.37087, -1.158671), float3(0.00838451, 0.09840991, 0.007551101), float3(3.093163, 1.942568, 359.1576));
+return;
 }
-else if (inx == 6 )
+if(inx == 6 )
 {
 BoxedTB(T,B,minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
+return;
 }
-else if (inx == 7 )
+if(inx == 7 )
 {
 BoxedTB(T,B,minHit.P, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576));
+return;
 }
-else if (inx == 8 )
+if(inx == 8 )
 {
 BoxedTB(T,B,minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+return;
 }
-else if (inx == 9 )
+if(inx == 9 )
 {
 BoxedTB(T,B,minHit.P, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576));
+return;
 }
-else if (inx == 10 )
+if(inx == 10 )
 {
 BoxedTB(T,B,minHit.P, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315), float3(0, 0, 0));
+return;
 }
-else if (inx == 11 )
+if(inx == 11 )
 {
 }
-else if (inx == 12 )
+if(inx == 12 )
 {
 BoxedTB(T,B,minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
+return;
 }
-else if (inx == 13 )
+if(inx == 13 )
 {
 BoxedTB(T,B,minHit.P, float3(-2.45, 2.88, -0.964), float3(0.20343, 0.20343, 0.20343), float3(0, 0, 0));
+return;
 }
-else if (inx == 14 )
+if(inx == 14 )
 {
 BoxedTB(T,B,minHit.P, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+return;
 }
-else if (inx == 15 )
+if(inx == 15 )
 {
 }
 //@@@

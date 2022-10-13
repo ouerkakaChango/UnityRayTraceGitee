@@ -107,14 +107,14 @@ public class AutoCS : MonoBehaviour
         {
             dyValSys.Refresh();
         }
-        for(int i=0;i<systems.Count;i++)
-        {
-            systems[i].Refresh();
-        }
         if(bakerMgr!=null)
         {
             bakerMgr.Bake();
             PreCompile();
+            for (int i = 0; i < systems.Count; i++)
+            {
+                systems[i].Refresh();
+            }
         }
         else
         {
