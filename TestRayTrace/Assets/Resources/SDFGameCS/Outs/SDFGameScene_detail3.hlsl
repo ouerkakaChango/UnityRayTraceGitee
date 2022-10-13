@@ -1,4 +1,4 @@
-﻿#define OBJNUM 4
+﻿#define OBJNUM 5
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -196,6 +196,12 @@ float3 GetGridCenterWithID(float3 p, float3 grid, out float3 id,float3 offset = 
 	return float3(c.x,centerY,c.y)+offset;
 }
 
+float2 gmod(float2 a, float2 b)
+{
+float2 c = frac(abs(a/b))*abs(b);
+return c;//(a < 0) ? -c : c; /* if ( a < 0 ) c = 0-c */
+}
+
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -227,6 +233,12 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
+else if (obj == 4 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+}
 //@@@
 	return re;
 }
@@ -234,11 +246,12 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[4];
+int renderMode[5];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
+renderMode[4] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -260,6 +273,9 @@ else if (inx == 2 )
 else if (inx == 3 )
 {
 }
+else if (inx == 4 )
+{
+}
 	//@@@
 
 	//----------------------------------
@@ -271,13 +287,17 @@ inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 2 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 3 )
+{
+inx = -3;
+}
+else if (inx == 4 )
 {
 inx = -4;
 }
@@ -307,6 +327,9 @@ if(inx == 2 )
 if(inx == 3 )
 {
 }
+if(inx == 4 )
+{
+}
 //@@@
 basis_unstable(minHit.N, T, B);
 }
@@ -315,7 +338,7 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==1)
+if(inx==2)
 {
 float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
@@ -336,13 +359,17 @@ inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 2 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 3 )
+{
+inx = -3;
+}
+else if (inx == 4 )
 {
 inx = -4;
 }
@@ -516,13 +543,17 @@ inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 2 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 3 )
+{
+inx = -3;
+}
+else if (inx == 4 )
 {
 inx = -4;
 }
@@ -690,13 +721,17 @@ inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 2 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 3 )
+{
+inx = -3;
+}
+else if (inx == 4 )
 {
 inx = -4;
 }
@@ -808,6 +843,55 @@ if(inx == -4)
 		re = min(re, dinfPillar);
 	}
 }
+//-------------------------------
+if(inx == -5)
+{//'unbias' stair like -555,but change distance from each other,so this 'config' make stair don't affect each other's SDF
+	float3 center = GetGridCenter(p,float3(30,20,30),float3(15,10,15));
+	Transform trans;
+	trans.pos = center+float3(0,0,0);
+	trans.rotEuler = float3(0,0,45);
+	trans.scale = 1;
+	float3 q = WorldToLocal(trans, p);
+	//float3 q = p - float3(0,5,0);
+	float s = gmod (q.x, sqrt (2.));
+	float d = 0.5*max (max (q.y - min (s, sqrt (2.) - s), abs (q.z) - 2.), -0.5 - q.y);
+	re = min(re, d);
+}
+//-------------------------------
+//'unbias' stair near each other, cost too heavy
+//if(inx == -555)
+//{
+	//if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	//{
+	//	float3 grid = float3(30,20,30);
+	//	float3 cId;
+	//	float3 center = GetGridCenterWithID(p,grid,cId,float3(15,0,15));
+	//	float stAng = 0.5 * PI * floor (4. * Hashfv2 (cId.xz + float2 (27.1, 37.1)));
+	//	float dStair = re;
+	//	float3 offsets[9];
+	//	offsets[0] = 0;
+	//	offsets[1] = float3(0,grid.y,grid.z);
+	//	offsets[2] = float3(0,-grid.y,-grid.z);
+	//	offsets[3] = float3(0,grid.y,0);
+	//	offsets[4] = float3(0,-grid.y,0);
+	//	offsets[5] = float3(grid.x,0,0);
+	//	offsets[6] = float3(-grid.x,0,0);
+	//	offsets[7] = float3(grid.x,grid.y,0);
+	//	offsets[8] = float3(-grid.x,-grid.y,0);
+	//	for(int i=0;i<9;i++)
+	//	{
+	//		float3 q = p - (center+offsets[i]);
+	//		//q.xz = rotate (q.xz, stAng);
+	//		q.xy = rotate (q.xy, 0.25 * PI);
+	//		float s = gmod (q.x, sqrt (2.));
+	//		//float d = 0.5*max (max (q.y - min (s, sqrt (2.) - s), abs (q.z) - 2.), -0.5 - q.y);
+	//		float d = 0.5*max (max (q.y - min (s, sqrt (2.) - s), abs (q.z) - 2.), -0.5 - q.y);
+	//		//float d = SDFBox(q,0,0.5);//SDFSphere(q,0,1);
+	//		dStair = min(dStair,d);
+	//	}
+	//	re = min(re, dStair);
+	//}
+//}
 
 return re;
 }
@@ -832,13 +916,17 @@ inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 2 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 3 )
+{
+inx = -3;
+}
+else if (inx == 4 )
 {
 inx = -4;
 }
@@ -985,13 +1073,17 @@ inx = -2;
 }
 else if (inx == 1 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 2 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 3 )
+{
+inx = -3;
+}
+else if (inx == 4 )
 {
 inx = -4;
 }
