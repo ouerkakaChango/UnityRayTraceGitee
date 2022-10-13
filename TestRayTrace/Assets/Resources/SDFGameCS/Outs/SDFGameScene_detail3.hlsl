@@ -1,4 +1,4 @@
-﻿#define OBJNUM 5
+﻿#define OBJNUM 6
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -168,7 +168,7 @@ t = lerp (Hashv2v2 (ip), Hashv2v2 (ip + float2 (0., 1.)), fp.y);
 return lerp (t.x, t.y, fp.x);
 }
 
-float3 GetGridCenter(float3 p, float3 grid, float3 offset = 0)
+float3 GetGridCenter_DownMode(float3 p, float3 grid, float3 offset = 0)
 {
 	p -= offset;
 	float dis = grid.y;
@@ -181,7 +181,7 @@ float3 GetGridCenter(float3 p, float3 grid, float3 offset = 0)
 	return float3(c.x,centerY,c.y)+offset;
 }
 
-float3 GetGridCenterWithID(float3 p, float3 grid, out float3 id,float3 offset = 0)
+float3 GetGridCenterWithID_DownMode(float3 p, float3 grid, out float3 id,float3 offset = 0)
 {
 	p -= offset;
 	float dis = grid.y;
@@ -194,6 +194,18 @@ float3 GetGridCenterWithID(float3 p, float3 grid, out float3 id,float3 offset = 
 
 	id = float3(m1.x,m,m1.y);
 	return float3(c.x,centerY,c.y)+offset;
+}
+
+float3 GetGridCenter_MidMode(float3 p, float3 grid, float3 offset = 0)
+{
+	float3 m = floor(p/grid);
+	return grid*(m+float3(0.5,0,0.5))+offset;
+}
+
+float3 GetGridCenterWithID_MidMode(float3 p, float3 grid, out float3 id,float3 offset = 0)
+{
+	id = floor(p/grid);
+	return grid*(id+float3(0.5,0,0.5))+offset;
 }
 
 float2 gmod(float2 a, float2 b)
@@ -211,19 +223,19 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
+re.albedo = float3(0.5849056, 0.5552883, 0.4331613);
+re.metallic = 0;
+re.roughness = 1;
+}
+else if (obj == 1 )
+{
 re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0.9;
 re.roughness = 0.1;
 }
-else if (obj == 1 )
-{
-re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
-}
 else if (obj == 2 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
 re.metallic = 0;
 re.roughness = 1;
 }
@@ -239,6 +251,12 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 }
+else if (obj == 5 )
+{
+re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
+re.metallic = 0;
+re.roughness = 1;
+}
 //@@@
 	return re;
 }
@@ -246,12 +264,13 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[5];
+int renderMode[6];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
 renderMode[4] = 0;
+renderMode[5] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -276,6 +295,9 @@ else if (inx == 3 )
 else if (inx == 4 )
 {
 }
+else if (inx == 5 )
+{
+}
 	//@@@
 
 	//----------------------------------
@@ -283,21 +305,25 @@ else if (inx == 4 )
 	//@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
+inx = -6;
 }
 else if (inx == 1 )
 {
-inx = -5;
+inx = -2;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 3 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 4 )
+{
+inx = -3;
+}
+else if (inx == 5 )
 {
 inx = -4;
 }
@@ -330,6 +356,9 @@ if(inx == 3 )
 if(inx == 4 )
 {
 }
+if(inx == 5 )
+{
+}
 //@@@
 basis_unstable(minHit.N, T, B);
 }
@@ -338,7 +367,7 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==2)
+if(inx==3)
 {
 float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
@@ -355,21 +384,25 @@ SetMatLib_Marquetry(mat, minHit, uv, T, B, woodTex, 9.6, 0.123);
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
+inx = -6;
 }
 else if (inx == 1 )
 {
-inx = -5;
+inx = -2;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 3 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 4 )
+{
+inx = -3;
+}
+else if (inx == 5 )
 {
 inx = -4;
 }
@@ -539,27 +572,31 @@ int inx = minHit.obj;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
+inx = -6;
 }
 else if (inx == 1 )
 {
-inx = -5;
+inx = -2;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 3 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 4 )
+{
+inx = -3;
+}
+else if (inx == 5 )
 {
 inx = -4;
 }
 //@@@
 
-if(inx <0 && inx>=-3 )
+if(inx <0 &&inx!=-5 && inx!=-6)
 {
 	//fake infinite pointLight
 	float3 offset[5];
@@ -572,8 +609,10 @@ if(inx <0 && inx>=-3 )
 	{
 	//book shelf center
 	float3 grid = float3(30,20,30);
-	float3 m = floor(minHit.P/grid);
-	float3 c = grid*(m+float3(0.5,0,0.5))+offset[i]*grid;
+	//float3 m = floor(minHit.P/grid);
+	//float3 c = grid*(m+float3(0.5,0,0.5))+offset[i]*grid;
+	float3 m;
+	float3 c = GetGridCenterWithID_MidMode(minHit.P, grid, m, offset[i]);
 	float3 infLPos = c + float3(0,2,0);
 	float3 infL = normalize(infLPos - minHit.P);
 	float3 infC = 10*HsvToRgb (float3(
@@ -585,6 +624,18 @@ if(inx <0 && inx>=-3 )
 	result += PBR_GGX(mat, minHit.N, -ray.dir, infL, infC);
 	}
 }
+//???
+//---Ceiling Light
+if(inx == -6 || inx == -4)
+{
+	float3 grid = float3(30,20,30);
+	float3 c = GetGridCenter_MidMode(minHit.P, grid);
+	float3 infLPos = c + float3(0,19.4,0);
+	float3 infL = normalize(infLPos - minHit.P);
+	float3 infC = 300* GetPntlightAttenuation(minHit.P,infLPos);
+	result += PBR_GGX(mat, minHit.N, -ray.dir, infL, infC);
+}
+//___Ceiling Light
 	ObjPostRender(result, mode, mat, ray, minHit);
 	return result;
 }
@@ -617,6 +668,37 @@ float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
+int inx = minHit.obj;
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+inx = -6;
+}
+else if (inx == 1 )
+{
+inx = -2;
+}
+else if (inx == 2 )
+{
+inx = -5;
+}
+else if (inx == 3 )
+{
+inx = -1;
+}
+else if (inx == 4 )
+{
+inx = -3;
+}
+else if (inx == 5 )
+{
+inx = -4;
+}
+//@@@
+if(inx == -6)
+{
+	return 1;
+}
 if(true)
 {
 //@@@SDFBakerMgr DirShadow
@@ -717,21 +799,25 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -2;
+inx = -6;
 }
 else if (inx == 1 )
 {
-inx = -5;
+inx = -2;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 3 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 4 )
+{
+inx = -3;
+}
+else if (inx == 5 )
 {
 inx = -4;
 }
@@ -742,7 +828,7 @@ if(inx == -1)
 if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
 	float3 grid = float3(30,20,30);
-	float3 center = GetGridCenter(p,grid);
+	float3 center = GetGridCenter_DownMode(p,grid,float3(0,1.5,0));
 	float3 lp = p - center;
 	float r = length(lp.xz);
 	float s = min(abs(lp.x),abs(lp.z));
@@ -758,13 +844,13 @@ if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	float tubeThick = 0.5;
 	float tubeR = 5;
 	float dTube = abs(r-tubeR)-tubeThick;
-	float tubeHeight = 3;
+	float tubeHeight = 1.5;
 	float dCutTube = max(dTube,abs(lp.y)-tubeHeight);
 
 	float sub2BookHeight = 0.6;
 	float sub2CutThick = 0.9;
 	float sub2BookOffsetFromMid = 0.7;
-	float dSub2 = max (max (abs (r - tubeR*0.9) - sub2CutThick, abs (abs ((lp.y-tubeHeight*0.5)) - sub2BookOffsetFromMid) - sub2BookHeight), crossWidth*1.2 - s);
+	float dSub2 = max (max (abs (r - tubeR*0.9) - sub2CutThick, abs (abs ((lp.y-tubeHeight*0.0)) - sub2BookOffsetFromMid) - sub2BookHeight), crossWidth*1.2 - s);
 
 	float d = dCutTube;
 	d = max(d,-dCross);
@@ -778,13 +864,13 @@ if(inx == -2)
 	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
 		float3 grid = float3(30,20,30);
-		float3 center = GetGridCenter(p,grid);
+		float3 center = GetGridCenter_DownMode(p,grid);
 		float floorBound = 0.1;
 		float df1 = abs(p.y - center.y) - floorBound;
 		float df2 = abs(p.y - (center.y+grid.y)) - floorBound;
 		float dFloor = min(df1, df2);
 
-		float3 center2 = GetGridCenter(p,grid,float3(15,0,15));
+		float3 center2 = GetGridCenter_DownMode(p,grid,float3(15,0,15));
 		float dPillar = length(p.xz-center2.xz) - 8;
 
 		//if(length(p.xz)>10)
@@ -799,7 +885,7 @@ if(inx == -3)
 {
 	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
-	float3 center = GetGridCenter(p,float3(30,20,30));
+	float3 center = GetGridCenter_DownMode(p,float3(30,20,30),float3(0,1.5,0));
 	float3 lp = p - center;
 	float r = length(lp.xz);
 	float s = min(abs(lp.x),abs(lp.z));
@@ -815,13 +901,13 @@ if(inx == -3)
 	float tubeThick = 0.1;
 	float tubeR = 5;
 	float dTube = abs(r-tubeR)-tubeThick;
-	float tubeHeight = 3*0.95;
+	float tubeHeight = 1.5*0.95;
 	float dCutTube = max(dTube,abs(lp.y)-tubeHeight);
 
 	float sub2BookHeight = 0.6;
 	float sub2CutThick = 0.9;
 	float sub2BookOffsetFromMid = 0.7;
-	float dSub2 = max (max (abs (r - tubeR*0.9) - sub2CutThick, abs (abs ((lp.y-tubeHeight*0.5)) - sub2BookOffsetFromMid) - sub2BookHeight), crossWidth*1.2 - s);
+	float dSub2 = max (max (abs (r - tubeR*0.9) - sub2CutThick, abs (abs ((lp.y-tubeHeight*0.0)) - sub2BookOffsetFromMid) - sub2BookHeight), crossWidth*1.2 - s);
 
 	float d = dCutTube;
 	d = max(d,-dCross);
@@ -834,7 +920,7 @@ if(inx == -4)
 {
 	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
 	{
-		float3 center = GetGridCenter(p,float3(30,20,30),float3(0,0,15));
+		float3 center = GetGridCenter_DownMode(p,float3(30,20,30),float3(0,0,15));
 		float3 lp = p-center;
 		float r = 0.5;
 		float disToCenter = 12.5;
@@ -846,7 +932,7 @@ if(inx == -4)
 //-------------------------------
 if(inx == -5)
 {//'unbias' stair like -555,but change distance from each other,so this 'config' make stair don't affect each other's SDF
-	float3 center = GetGridCenter(p,float3(30,20,30),float3(15,10,15));
+	float3 center = GetGridCenter_DownMode(p,float3(30,20,30),float3(15,10,15));
 	Transform trans;
 	trans.pos = center+float3(0,0,0);
 	trans.rotEuler = float3(0,0,45);
@@ -858,6 +944,18 @@ if(inx == -5)
 	re = min(re, d);
 }
 //-------------------------------
+if(inx == -6)
+{
+	float3 grid = float3(30,20,30);
+		float3 center = GetGridCenter_DownMode(p,grid,float3(0,19.5,0));
+		float floorBound = 0.01;
+		float d = abs(p.y - center.y) - floorBound;
+		float3 center2 = GetGridCenter_DownMode(p,grid,float3(15,0,15));
+		float dPillar = length(p.xz-center2.xz) - 8;
+		re = min(re, d);
+		re = max(re,-dPillar);
+}
+//-------------------------------
 //'unbias' stair near each other, cost too heavy
 //if(inx == -555)
 //{
@@ -865,7 +963,7 @@ if(inx == -5)
 	//{
 	//	float3 grid = float3(30,20,30);
 	//	float3 cId;
-	//	float3 center = GetGridCenterWithID(p,grid,cId,float3(15,0,15));
+	//	float3 center = GetGridCenterWithID_DownMode(p,grid,cId,float3(15,0,15));
 	//	float stAng = 0.5 * PI * floor (4. * Hashfv2 (cId.xz + float2 (27.1, 37.1)));
 	//	float dStair = re;
 	//	float3 offsets[9];
@@ -912,21 +1010,25 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
+inx = -6;
 }
 else if (inx == 1 )
 {
-inx = -5;
+inx = -2;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 3 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 4 )
+{
+inx = -3;
+}
+else if (inx == 5 )
 {
 inx = -4;
 }
@@ -1069,26 +1171,30 @@ int ori = inx;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
+inx = -6;
 }
 else if (inx == 1 )
 {
-inx = -5;
+inx = -2;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 3 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 4 )
+{
+inx = -3;
+}
+else if (inx == 5 )
 {
 inx = -4;
 }
 //@@@
-if(inx == -2)
+if(inx == -2 || inx == -6)
 {
 	inx = ori;
 	continue;
