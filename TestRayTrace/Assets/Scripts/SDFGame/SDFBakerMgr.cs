@@ -695,6 +695,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedMaterials.Add("re.metallic = " + tag.mat_PBR.metallic + ";");
         bakedMaterials.Add("re.roughness = " + tag.mat_PBR.roughness + ";");
         bakedMaterials.Add("re.reflective = " + tag.mat_PBR.reflective + ";");
+        bakedMaterials.Add("re.reflect_ST = " + Bake(tag.mat_PBR.reflect_ST) + ";");
         AddBakeMaterialExtra(tag);
     }
 

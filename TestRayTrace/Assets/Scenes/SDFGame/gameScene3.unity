@@ -279,6 +279,7 @@ MonoBehaviour:
     metallic: 0.9
     roughness: 0.1
     reflective: 0.2
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 1
@@ -446,8 +447,9 @@ MonoBehaviour:
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
-    roughness: 1
-    reflective: 0
+    roughness: 0.3
+    reflective: 0.1
+    reflect_ST: {x: 5, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 1
@@ -530,6 +532,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
     reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 1
@@ -622,6 +625,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
     reflective: 0.5
+    reflect_ST: {x: 0, y: 0.5}
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
@@ -748,6 +752,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
     reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
@@ -1066,7 +1071,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderSize: {x: 1024, y: 720}
   useIndirectRT: 0
-  usePostOp: 1
+  usePostOp: 0
   indirectMultiplier: 1
   useFSR: 0
   FSR_Scale: 2
@@ -1162,6 +1167,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
     reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 1
@@ -1222,6 +1228,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
     reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 1
@@ -1415,6 +1422,7 @@ MonoBehaviour:
     metallic: 0
     roughness: 1
     reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 1

@@ -109,13 +109,15 @@ re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0.9;
 re.roughness = 0.1;
 re.reflective = 0.2;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 1 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
+re.roughness = 0.3;
+re.reflective = 0.1;
+re.reflect_ST = float2(5, 0);
 }
 else if (obj == 2 )
 {
@@ -123,6 +125,7 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 3 )
 {
@@ -130,6 +133,7 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0.5;
+re.reflect_ST = float2(0, 0.5);
 }
 else if (obj == 4 )
 {
@@ -137,6 +141,7 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 5 )
 {
@@ -144,6 +149,7 @@ re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 6 )
 {
@@ -151,6 +157,7 @@ re.albedo = float3(0.5849056, 0.5552883, 0.4331613);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 //@@@
 	return re;
@@ -301,16 +308,23 @@ if(inx == 1)
 	k = clamp(k,0,0.5);
 	k = k*2;
 	k = pow(k,4);
-	float mip = 6*k;
+	//k = smoothstep(0,1,k);
+
+	float dis = length(eyePos-minHit.P);
+	float maxDis = 15;
+	float k2 = saturate(dis/maxDis);
+
+	float mip = 6*saturate(k+k2);
 	int m_lo = floor(mip);
 	float f = mip - m_lo;
 	int m_hi = m_lo+1;
 	float3 n1 = SampleNTanFromR(woodTex, uv,m_lo);
 	float3 n2 = SampleNTanFromR(woodTex, uv,m_hi);
 	float3 n_tan = lerp(n1,n2,f);
+	//!!! test no mip
 	//n_tan = SampleNTanFromR(woodTex, uv,0);
 
-	minHit.N = ApplyNTangent(n_tan,minHit.N,T,B);
+	minHit.N = ApplyNTangent(n_tan,minHit.N,T,B,1);
 }
 
 //@@@SDFBakerMgr ObjImgAttach
@@ -1264,7 +1278,7 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 }
 
 
-float3 SceneRenderReflect(Ray ray,in HitInfo minHit)
+float3 SceneRenderReflect(Ray ray,in HitInfo minHit,in Material_PBR mat)
 {
 	float3 re = 0;
 	ray.dir = reflect(ray.dir,minHit.N);
@@ -1277,7 +1291,9 @@ float3 SceneRenderReflect(Ray ray,in HitInfo minHit)
 	if (reflectHit.bHit)
 	{
 		reflectSourceMat = GetObjMaterial_PBR(reflectHit.obj);
-		re = RenderSceneObj(ray, reflectHit, reflectSourceMat);
+		float atten = GetPntlightAttenuation(minHit.P,reflectHit.P);
+		atten = saturate(mat.reflect_ST.x*atten+mat.reflect_ST.y);
+		re = atten * RenderSceneObj(ray, reflectHit, reflectSourceMat);
 	}
 	return re;
 }

@@ -56,11 +56,11 @@ if (minHit.bHit)
 	}
 	else if (mat.reflective<0.999)
 	{
-		re = lerp(RenderSceneObj(ray, minHit, mat),SceneRenderReflect(ray, minHit),mat.reflective);
+		re = lerp(RenderSceneObj(ray, minHit, mat),SceneRenderReflect(ray, minHit,mat),mat.reflective);
 	}
 	else
 	{
-	re = SceneRenderReflect(ray, minHit);
+	re = SceneRenderReflect(ray, minHit,mat);
 	}
 	re *= RenderSceneSDFShadow(minHit);
 }
