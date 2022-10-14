@@ -194,96 +194,112 @@ if(obj == 0 )
 re.albedo = float3(0.4901961, 0.282353, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 1 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0.9;
 re.roughness = 0.1;
+re.reflective = 0;
 }
 else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.4;
+re.reflective = 0;
 }
 else if (obj == 3 )
 {
 re.albedo = float3(0.4901961, 0.282353, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 4 )
 {
 re.albedo = float3(0.4901961, 0.282353, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 5 )
 {
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 6 )
 {
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 0.5;
+re.reflective = 0;
 }
 else if (obj == 7 )
 {
 re.albedo = float3(0.8584906, 0.7477921, 0.3199092);
 re.metallic = 0.9;
 re.roughness = 0.5;
+re.reflective = 0;
 }
 else if (obj == 8 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.3;
+re.reflective = 0;
 }
 else if (obj == 9 )
 {
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 0.5;
+re.reflective = 0;
 }
 else if (obj == 10 )
 {
 re.albedo = float3(0.4901961, 0.282353, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 11 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0.9;
 re.roughness = 0.1;
+re.reflective = 0;
 }
 else if (obj == 12 )
 {
 re.albedo = float3(0.8588235, 0.7490196, 0.3215686);
 re.metallic = 0.9;
 re.roughness = 0.9;
+re.reflective = 0;
 }
 else if (obj == 13 )
 {
 re.albedo = float3(0.8588235, 0.7490196, 0.3215686);
 re.metallic = 0.9;
 re.roughness = 0.5;
+re.reflective = 0;
 }
 else if (obj == 14 )
 {
 re.albedo = float3(0.490566, 0.28254, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 15 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 //@@@
 ###BLOCK
@@ -318,46 +334,68 @@ return renderMode[obj];
 if(inx == 0 )
 {
 uv = BoxedUV(minHit.P, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 1 )
 {
 uv = BoxedUV(minHit.P, float3(0, 4.14, 4.86), float3(3.33305, 2.025228, 0.475035), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 4.14, 4.86), float3(3.33305, 2.025228, 0.475035), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 2 )
 {
 uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 3 )
 {
 uv = BoxedUV(minHit.P, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 4 )
 {
 uv = BoxedUV(minHit.P, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 5 )
 {
 uv = BoxedUV(minHit.P, float3(-2.371201, 2.37087, -1.158671), float3(0.00838451, 0.09840991, 0.007551101), float3(3.093163, 1.942568, 359.1576));
+uv = BoxedUV(minHit.P, float3(-2.371201, 2.37087, -1.158671), float3(0.00838451, 0.09840991, 0.007551101), float3(3.093163, 1.942568, 359.1576));
+return uv;
 }
 else if (inx == 6 )
 {
 uv = BoxedUV(minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
+uv = BoxedUV(minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
+return uv;
 }
 else if (inx == 7 )
 {
 uv = BoxedUV(minHit.P, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576));
+uv = BoxedUV(minHit.P, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576));
+return uv;
 }
 else if (inx == 8 )
 {
 uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 9 )
 {
 uv = BoxedUV(minHit.P, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576));
+uv = BoxedUV(minHit.P, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576));
+return uv;
 }
 else if (inx == 10 )
 {
 uv = BoxedUV(minHit.P, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 11 )
 {
@@ -365,14 +403,20 @@ else if (inx == 11 )
 else if (inx == 12 )
 {
 uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
+return uv;
 }
 else if (inx == 13 )
 {
 uv = BoxedUV(minHit.P, float3(-2.45, 2.88, -0.964), float3(0.20343, 0.20343, 0.20343), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-2.45, 2.88, -0.964), float3(0.20343, 0.20343, 0.20343), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 14 )
 {
 uv = BoxedUV(minHit.P, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 15 )
 {

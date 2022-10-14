@@ -36,6 +36,7 @@ Texture2D<float> C_SDFTex;
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
+	Init(re);
 	re.albedo = float3(1, 1, 1);
 	re.metallic = 0.0f;
 	re.roughness = 0.8f;
@@ -171,22 +172,16 @@ float GetDirHardShadow(Ray ray, float3 lightDir, in HitInfo minHit)
 float RenderSceneSDFShadow(Ray ray, HitInfo minHit)
 {
 	float sha = 1;
-if(false)
-{
-//@@@SDFBakerMgr DirShadow
-float3 lightDirs[1];
-lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-for(int i=0;i<1;i++)
-{
-	sha *= GetDirHardShadow(ray, lightDirs[i], minHit);
-}
-//@@@
-}
 sha = saturate(0.2 + sha);
 return sha;
 }
 
 //###################################################################################
+#include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
+#include "../../../HLSL/Noise/NoiseCommonDef.hlsl"
+
+//tutorial: iq modeling https://www.youtube.com/watch?v=-pdSjBPH3zM
+
 //void SDFPrefab_ASCII_65(inout float re, in float3 p)
 //{
 //	float d = re;
@@ -335,6 +330,7 @@ return re;
 
 float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonScale = 1.0f)
 {
+	float normalEpsilon = NormalEpsilon;
 	return normalize(float3(
 		GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
 		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
@@ -364,25 +360,66 @@ return GetObjSDFNormal(inx, p, traceInfo);
 }
 
 
-float TraceScene(Ray ray, out HitInfo info)
+void TraceScene(Ray ray, out HitInfo info)
 {
+	float traceThre = TraceThre;
+
+
 	Init(info);
 
 	TraceInfo traceInfo;
 	Init(traceInfo,MaxSDF);
+
+	float objSDF[OBJNUM];
+	bool innerBoundFlag[OBJNUM];
+	float innerBoundStepScale[OBJNUM];
+	int objInx = -1;
+	float sdf = MaxSDF;
+	bool bInnerBound = false;
+
 	while (traceInfo.traceCount <= MaxTraceTime)
 	{
-		int objInx = -1;
-		float objSDF[OBJNUM];
-		float sdf = MaxSDF;
+		objInx = -1;
+		sdf = MaxSDF;
+		bInnerBound = false;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
-			if (objSDF[inx] < sdf)
+			innerBoundFlag[inx] = false;
+			innerBoundStepScale[inx] = 1;
+		}
+
+
+		if(bInnerBound)
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
 			{
-				sdf = objSDF[inx];
-				objInx = inx;
+				if(innerBoundFlag[inx])
+				{
+					objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo) * innerBoundStepScale[inx];
+					if (objSDF[inx] < sdf)
+					{
+						sdf = objSDF[inx];
+						objInx = inx;
+					}
+				}
 			}
+		}
+		else
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+				if (objSDF[inx] < sdf)
+				{
+					sdf = objSDF[inx];
+					objInx = inx;
+				}
+			}
+		}
+
+		if(objInx == -1)
+		{
+			break;
 		}
 
 		if (sdf > MaxTraceDis)
@@ -390,7 +427,7 @@ float TraceScene(Ray ray, out HitInfo info)
 			break;
 		}
 
-		if (sdf <= TraceThre)
+		if (sdf <= traceThre)
 		{
 			info.bHit = true;
 			info.obj = objInx;
@@ -401,15 +438,6 @@ float TraceScene(Ray ray, out HitInfo info)
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
 	}
-
-	if (info.bHit)
-	{
-		return 0;
-	}
-	else
-	{
-		return 1;
-	}
 }
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info)
@@ -418,19 +446,57 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info)
 
 	TraceInfo traceInfo;
 	Init(traceInfo,MaxSDF);
+
+	float objSDF[OBJNUM];
+	bool innerBoundFlag[OBJNUM];
+	float innerBoundStepScale[OBJNUM];
+	int objInx = -1;
+	float sdf = MaxSDF;
+	bool bInnerBound = false;
+
 	while (traceInfo.traceCount <= MaxTraceTime*0.01)
 	{
-		int objInx = -1;
-		float objSDF[OBJNUM];
-		float sdf = MaxSDF;
+		objInx = -1;
+		sdf = MaxSDF;
+		bInnerBound = false;
 		for (int inx = 0; inx < OBJNUM; inx++)
 		{
-			objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
-			if (objSDF[inx] < sdf)
+			innerBoundFlag[inx] = false;
+			innerBoundStepScale[inx] = 1;
+		}
+
+
+		if(bInnerBound)
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
 			{
-				sdf = objSDF[inx];
-				objInx = inx;
+				if(innerBoundFlag[inx])
+				{
+					objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo) * innerBoundStepScale[inx];
+					if (objSDF[inx] < sdf)
+					{
+						sdf = objSDF[inx];
+						objInx = inx;
+					}
+				}
 			}
+		}
+		else
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+				if (objSDF[inx] < sdf)
+				{
+					sdf = objSDF[inx];
+					objInx = inx;
+				}
+			}
+		}
+
+		if(objInx == -1)
+		{
+			break;
 		}
 
 		if (sdf > MaxTraceDis*0.05)

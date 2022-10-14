@@ -91,6 +91,7 @@ float2 RemapUV(float2 inUV, float2 src_uvmin, float2 src_uvmax, float2 tar_uvmin
 
 float3 ApplyNTangent(float3 n_tan, float3 N, float3 T, float3 B, float3 intensity = 1)
 {
+	n_tan = normalize(n_tan);
 	float3 n_world = normalize(n_tan.x*T + n_tan.y*B + n_tan.z*N);
 	return normalize(lerp(N, n_world, intensity));
 }

@@ -8,6 +8,7 @@ struct Material_PBR
 	float metallic;
 	float roughness;
 	float ao;
+	float reflective;
 };
 
 void Init(out Material_PBR mat)
@@ -16,6 +17,7 @@ void Init(out Material_PBR mat)
 	mat.metallic = 0;
 	mat.roughness = 1;
 	mat.ao = 1;
+	mat.reflective = 0;
 }
 
 //#######################################################################################

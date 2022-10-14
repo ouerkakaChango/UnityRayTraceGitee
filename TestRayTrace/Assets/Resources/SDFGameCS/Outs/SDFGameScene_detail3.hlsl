@@ -1,4 +1,4 @@
-﻿#define OBJNUM 6
+﻿#define OBJNUM 7
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -74,7 +74,6 @@ fp = fp * fp * (3. - 2. * fp);
 t = lerp (Hashv2v2 (ip), Hashv2v2 (ip + float2 (0., 1.)), fp.y);
 return lerp (t.x, t.y, fp.x);
 }
-
 int GetSpecialID(int inx);
 
 Material_PBR GetObjMaterial_PBR(int obj)
@@ -88,36 +87,49 @@ if(obj == 0 )
 re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0.9;
 re.roughness = 0.1;
+re.reflective = 0.2;
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0.5;
 }
 else if (obj == 4 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+}
+else if (obj == 5 )
 {
 re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
-else if (obj == 5 )
+else if (obj == 6 )
 {
 re.albedo = float3(0.5849056, 0.5552883, 0.4331613);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 //@@@
 	return re;
@@ -126,13 +138,14 @@ re.roughness = 1;
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[6];
+int renderMode[7];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
 renderMode[4] = 0;
 renderMode[5] = 0;
+renderMode[6] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -160,12 +173,19 @@ else if (inx == 4 )
 else if (inx == 5 )
 {
 }
+else if (inx == 6 )
+{
+}
 	//@@@
 
 	inx = GetSpecialID(inx);
 	if(inx == -1)
 	{
 		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(0.2,1,0.2));
+	}
+	else if(inx == -5)
+	{
+		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(1,1,1));
 	}
 return uv;
 }
@@ -194,6 +214,9 @@ if(inx == 4 )
 if(inx == 5 )
 {
 }
+if(inx == 6 )
+{
+}
 //@@@
 basis_unstable(minHit.N, T, B);
 }
@@ -202,6 +225,12 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
+if(inx==1)
+{
+	float2 uv = GetObjUV(minHit);
+uv = float2(1, 1)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(woodTex, uv);
+}
 if(inx==2)
 {
 float2 uv = GetObjUV(minHit);
@@ -211,6 +240,18 @@ float3 T,B;
 SetMatLib_Marquetry(mat, minHit, uv, T, B, woodTex, 9.6, 0.123);
 }
 //@@@
+if(inx == 1)
+{
+	//float2 uv = GetObjUV(minHit);
+	//float del = 0.001;
+	//float gx = SampleRGB(woodTex, uv+float2(del,0)).r - SampleRGB(woodTex, uv-float2(del,0)).r;
+	//float gy = SampleRGB(woodTex, uv+float2(0,del)).r - SampleRGB(woodTex, uv-float2(0,del)).r;
+	//float3 n_tan = normalize(float3(gx,gy,0.1));
+	//float3 T,B;
+	//GetObjTB(T,B, minHit);
+	//minHit.N = ApplyNTangent(n_tan,minHit.N,T,B);
+	//mat.albedo = n_tan;//float3(uv,0);
+}
 
 //@@@SDFBakerMgr ObjImgAttach
 
@@ -310,9 +351,8 @@ else{
 }
 }
 
-float3 RenderSceneObj(Ray ray, inout HitInfo minHit, out Material_PBR mat)
+float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 {
-	mat = GetObjMaterial_PBR(minHit.obj);
 	int mode = GetObjRenderMode(minHit.obj);
 	ObjPreRender(mode, mat, ray, minHit);
 	float3 result = 0;
@@ -349,19 +389,19 @@ else if (mode == 2)
 		result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir);
 	}
 }
-else if (mode == 3)
-{
-	//lightmap mode
-	result = mat.albedo;
-	//result = pow(result,2.2);
-	//result = pow(result,2.2);
-}
 else if (mode == 333)
 {
 	float3 lightPos = float3(0,4,0);
 	float3 lightColor = float3(1,1,1);
 	float3 l = normalize(lightPos - minHit.P);
 	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
+}
+else if (mode == 1000)
+{
+	//lightmap mode
+	result = mat.albedo;
+	//result = pow(result,2.2);
+	//result = pow(result,2.2);
 }
 else if (mode == 1001)
 {
@@ -462,7 +502,7 @@ if(true)
 {
 //@@@SDFBakerMgr DirShadow
 int lightType[1];
-lightType[0] = 0;
+lightType[0] = -1;
 float3 lightPos[1];
 lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
@@ -548,13 +588,17 @@ inx = -1;
 }
 else if (inx == 3 )
 {
-inx = -3;
+re = min(re, 0 + SDFSphere(p, float3(0, 4, 0), 2));
 }
 else if (inx == 4 )
 {
-inx = -4;
+inx = -3;
 }
 else if (inx == 5 )
+{
+inx = -4;
+}
+else if (inx == 6 )
 {
 inx = -6;
 }
@@ -669,10 +713,12 @@ if(inx == -4)
 //-------------------------------
 if(inx == -5)
 {//'unbias' stair like -555,but change distance from each other,so this 'config' make stair don't affect each other's SDF
-	float3 center = GetGridCenter_DownMode(p,float3(30,20,30),float3(15,10,15));
+	float3 cId;
+	float3 center = GetGridCenterWithID_DownMode(p,float3(30,20,30),cId, float3(15,10,15));
 	Transform trans;
 	trans.pos = center+float3(0,0,0);
-	trans.rotEuler = float3(0,0,45);
+	float stAng = 90 * floor (4. * hash_f2 (cId.xz + float2 (27.1, 37.1)));
+	trans.rotEuler = float3(0,stAng,45);
 	trans.scale = 1;
 	float3 q = WorldToLocal(trans, p);
 	//float3 q = p - float3(0,5,0);
@@ -1160,6 +1206,25 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 	}
 }
 
+
+float3 SceneRenderReflect(Ray ray,in HitInfo minHit)
+{
+	float3 re = 0;
+	ray.dir = reflect(ray.dir,minHit.N);
+	ray.pos = minHit.P + ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
+	Material_PBR reflectSourceMat;
+	Init(reflectSourceMat);
+	HitInfo reflectHit;
+	Init(reflectHit);
+	TraceScene(ray, reflectHit);
+	if (reflectHit.bHit)
+	{
+		reflectSourceMat = GetObjMaterial_PBR(reflectHit.obj);
+		re = RenderSceneObj(ray, reflectHit, reflectSourceMat);
+	}
+	return re;
+}
+
 void SceneRenderIndirRay(in Ray ray, out float3 re, out HitInfo minHit, out Material_PBR indirSourceMat)
 {
 	re = 0;
@@ -1171,6 +1236,7 @@ void SceneRenderIndirRay(in Ray ray, out float3 re, out HitInfo minHit, out Mate
 
 	if (minHit.bHit)
 	{
+		indirSourceMat = GetObjMaterial_PBR(minHit.obj);
 		re = RenderSceneObj(ray, minHit, indirSourceMat);
 	}
 }
@@ -1257,13 +1323,16 @@ inx = -1;
 }
 else if (inx == 3 )
 {
-inx = -3;
 }
 else if (inx == 4 )
 {
-inx = -4;
+inx = -3;
 }
 else if (inx == 5 )
+{
+inx = -4;
+}
+else if (inx == 6 )
 {
 inx = -6;
 }

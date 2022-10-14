@@ -67,6 +67,7 @@ GetEnvInfoByID(1,isPNGEnv,envTexArr);
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
+	Init(re);
 	re.albedo = float3(1, 1, 1);
 	re.metallic = 0.0f;
 	re.roughness = 0.8f;
@@ -78,72 +79,84 @@ if(obj == 0 )
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 1 )
 {
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 2 )
 {
 re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 3 )
 {
 re.albedo = float3(0.7254902, 0.4784314, 0.3411765);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 4 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 5 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 6 )
 {
 re.albedo = float3(0, 1, 0.1720126);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 7 )
 {
 re.albedo = float3(0, 1, 1);
 re.metallic = 1;
 re.roughness = 0.15;
+re.reflective = 0;
 }
 else if (obj == 8 )
 {
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 9 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.2;
+re.reflective = 0;
 }
 else if (obj == 10 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 else if (obj == 11 )
 {
 re.albedo = float3(0.8587747, 0, 1);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
 }
 	//@@@
 	return re;

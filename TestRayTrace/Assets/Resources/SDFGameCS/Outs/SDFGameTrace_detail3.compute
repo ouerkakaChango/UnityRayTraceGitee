@@ -49,7 +49,19 @@ float3 GetSDFGameColor(in Ray ray, out HitInfo minHit, out Material_PBR mat)
 
 if (minHit.bHit)
 {
+	mat = GetObjMaterial_PBR(minHit.obj);
+	if(mat.reflective<0.001)
+	{
 	re = RenderSceneObj(ray, minHit, mat);
+	}
+	else if (mat.reflective<0.999)
+	{
+		re = lerp(RenderSceneObj(ray, minHit, mat),SceneRenderReflect(ray, minHit),mat.reflective);
+	}
+	else
+	{
+	re = SceneRenderReflect(ray, minHit);
+	}
 	re *= RenderSceneSDFShadow(minHit);
 }
 else
@@ -65,14 +77,10 @@ else
 float3 GetSDFGameIndirColor(in Ray ray,float3 seed, in HitInfo minHit, in Material_PBR mat)
 {
 float3 re = 0;
-	//re = 0.11;
+	if(mat.reflective<0.5)
+	{
 	SetIndirectColor(re, seed, ray, minHit, mat);
-
-	//test
-	//int2 spos = seed.xy;
-	//uint2 size = GetSize(Result);
-	//re = float3(spos/(float2)size,0);
-	//float2 suv = spos/(float2)size;
+	}
 
 	return re;
 }

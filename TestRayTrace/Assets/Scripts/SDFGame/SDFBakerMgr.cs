@@ -619,6 +619,8 @@ public class SDFBakerMgr : MonoBehaviour
         //uv = BoxedUV(minHit.P, center, bound, rot);
         line = "uv = BoxedUV(minHit.P, " + center_str + ", " + bound_str + ", " + rot_str + ");";
         bakedObjUVs.Add(line);
+        bakedObjUVs.Add(line);
+        bakedObjUVs.Add("return uv;");
 
         //Bake ObjTB
         //BoxedTB(T,B,minHit.P, center, bound, rot));
@@ -692,6 +694,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedMaterials.Add("re.albedo = " + BakeColor3(tag.mat_PBR.albedo) + ";");
         bakedMaterials.Add("re.metallic = " + tag.mat_PBR.metallic + ";");
         bakedMaterials.Add("re.roughness = " + tag.mat_PBR.roughness + ";");
+        bakedMaterials.Add("re.reflective = " + tag.mat_PBR.reflective + ";");
         AddBakeMaterialExtra(tag);
     }
 
