@@ -449,7 +449,7 @@ MonoBehaviour:
     roughness: 1
     reflective: 0
   SDF_offset: 0
-  renderMode: 1000
+  renderMode: 0
   shapeType: 1
   specialID: -5
   fontCharacter: 0

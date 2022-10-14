@@ -69,13 +69,24 @@ float Noisefv2 (float2 p)
   return lerp (t.x, t.y, fp.x);
 }
 
-float3 SampleNTanFromR(Texture2D<float3> tex,float2 uv, float3 vtan, int mip = 0)
+float3 GetNTanFromR(Texture2D<float3> tex,float2 uv, float3 vtan, int mip = 0)
 {
 	uint2 size = GetSize(tex);
 	float2 del = 1;//pow(abs(vtan.z),2);
 	del/=size;
+	del = 0.01;
 	float gx = GetRGB(woodTex, uv+del*float2(1,0)).r - GetRGB(woodTex, uv+del*float2(-1,0)).r;
 	float gy = GetRGB(woodTex, uv+del*float2(0,1)).r - GetRGB(woodTex, uv+del*float2(0,-1)).r;
+	return normalize(float3(gx,gy,0.1));
+}
+
+float3 SampleNTanFromR(Texture2D<float3> tex,float2 uv, int mip = 0)
+{
+	uint2 size = GetSize(tex);
+	float2 del = 1;//pow(abs(vtan.z),2);
+	del/=size;
+	float gx = SampleRGB(woodTex, uv+del*float2(1,0),mip).r - SampleRGB(woodTex, uv+del*float2(-1,0),mip).r;
+	float gy = SampleRGB(woodTex, uv+del*float2(0,1),mip).r - SampleRGB(woodTex, uv+del*float2(0,-1),mip).r;
 	return normalize(float3(gx,gy,0.1));
 }
 ###BLOCK
@@ -235,7 +246,7 @@ re.reflective = 0;
 //@@@SDFBakerMgr ObjRenderMode
 int renderMode[7];
 renderMode[0] = 0;
-renderMode[1] = 1000;
+renderMode[1] = 0;
 renderMode[2] = 0;
 renderMode[3] = 0;
 renderMode[4] = 0;
@@ -333,36 +344,52 @@ if(inx==2)
 if(inx == 1)
 {
 	float2 uv = GetObjUV(minHit);
-	float3 n0 = SampleNTanFromR(woodTex, uv, 1);
+	float3 T,B;
+	GetObjTB(T,B, minHit);
+
+	//easy AA, thinking from https://www.shadertoy.com/view/4sfSzf --xc
+	//float3 vtan = WorldDirToTangent(ray.dir,minHit.N,T,B);
+
+	//float3 n0 = SampleNTanFromR(woodTex, uv, vtan,0);//GetNTanFromR(woodTex, uv, 1);
 	//float del = 1.0/1024;
 	//int mip = 0;
 	//float gx = SampleRGB(woodTex, uv+float2(del,0),mip).r - SampleRGB(woodTex, uv-float2(del,0),mip).r;
 	//float gy = SampleRGB(woodTex, uv+float2(0,del),mip).r - SampleRGB(woodTex, uv-float2(0,del),mip).r;
 
-	//easy AA, thinking from https://www.shadertoy.com/view/4sfSzf --xc
-	float3 T,B;
-	GetObjTB(T,B, minHit);
-	float3 vtan = WorldDirToTangent(ray.dir,minHit.N,T,B);
 
-	float scale = 1;
-	float2 dis = scale * 1.0/GetSize(woodTex);
+	//float wx = abs(vtan.x);
+	//float3 n1 = SampleNTanFromR(woodTex, uv+float2(0.01*(vtan.x+wx),0.01*vtan.y), vtan);
+	//float3 n2 = SampleNTanFromR(woodTex, uv+float2(0.01*(vtan.x-wx),0.01*vtan.y), vtan);
 	//
-	float wx = abs(vtan.x);
-	float3 n1 = SampleNTanFromR(woodTex, uv+dis*(1,0)*wx,vtan);
-	float3 n2 = SampleNTanFromR(woodTex, uv+dis*(-1,0)*wx,vtan);
-	
-	float wy = abs(vtan.y);
-	float3 n3 = SampleNTanFromR(woodTex, uv+dis*(0,1)*wy,vtan);
-	float3 n4 = SampleNTanFromR(woodTex, uv+dis*(0,-1)*wy,vtan);
-	float3 nAA = (n1+n2+n3+n4)/4;//lerp(lerp(n1,n2,0.5),lerp(n3,n4,0.5),0.5);
-	//float3 nAA = SampleNTanFromR(woodTex, uv, vtan);
+	//float wy = abs(vtan.y);
+	//float3 n3 = SampleNTanFromR(woodTex, uv+float2(0.01*(vtan.x),0.01*(vtan.y+wx)), vtan);
+	//float3 n4 = SampleNTanFromR(woodTex, uv+float2(0.01*(vtan.x),0.01*(vtan.y-wx)), vtan);
+	//
+	//float3 nAA = (n1+n2+n3+n4)*0.25;
+	//float3 nAA = SampleNTanFromR(woodTex, uv, vtan,6);
+	//float3 nAA = GetNTanFromR(woodTex, uv, vtan);
 
 	//float3 n_tan = n0;//normalize(float3(gx,gy,0.1));
 	//float3 n_tan = lerp(n0,nAA,0.5);
-	//float3 n_tan = lerp(n0,minHit.N,wx*wy);
+	//float3 n_tan = lerp(n0,nAA,pow(wx*wy,0.1));
 
-	//minHit.N = ApplyNTangent(n_tan,minHit.N,T,B);
-	mat.albedo = nAA;
+
+	float3 vtan2 = WorldDirToTangent(-ray.dir,minHit.N,T,B);
+	float3 sp = CartesianToSpherical(vtan2);
+	float k = sp.y/PI; //0:chuizhi,n0,0.5:nAA
+	k = clamp(k,0,0.5);
+	k = k*2;
+	k = pow(k,4);
+	float mip = 6*k;
+	int m_lo = floor(mip);
+	float f = mip - m_lo;
+	int m_hi = m_lo+1;
+	float3 n1 = SampleNTanFromR(woodTex, uv,m_lo);
+	float3 n2 = SampleNTanFromR(woodTex, uv,m_hi);
+	float3 n_tan = lerp(n1,n2,f);
+	//n_tan = SampleNTanFromR(woodTex, uv,0);
+
+	minHit.N = ApplyNTangent(n_tan,minHit.N,T,B);
 }
 
 //@@@SDFBakerMgr ObjImgAttach
