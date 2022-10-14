@@ -449,7 +449,7 @@ MonoBehaviour:
     roughness: 1
     reflective: 0
   SDF_offset: 0
-  renderMode: 0
+  renderMode: 1000
   shapeType: 1
   specialID: -5
   fontCharacter: 0
@@ -1066,6 +1066,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderSize: {x: 1024, y: 720}
   useIndirectRT: 0
+  usePostOp: 1
   indirectMultiplier: 1
   useFSR: 0
   FSR_Scale: 2
@@ -1094,7 +1095,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1965962561}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1090c4c7b2894044f80ecdaf73b99902, type: 3}
   m_Name: 

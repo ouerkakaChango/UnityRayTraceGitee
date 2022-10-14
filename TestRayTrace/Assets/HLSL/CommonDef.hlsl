@@ -381,9 +381,19 @@ float3 SampleRGB(in Texture2D tex, float2 uv)
 	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).rgb;
 }
 
-float3 SampleRGB(in Texture2D<float3> tex, float2 uv)
+float3 SampleRGB(in Texture2D<float3> tex, float2 uv, int mip=0)
 {
-	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).rgb;
+	return tex.SampleLevel(common_linear_repeat_sampler, uv, mip).rgb;
+}
+
+float3 GetRGB(in Texture2D<float3> tex, float2 uv)
+{
+	return tex.SampleLevel(common_point_repeat_sampler, uv, 0).rgb;
+}
+
+float3 GetRGB(in Texture2D<float4> tex, float2 uv)
+{
+	return tex.SampleLevel(common_point_repeat_sampler, uv, 0).rgb;
 }
 
 float4 SampleRGBA(in Texture2D<float4> tex, float2 uv)

@@ -1,6 +1,7 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel BlendFnial
 #pragma kernel CopyToNewFront
+#pragma kernel TextureAA
 
 #include "../../HLSL/CommonDef.hlsl"
 // Create a RenderTexture with enableRandomWrite flag and set it
@@ -45,4 +46,40 @@ void BlendFnial(uint3 id : SV_DispatchThreadID)
 void CopyToNewFront(uint3 id : SV_DispatchThreadID)
 {
 	Result[id.xy] = NewFrontIndirect[id.xy];
+}
+
+float mfwidth(float x)
+{
+	return x;
+}
+
+float3 texFiltered(Texture2D<float4> inTexture, in float3 rayDir)
+{
+	//Scale of the texture
+	float scale = 1.;
+	//This defines the width of the blur kernel 0.5 to 1. seems to work fine.
+	float wd = .75 / scale;
+
+	float w = mfwidth(rayDir.y)*wd;
+	float d1 = rayDir.y / scale - (w / 2.0);
+	float d2 = d1 + w;
+	float3 t1 = GetRGB(inTexture, float2(d1, rayDir.z / scale)).rgb;
+	float3 t2 = GetRGB(inTexture, float2(d2, rayDir.z / scale)).rgb;
+	float3 col = (t1 + t2)*0.5;
+
+	w = mfwidth(rayDir.z)*wd;
+	d1 = rayDir.z / scale - (w / 2.0);
+	d2 = d1 + w;
+	t1 = GetRGB(inTexture, float2(rayDir.y / scale, d1)).rgb;
+	t2 = GetRGB(inTexture, float2(rayDir.y / scale, d2)).rgb;
+	float3 col2 = (t1 + t2)*0.5;
+	col = lerp(col, col2, .5);
+
+	return col;
+}
+
+[numthreads(8, 8, 1)]
+void TextureAA(uint3 id : SV_DispatchThreadID)
+{
+	Result[id.xy] = Direct[id.xy];
 }

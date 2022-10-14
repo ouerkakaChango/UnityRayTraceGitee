@@ -68,6 +68,16 @@ float Noisefv2 (float2 p)
   t = lerp (Hashv2v2 (ip), Hashv2v2 (ip + float2 (0., 1.)), fp.y);
   return lerp (t.x, t.y, fp.x);
 }
+
+float3 SampleNTanFromR(Texture2D<float3> tex,float2 uv, float3 vtan, int mip = 0)
+{
+	uint2 size = GetSize(tex);
+	float2 del = 1;//pow(abs(vtan.z),2);
+	del/=size;
+	float gx = GetRGB(woodTex, uv+del*float2(1,0)).r - GetRGB(woodTex, uv+del*float2(-1,0)).r;
+	float gy = GetRGB(woodTex, uv+del*float2(0,1)).r - GetRGB(woodTex, uv+del*float2(0,-1)).r;
+	return normalize(float3(gx,gy,0.1));
+}
 ###BLOCK
 
 ###BLOCK ExtraFuncDependOnTraceScene
@@ -225,7 +235,7 @@ re.reflective = 0;
 //@@@SDFBakerMgr ObjRenderMode
 int renderMode[7];
 renderMode[0] = 0;
-renderMode[1] = 0;
+renderMode[1] = 1000;
 renderMode[2] = 0;
 renderMode[3] = 0;
 renderMode[4] = 0;
@@ -319,17 +329,40 @@ if(inx==2)
  SetMatLib_Marquetry(mat, minHit, uv, T, B, woodTex, 9.6, 0.123);
 }
 //@@@
+//???
 if(inx == 1)
 {
-	//float2 uv = GetObjUV(minHit);
-	//float del = 0.001;
-	//float gx = SampleRGB(woodTex, uv+float2(del,0)).r - SampleRGB(woodTex, uv-float2(del,0)).r;
-	//float gy = SampleRGB(woodTex, uv+float2(0,del)).r - SampleRGB(woodTex, uv-float2(0,del)).r;
-	//float3 n_tan = normalize(float3(gx,gy,0.1));
-	//float3 T,B;
-	//GetObjTB(T,B, minHit);
+	float2 uv = GetObjUV(minHit);
+	float3 n0 = SampleNTanFromR(woodTex, uv, 1);
+	//float del = 1.0/1024;
+	//int mip = 0;
+	//float gx = SampleRGB(woodTex, uv+float2(del,0),mip).r - SampleRGB(woodTex, uv-float2(del,0),mip).r;
+	//float gy = SampleRGB(woodTex, uv+float2(0,del),mip).r - SampleRGB(woodTex, uv-float2(0,del),mip).r;
+
+	//easy AA, thinking from https://www.shadertoy.com/view/4sfSzf --xc
+	float3 T,B;
+	GetObjTB(T,B, minHit);
+	float3 vtan = WorldDirToTangent(ray.dir,minHit.N,T,B);
+
+	float scale = 1;
+	float2 dis = scale * 1.0/GetSize(woodTex);
+	//
+	float wx = abs(vtan.x);
+	float3 n1 = SampleNTanFromR(woodTex, uv+dis*(1,0)*wx,vtan);
+	float3 n2 = SampleNTanFromR(woodTex, uv+dis*(-1,0)*wx,vtan);
+	
+	float wy = abs(vtan.y);
+	float3 n3 = SampleNTanFromR(woodTex, uv+dis*(0,1)*wy,vtan);
+	float3 n4 = SampleNTanFromR(woodTex, uv+dis*(0,-1)*wy,vtan);
+	float3 nAA = (n1+n2+n3+n4)/4;//lerp(lerp(n1,n2,0.5),lerp(n3,n4,0.5),0.5);
+	//float3 nAA = SampleNTanFromR(woodTex, uv, vtan);
+
+	//float3 n_tan = n0;//normalize(float3(gx,gy,0.1));
+	//float3 n_tan = lerp(n0,nAA,0.5);
+	//float3 n_tan = lerp(n0,minHit.N,wx*wy);
+
 	//minHit.N = ApplyNTangent(n_tan,minHit.N,T,B);
-	//mat.albedo = n_tan;//float3(uv,0);
+	mat.albedo = nAA;
 }
 
 //@@@SDFBakerMgr ObjImgAttach
@@ -459,10 +492,7 @@ else if (mode == 333)
 }
 else if (mode == 1000)
 {
-	//lightmap mode
 	result = mat.albedo;
-	//result = pow(result,2.2);
-	//result = pow(result,2.2);
 }
 else if (mode == 1001)
 {

@@ -96,6 +96,17 @@ float3 ApplyNTangent(float3 n_tan, float3 N, float3 T, float3 B, float3 intensit
 	return normalize(lerp(N, n_world, intensity));
 }
 
+//https://www.bilibili.com/read/cv15558167
+float3 WorldDirToTangent(float3 dir_world, float3 N, float3 T, float3 B)
+{
+	dir_world = normalize(dir_world);
+	return normalize(float3(
+		dot(dir_world,T),
+		dot(dir_world, B),
+		dot(dir_world, N)
+		));
+}
+
 float3 SampleNormalMap(in Texture2D<float3> normalmap, float2 uv, float3 N, float3 T,float3 B, float3 intensity = 1)
 {
 	float3 n_tan = normalmap.SampleLevel(common_linear_repeat_sampler, uv, 0).rgb;

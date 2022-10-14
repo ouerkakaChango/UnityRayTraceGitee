@@ -127,6 +127,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     const int CoreY = 8;
     public Vector2Int renderSize = new Vector2Int(1024, 720);
     public bool useIndirectRT = false;
+    public bool usePostOp = true;
     public float indirectMultiplier = 1.0f;
 
     //---Indirect
@@ -138,6 +139,7 @@ public class SDFGameSceneTrace : MonoBehaviour
      RenderTexture directRT = null;
      RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
      RenderTexture uselessRT = null;
+     RenderTexture rt_beforePostOp;
     //FSR
     RenderTexture easuRT,finalRT;
 
@@ -191,6 +193,11 @@ public class SDFGameSceneTrace : MonoBehaviour
             else
             {
                 CreateRT(ref uselessRT, 1, 1, 1);
+            }
+            if(usePostOp)
+            {
+                //rt_beforePostOp
+                CreateRT(ref rt_beforePostOp, 1, renderSize.x, renderSize.y);
             }
 
             Co_GoIter = GoIter();
@@ -407,6 +414,15 @@ public class SDFGameSceneTrace : MonoBehaviour
                 cs_blendResult.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
             }
         }
+
+        if(usePostOp)
+        {
+            Graphics.Blit(rt, rt_beforePostOp);
+            kInx = cs_blendResult.FindKernel("TextureAA");
+            cs_blendResult.SetTexture(kInx, "Result", rt);
+            cs_blendResult.SetTexture(kInx, "Direct", rt_beforePostOp);
+            cs_blendResult.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+        }
     }
     //####################################################################################
 
@@ -425,7 +441,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             var csResourcesPath = ChopEnd(autoCS.outs[0], ".compute");
             csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
             cs = (ComputeShader)Resources.Load(csResourcesPath);
-            if(useIndirectRT)
+            if(useIndirectRT || usePostOp)
             {
                 cs_blendResult = (ComputeShader)Resources.Load("LightingCS/BlendFinal");
             }
