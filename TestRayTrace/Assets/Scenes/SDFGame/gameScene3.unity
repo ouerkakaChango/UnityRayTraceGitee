@@ -123,6 +123,67 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &338121909
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 338121910}
+  - component: {fileID: 338121911}
+  m_Layer: 0
+  m_Name: InfPlantDirt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &338121910
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338121909}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 10.062239, y: -4.7168765, z: 7.5266743}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2111678685}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &338121911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338121909}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 0.03773582, g: 0.017874863, b: 0, a: 1}
+    metallic: 0
+    roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 1
+  specialID: -8
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
+  SDF_offset2D: 0
+  mergeType: 0
+  objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!1 &345669638
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,6 +292,88 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &439061376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 439061377}
+  - component: {fileID: 439061378}
+  - component: {fileID: 439061379}
+  m_Layer: 0
+  m_Name: InfPlantPot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &439061377
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 439061376}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 10.062239, y: -4.7168765, z: 7.5266743}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2111678685}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &439061378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 439061376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 1
+  specialID: -7
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
+  SDF_offset2D: 0
+  mergeType: 0
+  objInx: 1
+  needExtraCondition: 0
+  extraCondition: 
+--- !u!114 &439061379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 439061376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: D
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  texParams:
+  - {fileID: 1087498738}
 --- !u!1 &645779221
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,9 +419,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mat_PBR:
     albedo: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-    metallic: 0.9
-    roughness: 0.1
-    reflective: 0.2
+    metallic: 0
+    roughness: 1
+    reflective: 0
     reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
@@ -289,7 +432,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 0
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &760834262
@@ -448,7 +591,7 @@ MonoBehaviour:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 0.3
-    reflective: 0.1
+    reflective: 0
     reflect_ST: {x: 5, y: 0}
   SDF_offset: 0
   renderMode: 0
@@ -459,7 +602,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 1
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1033651199
@@ -542,7 +685,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 2
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1087498737
@@ -607,7 +750,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1694145428
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -635,7 +778,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 3
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!135 &1694145429
@@ -1177,7 +1320,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 4
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2013768847
@@ -1238,7 +1381,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 5
+  objInx: 6
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2040918646
@@ -1280,17 +1423,18 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[7];
+  - int renderMode[8];
   bakedRenders: []
   bakedShadows: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
+  - {fileID: 338121911}
+  - {fileID: 439061378}
   - {fileID: 645779223}
   - {fileID: 1033651198}
   - {fileID: 1087498736}
-  - {fileID: 1694145428}
   - {fileID: 2012684371}
   - {fileID: 2013768849}
   - {fileID: 2065020612}
@@ -1336,6 +1480,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tags:
+  - {fileID: 439061379}
   - {fileID: 1033651199}
   - {fileID: 1087498737}
   bakedObjMatLib:
@@ -1345,7 +1490,13 @@ MonoBehaviour:
   - ' uv = float2(1, 1)*uv+float2(0, 0);'
   - "\tmat.albedo *= SampleRGB(woodTex, uv);"
   - '}'
-  - if(inx==2)
+  - if(inx==3)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' uv = float2(1, 1)*uv+float2(0, 0);'
+  - "\tmat.albedo *= SampleRGB(woodTex, uv);"
+  - '}'
+  - if(inx==4)
   - '{'
   - ' float2 uv = GetObjUV(minHit);'
   - ' uv = float2(1, 1)*uv+float2(0, 0);'
@@ -1432,7 +1583,7 @@ MonoBehaviour:
   hBound: 0.1
   SDF_offset2D: 0
   mergeType: 0
-  objInx: 6
+  objInx: 7
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2111678684
@@ -1468,6 +1619,8 @@ Transform:
   - {fileID: 2013768848}
   - {fileID: 1033651197}
   - {fileID: 2065020611}
+  - {fileID: 439061377}
+  - {fileID: 338121910}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

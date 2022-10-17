@@ -271,6 +271,35 @@ float SDFTriangle2D(float2 p, float2 A, float2 B, float2 C)
 	return min(min(lenap, lenbp), lencp);
 
 }
+float3 SDFTube(float3 q, float h, float tubeR, float tubeThick)
+{
+	float r = length(q.xz);
+	float dTube = abs(r - tubeR) - tubeThick;
+	return max(dTube, abs(q.y - h * 0.5) - h * 0.5);
+}
+
+float SDFCylinder(float3 p, float3 a, float3 b, float r)
+{
+	float3  ba = b - a;
+	float3  pa = p - a;
+	float ba2 = dot(ba, ba);
+	float paba = dot(pa, ba);
+	float x = length(pa*ba2 - ba * paba) - r * ba2;
+	float y = abs(paba - ba2 * 0.5) - ba2 * 0.5;
+	float x2 = x * x;
+	float y2 = y * y*ba2;
+
+	float d = (max(x, y) < 0.0) ? -min(x2, y2) : (((x > 0.0) ? x2 : 0.0) + ((y > 0.0) ? y2 : 0.0));
+
+	return sign(d)*sqrt(abs(d)) / ba2;
+}
+
+float SDFCircleSlice(float3 q, float r, float hBound)
+{
+	float3 a = float3(0, -hBound, 0);
+	float3 b = float3(0, hBound, 0);
+	return SDFCylinder(q, a, b, r);
+}
 
 //---Grid-------------------------------------------------------
 float3 GetGridCenter_DownMode(float3 p, float3 grid, float3 offset = 0)

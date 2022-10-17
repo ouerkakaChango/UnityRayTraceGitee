@@ -1,4 +1,4 @@
-﻿#define OBJNUM 7
+﻿#define OBJNUM 8
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -105,23 +105,23 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0.5, 0.5, 0.5);
-re.metallic = 0.9;
-re.roughness = 0.1;
-re.reflective = 0.2;
+re.albedo = float3(0.03773582, 0.01787486, 0);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
 else if (obj == 1 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 0.3;
-re.reflective = 0.1;
-re.reflect_ST = float2(5, 0);
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 2 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -131,9 +131,9 @@ else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0.5;
-re.reflect_ST = float2(0, 0.5);
+re.roughness = 0.3;
+re.reflective = 0;
+re.reflect_ST = float2(5, 0);
 }
 else if (obj == 4 )
 {
@@ -145,13 +145,21 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 5 )
 {
-re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
 else if (obj == 6 )
+{
+re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 7 )
 {
 re.albedo = float3(0.5849056, 0.5552883, 0.4331613);
 re.metallic = 0;
@@ -166,7 +174,7 @@ re.reflect_ST = float2(1, 0);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[7];
+int renderMode[8];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
@@ -174,6 +182,7 @@ renderMode[3] = 0;
 renderMode[4] = 0;
 renderMode[5] = 0;
 renderMode[6] = 0;
+renderMode[7] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -204,6 +213,9 @@ else if (inx == 5 )
 else if (inx == 6 )
 {
 }
+else if (inx == 7 )
+{
+}
 	//@@@
 
 	inx = GetSpecialID(inx);
@@ -211,9 +223,13 @@ else if (inx == 6 )
 	{
 		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(0.2,1,0.2));
 	}
-	else if(inx == -5)
+	else if(inx == -5 )
 	{
 		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(1,1,1));
+	}
+	else if(inx == -7)
+	{
+		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(0.2,1,0.2));
 	}
 return uv;
 }
@@ -245,6 +261,9 @@ if(inx == 5 )
 if(inx == 6 )
 {
 }
+if(inx == 7 )
+{
+}
 //@@@
 basis_unstable(minHit.N, T, B);
 }
@@ -259,7 +278,13 @@ if(inx==1)
 uv = float2(1, 1)*uv+float2(0, 0);
 	mat.albedo *= SampleRGB(woodTex, uv);
 }
-if(inx==2)
+if(inx==3)
+{
+	float2 uv = GetObjUV(minHit);
+uv = float2(1, 1)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(woodTex, uv);
+}
+if(inx==4)
 {
 float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
@@ -268,39 +293,19 @@ float3 T,B;
 SetMatLib_Marquetry(mat, minHit, uv, T, B, woodTex, 9.6, 0.123);
 }
 //@@@
-//???
-if(inx == 1)
+
+//@@@SDFBakerMgr ObjImgAttach
+
+//@@@
+
+inx = GetSpecialID(inx);
+
+//!!! mip wood normal
+if(inx == -5)
 {
 	float2 uv = GetObjUV(minHit);
 	float3 T,B;
 	GetObjTB(T,B, minHit);
-
-	//easy AA, thinking from https://www.shadertoy.com/view/4sfSzf --xc
-	//float3 vtan = WorldDirToTangent(ray.dir,minHit.N,T,B);
-
-	//float3 n0 = SampleNTanFromR(woodTex, uv, vtan,0);//GetNTanFromR(woodTex, uv, 1);
-	//float del = 1.0/1024;
-	//int mip = 0;
-	//float gx = SampleRGB(woodTex, uv+float2(del,0),mip).r - SampleRGB(woodTex, uv-float2(del,0),mip).r;
-	//float gy = SampleRGB(woodTex, uv+float2(0,del),mip).r - SampleRGB(woodTex, uv-float2(0,del),mip).r;
-
-
-	//float wx = abs(vtan.x);
-	//float3 n1 = SampleNTanFromR(woodTex, uv+float2(0.01*(vtan.x+wx),0.01*vtan.y), vtan);
-	//float3 n2 = SampleNTanFromR(woodTex, uv+float2(0.01*(vtan.x-wx),0.01*vtan.y), vtan);
-	//
-	//float wy = abs(vtan.y);
-	//float3 n3 = SampleNTanFromR(woodTex, uv+float2(0.01*(vtan.x),0.01*(vtan.y+wx)), vtan);
-	//float3 n4 = SampleNTanFromR(woodTex, uv+float2(0.01*(vtan.x),0.01*(vtan.y-wx)), vtan);
-	//
-	//float3 nAA = (n1+n2+n3+n4)*0.25;
-	//float3 nAA = SampleNTanFromR(woodTex, uv, vtan,6);
-	//float3 nAA = GetNTanFromR(woodTex, uv, vtan);
-
-	//float3 n_tan = n0;//normalize(float3(gx,gy,0.1));
-	//float3 n_tan = lerp(n0,nAA,0.5);
-	//float3 n_tan = lerp(n0,nAA,pow(wx*wy,0.1));
-
 
 	float3 vtan2 = WorldDirToTangent(-ray.dir,minHit.N,T,B);
 	float3 sp = CartesianToSpherical(vtan2);
@@ -308,7 +313,6 @@ if(inx == 1)
 	k = clamp(k,0,0.5);
 	k = k*2;
 	k = pow(k,4);
-	//k = smoothstep(0,1,k);
 
 	float dis = length(eyePos-minHit.P);
 	float maxDis = 15;
@@ -327,25 +331,14 @@ if(inx == 1)
 	minHit.N = ApplyNTangent(n_tan,minHit.N,T,B,1);
 }
 
-//@@@SDFBakerMgr ObjImgAttach
-
-//@@@
-
-inx = GetSpecialID(inx);
-
 //book shelf center
-float grid = 30;
-float2 m1 = floor(minHit.P.xz/grid);
-float2 c = grid*(m1+0.5);
-float dis = 20;
-float m = floor(minHit.P.y/dis);
-float centerY = m * dis;
-float3 center = float3(c.x,centerY,c.y);
-float3 cId = float3(m1.x,m,m1.y);
+float3 grid3 = float3(30,20,30);
+float3 cId;
+float3 center = GetGridCenterWithID_DownMode(minHit.P,grid3,cId,float3(0,0,0));
+
 float3 h_bookShelf = 3.0;
 float h_lift = 0.2;
 float3 q = minHit.P - center - float3(0,h_lift,0);
-
 
 //--- inx:-3 infibiteBooks shade
 if(inx == -3)
@@ -357,7 +350,7 @@ float a = (r > 0) ? (atan2 (q.z, q.x) / PI + 1)*0.5 : 0;
 	float layHeight = (h_bookShelf - h_lift)*0.5;
 	float bookNum = 256;
 	a *= bookNum;
-float s = hash_f2 (float2 (floor(a), 1. + centerY)); //hash each book,layer
+float s = hash_f2 (float2 (floor(a), 1. + cId.y)); //hash each book,layer
 	float bookMaxHeight = 0.6;
 	float bookHeightVary = 0.2;
 float y = frac (q.y / layHeight) / (bookMaxHeight - bookHeightVary * s);
@@ -402,8 +395,7 @@ minHit.N.xz = rotate (minHit.N.xz, 0.5 * PI * (a - 0.5)); //bend norm for each b
 //___
 
 //--- Attach Floor Number
-
-if(ShowInt(q.xz,m))
+if(ShowInt(q.xz,cId.y))
 {
 	mat.albedo = float3(0,1,0);
 }
@@ -647,29 +639,33 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -2;
+inx = -8;
 }
 else if (inx == 1 )
 {
-inx = -5;
+inx = -7;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFSphere(p, float3(0, 4, 0), 2));
+inx = -5;
 }
 else if (inx == 4 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 5 )
 {
-inx = -4;
+inx = -3;
 }
 else if (inx == 6 )
+{
+inx = -4;
+}
+else if (inx == 7 )
 {
 inx = -6;
 }
@@ -784,6 +780,8 @@ if(inx == -4)
 //-------------------------------
 if(inx == -5)
 {//'unbias' stair like -555,but change distance from each other,so this 'config' make stair don't affect each other's SDF
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	{
 	float3 cId;
 	float3 center = GetGridCenterWithID_DownMode(p,float3(30,20,30),cId, float3(15,10,15));
 	Transform trans;
@@ -796,18 +794,50 @@ if(inx == -5)
 	float s = gmod (q.x, sqrt (2.));
 	float d = 0.5*max (max (q.y - min (s, sqrt (2.) - s), abs (q.z) - 2.), -0.5 - q.y);
 	re = min(re, d);
+	}
 }
 //-------------------------------
 if(inx == -6)
 {
+if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	{
 	float3 grid = float3(30,20,30);
-		float3 center = GetGridCenter_DownMode(p,grid,float3(0,19.5,0));
-		float floorBound = 0.01;
-		float d = abs(p.y - center.y) - floorBound;
-		float3 center2 = GetGridCenter_DownMode(p,grid,float3(15,0,15));
-		float dPillar = length(p.xz-center2.xz) - 8;
-		re = min(re, d);
-		re = max(re,-dPillar);
+	float3 center = GetGridCenter_DownMode(p,grid,float3(0,19.5,0));
+	float floorBound = 0.01;
+	float d = abs(p.y - center.y) - floorBound;
+	float3 center2 = GetGridCenter_DownMode(p,grid,float3(15,0,15));
+	float dPillar = length(p.xz-center2.xz) - 8;
+	re = min(re, d);
+	re = max(re,-dPillar);
+	}
+}
+//-------------------------------
+if(inx == -7)
+{
+if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	{
+	float3 grid = float3(30,20,30);
+	float3 center = GetGridCenter_DownMode(p,grid,float3(0,0,15));
+	float3 q = p - center;
+
+	float tubeHeight = 0.6;
+	float tubeR = 2;
+	float tubeThick = 0.1;
+	float dTube = SDFTube(q, tubeHeight, tubeR, tubeThick);
+	re = min(re,dTube);
+	}
+}
+if(inx == -8)
+{
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300)
+	{
+		float3 grid = float3(30,20,30);
+		float3 center = GetGridCenter_DownMode(p,grid,float3(0,0,15));
+		float3 q = p - center-float3(0,0.3,0);
+
+		float d = SDFCircleSlice(q,2,0.02);
+		re = min(re,d);
+	}
 }
 //-------------------------------
 //'unbias' stair near each other, cost too heavy
@@ -1384,28 +1414,33 @@ int GetSpecialID(int inx)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -2;
+inx = -8;
 }
 else if (inx == 1 )
 {
-inx = -5;
+inx = -7;
 }
 else if (inx == 2 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 3 )
 {
+inx = -5;
 }
 else if (inx == 4 )
 {
-inx = -3;
+inx = -1;
 }
 else if (inx == 5 )
 {
-inx = -4;
+inx = -3;
 }
 else if (inx == 6 )
+{
+inx = -4;
+}
+else if (inx == 7 )
 {
 inx = -6;
 }
