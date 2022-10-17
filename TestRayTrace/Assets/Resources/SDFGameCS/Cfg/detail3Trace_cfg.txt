@@ -1,6 +1,6 @@
 valMaps:
 SceneName Detail3
-BackGroundColor float3(0,0,0)
+BackGroundColor float3(1,1,1)
 
 Blocks:
 

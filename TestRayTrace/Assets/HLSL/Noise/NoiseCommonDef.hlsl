@@ -59,6 +59,27 @@ float fbm3(in float3 p)
 	return n;
 }
 
+//[-1,1]
+float fbm3_v2(in float3 p)
+{
+	return 2 * fbm3(p) - 1;
+}
+
+float fbm2(in float3 p)
+{
+	float n = 0.0;
+	n += 1.000*noise(p*1.0);
+	n += 0.500*noise(p*2.0);
+	return n;
+}
+
+float fbm1(in float3 p)
+{
+	float n = 0.0;
+	n += 1.000*noise(p*1.0);
+	return n;
+}
+
 float perlinNoiseFromTex(float2 uv)
 {
 	return perlinNoise1.SampleLevel(noise_linear_repeat_sampler, uv, 0).r;

@@ -1,4 +1,4 @@
-﻿#define OBJNUM 8
+﻿#define OBJNUM 9
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -122,10 +122,10 @@ re.reflect_ST = float2(1, 0);
 else if (obj == 2 )
 {
 re.albedo = float3(0.5, 0.5, 0.5);
-re.metallic = 0;
-re.roughness = 1;
+re.metallic = 0.9;
+re.roughness = 0.1;
 re.reflective = 0;
-re.reflect_ST = float2(1, 0);
+re.reflect_ST = float2(1, 0.05);
 }
 else if (obj == 3 )
 {
@@ -167,6 +167,14 @@ re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
+else if (obj == 8 )
+{
+re.albedo = float3(0.1509434, 0.07631969, 0);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
 //@@@
 	return re;
 }
@@ -174,7 +182,7 @@ re.reflect_ST = float2(1, 0);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[8];
+int renderMode[9];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
@@ -183,6 +191,7 @@ renderMode[4] = 0;
 renderMode[5] = 0;
 renderMode[6] = 0;
 renderMode[7] = 0;
+renderMode[8] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -216,6 +225,9 @@ else if (inx == 6 )
 else if (inx == 7 )
 {
 }
+else if (inx == 8 )
+{
+}
 	//@@@
 
 	inx = GetSpecialID(inx);
@@ -230,6 +242,10 @@ else if (inx == 7 )
 	else if(inx == -7)
 	{
 		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(0.2,1,0.2));
+	}
+	else if(inx == -8)
+	{
+		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(1,1,1));
 	}
 return uv;
 }
@@ -262,6 +278,9 @@ if(inx == 6 )
 {
 }
 if(inx == 7 )
+{
+}
+if(inx == 8 )
 {
 }
 //@@@
@@ -405,6 +424,14 @@ if(ShowInt(q.xz,cId.y))
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
+//???
+//int inx = GetSpecialID(minHit.obj);
+//if(inx==-8)
+//{
+//	float2 uv = GetObjUV(minHit);
+//	result *= SampleRGB(DirtNoise, uv).r;
+//}
+
 SmoothWithDither(result, suv);
 if(camGammaMode == 1)
 {
@@ -565,7 +592,7 @@ if(true)
 {
 //@@@SDFBakerMgr DirShadow
 int lightType[1];
-lightType[0] = -1;
+lightType[0] = 0;
 float3 lightPos[1];
 lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
@@ -668,6 +695,10 @@ inx = -4;
 else if (inx == 7 )
 {
 inx = -6;
+}
+else if (inx == 8 )
+{
+inx = -9;
 }
 //@@@
 //-------------------------------
@@ -834,8 +865,36 @@ if(inx == -8)
 		float3 grid = float3(30,20,30);
 		float3 center = GetGridCenter_DownMode(p,grid,float3(0,0,15));
 		float3 q = p - center-float3(0,0.3,0);
+		//if(traceInfo.lastTrace<1)
+		{
+		q.y += 0.1*fbm2(5*q);
+		}
+		float d = 0.5*SDFCircleSlice(q,2,0.02);
+		re = min(re,d);
+	}
+}
+if(inx == -9)
+{
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300 )
+	{
+		float3 grid = float3(30,20,30);
+		float3 center = GetGridCenter_DownMode(p,grid,float3(0,0,15));
+		float3 q = p - center;
 
-		float d = SDFCircleSlice(q,2,0.02);
+		float h = 8;
+		q = q - float3(0,h*0.5,0);
+		q.x += 0.8*fbm3(0.3*(p)) - 0.8;
+		float r = 0.6;
+		float y = q.y/(h*0.5);
+		y = 0.5*(y+1);
+		y = saturate(y);
+		//if(traceInfo.lastTrace<0.5)
+		{
+		r += 0.1*fbm3(float3(20,5,20)*q);
+		}
+		r*=pow(1-y,0.2);
+		float d = 0.5*SDFCircleSlice(q,r,h*0.5);
+
 		re = min(re,d);
 	}
 }
@@ -1443,6 +1502,10 @@ inx = -4;
 else if (inx == 7 )
 {
 inx = -6;
+}
+else if (inx == 8 )
+{
+inx = -9;
 }
 //@@@
 return inx;
