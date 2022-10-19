@@ -80,7 +80,7 @@ public class SDFBakerMgr : MonoBehaviour
             }
             else if (tag.shapeType == SDFShapeType.Normal)
             {
-                AddBake(tag.gameObject);
+                AddBake(tag);
             }
             else if (tag.shapeType == SDFShapeType.Slice)
             {
@@ -574,8 +574,9 @@ public class SDFBakerMgr : MonoBehaviour
         bakedSDFs.Add("re = min(re, d);");
     }
 
-    void AddBake(GameObject obj)
+    void AddBake(SDFBakerTag tag)
     {
+        var obj = tag.gameObject;
         var mf = obj.GetComponent<MeshFilter>();
         var mr = obj.GetComponent<MeshRenderer>();
         if(mf&&mr)
@@ -584,12 +585,12 @@ public class SDFBakerMgr : MonoBehaviour
             //Debug.Log(meshName);
             if(meshName == "Cube")
             {
-                AddBakeCube(obj);
+                AddBakeCube(tag);
                 return;
             }
             else if(meshName == "Sphere")
             {
-                AddBakeSphere(obj);
+                AddBakeSphere(tag);
                 return;
             }
         }
@@ -604,16 +605,34 @@ public class SDFBakerMgr : MonoBehaviour
         Debug.LogError("Nothing Baked!");
     }
 
-    void AddBakeCube(GameObject obj)
+    void AddBakeCube(SDFBakerTag tag)
     {
+        var obj = tag.gameObject;
         float offset = obj.GetComponent<SDFBakerTag>().SDF_offset;
         Vector3 bakeRot = obj.transform.rotation.eulerAngles;
         string center_str = Bake(obj.transform.position);
         string bound_str = Bake(obj.transform.lossyScale * 0.5f);
         string rot_str = Bake(bakeRot);
-        string line = offset + " + SDFBox(p, " + center_str + ", " + bound_str + ", " + rot_str + ")";
-        line = "re = min(re, " + line + ");";
-        bakedSDFs.Add(line);
+
+        var expression = obj.GetComponent<SDFBakerExpression>();
+
+        string line;
+        if (expression == null)
+        {
+            line = offset + " + SDFBox(p, " + center_str + ", " + bound_str + ", " + rot_str + ")";
+            line = "re = min(re, " + line + ");";
+            bakedSDFs.Add(line);
+        }
+        else
+        {
+            bakedSDFs.Add("float3 center = " + center_str + ";");
+            bakedSDFs.Add("float3 bound = " + bound_str + ";");
+            bakedSDFs.Add("float3 rot = " + rot_str + ";");
+            bakedSDFs.Add("float offset = " + offset + ";");
+            bakedSDFs.Add(expression.expressionStr);
+            bakedSDFs.Add("float d = offset + SDFBox(p,center,bound, rot);");
+            bakedSDFs.Add("re = min(re,d);");
+        }
 
         //Bake ObjUV
         //uv = BoxedUV(minHit.P, center, bound, rot);
@@ -631,13 +650,28 @@ public class SDFBakerMgr : MonoBehaviour
         SetTagMergeType(obj, SDFMergeType.Box);
     }
 
-    void AddBakeSphere(GameObject obj)
+    void AddBakeSphere(SDFBakerTag tag)
     {
+        var obj = tag.gameObject;
+        var expression = obj.GetComponent<SDFBakerExpression>();
         float offset = obj.GetComponent<SDFBakerTag>().SDF_offset;
         string center_str = Bake(obj.transform.position);
-        string line = offset + " + SDFSphere(p, " + center_str + ", " + obj.transform.localScale.x*0.5 + ")";
-        line = "re = min(re, " + line + ");";
-        bakedSDFs.Add(line);
+        if (expression == null)
+        {
+            string line = offset + " + SDFSphere(p, " + center_str + ", " + obj.transform.localScale.x * 0.5 + ")";
+            line = "re = min(re, " + line + ");";
+            bakedSDFs.Add(line);
+        }
+        else
+        {
+            //Debug.Log("expression baked!");
+            bakedSDFs.Add("float3 center = "+center_str+";");
+            bakedSDFs.Add("float r = " + obj.transform.localScale.x * 0.5 + ";");
+            bakedSDFs.Add("float offset = " + offset + ";");
+            bakedSDFs.Add(expression.expressionStr);
+            bakedSDFs.Add("float d = offset + SDFSphere(p,center,r);");
+            bakedSDFs.Add("re = min(re,d);");
+        }
     }
 
     void AddBakeQuadBezier(GameObject obj)

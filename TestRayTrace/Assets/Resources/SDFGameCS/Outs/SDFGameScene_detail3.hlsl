@@ -113,7 +113,7 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 1 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.03773582, 0.01787486, 0);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -121,7 +121,7 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 2 )
 {
-re.albedo = float3(0.03773582, 0.01787486, 0);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -129,27 +129,27 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 3 )
 {
-re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
-}
-else if (obj == 4 )
-{
 re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0.9;
 re.roughness = 0.1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0.05);
 }
-else if (obj == 5 )
+else if (obj == 4 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.3;
 re.reflective = 0;
 re.reflect_ST = float2(5, 0);
+}
+else if (obj == 5 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 6 )
 {
@@ -221,6 +221,9 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
+uv = BoxedUV(minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 1 )
 {
@@ -282,6 +285,8 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
+BoxedTB(T,B,minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
+return;
 }
 if(inx == 1 )
 {
@@ -321,19 +326,19 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==3)
+if(inx==2)
+{
+	float2 uv = GetObjUV(minHit);
+uv = float2(1, 1)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(woodTex, uv);
+}
+if(inx==4)
 {
 	float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
 	mat.albedo *= SampleRGB(woodTex, uv);
 }
 if(inx==5)
-{
-	float2 uv = GetObjUV(minHit);
-uv = float2(1, 1)*uv+float2(0, 0);
-	mat.albedo *= SampleRGB(woodTex, uv);
-}
-if(inx==6)
 {
 float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
@@ -696,31 +701,37 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFSphere(p, float3(1.624, 0.1471191, -1.283141), 0.5));
+float3 center = float3(1.624, 0.1471191, -1.283141);
+float3 bound = float3(0.5, 0.065, 0.5);
+float3 rot = float3(0, 0, 0);
+float offset = 0;
+center.y+=1;
+float d = offset + SDFBox(p,center,bound, rot);
+re = min(re,d);
 }
 else if (inx == 1 )
 {
-inx = -10;
+inx = -8;
 }
 else if (inx == 2 )
 {
-inx = -8;
+inx = -7;
 }
 else if (inx == 3 )
 {
-inx = -7;
+inx = -2;
 }
 else if (inx == 4 )
 {
-inx = -2;
+inx = -5;
 }
 else if (inx == 5 )
 {
-inx = -5;
+inx = -1;
 }
 else if (inx == 6 )
 {
-inx = -1;
+inx = -10;
 }
 else if (inx == 7 )
 {
@@ -1526,27 +1537,27 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
-inx = -10;
+inx = -8;
 }
 else if (inx == 2 )
 {
-inx = -8;
+inx = -7;
 }
 else if (inx == 3 )
 {
-inx = -7;
+inx = -2;
 }
 else if (inx == 4 )
 {
-inx = -2;
+inx = -5;
 }
 else if (inx == 5 )
 {
-inx = -5;
+inx = -1;
 }
 else if (inx == 6 )
 {
-inx = -1;
+inx = -10;
 }
 else if (inx == 7 )
 {
