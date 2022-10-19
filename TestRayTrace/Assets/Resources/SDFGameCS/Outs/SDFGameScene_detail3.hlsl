@@ -1,4 +1,4 @@
-﻿#define OBJNUM 9
+﻿#define OBJNUM 11
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -105,7 +105,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0.03773582, 0.01787486, 0);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -121,13 +121,29 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 2 )
 {
+re.albedo = float3(0.03773582, 0.01787486, 0);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 3 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 4 )
+{
 re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0.9;
 re.roughness = 0.1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0.05);
 }
-else if (obj == 3 )
+else if (obj == 5 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -135,25 +151,9 @@ re.roughness = 0.3;
 re.reflective = 0;
 re.reflect_ST = float2(5, 0);
 }
-else if (obj == 4 )
-{
-re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
-}
-else if (obj == 5 )
-{
-re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
-}
 else if (obj == 6 )
 {
-re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -161,13 +161,29 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 7 )
 {
-re.albedo = float3(0.5849056, 0.5552883, 0.4331613);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
 else if (obj == 8 )
+{
+re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 9 )
+{
+re.albedo = float3(0.5849056, 0.5552883, 0.4331613);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 10 )
 {
 re.albedo = float3(0.1509434, 0.07631969, 0);
 re.metallic = 0;
@@ -182,7 +198,7 @@ re.reflect_ST = float2(1, 0);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[9];
+int renderMode[11];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
@@ -192,6 +208,8 @@ renderMode[5] = 0;
 renderMode[6] = 0;
 renderMode[7] = 0;
 renderMode[8] = 0;
+renderMode[9] = 0;
+renderMode[10] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -226,6 +244,12 @@ else if (inx == 7 )
 {
 }
 else if (inx == 8 )
+{
+}
+else if (inx == 9 )
+{
+}
+else if (inx == 10 )
 {
 }
 	//@@@
@@ -283,6 +307,12 @@ if(inx == 7 )
 if(inx == 8 )
 {
 }
+if(inx == 9 )
+{
+}
+if(inx == 10 )
+{
+}
 //@@@
 basis_unstable(minHit.N, T, B);
 }
@@ -291,19 +321,19 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==1)
-{
-	float2 uv = GetObjUV(minHit);
-uv = float2(1, 1)*uv+float2(0, 0);
-	mat.albedo *= SampleRGB(woodTex, uv);
-}
 if(inx==3)
 {
 	float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
 	mat.albedo *= SampleRGB(woodTex, uv);
 }
-if(inx==4)
+if(inx==5)
+{
+	float2 uv = GetObjUV(minHit);
+uv = float2(1, 1)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(woodTex, uv);
+}
+if(inx==6)
 {
 float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
@@ -592,7 +622,7 @@ if(true)
 {
 //@@@SDFBakerMgr DirShadow
 int lightType[1];
-lightType[0] = 0;
+lightType[0] = -1;
 float3 lightPos[1];
 lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
@@ -666,37 +696,45 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -8;
+re = min(re, 0 + SDFSphere(p, float3(1.624, 0.1471191, -1.283141), 0.5));
 }
 else if (inx == 1 )
 {
-inx = -7;
+inx = -10;
 }
 else if (inx == 2 )
 {
-inx = -2;
+inx = -8;
 }
 else if (inx == 3 )
 {
-inx = -5;
+inx = -7;
 }
 else if (inx == 4 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 5 )
 {
-inx = -3;
+inx = -5;
 }
 else if (inx == 6 )
 {
-inx = -4;
+inx = -1;
 }
 else if (inx == 7 )
 {
-inx = -6;
+inx = -3;
 }
 else if (inx == 8 )
+{
+inx = -4;
+}
+else if (inx == 9 )
+{
+inx = -6;
+}
+else if (inx == 10 )
 {
 inx = -9;
 }
@@ -897,6 +935,18 @@ if(inx == -9)
 
 		re = min(re,d);
 	}
+}
+if(inx == -10)
+{
+	float3 center = 0;
+	float anim = frac(_Time.y);
+	int f = floor(_Time.y);
+	f = f%4;
+	anim = f==0 ? anim : (f==1?1:(f==2 ? 1-anim : 0));
+	center.y = 2*anim;
+	float r = 1;
+	float d = SDFSphere(p,center,r);
+	re = min(re,d);
 }
 //-------------------------------
 //'unbias' stair near each other, cost too heavy
@@ -1473,37 +1523,44 @@ int GetSpecialID(int inx)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -8;
 }
 else if (inx == 1 )
 {
-inx = -7;
+inx = -10;
 }
 else if (inx == 2 )
 {
-inx = -2;
+inx = -8;
 }
 else if (inx == 3 )
 {
-inx = -5;
+inx = -7;
 }
 else if (inx == 4 )
 {
-inx = -1;
+inx = -2;
 }
 else if (inx == 5 )
 {
-inx = -3;
+inx = -5;
 }
 else if (inx == 6 )
 {
-inx = -4;
+inx = -1;
 }
 else if (inx == 7 )
 {
-inx = -6;
+inx = -3;
 }
 else if (inx == 8 )
+{
+inx = -4;
+}
+else if (inx == 9 )
+{
+inx = -6;
+}
+else if (inx == 10 )
 {
 inx = -9;
 }
