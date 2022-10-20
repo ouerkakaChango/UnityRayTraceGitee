@@ -169,7 +169,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
-  mergeType: 0
+  mergeType: 1
   objInx: 0
   needExtraCondition: 0
   extraCondition: 
@@ -248,7 +248,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d5fb7499814c5540afc2e246b52b52c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  expressionStr: center.y+=1;
+  expressionStr: 'center.y+=1;
+
+    float3 rotCenter = center.x-bound.x;
+
+    p =InvRotCenterByEuler(p,rotCenter,
+    float3(0,0,30*frac(_Time.y))); '
 --- !u!1 &338121909
 GameObject:
   m_ObjectHideFlags: 0

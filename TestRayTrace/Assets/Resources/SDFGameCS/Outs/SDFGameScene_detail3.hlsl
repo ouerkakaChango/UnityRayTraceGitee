@@ -706,6 +706,8 @@ float3 bound = float3(0.5, 0.065, 0.5);
 float3 rot = float3(0, 0, 0);
 float offset = 0;
 center.y+=1;
+float3 rotCenter = center.x-bound.x;
+p =InvRotCenterByEuler(p,rotCenter, float3(0,0,30*frac(_Time.y)));
 float d = offset + SDFBox(p,center,bound, rot);
 re = min(re,d);
 }

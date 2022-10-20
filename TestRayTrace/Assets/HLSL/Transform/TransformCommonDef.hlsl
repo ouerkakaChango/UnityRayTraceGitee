@@ -34,6 +34,13 @@ float3 InvRotByEuler(float3 p, float3 eulerAngle)
 	return p;
 }
 
+float3 InvRotCenterByEuler(float3 p, float3 rotCenter, float3 rotEuler)
+{
+	float3 locP = p - rotCenter;
+	locP = InvRotByEuler(locP, rotEuler);
+	return locP + rotCenter;
+}
+
 float3 RotByEuler(float3 p, float3 eulerAngle)
 {
 	float a = eulerAngle.x / 180.0f * PI;

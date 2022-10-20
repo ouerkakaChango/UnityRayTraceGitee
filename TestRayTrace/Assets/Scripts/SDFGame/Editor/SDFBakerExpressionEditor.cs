@@ -25,7 +25,11 @@ public class SDFBakerExpressionEditor : Editor
         //}
         var expression = serializedObject.FindProperty("expressionStr");
         GUILayout.Label("Expression");
-        expression.stringValue = GUILayout.TextArea(expression.stringValue);
+        var newStr = GUILayout.TextArea(expression.stringValue);
+        if(newStr!=expression.stringValue)
+        {
+            expression.stringValue = newStr;
+        }
         if (EditorGUI.EndChangeCheck())
         {
             serializedObject.ApplyModifiedProperties();
