@@ -352,20 +352,24 @@ if(inx == -3)
 }
 if(inx == -4)
 {
-	float d = re;
-	float3 bound = 0.5;
-	float3 center = 0;
-	if(gtor(abs(p),bound))
-	{
-		//not hit,than the sdf is sdfBox
-		d = SDFBox(p,center,bound)+ TraceThre*2;
-	}
-	else
-	{
-		float d1 = SphereTex3D.SampleLevel(common_linear_clamp_sampler, p+0.5, 0).r;
-		d = d1+0.00*fbm4(5*p+_Time.y);//SDFSphere(p,center,0.25);
-	}
-	re = min(re,d);
+	float3 bound = 2;
+	float3 center = float3(1,0,0);
+	//float d = re;
+
+	//float3 q = p-center;
+	//if(gtor(abs(q),bound))
+	//{
+	//	//not hit,than the sdf is sdfBox
+	//	d = SDFBox(q,0,bound)+ TraceThre*2;
+	//}
+	//else
+	//{
+	//	float d1 = SphereTex3D.SampleLevel(common_linear_clamp_sampler, q+0.5, 0).r;
+	//	d = d1+0.05*fbm4(5*q+_Time.y);
+	//}
+	//re = min(re,d);
+	float offset = 0.05*fbm4(5*p+_Time.y);
+	re = SDFTex3D(p,center,bound,SphereTex3D,TraceThre,offset);
 }
 
 return re;
@@ -404,8 +408,13 @@ inx = -4;
 if(inx == -4)
 {
 //return GetObjSDFNormal(inx, p, traceInfo,100);
-float3 norm = SphereNorm3D.SampleLevel(common_linear_clamp_sampler, p+0.5, 0).rgb;
-return norm;
+float3 bound = 2;
+float3 center = float3(1,0,0);
+
+//float3 q = p - center;
+//q/=bound;
+//float3 norm = SphereNorm3D.SampleLevel(common_linear_clamp_sampler, q+0.5, 0).rgb;
+return SDFTexNorm3D(p, center, bound, SphereNorm3D);
 }
 return GetObjSDFNormal(inx, p, traceInfo);
 }

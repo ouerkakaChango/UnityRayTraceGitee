@@ -301,6 +301,30 @@ float SDFCircleSlice(float3 q, float r, float hBound)
 	return SDFCylinder(q, a, b, r);
 }
 
+float SDFTex3D(float3 p, float3 center, float3 bound, Texture3D<float> SDFTex3D, float traceThre, float offset = 0)
+{
+	float3 q = p - center;
+	q /= bound;
+	float d = MAXFLOAT;
+	if (gtor(abs(q), bound))
+	{
+		//not hit,than the sdf is sdfBox
+		d = SDFBox(q, 0, bound) + traceThre * 2;
+	}
+	else
+	{
+		d = offset + SDFTex3D.SampleLevel(common_linear_clamp_sampler, q + 0.5, 0).r;
+	}
+	return d;
+}
+
+float3 SDFTexNorm3D(float3 p, float3 center, float3 bound, Texture3D<float3> SDFNorm3D)
+{
+	float3 q = p - center;
+	q /= bound;
+	return SDFNorm3D.SampleLevel(common_linear_clamp_sampler, q + 0.5, 0).rgb;
+}
+
 //---Grid-------------------------------------------------------
 float3 GetGridCenter_DownMode(float3 p, float3 grid, float3 offset = 0)
 {
