@@ -117,6 +117,11 @@ bool gtor(float2 a, float2 b)
 	return a.x > b.x || a.y > b.y;
 }
 
+bool gtor(float3 a, float3 b)
+{
+	return a.x > b.x || a.y > b.y || a.z > b.z;
+}
+
 bool gt(float3 a, float3 b)
 {
 	return a.x > b.x && a.y > b.y && a.z > b.z;
@@ -246,9 +251,10 @@ float Time01(float frequency=1.0f,float phi = 0.0f)
 
 SamplerState common_point_repeat_sampler;
 SamplerState common_linear_repeat_sampler;
+SamplerState common_trilinear_repeat_sampler;
 SamplerState common_point_clamp_sampler;
 SamplerState common_linear_clamp_sampler;
-SamplerState common_trilinear_repeat_sampler;
+SamplerState common_trilinear_clamp_sampler;
 
 float2 GetUV(RWTexture2D<float4> dst, uint3 id)
 {

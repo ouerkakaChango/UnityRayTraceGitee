@@ -175,7 +175,7 @@ public class TextureSystem : MonoBehaviour
         for (int i=0;i<outTextures.Count;i++)
         {
             string line = "";
-            string prefix = GetPrefex(outTextures[i]);
+            string prefix = GetPrefix(outTextures[i]);
             line = prefix + " " + outTextures[i].name+";";
             bakedDeclares.Add(line);
         }
@@ -189,11 +189,16 @@ public class TextureSystem : MonoBehaviour
         }
     }
 
-    string GetPrefex(NamedTexture namedTexture)
+    string GetPrefix(NamedTexture namedTexture)
     {
         if((namedTexture.tex).GetType() == typeof(Texture2DArray))
         {
             return "Texture2DArray";
+        }
+        else if((namedTexture.tex).GetType() == typeof(Texture3D))
+        {
+            //Debug.Log("3D Tex!");
+            return GetTexture3DPrefix(namedTexture);
         }
 
         var channel = namedTexture.channel;
@@ -215,8 +220,34 @@ public class TextureSystem : MonoBehaviour
         }
         else
         {
-            Debug.Log(namedTexture.name + " channel " + channel + " not handled prefix,turn to defalt \'Texture<float4>\'");
+            Debug.Log(namedTexture.name + " channel " + channel + " not handled prefix,turn to defalt \'Texture2D<float4>\'");
             return "Texture2D<float4>";
+        }
+    }
+
+    string GetTexture3DPrefix(NamedTexture namedTexture)
+    {
+        var channel = namedTexture.channel;
+        if (channel == ColorChannel.RGBA)
+        {
+            return "Texture3D<float4>";
+        }
+        else if (channel == ColorChannel.RGB)
+        {
+            return "Texture3D<float3>";
+        }
+        else if (channel == ColorChannel.RG)
+        {
+            return "Texture3D<float2>";
+        }
+        else if (channel == ColorChannel.R)
+        {
+            return "Texture3D<float>";
+        }
+        else
+        {
+            Debug.Log(namedTexture.name + " channel " + channel + " not handled prefix,turn to defalt \'Texture3D<float4>\'");
+            return "Texture3D<float4>";
         }
     }
 

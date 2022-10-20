@@ -16,6 +16,11 @@ public class GameSceneSystem : MonoBehaviour
             return;
         }
         var keyboard = trace.gameObject.GetComponent<KeyboardInputer>();
+        if(keyboard == null && startActions.Count>0)
+        {
+            Debug.LogError("Need Keyboard Inputer!!!");
+            return;
+        }
         for (int i = 0; i < startActions.Count; i++)
         {
             var action = startActions[i];

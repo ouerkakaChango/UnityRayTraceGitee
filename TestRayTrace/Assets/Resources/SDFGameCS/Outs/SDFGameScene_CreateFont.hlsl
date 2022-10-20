@@ -31,6 +31,7 @@
 //SamplerState sdf_linear_repeat_sampler;
 //@@@SDFBakerMgr TexSys
 Texture2D<float> C_SDFTex;
+Texture3D<float> SphereTex3D;
 //@@@
 
 Material_PBR GetObjMaterial_PBR(int obj)
@@ -48,24 +49,32 @@ if(obj == 0 )
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 1 )
 {
 re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 2 )
-{
-re.albedo = float3(0.6037736, 0.6037736, 0.6037736);
-re.metallic = 0;
-re.roughness = 1;
-}
-else if (obj == 3 )
 {
 re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 3 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 	//@@@
 	return re;
@@ -77,7 +86,7 @@ int GetObjRenderMode(int obj)
 int renderMode[4];
 renderMode[0] = 0;
 renderMode[1] = 0;
-renderMode[2] = 4;
+renderMode[2] = 0;
 renderMode[3] = 0;
 return renderMode[obj];
 //@@@
@@ -95,10 +104,10 @@ else if (inx == 1 )
 }
 else if (inx == 2 )
 {
-inx = -1;
 }
 else if (inx == 3 )
 {
+inx = -4;
 }
 //@@@
 if(inx == -1)
@@ -114,8 +123,8 @@ if(inx == -1)
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
-result = result / (result + 1.0);
-result = pow(result, 1/2.2);
+//result = result / (result + 1.0);
+//result = pow(result, 1/2.2);
 }
 
 float3 RenderSceneObj(Texture2DArray envSpecTex2DArr, Ray ray, HitInfo minHit)
@@ -210,7 +219,7 @@ return sha;
 
 float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 {
-float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
+float re = MaxSDF; //Make sure default is an invalid SDF
 
 //if(inx == 3)
 //{
@@ -268,11 +277,11 @@ re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.05, 0.05, 0.05), float3(0, 
 }
 else if (inx == 2 )
 {
-inx = -1;
+re = min(re, 0 + SDFBox(p, float3(1, 0, 1), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(1, 0, 1), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
+inx = -4;
 }
 //@@@
 if(inx == -1)
@@ -324,6 +333,23 @@ if(inx == -3)
 	//}
 	//re = min(re,d);
 }
+if(inx == -4)
+{
+	float d = re;
+	float3 bound = 0.5;
+	float3 center = 0;
+	if(gtor(abs(p),bound))
+	{
+		//not hit,than the sdf is sdfBox
+		d = SDFBox(p,center,bound)+ TraceThre*2;
+	}
+	else
+	{
+		float d1 = SphereTex3D.SampleLevel(common_trilinear_clamp_sampler, p+0.5, 0).r;
+		d = d1+0.05*fbm4(5*p+_Time.y);//SDFSphere(p,center,0.25);
+	}
+	re = min(re,d);
+}
 
 return re;
 }
@@ -349,13 +375,16 @@ else if (inx == 1 )
 }
 else if (inx == 2 )
 {
-inx = -1;
 }
 else if (inx == 3 )
 {
+inx = -4;
 }
 //@@@
-
+if(inx == -4)
+{
+return GetObjSDFNormal(inx, p, traceInfo,100);
+}
 return GetObjSDFNormal(inx, p, traceInfo);
 }
 
