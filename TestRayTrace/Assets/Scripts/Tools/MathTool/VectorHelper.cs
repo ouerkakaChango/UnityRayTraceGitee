@@ -7,6 +7,15 @@ namespace MathHelper
 {
     public static class Vec
     {
+        public static Vector2 xy(this Vector3 v)
+        {
+            return new Vector2(v.x, v.y);
+        }
+
+        public static Vector2 yx(this Color v)
+        {
+            return new Vector2(v.g, v.r);
+        }
 
         public static Vector3 Divide(in Vector3 v1, in Vector3 v2)
         {

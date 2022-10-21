@@ -1,4 +1,4 @@
-﻿#define OBJNUM 2
+﻿#define OBJNUM 3
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -30,9 +30,15 @@
 //Texture2D<float4> SphereSDFTex;
 //SamplerState sdf_linear_repeat_sampler;
 //@@@SDFBakerMgr TexSys
+Texture3D<float> fbm4_3D;
 Texture3D<float> HalfSphereTex3D;
 Texture3D<float3> HalfSphereNorm3D;
 //@@@
+
+float fbm4_v2(float3 p)
+{
+	return fbm4_3D.SampleLevel(common_linear_repeat_sampler, p, 0).r;
+}
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {
@@ -46,7 +52,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -60,6 +66,14 @@ re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
+else if (obj == 2 )
+{
+re.albedo = float3(1, 0, 0);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
 	//@@@
 	return re;
 }
@@ -67,9 +81,10 @@ re.reflect_ST = float2(1, 0);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[2];
+int renderMode[3];
 renderMode[0] = 0;
 renderMode[1] = 0;
+renderMode[2] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -82,6 +97,10 @@ if(inx == 0 )
 {
 }
 else if (inx == 1 )
+{
+inx = -5;
+}
+else if (inx == 2 )
 {
 }
 //@@@
@@ -216,11 +235,15 @@ float re = MaxSDF; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = SDFTex3D(p, float3(0.905, 0.166, 0), float3(0.25, 0.25, 0.25), HalfSphereTex3D, TraceThre);
+re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = SDFTex3D(p, float3(0, 0, 0), float3(0.25, 0.25, 0.25), HalfSphereTex3D, TraceThre);
+inx = -5;
+}
+else if (inx == 2 )
+{
+re = min(re, 0 + SDFBox(p, float3(1, 0, 1), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
 }
 //@@@
 if(inx == -1)
@@ -280,6 +303,18 @@ if(inx == -3)
 //	float offset = 0.05*fbm4(5*p+_Time.y);
 //	re = SDFTex3D(p,center,bound,SphereTex3D,TraceThre,offset);
 //}
+if(inx == -5)
+{
+	float r = 0.5;
+	float3 center = float3(0,0,0);
+	r += 0.05*fbm4(5*p+1*_Time.y);
+	//if(IsInBBox(p,-0.5,0.5))
+	//{
+	//	float h = 0.05*fbm4_v2(p+0.1*_Time.y);
+	//	r += h;
+	//}
+	re = 0.5*SDFSphere(p,center,r);
+}
 
 return re;
 }
@@ -299,11 +334,12 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 //@@@SDFBakerMgr ObjNormal
 if(inx == 0 )
 {
-return SDFTexNorm3D(p, float3(0.905, 0.166, 0), float3(0.25, 0.25, 0.25), HalfSphereNorm3D);
 }
 else if (inx == 1 )
 {
-return SDFTexNorm3D(p, float3(0, 0, 0), float3(0.25, 0.25, 0.25), HalfSphereNorm3D);
+}
+else if (inx == 2 )
+{
 }
 //@@@
 
@@ -312,6 +348,10 @@ if(inx == 0 )
 {
 }
 else if (inx == 1 )
+{
+inx = -5;
+}
+else if (inx == 2 )
 {
 }
 //@@@

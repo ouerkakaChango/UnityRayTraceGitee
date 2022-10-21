@@ -148,6 +148,21 @@ namespace MathHelper
             return Mathf.Floor(x);
         }
 
+        public static Vector3 floor(Vector3 v)
+        {
+            return new Vector3(floor(v.x), floor(v.y), floor(v.z));
+        }
+
+        public static float frac(float x)
+        {
+            return x - floor(x);
+        }
+
+        public static Vector3 frac(Vector3 v)
+        {
+            return v - floor(v);
+        }
+
         public static float clamp(float x, float min, float max)
         {
             if (x < min)
