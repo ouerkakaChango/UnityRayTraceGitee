@@ -53,6 +53,11 @@ public class SDFBakerTagEditor : Editor
             SerializedProperty SDF_offset2D = serializedObject.FindProperty("SDF_offset2D");
             EditorGUILayout.PropertyField(SDF_offset2D, new GUIContent("SDF_offset2D"), true);
         }
+        else if(type == SDFShapeType.Tex3D)
+        {
+            SerializedProperty tex3DTag = serializedObject.FindProperty("tex3DTag");
+            EditorGUILayout.PropertyField(tex3DTag, new GUIContent("tex3DTag"), true);
+        }
 
         showMergeTag = EditorGUILayout.Foldout(showMergeTag, "Merge");
         if (showMergeTag)

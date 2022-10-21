@@ -13,6 +13,8 @@ public class SDFBakerMgr : MonoBehaviour
     [HideInInspector]
     public List<string> bakedSDFs = new List<string>();
     [HideInInspector]
+    public List<string> bakedObjNormals = new List<string>();
+    [HideInInspector]
     public List<string> bakedObjUVs = new List<string>();
     [HideInInspector]
     public List<string> bakedObjTBs = new List<string>();
@@ -86,6 +88,10 @@ public class SDFBakerMgr : MonoBehaviour
             {
                 AddBakeSlice(tag);
             }
+            else if (tag.shapeType == SDFShapeType.Tex3D)
+            {
+                AddBakeTex3D(tag);
+            }
 
             AddBakeMaterial(tag);
             AddBakeRenderMode(i, tag);
@@ -102,6 +108,7 @@ public class SDFBakerMgr : MonoBehaviour
     void DoPreAddAction(int i,SDFBakerTag tag)
     {
         PreAddSDF(i, ref bakedSDFs, tag);
+        PreAdd(i, ref bakedObjNormals);
         PreAdd(i, ref bakedObjUVs);
         PreAdd(i, ref bakedObjTBs,"inx",true);
         PreAdd(i, ref bakedSpecialObjects);
@@ -112,6 +119,7 @@ public class SDFBakerMgr : MonoBehaviour
     void DoPostAddAction(int i)
     {
         PostAdd(i, ref bakedSDFs);
+        PostAdd(i, ref bakedObjNormals);
         PostAdd(i, ref bakedObjUVs);
         PostAdd(i, ref bakedObjTBs);
         PostAdd(i, ref bakedSpecialObjects);
@@ -164,6 +172,7 @@ public class SDFBakerMgr : MonoBehaviour
     {
         bakedBeforeSDF.Clear();
         bakedSDFs.Clear();
+        bakedObjNormals.Clear();
         bakedObjUVs.Clear();
         bakedObjTBs.Clear();
 
@@ -572,6 +581,45 @@ public class SDFBakerMgr : MonoBehaviour
         bakedSDFs.Add("    d += "+tag.SDF_offset+";");
         bakedSDFs.Add("}");
         bakedSDFs.Add("re = min(re, d);");
+    }
+
+    void AddBakeTex3D(SDFBakerTag tag)
+    {
+        //float3 bound = 2;
+        //float3 center = float3(1, 0, 0);
+        //float offset = 0.05 * fbm4(5 * p + _Time.y);
+        //re = SDFTex3D(p, center, bound, SphereTex3D, TraceThre, offset);
+
+        var obj = tag.gameObject;
+        //Vector3 bound = obj.transform.lossyScale * 0.5f;
+        //Vector3 center = obj.transform.position;
+        string centerStr = Bake(obj.transform.position);
+        string boundStr = Bake(obj.transform.lossyScale * 0.5f);
+        var textag = tag.tex3DTag;
+        if(textag==null)
+        {
+            Debug.LogError(obj + " not having tex sys tag");
+            return;
+        }
+        if(textag.plainTextures.Count<1)
+        {
+            Debug.LogError(obj + " texTag at least need 1 plainTex for SDF!!!");
+            return;
+        }
+
+        //---Shape
+        string texName = textag.plainTextures[0].name;
+        bakedSDFs.Add("re = SDFTex3D(p, "+centerStr+", "+ boundStr + ", "+texName+", TraceThre);");
+        //___Shape
+
+        //---Normal
+        //return SDFTexNorm3D(p, center, bound, SphereNorm3D);
+        if (textag.plainTextures.Count >= 2)
+        {
+            string normTexName = textag.plainTextures[1].name;
+            bakedObjNormals.Add("return SDFTexNorm3D(p, "+centerStr+", "+ boundStr + ", "+normTexName+");");
+        }
+        //___Normal
     }
 
     void AddBake(SDFBakerTag tag)

@@ -304,7 +304,6 @@ float SDFCircleSlice(float3 q, float r, float hBound)
 float SDFTex3D(float3 p, float3 center, float3 bound, Texture3D<float> SDFTex3D, float traceThre, float offset = 0)
 {
 	float3 q = p - center;
-	q /= bound;
 	float d = MAXFLOAT;
 	if (gtor(abs(q), bound))
 	{
@@ -313,7 +312,13 @@ float SDFTex3D(float3 p, float3 center, float3 bound, Texture3D<float> SDFTex3D,
 	}
 	else
 	{
-		d = offset + SDFTex3D.SampleLevel(common_linear_clamp_sampler, q + 0.5, 0).r;
+		//!Take scale.x to restore actual sdf
+		float scale = bound.x / 0.5;
+		//normalize to [0-1]
+		q = q/ scale +0.5;
+		d = offset + SDFTex3D.SampleLevel(common_linear_clamp_sampler, q, 0).r;
+		//restore sdf
+		d *= scale;
 	}
 	return d;
 }
@@ -321,7 +326,11 @@ float SDFTex3D(float3 p, float3 center, float3 bound, Texture3D<float> SDFTex3D,
 float3 SDFTexNorm3D(float3 p, float3 center, float3 bound, Texture3D<float3> SDFNorm3D)
 {
 	float3 q = p - center;
-	q /= bound;
+	if (gtor(abs(q), bound))
+	{
+		return 0;
+	}
+	q /= (bound.x/0.5);
 	return SDFNorm3D.SampleLevel(common_linear_clamp_sampler, q + 0.5, 0).rgb;
 }
 

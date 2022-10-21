@@ -1,4 +1,4 @@
-﻿#define OBJNUM 5
+﻿#define OBJNUM 2
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -30,9 +30,8 @@
 //Texture2D<float4> SphereSDFTex;
 //SamplerState sdf_linear_repeat_sampler;
 //@@@SDFBakerMgr TexSys
-Texture2D<float> C_SDFTex;
-Texture3D<float> SphereTex3D;
-Texture3D<float3> SphereNorm3D;
+Texture3D<float> HalfSphereTex3D;
+Texture3D<float3> HalfSphereNorm3D;
 //@@@
 
 Material_PBR GetObjMaterial_PBR(int obj)
@@ -47,37 +46,13 @@ Material_PBR GetObjMaterial_PBR(int obj)
 	//@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 0, 0);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
 else if (obj == 1 )
-{
-re.albedo = float3(0, 0, 0);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
-}
-else if (obj == 2 )
-{
-re.albedo = float3(1, 0, 0);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
-}
-else if (obj == 3 )
-{
-re.albedo = float3(1, 0, 0);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
-}
-else if (obj == 4 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -92,12 +67,9 @@ re.reflect_ST = float2(1, 0);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[5];
+int renderMode[2];
 renderMode[0] = 0;
 renderMode[1] = 0;
-renderMode[2] = 0;
-renderMode[3] = 0;
-renderMode[4] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -111,16 +83,6 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
-}
-else if (inx == 2 )
-{
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
-inx = -4;
 }
 //@@@
 if(inx == -1)
@@ -254,51 +216,11 @@ float re = MaxSDF; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFSphere(p, float3(-1.769, 0, 0), 0.5));
+re = SDFTex3D(p, float3(0.905, 0.166, 0), float3(0.25, 0.25, 0.25), HalfSphereTex3D, TraceThre);
 }
 else if (inx == 1 )
 {
-float3 localp = WorldToLocal(p, float3(0.5, 0, 0.5), float3(0, 0, 0), float3(0.9, 0.9, 0.9));
-float dh = abs(localp.y) - 0.05;
-dh = dh > 0 ? dh : 0;
-dh *= 0.9;
-
-float d = re;
-float d2d = re;
-float2 picBound = float2(0.5, 0.5) * 0.9;
-float2 p2d = localp.xz * 0.9;
-if (gtor(abs(p2d), picBound))
-{
-d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;
-d = sqrt(d2d * d2d + dh * dh);
-}
-else
-{
-float2 uv = p2d / picBound;
-uv = (uv + 1) * 0.5;
-uint2 picSize = GetSize(C_SDFTex);
-float sdfFromPic = C_SDFTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
-sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 0.9;
-sdfFromPic *= picBound.x;
-d2d = sdfFromPic;
-d2d += 0;
-d2d = max(d2d,0);
-d = sqrt(d2d * d2d + dh * dh);
-d += 0;
-}
-re = min(re, d);
-}
-else if (inx == 2 )
-{
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
-}
-else if (inx == 3 )
-{
-re = min(re, 0 + SDFBox(p, float3(1, 0, 1), float3(0.05, 0.05, 0.05), float3(0, 0, 0)));
-}
-else if (inx == 4 )
-{
-inx = -4;
+re = SDFTex3D(p, float3(0, 0, 0), float3(0.25, 0.25, 0.25), HalfSphereTex3D, TraceThre);
 }
 //@@@
 if(inx == -1)
@@ -350,27 +272,14 @@ if(inx == -3)
 	//}
 	//re = min(re,d);
 }
-if(inx == -4)
-{
-	float3 bound = 2;
-	float3 center = float3(1,0,0);
-	//float d = re;
-
-	//float3 q = p-center;
-	//if(gtor(abs(q),bound))
-	//{
-	//	//not hit,than the sdf is sdfBox
-	//	d = SDFBox(q,0,bound)+ TraceThre*2;
-	//}
-	//else
-	//{
-	//	float d1 = SphereTex3D.SampleLevel(common_linear_clamp_sampler, q+0.5, 0).r;
-	//	d = d1+0.05*fbm4(5*q+_Time.y);
-	//}
-	//re = min(re,d);
-	float offset = 0.05*fbm4(5*p+_Time.y);
-	re = SDFTex3D(p,center,bound,SphereTex3D,TraceThre,offset);
-}
+//if(inx == -4)
+//{
+//	float3 bound = 1;
+//	float3 center = float3(1,0,0);
+//
+//	float offset = 0.05*fbm4(5*p+_Time.y);
+//	re = SDFTex3D(p,center,bound,SphereTex3D,TraceThre,offset);
+//}
 
 return re;
 }
@@ -387,6 +296,17 @@ float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonS
 
 float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 {
+//@@@SDFBakerMgr ObjNormal
+if(inx == 0 )
+{
+return SDFTexNorm3D(p, float3(0.905, 0.166, 0), float3(0.25, 0.25, 0.25), HalfSphereNorm3D);
+}
+else if (inx == 1 )
+{
+return SDFTexNorm3D(p, float3(0, 0, 0), float3(0.25, 0.25, 0.25), HalfSphereNorm3D);
+}
+//@@@
+
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
@@ -394,28 +314,16 @@ if(inx == 0 )
 else if (inx == 1 )
 {
 }
-else if (inx == 2 )
-{
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
-inx = -4;
-}
 //@@@
-if(inx == -4)
-{
-//return GetObjSDFNormal(inx, p, traceInfo,100);
-float3 bound = 2;
-float3 center = float3(1,0,0);
-
-//float3 q = p - center;
-//q/=bound;
-//float3 norm = SphereNorm3D.SampleLevel(common_linear_clamp_sampler, q+0.5, 0).rgb;
-return SDFTexNorm3D(p, center, bound, SphereNorm3D);
-}
+//if(inx == -4)
+//{
+//	{//expensive,because sdf sample 3d texture,rather sample once baked norm --xc
+//		//return GetObjSDFNormal(inx, p, traceInfo,100);
+//	}
+//float3 bound = 1;
+//float3 center = float3(1,0,0);
+//return SDFTexNorm3D(p, center, bound, SphereNorm3D);
+//}
 return GetObjSDFNormal(inx, p, traceInfo);
 }
 
