@@ -221,10 +221,10 @@ public class SDFBakerMgr : MonoBehaviour
     //    lightDirs[1] = normalize(minHit.P - pntlightPos[x]);
     //    lightColors[1] = pntlightColor[x] * GetPntLightAttenuation(minHit.P,pntlightPos[x]);
 
-    //    result = 0.03 * mat.albedo* mat.ao;
+    //    result.rgb = 0.03 * mat.albedo* mat.ao;
     //  for(int i=0;i<1;i++)
     //  {
-    //      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+    //      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
     //}
     //}
 
@@ -266,10 +266,10 @@ public class SDFBakerMgr : MonoBehaviour
             }
         }
         //###
-        bakedRenders.Add("  result = " + ambientIntensity + " * mat.albedo * mat.ao;");
+        bakedRenders.Add("  result.rgb = " + ambientIntensity + " * mat.albedo * mat.ao;");
         bakedRenders.Add("  for(int i=0;i<" + lightNum + ";i++)");
         bakedRenders.Add("  {");
-        bakedRenders.Add("      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);");
+        bakedRenders.Add("      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);");
         bakedRenders.Add("  }");
         bakedRenders.Add("}");
     }
