@@ -156,7 +156,7 @@ public class UVTrace : MonoBehaviour
         //####
         //System Value
         cs.SetVector("_Time", Shader.GetGlobalVector("_Time"));
-        cs.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
+        cs.SetTexture(kInx, "shiftNoiseTex", ShaderToyTool.Instance.shiftNoiseTex);
         cs.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
         //####
 

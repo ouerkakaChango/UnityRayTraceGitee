@@ -335,7 +335,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         computeShader.SetFloat("daoScale", daoScale);
         computeShader.SetVector("_Time", Shader.GetGlobalVector("_Time"));
         //??? 写成for循环
-        computeShader.SetTexture(kInx, "NoiseRGBTex", ShaderToyTool.Instance.noiseRGB);
+        computeShader.SetTexture(kInx, "shiftNoiseTex", ShaderToyTool.Instance.shiftNoiseTex);
         computeShader.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
         computeShader.SetTexture(kInx, "perlinNoise1", ShaderToyTool.Instance.perlinNoise1);
         computeShader.SetTexture(kInx, "voronoiNoise1", ShaderToyTool.Instance.voronoiNoise1);

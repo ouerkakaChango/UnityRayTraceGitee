@@ -87,10 +87,10 @@ if(mode==0)
   float3 lightColors[1];
   lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
   lightColors[0] = float3(1, 0.9568627, 0.8392157);
-  result = 0.03 * mat.albedo * mat.ao;
+  result.rgb = 0.03 * mat.albedo * mat.ao;
   for(int i=0;i<1;i++)
   {
-      result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
   }
 }
 //@@@
