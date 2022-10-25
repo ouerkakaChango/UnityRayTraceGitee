@@ -246,6 +246,8 @@ MonoBehaviour:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 1
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 3
   shapeType: 0
@@ -254,6 +256,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
   objInx: 0
   needExtraCondition: 0
@@ -415,6 +418,8 @@ MonoBehaviour:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 4
   shapeType: 0
@@ -423,6 +428,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 1
   objInx: 0
   needExtraCondition: 0
@@ -753,6 +759,8 @@ MonoBehaviour:
     albedo: {r: 0, g: 0, b: 0, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 3
@@ -761,6 +769,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 446652356}
   hBound: 0.03
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
   objInx: 1
   needExtraCondition: 0
@@ -865,6 +874,8 @@ MonoBehaviour:
     albedo: {r: 1, g: 0, b: 0, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
@@ -873,6 +884,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 1
   objInx: 2
   needExtraCondition: 0
@@ -991,6 +1003,8 @@ MonoBehaviour:
     albedo: {r: 0.7254902, g: 0.47843137, b: 0.34117648, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 1
@@ -999,6 +1013,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
   objInx: 3
   needExtraCondition: 0
@@ -1116,6 +1131,8 @@ MonoBehaviour:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 4
   shapeType: 0
@@ -1124,6 +1141,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 1
   objInx: 4
   needExtraCondition: 0
@@ -1407,6 +1425,8 @@ MonoBehaviour:
     albedo: {r: 0, g: 0.14847445, b: 1, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 3
@@ -1415,6 +1435,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 764754548}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
   objInx: 3
   needExtraCondition: 0
@@ -1490,6 +1511,8 @@ MonoBehaviour:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 4
   shapeType: 0
@@ -1498,6 +1521,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 1
   objInx: 5
   needExtraCondition: 0
@@ -1635,6 +1659,8 @@ MonoBehaviour:
     albedo: {r: 0, g: 0.14847445, b: 1, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 3
@@ -1643,6 +1669,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: -0.02
+  tex3DTag: {fileID: 0}
   mergeType: 0
   objInx: 5
   needExtraCondition: 0
@@ -1683,6 +1710,8 @@ MonoBehaviour:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: -0.2
   renderMode: 2
   shapeType: 0
@@ -1691,6 +1720,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 1
   objInx: 3
   needExtraCondition: 0
@@ -1999,6 +2029,8 @@ MonoBehaviour:
     albedo: {r: 0, g: 1, b: 0.17201257, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 1
@@ -2007,6 +2039,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
   objInx: 6
   needExtraCondition: 0
@@ -2153,6 +2186,8 @@ MonoBehaviour:
     albedo: {r: 0, g: 0.32123232, b: 1, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
@@ -2161,6 +2196,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 2
   objInx: 8
   needExtraCondition: 0
@@ -2218,6 +2254,8 @@ MonoBehaviour:
     albedo: {r: 0, g: 1, b: 1, a: 1}
     metallic: 1
     roughness: 0.15
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: -0.001
   renderMode: 2
   shapeType: 3
@@ -2226,6 +2264,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 1355201450}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
   objInx: 7
   needExtraCondition: 1
@@ -2383,6 +2422,8 @@ MonoBehaviour:
     albedo: {r: 0, g: 0, b: 0, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
@@ -2391,6 +2432,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 1
   objInx: 8
   needExtraCondition: 0
@@ -2573,6 +2615,8 @@ MonoBehaviour:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 0.2
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 0
@@ -2581,6 +2625,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 1
   objInx: 9
   needExtraCondition: 0
@@ -2745,6 +2790,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderSize: {x: 1024, y: 720}
   useIndirectRT: 0
+  usePostOp: 1
   indirectMultiplier: 1
   useFSR: 0
   FSR_Scale: 2
@@ -2765,6 +2811,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d32655854621cac4abd859f2c2ae0f36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxSpeed: 80
 --- !u!114 &1666331707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3019,6 +3066,8 @@ MonoBehaviour:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 4
   shapeType: 0
@@ -3027,6 +3076,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 1
   objInx: 10
   needExtraCondition: 0
@@ -3141,6 +3191,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ambientIntensity: 0.04
   bakedSDFs: []
+  bakedObjNormals: []
   bakedObjUVs: []
   bakedObjTBs: []
   bakedSpecialObjects: []
@@ -3350,6 +3401,8 @@ MonoBehaviour:
     albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 999
   shapeType: 1
@@ -3358,6 +3411,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
   objInx: 0
   needExtraCondition: 0
@@ -3509,6 +3563,8 @@ MonoBehaviour:
     albedo: {r: 0.85877466, g: 0, b: 1, a: 1}
     metallic: 0
     roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   renderMode: 0
   shapeType: 1
@@ -3517,6 +3573,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
   objInx: 11
   needExtraCondition: 0

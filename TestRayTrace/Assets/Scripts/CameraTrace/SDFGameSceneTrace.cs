@@ -76,15 +76,16 @@ public class SDFGameCameraParam : SDFCameraParam
     public override void UpdateCamParam(ref Camera cam, float daoScale = 1.0f)
     {
         var obj = cam.gameObject;
-
-        //大概在Unity场景中对比了一下渲染大小，定下了合理的像素晶元大小（也就是根据了w,h和原始的cam nf,FOV,尝试出合适的pixW）
-        pixW = 0.000485f;
-        pixH = pixW;
-        pixW *= daoScale;
-        pixH *= daoScale;
-
         var near = cam.nearClipPlane;
         near *= daoScale;
+
+        // 根据near和fov算出pixH
+        float verticleFOV = cam.fieldOfView / 180.0f * Mathf.PI;
+        //tan(half) = (0.5*H)/(near)
+        float screenH = Mathf.Tan(verticleFOV * 0.5f) * near * 2;
+        float screenW = screenH * cam.aspect;
+        pixW = screenW / w;
+        pixH = screenH / h;
         
         if(camType==2)
         {
