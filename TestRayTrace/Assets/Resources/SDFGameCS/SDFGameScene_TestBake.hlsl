@@ -80,6 +80,7 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 1 )
 {
@@ -87,6 +88,7 @@ re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 2 )
 {
@@ -94,6 +96,7 @@ re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 3 )
 {
@@ -101,6 +104,7 @@ re.albedo = float3(0.7254902, 0.4784314, 0.3411765);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 4 )
 {
@@ -108,6 +112,7 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 5 )
 {
@@ -115,6 +120,7 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 6 )
 {
@@ -122,6 +128,7 @@ re.albedo = float3(0, 1, 0.1720126);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 7 )
 {
@@ -129,6 +136,7 @@ re.albedo = float3(0, 1, 1);
 re.metallic = 1;
 re.roughness = 0.15;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 8 )
 {
@@ -136,6 +144,7 @@ re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 9 )
 {
@@ -143,6 +152,7 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.2;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 10 )
 {
@@ -150,6 +160,7 @@ re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 11 )
 {
@@ -157,6 +168,7 @@ re.albedo = float3(0.8587747, 0, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 	//@@@
 	return re;
@@ -355,10 +367,10 @@ float3 lightDirs[1];
 float3 lightColors[1];
 lightDirs[0] = float3(0.3534208, -0.4141579, -0.8387889);
 lightColors[0] = float3(1, 1, 1);
-result = 0.04 * mat.albedo * mat.ao;
+result.rgb = 0.04 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
 {
-result += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
 }
 }
 //@@@
@@ -823,7 +835,7 @@ void TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	TraceInfo traceInfo;
-	Init(traceInfo,MaxSDF);
+	Init(traceInfo);
 
 	float objSDF[OBJNUM];
 	bool innerBoundFlag[OBJNUM];
@@ -918,7 +930,8 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 	Init(info);
 
 	TraceInfo traceInfo;
-	Init(traceInfo,MaxSDF);
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
 
 	float objSDF[OBJNUM];
 	bool innerBoundFlag[OBJNUM];
@@ -986,6 +999,8 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 		}
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
+
 		if(traceInfo.traceSum>maxLength)
 		{
 			break;
@@ -1010,7 +1025,9 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 	float t = 0.005 * 0.1; //一个非0小值，会避免极其细微的多余shadow
 
 	TraceInfo traceInfo;
-	Init(traceInfo,MaxSDF);
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
+
 	while (traceInfo.traceCount <= MaxTraceTime*0.2)
 	{
 		int objInx = -1;
@@ -1053,6 +1070,8 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
+
 		if(traceInfo.traceSum>maxLength)
 		{
 			break;

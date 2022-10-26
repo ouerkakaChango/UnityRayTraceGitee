@@ -1027,7 +1027,8 @@ void TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	TraceInfo traceInfo;
-	Init(traceInfo,MaxSDF);
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
 
 	float objSDF[OBJNUM];
 	bool innerBoundFlag[OBJNUM];
@@ -1098,6 +1099,7 @@ void TraceScene(Ray ray, out HitInfo info)
 		}
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
 	}
 }
 
@@ -1106,7 +1108,8 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 	Init(info);
 
 	TraceInfo traceInfo;
-	Init(traceInfo,MaxSDF);
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
 
 	float objSDF[OBJNUM];
 	bool innerBoundFlag[OBJNUM];
@@ -1187,6 +1190,8 @@ else
 		}
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
+
 		if(traceInfo.traceSum>maxLength)
 		{
 			break;
@@ -1208,7 +1213,8 @@ float Expensive_HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength
 	Init(info);
 
 	TraceInfo traceInfo;
-	Init(traceInfo,MaxSDF);
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
 
 	float objSDF[OBJNUM];
 	bool innerBoundFlag[OBJNUM];
@@ -1275,6 +1281,7 @@ float Expensive_HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength
 		}
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
 		if(traceInfo.traceSum>maxLength)
 		{
 			break;
@@ -1299,7 +1306,9 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 	float t = 0.005 * 0.1; //一个非0小值，会避免极其细微的多余shadow
 
 	TraceInfo traceInfo;
-	Init(traceInfo,MaxSDF);
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
+
 	while (traceInfo.traceCount <= MaxTraceTime*0.2)
 	{
 		int objInx = -1;
@@ -1342,6 +1351,8 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
+
 		if(traceInfo.traceSum>maxLength)
 		{
 			break;
@@ -1358,7 +1369,8 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 	Init(info);
 
 	TraceInfo traceInfo;
-	Init(traceInfo,MaxSDF);
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
 
 	float objSDF[OBJNUM];
 	bool innerBoundFlag[OBJNUM];
@@ -1426,6 +1438,7 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 		}
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
 	}
 }
 

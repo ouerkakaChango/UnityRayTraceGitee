@@ -987,7 +987,7 @@ if(inx == -9)
 		y = saturate(y);
 		//if(traceInfo.lastTrace<0.5)
 		{
-		r += 0.1*fbm3(float3(20,5,20)*q);
+			r += 0.1*fbm3(float3(20,5,20)*q);
 		}
 		r*=pow(1-y,0.2);
 		float d = 0.5*SDFCircleSlice(q,r,h*0.5);
