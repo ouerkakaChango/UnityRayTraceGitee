@@ -1,4 +1,4 @@
-﻿#define OBJNUM 11
+﻿#define OBJNUM 12
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -20,9 +20,12 @@
 #include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
 #include "../../../HLSL/MatLib/CommonMatLib.hlsl"
 
-float daoScale;
+float3 flipLocalPos;
+float flipAngle;
+float flipFreq;
 
 //@@@SDFBakerMgr TexSys
+Texture2D<float3> N_paper;
 Texture2D<float3> woodTex;
 //@@@
 
@@ -113,7 +116,7 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0.03773582, 0.01787486, 0);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -121,7 +124,7 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 2 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.03773582, 0.01787486, 0);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -129,27 +132,27 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 3 )
 {
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 4 )
+{
 re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0.9;
 re.roughness = 0.1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0.05);
 }
-else if (obj == 4 )
+else if (obj == 5 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 0.3;
 re.reflective = 0;
 re.reflect_ST = float2(5, 0);
-}
-else if (obj == 5 )
-{
-re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
 }
 else if (obj == 6 )
 {
@@ -169,7 +172,7 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 8 )
 {
-re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -177,13 +180,21 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 9 )
 {
-re.albedo = float3(0.5849056, 0.5552883, 0.4331613);
+re.albedo = float3(0.5843138, 0.5568628, 0.4313726);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
 else if (obj == 10 )
+{
+re.albedo = float3(0.5849056, 0.5552883, 0.4331613);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 11 )
 {
 re.albedo = float3(0.1509434, 0.07631969, 0);
 re.metallic = 0;
@@ -198,7 +209,7 @@ re.reflect_ST = float2(1, 0);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[11];
+int renderMode[12];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
@@ -210,6 +221,7 @@ renderMode[7] = 0;
 renderMode[8] = 0;
 renderMode[9] = 0;
 renderMode[10] = 0;
+renderMode[11] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -221,12 +233,12 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
-return uv;
 }
 else if (inx == 1 )
 {
+uv = BoxedUV(minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 2 )
 {
@@ -255,6 +267,9 @@ else if (inx == 9 )
 else if (inx == 10 )
 {
 }
+else if (inx == 11 )
+{
+}
 	//@@@
 
 	inx = GetSpecialID(inx);
@@ -274,6 +289,12 @@ else if (inx == 10 )
 	{
 		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(1,1,1));
 	}
+	else if (inx == -11)
+	{
+		//???
+		//float3 localN = InvRotByEuler(minHit.N, float3(0,0,flipAngle*frac(flipFreq*_Time.y)));
+		//uv = SimpleUVFromPos(flipLocalPos, localN, float3(1,1,1));
+	}
 return uv;
 }
 
@@ -285,11 +306,11 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
-return;
 }
 if(inx == 1 )
 {
+BoxedTB(T,B,minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
+return;
 }
 if(inx == 2 )
 {
@@ -318,6 +339,9 @@ if(inx == 9 )
 if(inx == 10 )
 {
 }
+if(inx == 11 )
+{
+}
 //@@@
 basis_unstable(minHit.N, T, B);
 }
@@ -326,19 +350,26 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==2)
+if(inx==0)
 {
 	float2 uv = GetObjUV(minHit);
-uv = float2(1, 1)*uv+float2(0, 0);
-	mat.albedo *= SampleRGB(woodTex, uv);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,1);
 }
-if(inx==4)
+if(inx==3)
 {
 	float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
 	mat.albedo *= SampleRGB(woodTex, uv);
 }
 if(inx==5)
+{
+	float2 uv = GetObjUV(minHit);
+uv = float2(1, 1)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(woodTex, uv);
+}
+if(inx==6)
 {
 float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
@@ -459,24 +490,7 @@ if(ShowInt(q.xz,cId.y))
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
-//???
-//int inx = GetSpecialID(minHit.obj);
-//if(inx==-8)
-//{
-//	float2 uv = GetObjUV(minHit);
-//	result *= SampleRGB(DirtNoise, uv).r;
-//}
-
 SmoothWithDither(result, suv);
-if(camGammaMode == 1)
-{
-	
-}
-else{
-	//gamma
-	//result = result / (result + 1.0);
-	//result = pow(result, 1/2.2);
-}
 }
 
 float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
@@ -537,6 +551,10 @@ else if (mode == 1002)
 	float3 T,B;
 	GetObjTB(T, B, minHit);
 	result = T;
+}
+else if (mode == -1)
+{
+	result = flipLocalPos;
 }
 else
 {
@@ -701,53 +719,57 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
+inx = -11;
+}
+else if (inx == 1 )
+{
 float3 center = float3(1.624, 0.1471191, -1.283141);
 float3 bound = float3(0.5, 0.065, 0.5);
 float3 rot = float3(0, 0, 0);
 float offset = 0;
 center.y+=1;
-float3 rotCenter = center.x-bound.x;
+float3 rotCenter = float3(center.x-bound.x,center.y,center.z);
 p =InvRotCenterByEuler(p,rotCenter, float3(0,0,30*frac(_Time.y)));
 float d = offset + SDFBox(p,center,bound, rot);
 re = min(re,d);
 }
-else if (inx == 1 )
+else if (inx == 2 )
 {
 inx = -8;
 }
-else if (inx == 2 )
+else if (inx == 3 )
 {
 inx = -7;
 }
-else if (inx == 3 )
+else if (inx == 4 )
 {
 inx = -2;
 }
-else if (inx == 4 )
+else if (inx == 5 )
 {
 inx = -5;
 }
-else if (inx == 5 )
+else if (inx == 6 )
 {
 inx = -1;
 }
-else if (inx == 6 )
+else if (inx == 7 )
 {
 inx = -10;
 }
-else if (inx == 7 )
+else if (inx == 8 )
 {
 inx = -3;
 }
-else if (inx == 8 )
+else if (inx == 9 )
 {
 inx = -4;
 }
-else if (inx == 9 )
+else if (inx == 10 )
 {
 inx = -6;
 }
-else if (inx == 10 )
+else if (inx == 11 )
 {
 inx = -9;
 }
@@ -941,7 +963,7 @@ if(inx == -9)
 		y = saturate(y);
 		//if(traceInfo.lastTrace<0.5)
 		{
-		r += 0.1*fbm3(float3(20,5,20)*q);
+			r += 0.1*fbm3(float3(20,5,20)*q);
 		}
 		r*=pow(1-y,0.2);
 		float d = 0.5*SDFCircleSlice(q,r,h*0.5);
@@ -951,15 +973,49 @@ if(inx == -9)
 }
 if(inx == -10)
 {
-	float3 center = 0;
-	float anim = frac(_Time.y);
-	int f = floor(_Time.y);
-	f = f%4;
-	anim = f==0 ? anim : (f==1?1:(f==2 ? 1-anim : 0));
-	center.y = 2*anim;
-	float r = 1;
-	float d = SDFSphere(p,center,r);
-	re = min(re,d);
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300 )
+	{
+		float3 center = 0;
+		float anim = frac(_Time.y);
+		int f = floor(_Time.y);
+		f = f%4;
+		anim = f==0 ? anim : (f==1?1:(f==2 ? 1-anim : 0));
+		center.y = 2*anim;
+		float r = 1;
+		float d = SDFSphere(p,center,r);
+		re = min(re,d);
+	}
+}
+if(inx == -11)
+{
+//???
+	if(abs(p.x-eyePos.x)<300 && abs(p.z - eyePos.z)<300 )
+	{
+		float3 grid = float3(30,20,30);
+		float3 center = GetGridCenter_DownMode(p,grid,float3(0.0,0.1,5));
+
+		float3 q = p - center;
+		float3 bound = 0.5*float3(1,0.015,1);
+		//X-Y Plane calculate theta
+		float a = (atan2 (q.y, q.x) / PI + 1)*0.5;
+		float paperNum = 4;
+		int paperInx = floor(a*paperNum);
+
+		flipAngle = 360;
+		flipFreq = 0.1;
+
+		float t = frac(0.6*_Time.y);
+		for(int i=0;i<paperNum;i++)
+		{
+			float a_paper = ((paperInx+i)%paperNum)/ paperNum;
+			a_paper += t+iqhash(i+0.2);
+			float3 paperCenter = float3(CircleToCartesian( a_paper*2*PI,0.5),0);
+			//q =InvRotCenterByEuler(q,0, float3(0,0,flipAngle*frac(flipFreq*_Time.y)));
+			re = min(re,SDFBox(q,paperCenter,bound, float3(0,0, a_paper*360)));
+			//re = min(re,SDFSphere(q,paperCenter,0.1));
+		}
+		re*=0.5;
+	}
 }
 //-------------------------------
 //'unbias' stair near each other, cost too heavy
@@ -1003,7 +1059,7 @@ return re;
 float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonScale = 1.0f)
 {
 	float normalEpsilon = NormalEpsilon;
-	//normalEpsilon *= daoScale;
+
 	return normalize(float3(
 		GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
 		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
@@ -1022,7 +1078,7 @@ void TraceScene(Ray ray, out HitInfo info)
 {
 	float traceThre = TraceThre;
 
-	//traceThre *= daoScale;
+
 
 	Init(info);
 
@@ -1549,44 +1605,48 @@ int GetSpecialID(int inx)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -11;
 }
 else if (inx == 1 )
 {
-inx = -8;
 }
 else if (inx == 2 )
 {
-inx = -7;
+inx = -8;
 }
 else if (inx == 3 )
 {
-inx = -2;
+inx = -7;
 }
 else if (inx == 4 )
 {
-inx = -5;
+inx = -2;
 }
 else if (inx == 5 )
 {
-inx = -1;
+inx = -5;
 }
 else if (inx == 6 )
 {
-inx = -10;
+inx = -1;
 }
 else if (inx == 7 )
 {
-inx = -3;
+inx = -10;
 }
 else if (inx == 8 )
 {
-inx = -4;
+inx = -3;
 }
 else if (inx == 9 )
 {
-inx = -6;
+inx = -4;
 }
 else if (inx == 10 )
+{
+inx = -6;
+}
+else if (inx == 11 )
 {
 inx = -9;
 }

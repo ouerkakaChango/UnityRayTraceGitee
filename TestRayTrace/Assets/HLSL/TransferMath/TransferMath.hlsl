@@ -29,6 +29,14 @@ float3 SphericalToCartesian(float phi, float theta, float r=1)
 		);
 }
 
+float2 CircleToCartesian(float theta, float r = 1)
+{
+	return float2(
+		r*cos(theta),
+		r*sin(theta)
+		);
+}
+
 float3 XYZ_StandardFromUnity(float3 p)
 {
 	p.z = -p.z;

@@ -71,6 +71,13 @@ float3 RotByEuler(float3 p, float3 eulerAngle)
 	return p;
 }
 
+float3 RotCenterByEuler(float3 p, float3 rotCenter, float3 rotEuler)
+{
+	float3 locP = p - rotCenter;
+	locP = RotByEuler(locP, rotEuler);
+	return locP + rotCenter;
+}
+
 float2 rotate(float2 p, float a)
 {
 	float c = cos(a), s = sin(a);

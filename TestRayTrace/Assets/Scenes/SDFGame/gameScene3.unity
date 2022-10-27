@@ -169,8 +169,9 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 0
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &292457935
@@ -234,7 +235,7 @@ Transform:
   m_LocalScale: {x: 1, y: 0.13, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &292457938
 MonoBehaviour:
@@ -250,10 +251,116 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   expressionStr: 'center.y+=1;
 
-    float3 rotCenter = center.x-bound.x;
+    float3 rotCenter = float3(center.x-bound.x,center.y,center.z);
 
-    p =InvRotCenterByEuler(p,rotCenter,
-    float3(0,0,30*frac(_Time.y))); '
+    p
+    =InvRotCenterByEuler(p,rotCenter, float3(0,0,30*frac(_Time.y))); '
+--- !u!1 &304829803
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 304829804}
+  - component: {fileID: 304829805}
+  - component: {fileID: 304829807}
+  - component: {fileID: 304829806}
+  m_Layer: 0
+  m_Name: InfFlipBook
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &304829804
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304829803}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 10.062239, y: -4.7168765, z: 7.5266743}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2111678685}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &304829805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304829803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 1
+  specialID: -11
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
+  SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
+  mergeType: 0
+  objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
+--- !u!114 &304829806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304829803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  pbrTextures: []
+  heightTextures: []
+  plainTextures:
+  - name: N_paper
+    tex: {fileID: 2800000, guid: 3f2ea3910af41804396e1036204466df, type: 3}
+    channel: 1
+  envTextures: []
+  texInx: 0
+--- !u!114 &304829807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304829803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: N
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  - 1
+  texParams:
+  - {fileID: 304829806}
 --- !u!1 &338121909
 GameObject:
   m_ObjectHideFlags: 0
@@ -311,8 +418,9 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 1
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &345669638
@@ -481,8 +589,9 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 2
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &439061379
@@ -562,8 +671,9 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 3
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &760834262
@@ -674,6 +784,87 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bakeShadow: 0
   shadowType: 0
+--- !u!1 &948289191
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 948289194}
+  - component: {fileID: 948289193}
+  - component: {fileID: 948289192}
+  m_Layer: 0
+  m_Name: testPage (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &948289192
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 948289191}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &948289193
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 948289191}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &948289194
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 948289191}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5, y: 0.1, z: 5}
+  m_LocalScale: {x: 1, y: 0.03, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1033651196
 GameObject:
   m_ObjectHideFlags: 0
@@ -732,8 +923,9 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 4
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1033651199
@@ -815,8 +1007,9 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 5
+  objInx: 6
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1087498737
@@ -861,7 +1054,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: b31673e27b944c54f9f3bc97b3e9b2f8, type: 3}
     channel: 1
   envTextures: []
-  texInx: 0
+  texInx: 1
 --- !u!1 &1694145427
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,6 +1101,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
   objInx: 5
   needExtraCondition: 0
@@ -986,7 +1180,7 @@ Transform:
   m_LocalScale: {x: 4, y: 4, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1731007679
 GameObject:
@@ -1002,7 +1196,7 @@ GameObject:
   - component: {fileID: 1731007681}
   - component: {fileID: 1731007680}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: AnimSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1034,8 +1228,9 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 6
+  objInx: 7
   needExtraCondition: 0
   extraCondition: 
 --- !u!135 &1731007681
@@ -1107,12 +1302,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1731007679}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_Father: {fileID: 2111678685}
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1780628391
 GameObject:
@@ -1161,6 +1356,7 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 1
   objInx: 3
   needExtraCondition: 0
@@ -1261,87 +1457,6 @@ MonoBehaviour:
   - 0
   texParams:
   - {fileID: 1087498738}
---- !u!1 &1964481501
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1964481505}
-  - component: {fileID: 1964481504}
-  - component: {fileID: 1964481503}
-  m_Layer: 0
-  m_Name: Cube (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!23 &1964481503
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1964481501}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1964481504
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1964481501}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &1964481505
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1964481501}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 15, y: 0, z: 15}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1965962561
 GameObject:
   m_ObjectHideFlags: 0
@@ -1576,8 +1691,9 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 7
+  objInx: 8
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2013768847
@@ -1637,8 +1753,9 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 8
+  objInx: 9
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2040918646
@@ -1675,18 +1792,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ambientIntensity: 0.003
   bakedSDFs: []
+  bakedObjNormals: []
   bakedObjUVs: []
   bakedObjTBs: []
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[11];
+  - int renderMode[12];
   bakedRenders: []
   bakedShadows: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
+  - {fileID: 304829805}
   - {fileID: 292457933}
   - {fileID: 338121911}
   - {fileID: 439061378}
@@ -1740,23 +1859,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tags:
+  - {fileID: 304829807}
   - {fileID: 439061379}
   - {fileID: 1033651199}
   - {fileID: 1087498737}
   bakedObjMatLib:
-  - if(inx==2)
+  - if(inx==0)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
-  - ' uv = float2(1, 1)*uv+float2(0, 0);'
-  - "\tmat.albedo *= SampleRGB(woodTex, uv);"
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - "\tminHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,1);"
   - '}'
-  - if(inx==4)
+  - if(inx==3)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' uv = float2(1, 1)*uv+float2(0, 0);'
   - "\tmat.albedo *= SampleRGB(woodTex, uv);"
   - '}'
   - if(inx==5)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' uv = float2(1, 1)*uv+float2(0, 0);'
+  - "\tmat.albedo *= SampleRGB(woodTex, uv);"
+  - '}'
+  - if(inx==6)
   - '{'
   - ' float2 uv = GetObjUV(minHit);'
   - ' uv = float2(1, 1)*uv+float2(0, 0);'
@@ -1777,12 +1904,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
+  - name: N_paper
+    tex: {fileID: 2800000, guid: 3f2ea3910af41804396e1036204466df, type: 3}
+    channel: 1
   - name: woodTex
     tex: {fileID: 2800000, guid: b31673e27b944c54f9f3bc97b3e9b2f8, type: 3}
     channel: 1
   tags:
+  - {fileID: 304829806}
   - {fileID: 1087498738}
   bakedDeclares:
+  - Texture2D<float3> N_paper;
   - Texture2D<float3> woodTex;
   bakedEnvTexSettings: []
 --- !u!1 &2065020610
@@ -1842,8 +1974,9 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 9
+  objInx: 10
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2111678684
@@ -1882,6 +2015,8 @@ Transform:
   - {fileID: 439061377}
   - {fileID: 338121910}
   - {fileID: 2140580170}
+  - {fileID: 1731007684}
+  - {fileID: 304829804}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1942,7 +2077,8 @@ MonoBehaviour:
   sliceTexTag: {fileID: 0}
   hBound: 0.1
   SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 10
+  objInx: 11
   needExtraCondition: 0
   extraCondition: 

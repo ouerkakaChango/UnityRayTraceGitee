@@ -86,7 +86,17 @@ public class MatLibTag : MonoBehaviour
 
         Vector2 uv_scale = new Vector2(floatParams[0], floatParams[1]);
         Vector2 uv_offset = new Vector2(floatParams[2], floatParams[3]);
-        float normalIntensity = floatParams[4];
+        float normalIntensity = 1;
+        if (floatParams.Count >= 5)
+        {
+            normalIntensity = floatParams[4];
+        }
+
+        if(texParams.Count<1)
+        {
+            Debug.LogError("No tex tag for N MatLib!");
+            return;
+        }
 
         int objInx = SafeGetObjInx();
         lines.Add("if(inx==" + objInx + ")");
