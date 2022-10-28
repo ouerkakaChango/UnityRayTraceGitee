@@ -108,7 +108,7 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(0, 0, 0);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -124,7 +124,7 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 2 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(0.03773582, 0.01787486, 0);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -132,7 +132,7 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 3 )
 {
-re.albedo = float3(0.03773582, 0.01787486, 0);
+re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -242,12 +242,12 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-}
-else if (inx == 1 )
-{
 uv = BoxedUV(minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
 return uv;
+}
+else if (inx == 1 )
+{
 }
 else if (inx == 2 )
 {
@@ -318,11 +318,11 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
+BoxedTB(T,B,minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
+return;
 }
 if(inx == 1 )
 {
-BoxedTB(T,B,minHit.P, float3(1.624, 0.1471191, -1.283141), float3(0.5, 0.065, 0.5), float3(0, 0, 0));
-return;
 }
 if(inx == 2 )
 {
@@ -365,7 +365,7 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==2)
+if(inx==1)
 {
 	float2 uv = GetObjUV(minHit);
 float3 T,B;
@@ -734,10 +734,6 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -12;
-}
-else if (inx == 1 )
-{
 float3 center = float3(1.624, 0.1471191, -1.283141);
 float3 bound = float3(0.5, 0.065, 0.5);
 float3 rot = float3(0, 0, 0);
@@ -748,13 +744,17 @@ p =InvRotCenterByEuler(p,rotCenter, float3(0,0,30*frac(_Time.y)));
 float d = offset + SDFBox(p,center,bound, rot);
 re = min(re,d);
 }
-else if (inx == 2 )
+else if (inx == 1 )
 {
 inx = -11;
 }
-else if (inx == 3 )
+else if (inx == 2 )
 {
 inx = -8;
+}
+else if (inx == 3 )
+{
+inx = -12;
 }
 else if (inx == 4 )
 {
@@ -1021,8 +1021,7 @@ if(inx == -11)
 		int paperInx = floor(a*paperNum);
 
 		flipAngle = 360;
-		flipFreq = 0.1;
-
+		flipFreq = 0.6+ 0.4*(iqhash(center.z));
 		float t = frac(0.6*_Time.y);
 		for(int i=0;i<paperNum;i++)
 		{
@@ -1644,18 +1643,18 @@ int GetSpecialID(int inx)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -12;
 }
 else if (inx == 1 )
 {
+inx = -11;
 }
 else if (inx == 2 )
 {
-inx = -11;
+inx = -8;
 }
 else if (inx == 3 )
 {
-inx = -8;
+inx = -12;
 }
 else if (inx == 4 )
 {
