@@ -268,7 +268,7 @@ GameObject:
   - component: {fileID: 304829807}
   - component: {fileID: 304829806}
   m_Layer: 0
-  m_Name: InfFlipBook
+  m_Name: InfFlipPage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -316,7 +316,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 0
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &304829806
@@ -420,7 +420,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 2
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &345669638
@@ -531,6 +531,68 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &390336342
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 390336343}
+  - component: {fileID: 390336344}
+  m_Layer: 0
+  m_Name: InfPageBase
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &390336343
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390336342}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 10.062239, y: -4.7168765, z: 7.5266743}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2111678685}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &390336344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390336342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 0, g: 0, b: 0, a: 1}
+    metallic: 0
+    roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 1
+  specialID: -12
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.1
+  SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
+  mergeType: 0
+  objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!1 &439061376
 GameObject:
   m_ObjectHideFlags: 0
@@ -591,7 +653,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 3
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &439061379
@@ -673,7 +735,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 4
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &760834262
@@ -925,7 +987,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 5
+  objInx: 6
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1033651199
@@ -1009,7 +1071,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 6
+  objInx: 7
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &1087498737
@@ -1230,7 +1292,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 7
+  objInx: 8
   needExtraCondition: 0
   extraCondition: 
 --- !u!135 &1731007681
@@ -1693,7 +1755,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 8
+  objInx: 9
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2013768847
@@ -1755,7 +1817,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 9
+  objInx: 10
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2040918646
@@ -1798,15 +1860,16 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[12];
+  - int renderMode[13];
   bakedRenders: []
   bakedShadows: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 304829805}
+  - {fileID: 390336344}
   - {fileID: 292457933}
+  - {fileID: 304829805}
   - {fileID: 338121911}
   - {fileID: 439061378}
   - {fileID: 645779223}
@@ -1864,26 +1927,26 @@ MonoBehaviour:
   - {fileID: 1033651199}
   - {fileID: 1087498737}
   bakedObjMatLib:
-  - if(inx==0)
+  - if(inx==2)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
   - "\tminHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,1);"
   - '}'
-  - if(inx==3)
-  - '{'
-  - "\tfloat2 uv = GetObjUV(minHit);"
-  - ' uv = float2(1, 1)*uv+float2(0, 0);'
-  - "\tmat.albedo *= SampleRGB(woodTex, uv);"
-  - '}'
-  - if(inx==5)
+  - if(inx==4)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' uv = float2(1, 1)*uv+float2(0, 0);'
   - "\tmat.albedo *= SampleRGB(woodTex, uv);"
   - '}'
   - if(inx==6)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' uv = float2(1, 1)*uv+float2(0, 0);'
+  - "\tmat.albedo *= SampleRGB(woodTex, uv);"
+  - '}'
+  - if(inx==7)
   - '{'
   - ' float2 uv = GetObjUV(minHit);'
   - ' uv = float2(1, 1)*uv+float2(0, 0);'
@@ -1976,7 +2039,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 10
+  objInx: 11
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2111678684
@@ -2017,6 +2080,7 @@ Transform:
   - {fileID: 2140580170}
   - {fileID: 1731007684}
   - {fileID: 304829804}
+  - {fileID: 390336343}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2079,6 +2143,6 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 11
+  objInx: 12
   needExtraCondition: 0
   extraCondition: 
