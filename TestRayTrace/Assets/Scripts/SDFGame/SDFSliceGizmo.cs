@@ -77,4 +77,10 @@ public class SDFSliceGizmo : MonoBehaviour
             mr.sharedMaterial = mat;
         }
     }
+
+    public void Refresh()
+    {
+        var mr = gameObject.AddComponent<MeshRenderer>();
+        mr.sharedMaterial = null;
+    }
 }

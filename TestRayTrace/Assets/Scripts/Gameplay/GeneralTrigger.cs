@@ -10,6 +10,11 @@ namespace XCGame
         PlayerEnter,
     }
 
+    public enum TriggerSinceStartEvent
+    {
+        Timeup,
+    }
+
     public enum TriggerAction
     {
         SetDynamicVal,
@@ -22,20 +27,39 @@ namespace XCGame
     public class GeneralTrigger : MonoBehaviour
     {
         public List<TriggerEnterOnceEvent> enterOnceEvents = new List<TriggerEnterOnceEvent>();
+        public List<TriggerSinceStartEvent> sinceStartEvents = new List<TriggerSinceStartEvent>();
+
         public List<TriggerAction> actions = new List<TriggerAction>();
         public List<float> f_params = new List<float>();
         public List<string> str_params = new List<string>();
 
+        float start_t;
+
         // Start is called before the first frame update
         void Start()
         {
-
+            start_t = Time.timeSinceLevelLoad;
         }
 
         // Update is called once per frame
         void Update()
         {
-
+            float t = Time.timeSinceLevelLoad - start_t;
+            for(int i=0;i<sinceStartEvents.Count;i++)
+            {
+                bool condition = false;
+                if(sinceStartEvents[i] == TriggerSinceStartEvent.Timeup)
+                {
+                    condition = t >= f_params[0];
+                }
+                if (condition)
+                {
+                    for (int i1 = 0; i1 < actions.Count; i1++)
+                    {
+                        DoAction(i1);
+                    }
+                }
+            }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -51,7 +75,7 @@ namespace XCGame
                 {
                     for (int i1 = 0; i1 < actions.Count; i1++)
                     {
-                        DoAction(other, i1);
+                        DoAction(i1, other);
                     }
                 }
             }
@@ -64,7 +88,7 @@ namespace XCGame
             return other.gameObject.GetComponent<SDFGameSceneTrace>() != null;
         }
 
-        void DoAction(Collider other, int inx)
+        void DoAction(int inx, Collider other=null)
         {
             if(actions[inx]==TriggerAction.SetDynamicVal)
             {
@@ -80,8 +104,8 @@ namespace XCGame
             else if(actions[inx] == TriggerAction.EnableNextLevelDoor)
             {
                 //!!!
-                var dyValSys = Camera.main.gameObject.GetComponent<AutoCS>().dyValSys;
-                var gameSys = dyValSys.gameObject.GetComponent<GameSceneSystem>();
+                var bakerMgr = Camera.main.gameObject.GetComponent<AutoCS>().bakerMgr;
+                var gameSys = bakerMgr.gameObject.GetComponent<GameSceneSystem>();
                 var boxColi = gameSys.nextLevelObj.GetComponent<BoxCollider>();
                 boxColi.enabled = true;
             }
