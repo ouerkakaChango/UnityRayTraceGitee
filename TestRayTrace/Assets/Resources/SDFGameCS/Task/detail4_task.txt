@@ -1,0 +1,11 @@
+templates:
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Template/SDFGameTrace_d4_Template.txt
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Template/SDFGameScene_d4_Template.txt
+
+outs:
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Outs/SDFGameTrace_detail4.compute
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Outs/SDFGameScene_detail4.hlsl
+
+configs:
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Cfg/detail4Trace_cfg.txt
+C:/Personal/UnityRayTraceGitGee/TestRayTrace/Assets/Resources/SDFGameCS/Cfg/detail4Scene_cfg.txt 
