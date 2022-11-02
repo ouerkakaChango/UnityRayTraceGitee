@@ -541,7 +541,10 @@ public class SDFBakerMgr : MonoBehaviour
         //    d += SDF_offset;
         //}
         //re = min(re, d);
-
+        if(!CheckTexSys())
+        {
+            return;
+        }
         var obj = tag.gameObject;
 
         if(tag.sliceTexTag == null)
@@ -552,35 +555,43 @@ public class SDFBakerMgr : MonoBehaviour
 
         Vector3 scale = obj.transform.lossyScale;
 
-        bakedSDFs.Add("float3 localp = WorldToLocal(p, "+Bake(obj.transform.position)+", "+BakeRotEuler(obj.transform.rotation)+", "+Bake(obj.transform.lossyScale)+");");
-        bakedSDFs.Add("float dh = abs(localp.y) - " + tag.hBound + ";");
-        bakedSDFs.Add("dh = dh > 0 ? dh : 0;");
-        bakedSDFs.Add("dh *= "+scale.x+";");
-        bakedSDFs.Add("");
-        bakedSDFs.Add("float d = re;");
-        bakedSDFs.Add("float d2d = re;");
-        bakedSDFs.Add("float2 picBound = float2(0.5, 0.5) * " + scale.x + ";");
-        bakedSDFs.Add("float2 p2d = localp.xz * "+scale.x+";");
-        bakedSDFs.Add("if (gtor(abs(p2d), picBound))");
-        bakedSDFs.Add("{");
-        bakedSDFs.Add("    d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;");
-        bakedSDFs.Add("    d = sqrt(d2d * d2d + dh * dh);");
-        bakedSDFs.Add("}");
-        bakedSDFs.Add("else");
-        bakedSDFs.Add("{");
-        bakedSDFs.Add("    float2 uv = p2d / picBound;");
-        bakedSDFs.Add("    uv = (uv + 1) * 0.5;");
-        bakedSDFs.Add("    uint2 picSize = GetSize("+sliceTexName+");");
-        bakedSDFs.Add("    float sdfFromPic = "+sliceTexName+ ".SampleLevel(common_linear_repeat_sampler, uv, 0).r;");
-        bakedSDFs.Add("    sdfFromPic /= picSize.x * 0.5 * sqrt(2) * "+scale.x+";");
-        bakedSDFs.Add("    sdfFromPic *= picBound.x;");
-        bakedSDFs.Add("    d2d = sdfFromPic;");
-        bakedSDFs.Add("    d2d += "+tag.SDF_offset2D+";");
-        bakedSDFs.Add("    d2d = max(d2d,0);");
-        bakedSDFs.Add("    d = sqrt(d2d * d2d + dh * dh);");
-        bakedSDFs.Add("    d += "+tag.SDF_offset+";");
-        bakedSDFs.Add("}");
+        string centerStr = Bake(obj.transform.position);
+        string rotStr = BakeRotEuler(obj.transform.rotation);
+        string sizeStr = Bake(obj.transform.lossyScale);
+
+        //SDFSlice(float3 p, float3 center, float3 rotEuler, float3 size, Texture2D<float> SliceTex, float hBound, float traceThre, float offset2D, float offset)
+        bakedSDFs.Add("float d = SDFSlice(p, "+ centerStr + ", "+ rotStr + ", "+ sizeStr + ", "+sliceTexName+", "+ tag.hBound + ", TraceThre, "+tag.SDF_offset2D+", "+tag.SDF_offset+");");
         bakedSDFs.Add("re = min(re, d);");
+
+        //bakedSDFs.Add("float3 localp = WorldToLocal(p, "+Bake(obj.transform.position)+", "+BakeRotEuler(obj.transform.rotation)+", "+Bake(obj.transform.lossyScale)+");");
+        //bakedSDFs.Add("float dh = abs(localp.y) - " + tag.hBound + ";");
+        //bakedSDFs.Add("dh = dh > 0 ? dh : 0;");
+        //bakedSDFs.Add("dh *= "+scale.x+";");
+        //bakedSDFs.Add("");
+        //bakedSDFs.Add("float d = re;");
+        //bakedSDFs.Add("float d2d = re;");
+        //bakedSDFs.Add("float2 picBound = float2(0.5, 0.5) * " + scale.x + ";");
+        //bakedSDFs.Add("float2 p2d = localp.xz * "+scale.x+";");
+        //bakedSDFs.Add("if (gtor(abs(p2d), picBound))");
+        //bakedSDFs.Add("{");
+        //bakedSDFs.Add("    d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;");
+        //bakedSDFs.Add("    d = sqrt(d2d * d2d + dh * dh);");
+        //bakedSDFs.Add("}");
+        //bakedSDFs.Add("else");
+        //bakedSDFs.Add("{");
+        //bakedSDFs.Add("    float2 uv = p2d / picBound;");
+        //bakedSDFs.Add("    uv = (uv + 1) * 0.5;");
+        //bakedSDFs.Add("    uint2 picSize = GetSize("+sliceTexName+");");
+        //bakedSDFs.Add("    float sdfFromPic = "+sliceTexName+ ".SampleLevel(common_linear_repeat_sampler, uv, 0).r;");
+        //bakedSDFs.Add("    sdfFromPic /= picSize.x * 0.5 * sqrt(2) * "+scale.x+";");
+        //bakedSDFs.Add("    sdfFromPic *= picBound.x;");
+        //bakedSDFs.Add("    d2d = sdfFromPic;");
+        //bakedSDFs.Add("    d2d += "+tag.SDF_offset2D+";");
+        //bakedSDFs.Add("    d2d = max(d2d,0);");
+        //bakedSDFs.Add("    d = sqrt(d2d * d2d + dh * dh);");
+        //bakedSDFs.Add("    d += "+tag.SDF_offset+";");
+        //bakedSDFs.Add("}");
+        //bakedSDFs.Add("re = min(re, d);");
     }
 
     void AddBakeTex3D(SDFBakerTag tag)
@@ -911,25 +922,19 @@ public class SDFBakerMgr : MonoBehaviour
         tag.mergeType = type;
     }
 
-    //SDFBakerTag GetActiveTag(GameObject obj)
-    //{
-    //    var tags = obj.GetComponents<SDFBakerTag>();
-    //    int num = 0;
-    //    SDFBakerTag re = null;
-    //    for (int i=0;i<tags.Length;i++)
-    //    {
-    //        if(tags[i].isActiveAndEnabled)
-    //        {
-    //            re = tags[i];
-    //            num++;
-    //        }
-    //    }
-    //    if(num>1)
-    //    {
-    //        Debug.LogWarning("SDF Baker active tag > 1");
-    //    }
-    //    return re;
-    //}
+    bool CheckTexSys()
+    {
+        var texsys = gameObject.GetComponent<TextureSystem>();
+        if(texsys==null)
+        {
+            Debug.LogError("Tex Sys empty!");
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
 
     //##################################################################
 

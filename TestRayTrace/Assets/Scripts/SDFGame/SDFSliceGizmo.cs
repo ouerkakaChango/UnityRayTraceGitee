@@ -71,8 +71,17 @@ public class SDFSliceGizmo : MonoBehaviour
             var shader = Resources.Load<Shader>("Shader/S_SDFSliceVisualize");
             mat = new Material(shader);
             var tag = gameObject.GetComponent<SDFBakerTag>();
+            if(tag == null)
+            {
+                Debug.LogError("No sdf baker tag");
+                return;
+            }
             var texTag = tag.sliceTexTag;
-
+            if(texTag == null)
+            {
+                Debug.LogError("No sliceTex of sdf baker tag");
+                return;
+            }
             mat.SetTexture("_MainTex", texTag.plainTextures[0].tex);
             mr.sharedMaterial = mat;
         }
@@ -80,7 +89,7 @@ public class SDFSliceGizmo : MonoBehaviour
 
     public void Refresh()
     {
-        var mr = gameObject.AddComponent<MeshRenderer>();
+        var mr = gameObject.GetComponent<MeshRenderer>();
         mr.sharedMaterial = null;
     }
 }

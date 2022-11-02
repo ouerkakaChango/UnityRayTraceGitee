@@ -27,6 +27,7 @@ public class SDFSliceBakerEditor : Editor
         if (GUILayout.Button("SaveOutTex"))
         {
             TexHelper.SaveEXR(Target.outTex, "Assets", Target.outName);
+            AssetDatabase.Refresh();
         }
 
         if (GUILayout.Button("Clear"))

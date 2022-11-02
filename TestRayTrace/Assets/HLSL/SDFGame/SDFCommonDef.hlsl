@@ -323,6 +323,40 @@ float SDFTex3D(float3 p, float3 center, float3 bound, Texture3D<float> SDFTex3D,
 	return d;
 }
 
+float SDFSlice(float3 p, float3 center, float3 rotEuler, float3 size, Texture2D<float> SliceTex, float hBound, float traceThre, float offset2D, float offset)
+{
+	float3 q = WorldToLocal(p, center, rotEuler, size);
+	float dh = abs(q.y) - hBound;
+	dh = dh > 0 ? dh : 0;
+	float scale = size.x;
+	dh *= scale;
+
+	float d = MAXFLOAT;
+	float d2d = MAXFLOAT;
+	float2 picBound = float2(0.5, 0.5) * scale;
+	float2 p2d = q.xz * scale;
+	if (gtor(abs(p2d), picBound))
+	{
+		d2d = SDFBox(p2d, 0, picBound) + traceThre * 2;
+		d = sqrt(d2d * d2d + dh * dh);
+	}
+	else
+	{
+		float2 uv = p2d / picBound;
+		uv = (uv + 1) * 0.5;
+		uint2 picSize = GetSize(SliceTex);
+		float sdfFromPic = SliceTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+		sdfFromPic /= picSize.x * 0.5 * sqrt(2) * scale;
+		sdfFromPic *= picBound.x;
+		d2d = sdfFromPic;
+		d2d += offset2D;
+		d2d = max(d2d, 0);
+		d = sqrt(d2d * d2d + dh * dh);
+		d += offset;
+	}
+	return d;
+}
+
 float3 SDFTexNorm3D(float3 p, float3 center, float3 bound, Texture3D<float3> SDFNorm3D)
 {
 	float3 q = p - center;

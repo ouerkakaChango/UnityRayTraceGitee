@@ -42,7 +42,7 @@ public class SDFBakerTag : MonoBehaviour
     [HideInInspector]
     public TexSysTag sliceTexTag = null;
     [HideInInspector]
-    public float hBound = 0.1f;
+    public float hBound = 0.02f;
     [HideInInspector]
     public float SDF_offset2D = 0.0f;
     //___Slice

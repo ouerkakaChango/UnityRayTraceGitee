@@ -1,6 +1,6 @@
 valMaps:
 //@@@SDFBakerMgr ValMaps
-ObjNum 1
+ObjNum 2
 //@@@
 TraceThre 0.001
 NormalEpsilon 0.001
@@ -15,6 +15,7 @@ Blocks:
 #include "../../../HLSL/MatLib/CommonMatLib.hlsl"
 
 //@@@SDFBakerMgr TexSys
+Texture2D<float> cha_c00;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
@@ -161,13 +162,22 @@ re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
+else if (obj == 1 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
 //@@@
 ###BLOCK
 
 ###BLOCK ObjRenderMode
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[1];
+int renderMode[2];
 renderMode[0] = 0;
+renderMode[1] = 0;
 return renderMode[obj];
 //@@@
 ###BLOCK
@@ -177,6 +187,9 @@ return renderMode[obj];
 	int inx = minHit.obj;
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
+{
+}
+else if (inx == 1 )
 {
 uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
@@ -191,6 +204,9 @@ return uv;
 ###BLOCK ObjTB
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
+{
+}
+if(inx == 1 )
 {
 BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return;
@@ -360,6 +376,11 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
+float d = SDFSlice(p, float3(2, 0, 0), float3(270.0198, 0, 0), float3(2.6451, 2.6451, 2.6451), cha_c00, 0.02, TraceThre, 0, 0);
+re = min(re, d);
+}
+else if (inx == 1 )
+{
 re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 //@@@
@@ -397,6 +418,9 @@ return re;
 ###BLOCK SpecialID
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
+{
+}
+else if (inx == 1 )
 {
 }
 //@@@
