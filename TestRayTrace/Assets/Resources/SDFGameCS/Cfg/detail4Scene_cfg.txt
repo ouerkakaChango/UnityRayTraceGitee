@@ -164,7 +164,7 @@ re.reflect_ST = float2(1, 0);
 }
 else if (obj == 1 )
 {
-re.albedo = float3(1, 1, 1);
+re.albedo = float3(1, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -191,9 +191,6 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return uv;
 }
 	//@@@
 
@@ -208,8 +205,6 @@ if(inx == 0 )
 }
 if(inx == 1 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return;
 }
 //@@@
 basis_unstable(minHit.N, T, B);
@@ -235,7 +230,7 @@ if(mode==0)
 {
   float3 lightDirs[1];
   float3 lightColors[1];
-  lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+  lightDirs[0] = float3(0.8498677, -0.5074472, 0.142205);
   lightColors[0] = float3(1, 0.9568627, 0.8392157);
   result.rgb = 0.03 * mat.albedo * mat.ao;
   for(int i=0;i<1;i++)
@@ -311,7 +306,7 @@ lightType[0] = 0;
 float3 lightPos[1];
 lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
-lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+lightDirs[0] = float3(0.8498677, -0.5074472, 0.142205);
 int shadowType[1];
 shadowType[0] =0;
 float lightspace = 1;
@@ -376,17 +371,27 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-float4 subInfo = float4(4, 4, 2, 0);
-subInfo.z  = (subInfo.z+16*frac(0.2*_Time.y))%16;
-float d = SDFSlice_Sub(p, float3(2, 0, 0), float3(270.0198, 0, 0), float3(2.6451, 2.6451, 2.6451), cha_c00, 0.02, TraceThre, 0, 0, subInfo);
-re = min(re, d);
+inx = -1;
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+float4 subInfo = float4(4, 4, 2, 0);
+subInfo.z  = (subInfo.z+16*frac(0.2*_Time.y))%16;
+float d = SDFSlice_Sub(p, float3(-2, 0, 0), float3(270.0198, 0, 0), float3(2.6451, 2.6451, 2.6451), cha_c00, 0.02, TraceThre, 0, 0, subInfo);
+re = min(re, d);
 }
 //@@@
 
+if(inx == -1)
+{
+	float3 q = p;
+	float2 pos2d = q.zy;
+	float2 grid = float2(0.5,0.5);
+	float2 m = floor(pos2d / grid);
+	float2 centerZY = grid * (m + float2(0.5, 0.5));
+	float3 center = float3(0,centerZY.g,centerZY.r);
+	re = SDFBox(p, center , 0.2);
+}
 
 return re;
 ###BLOCK
@@ -421,6 +426,7 @@ return re;
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -1;
 }
 else if (inx == 1 )
 {
