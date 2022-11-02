@@ -444,4 +444,22 @@ float SmoothBump(float lo, float hi, float w, float x)
 	return (1. - smoothstep(hi - w, hi + w, x)) * smoothstep(lo - w, lo + w, x);
 }
 
+float2 GetSubUV(float2 uv, float4 subInfo)
+{
+	int edgeX = subInfo.x;
+	int edgeY = subInfo.y;
+	if (edgeX > 0 && edgeY > 0)
+	{
+		int subID = subInfo.z;
+		int idx = subID % edgeX;
+		int idy = (subID - idx) / edgeY;
+
+		float2 cell = 1 / float2(edgeX, edgeY);
+		float2 origin = float2(idx*cell.x, idy*cell.y);
+		//localuv = (worlduv - origin) / cell;
+		uv = uv * cell + origin;
+	}
+	return uv;
+}
+
 #endif

@@ -14,7 +14,6 @@ public class SDFSliceGizmo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
     }
 
     private void OnDrawGizmosSelected()
@@ -27,6 +26,7 @@ public class SDFSliceGizmo : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        //Refresh();
         if(persistent)
         {
             DrawSliceBox();
@@ -67,7 +67,7 @@ public class SDFSliceGizmo : MonoBehaviour
         var mat = mr.sharedMaterial;
         if(mat == null)
         {
-            Debug.Log("check mat");
+            //Debug.Log("check mat");
             var shader = Resources.Load<Shader>("Shader/S_SDFSliceVisualize");
             mat = new Material(shader);
             var tag = gameObject.GetComponent<SDFBakerTag>();
@@ -83,6 +83,14 @@ public class SDFSliceGizmo : MonoBehaviour
                 return;
             }
             mat.SetTexture("_MainTex", texTag.plainTextures[0].tex);
+            if (texTag.useSubTex)
+            {
+                mat.SetVector("_SubInfo", new Vector4(texTag.edgeNum,texTag.edgeNum,texTag.subTexID,0));
+            }
+            else
+            {
+                mat.SetVector("_SubInfo", Vector4.zero);
+            }
             mr.sharedMaterial = mat;
         }
     }

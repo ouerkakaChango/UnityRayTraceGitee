@@ -18,6 +18,14 @@ public class TexSysTagEditor : Editor
     {
         base.OnInspectorGUI();
 
+        if(Target.useSubTex)
+        {
+            var edgeNum = serializedObject.FindProperty("edgeNum");
+            EditorGUILayout.PropertyField(edgeNum, new GUIContent("edgeNum"), true);
+            var subTexID = serializedObject.FindProperty("subTexID");
+            EditorGUILayout.PropertyField(subTexID, new GUIContent("subTexID"), true);
+        }
+
         if (Target.type == TexTagType.pbrTexture)
         {
             //1.原生listGUI,不显示内部元素
@@ -64,6 +72,11 @@ public class TexSysTagEditor : Editor
             {
                 EditorShowEnvTextureList(serializedObject, Target.envTextures.Count, listSP);
             }
+        }
+
+        //if (serializedObject.chan)
+        {
+            serializedObject.ApplyModifiedProperties();
         }
     }
 

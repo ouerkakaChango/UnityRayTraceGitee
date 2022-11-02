@@ -3,6 +3,7 @@ Shader "Unlit/S_SDFSliceVisualize"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+		_SubInfo("SubInfo", Vector) = (0,0,0,0)
     }
     SubShader
     {
@@ -46,9 +47,26 @@ Shader "Unlit/S_SDFSliceVisualize"
                 return o;
             }
 
+			float4 _SubInfo;
+
             float4 frag (v2f i) : SV_Target
             {
-				float sdf = tex2D(_MainTex, i.uv).r;
+				float2 uv = i.uv;
+				int edgeX = _SubInfo.x;
+				int edgeY = _SubInfo.y;
+				if (edgeX > 0 && edgeY > 0)
+				{
+					int subID = _SubInfo.z;
+					int idx = subID % edgeX;
+					int idy = (subID - idx) / edgeY;
+
+					float2 cell = 1 / float2(edgeX, edgeY);
+					float2 origin = float2(idx*cell.x, idy*cell.y);
+					//localuv = (worlduv - origin) / cell;
+					uv = uv * cell + origin;
+				}
+
+				float sdf = tex2D(_MainTex, uv).r;
 				float4 re;
 				if (abs(sdf) < 0.0001)
 				{

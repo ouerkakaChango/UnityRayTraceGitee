@@ -546,12 +546,12 @@ public class SDFBakerMgr : MonoBehaviour
             return;
         }
         var obj = tag.gameObject;
-
-        if(tag.sliceTexTag == null)
+        var texTag = tag.sliceTexTag;
+        if (texTag == null)
         {
             Debug.LogError("BakeError:slice not refer a tex tag "+obj);
         }
-        var sliceTexName = tag.sliceTexTag.plainTextures[0].name;
+        var sliceTexName = texTag.plainTextures[0].name;
 
         Vector3 scale = obj.transform.lossyScale;
 
@@ -559,39 +559,28 @@ public class SDFBakerMgr : MonoBehaviour
         string rotStr = BakeRotEuler(obj.transform.rotation);
         string sizeStr = Bake(obj.transform.lossyScale);
 
-        //SDFSlice(float3 p, float3 center, float3 rotEuler, float3 size, Texture2D<float> SliceTex, float hBound, float traceThre, float offset2D, float offset)
-        bakedSDFs.Add("float d = SDFSlice(p, "+ centerStr + ", "+ rotStr + ", "+ sizeStr + ", "+sliceTexName+", "+ tag.hBound + ", TraceThre, "+tag.SDF_offset2D+", "+tag.SDF_offset+");");
-        bakedSDFs.Add("re = min(re, d);");
+        var expression = obj.GetComponent<SDFBakerExpression>();
 
-        //bakedSDFs.Add("float3 localp = WorldToLocal(p, "+Bake(obj.transform.position)+", "+BakeRotEuler(obj.transform.rotation)+", "+Bake(obj.transform.lossyScale)+");");
-        //bakedSDFs.Add("float dh = abs(localp.y) - " + tag.hBound + ";");
-        //bakedSDFs.Add("dh = dh > 0 ? dh : 0;");
-        //bakedSDFs.Add("dh *= "+scale.x+";");
-        //bakedSDFs.Add("");
-        //bakedSDFs.Add("float d = re;");
-        //bakedSDFs.Add("float d2d = re;");
-        //bakedSDFs.Add("float2 picBound = float2(0.5, 0.5) * " + scale.x + ";");
-        //bakedSDFs.Add("float2 p2d = localp.xz * "+scale.x+";");
-        //bakedSDFs.Add("if (gtor(abs(p2d), picBound))");
-        //bakedSDFs.Add("{");
-        //bakedSDFs.Add("    d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;");
-        //bakedSDFs.Add("    d = sqrt(d2d * d2d + dh * dh);");
-        //bakedSDFs.Add("}");
-        //bakedSDFs.Add("else");
-        //bakedSDFs.Add("{");
-        //bakedSDFs.Add("    float2 uv = p2d / picBound;");
-        //bakedSDFs.Add("    uv = (uv + 1) * 0.5;");
-        //bakedSDFs.Add("    uint2 picSize = GetSize("+sliceTexName+");");
-        //bakedSDFs.Add("    float sdfFromPic = "+sliceTexName+ ".SampleLevel(common_linear_repeat_sampler, uv, 0).r;");
-        //bakedSDFs.Add("    sdfFromPic /= picSize.x * 0.5 * sqrt(2) * "+scale.x+";");
-        //bakedSDFs.Add("    sdfFromPic *= picBound.x;");
-        //bakedSDFs.Add("    d2d = sdfFromPic;");
-        //bakedSDFs.Add("    d2d += "+tag.SDF_offset2D+";");
-        //bakedSDFs.Add("    d2d = max(d2d,0);");
-        //bakedSDFs.Add("    d = sqrt(d2d * d2d + dh * dh);");
-        //bakedSDFs.Add("    d += "+tag.SDF_offset+";");
-        //bakedSDFs.Add("}");
-        //bakedSDFs.Add("re = min(re, d);");
+        if (texTag.useSubTex)
+        {
+            string subInfoStr = Bake(texTag.GetSubInfoVec());
+            if (expression == null)
+            {
+                bakedSDFs.Add("float d = SDFSlice_Sub(p, " + centerStr + ", " + rotStr + ", " + sizeStr + ", " + sliceTexName + ", " + tag.hBound + ", TraceThre, " + tag.SDF_offset2D + ", " + tag.SDF_offset + ", " + subInfoStr + ");");
+            }
+            else
+            {
+                bakedSDFs.Add("float4 subInfo = " + subInfoStr + ";");
+                bakedSDFs.Add(expression.expressionStr);
+                bakedSDFs.Add("float d = SDFSlice_Sub(p, " + centerStr + ", " + rotStr + ", " + sizeStr + ", " + sliceTexName + ", " + tag.hBound + ", TraceThre, " + tag.SDF_offset2D + ", " + tag.SDF_offset + ", subInfo);");
+            }
+        }
+        else
+        {
+            //SDFSlice(float3 p, float3 center, float3 rotEuler, float3 size, Texture2D<float> SliceTex, float hBound, float traceThre, float offset2D, float offset)
+            bakedSDFs.Add("float d = SDFSlice(p, " + centerStr + ", " + rotStr + ", " + sizeStr + ", " + sliceTexName + ", " + tag.hBound + ", TraceThre, " + tag.SDF_offset2D + ", " + tag.SDF_offset + ");");
+        }
+        bakedSDFs.Add("re = min(re, d);");
     }
 
     void AddBakeTex3D(SDFBakerTag tag)
@@ -946,6 +935,11 @@ public class SDFBakerMgr : MonoBehaviour
     string Bake(Vector3 v)
     {
         return "float3(" + v.x+", "+v.y+", "+v.z+")";
+    }
+
+    string Bake(Vector4 v)
+    {
+        return "float4(" + v.x + ", " + v.y + ", " + v.z+ ", " + v.w + ")";
     }
 
     string BakeColor3(Color c)

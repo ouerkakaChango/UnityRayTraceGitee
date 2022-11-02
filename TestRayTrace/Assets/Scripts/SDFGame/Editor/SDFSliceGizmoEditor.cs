@@ -21,7 +21,7 @@ public class SDFSliceGizmoEditor : Editor
         if (GUILayout.Button("Refresh"))
         {
             Target.Refresh();
-       
+        
         }
     }
 }

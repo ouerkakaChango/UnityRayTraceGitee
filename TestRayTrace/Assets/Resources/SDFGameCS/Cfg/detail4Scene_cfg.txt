@@ -376,7 +376,9 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-float d = SDFSlice(p, float3(2, 0, 0), float3(270.0198, 0, 0), float3(2.6451, 2.6451, 2.6451), cha_c00, 0.02, TraceThre, 0, 0);
+float4 subInfo = float4(4, 4, 2, 0);
+subInfo.z  = (subInfo.z+16*frac(0.2*_Time.y))%16;
+float d = SDFSlice_Sub(p, float3(2, 0, 0), float3(270.0198, 0, 0), float3(2.6451, 2.6451, 2.6451), cha_c00, 0.02, TraceThre, 0, 0, subInfo);
 re = min(re, d);
 }
 else if (inx == 1 )

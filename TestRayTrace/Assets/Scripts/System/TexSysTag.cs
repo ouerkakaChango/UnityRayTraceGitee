@@ -26,6 +26,15 @@ public class TexSysTag : MonoBehaviour
 
     [ReadOnly]
     public int texInx = -1;
+
+    //---SubTex
+    public bool useSubTex = false;
+    [HideInInspector]
+    public int subTexID = 0;
+    [HideInInspector]
+    public int edgeNum = 4;
+    //___SubTex
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,5 +45,11 @@ public class TexSysTag : MonoBehaviour
     void Update()
     {
         
+    }
+
+    //##########################################################
+    public Vector4 GetSubInfoVec()
+    {
+        return new Vector4(edgeNum, edgeNum, subTexID, 0);
     }
 }
