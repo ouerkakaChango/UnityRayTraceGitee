@@ -90,7 +90,7 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 	Ray ray;
 	ray.pos = minHit.P;
 	ray.dir = -lightDir;
-	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
+	ray.pos += ray.dir*TraceThre*2 + minHit.N*0.05*2;
 	HitInfo hitInfo;
 	return HardShadow_TraceScene(ray, hitInfo, maxLength);
 }

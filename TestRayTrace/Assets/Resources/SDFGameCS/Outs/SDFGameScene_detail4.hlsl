@@ -109,6 +109,10 @@ else if (inx == 1 )
 	//@@@
 
 	inx = GetSpecialID(inx);
+	if(inx == -1)
+	{
+		uv = SimpleUVFromPos(minHit.P,minHit.N, float3(1,1,1));
+	}
 return uv;
 }
 
@@ -132,7 +136,6 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-
 //@@@
 
 //@@@SDFBakerMgr ObjImgAttach
@@ -159,7 +162,7 @@ if(mode==0)
 float3 lightDirs[1];
 float3 lightColors[1];
 lightDirs[0] = float3(0.8498677, -0.5074472, 0.142205);
-lightColors[0] = float3(1, 0.9568627, 0.8392157);
+lightColors[0] = float3(0.4, 0.3827451, 0.3356863);
 result.rgb = 0.03 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
 {
@@ -228,7 +231,7 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 	Ray ray;
 	ray.pos = minHit.P;
 	ray.dir = -lightDir;
-	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
+	ray.pos += ray.dir*TraceThre*2 + minHit.N*0.05*2;
 	HitInfo hitInfo;
 	return HardShadow_TraceScene(ray, hitInfo, maxLength);
 }
@@ -331,26 +334,33 @@ else if (inx == 1 )
 {
 float4 subInfo = float4(4, 4, 2, 0);
 subInfo.z = (subInfo.z+16*frac(0.2*_Time.y))%16;
-float d = SDFSlice_Sub(p, float3(-2, 0, 0), float3(270, 0, 0), float3(2.6451, 2.6451, 2.6451), cha_c00, 0.02, TraceThre, 0, 0, subInfo);
+float d = SDFSlice_Sub(p, float3(-2, 0, 0), float3(270.0198, 0, 0), float3(2.6451, 2.6451, 2.6451), cha_c00, 0.02, TraceThre, 0, 0, subInfo);
 re = min(re, d);
 }
 //@@@
 
 if(inx == -1)
 {
-	float3 q = p;
-	float2 pos2d = q.zy;
-	float2 grid = float2(0.5,0.5);
-	float2 m = floor(pos2d / grid);
-	float2 centerZY = grid * (m + float2(0.5, 0.5));
-	float3 center = float3(0,centerZY.g,centerZY.r);
-	float3 bound = 0.2;
-	float d1 = SDFBox(p, center , 0.2);
+	if(IsInBBox(p,eyePos - 300,eyePos+300))
+	{
+		float3 q = p;
+		float2 pos2d = q.zy;
+		float2 grid = float2(0.5,0.5);
+		float2 m = floor(pos2d / grid);
+		float2 centerZY = grid * (m + float2(0.5, 0.5));
+		float3 center = float3(0,centerZY.g,centerZY.r);
 
-	float id = (16*noise(5*center))%16;
-	float4 subInfo = float4(4, 4, id, 0);
-	float d2 = SDFSlice_Sub(p, center-float3(1,0,0)*bound, float3(270, 0, 90), bound*3, cha_c00, 0.04, TraceThre, 0, 0, subInfo);
-	re = min(d1,d2);
+		float id = (16*noise(5*center))%16;
+
+		center.x -= 1*noise(center+0.2*_Time.y);
+
+		float3 bound = 0.2;
+		float d1 = SDFBox(p, center , 0.2);
+
+		float4 subInfo = float4(4, 4, id, 0);
+		float d2 = 0.5*SDFSlice_Sub(p, center-float3(1,0,0)*bound, float3(270, 0, 90), bound*3, cha_c00, 0.04, TraceThre, 0, 0, subInfo);
+		re = min(d1,d2);
+	}
 }
 
 return re;
