@@ -63,6 +63,13 @@ float3 randP_round(float3 seed)
 	return random_on_unit_sphere(stat);
 }
 
+float3 randP_sphere(float3 seed)
+{
+	uint stat = (uint)(seed.x) * 1973 + (uint)(seed.y) * 9277 + (uint)(seed.z) * 2699 | 1;
+
+	return random_in_unit_sphere(stat);
+}
+
 float3 randP_hemiRound(float3 seed)
 {
 	uint stat = (uint)(seed.x) * 1973 + (uint)(seed.y) * 9277 + (uint)(seed.z) * 2699 | 1;

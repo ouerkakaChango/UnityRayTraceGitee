@@ -57,6 +57,19 @@ float GetPntlightAttenuation(float3 pos, float3 lightPos)
 	//return 1 / (1 + 0.01*d + 0.005*d*d);
 }
 
+//https://www.shadertoy.com/view/mdS3zD
+//https://graphtoy.com/?f1(x,t)=sin(2*clamp(x-t,-PI,0))*exp(-x)&v1=true&f2(x,t)=&v2=false&f3(x,t)=&v3=false&f4(x,t)=&v4=false&f5(x,t)=&v5=false&f6(x,t)=&v6=false&grid=1&coords=0,0,5.089171420469822
+float ripple(float x, float t, float damp=0.3) {
+
+// First wave, low
+float w1 = sin(2.*clamp(x - t, -2.*PI*0.5, 0.));
+
+// Second wave,high
+float w2 = (sin(2.*clamp(x - t, -4.5*PI*0.5, -2.5*PI*0.5))*0.5 + 0.5)*0.7;
+
+return (w1 + w2)*exp(-abs(x)*damp);
+}
+
 int GetSpecialID(int inx);
 
 Material_PBR GetObjMaterial_PBR(int obj)
@@ -352,7 +365,22 @@ if(inx == -1)
 
 		float id = (16*noise(5*center))%16;
 
-		center.x -= 1*noise(center+0.2*_Time.y);
+		float t = _Time.y;
+
+		float animTime = 10;
+		int waveID = (round(5*t - fmod(5*t, animTime)))/(int)animTime;
+		waveID = waveID%9;
+		float3 center_wave1 = 5*randP_sphere(waveID);
+		center_wave1.x = 0;
+		center_wave1 = floor(center_wave1);
+		float dis = length(center - center_wave1);
+		float x = dis;
+		center.x -= 0.5*ripple(x,fmod(5*t, animTime));
+
+		center.x -= 0.5*noise(0.5*center+0.2*t);
+
+		x = center.z;
+		center.x -= 0.5*cos(0.1*x+t)*exp(-sin(t));
 
 		float3 bound = 0.2;
 		float d1 = SDFBox(p, center , 0.2);

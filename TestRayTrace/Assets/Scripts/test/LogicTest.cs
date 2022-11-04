@@ -205,7 +205,9 @@ public class LogicTest : MonoBehaviour
         }
 
         //8.
-        if(CheckNotNeighbour(n[0], n[6]) && n[7]!=0)
+        count = 0;
+        c1 = CheckNotNeighbour(n[0], n[6]);
+        if (c1 && n[7]!=0)
         {
             if (blog)
             {
@@ -213,7 +215,13 @@ public class LogicTest : MonoBehaviour
             }
             return false;
         }
-        if (CheckNotNeighbour(n[0], n[4]) && n[7] != 1)
+        else if(c1 && n[7] == 0)
+        {
+            count++;
+        }
+
+        c1 = CheckNotNeighbour(n[0], n[4]);
+        if ( c1 && n[7] != 1)
         {
             if (blog)
             {
@@ -221,7 +229,13 @@ public class LogicTest : MonoBehaviour
             }
             return false;
         }
-        if (CheckNotNeighbour(n[0], n[1]) && n[7] != 2)
+        else if(c1 && n[7] == 1)
+        {
+            count++;
+        }
+
+        c1 = CheckNotNeighbour(n[0], n[1]);
+        if ( c1&& n[7] != 2)
         {
             if (blog)
             {
@@ -229,12 +243,27 @@ public class LogicTest : MonoBehaviour
             }
             return false;
         }
-        if (CheckNotNeighbour(n[0], n[9]) && n[7] != 3)
+        else if(c1 && n[7] == 2)
+        {
+            count++;
+        }
+
+        c1 = CheckNotNeighbour(n[0], n[9]);
+        if ( c1 && n[7] != 3)
         {
             if (blog)
             {
                 Debug.Log("error 8.4");
             }
+            return false;
+        }
+        else if (c1 && n[7] == 3)
+        {
+            count++;
+        }
+
+        if (count!=1)
+        {
             return false;
         }
 
