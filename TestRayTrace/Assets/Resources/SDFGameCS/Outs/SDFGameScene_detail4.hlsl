@@ -174,8 +174,8 @@ if(mode==0)
 {
 float3 lightDirs[1];
 float3 lightColors[1];
-lightDirs[0] = float3(0.8498677, -0.5074472, 0.142205);
-lightColors[0] = float3(0.4, 0.3827451, 0.3356863);
+lightDirs[0] = float3(0.8390074, -0.2160703, 0.4993799);
+lightColors[0] = float3(1, 1, 1);
 result.rgb = 0.03 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
 {
@@ -271,7 +271,7 @@ lightType[0] = 0;
 float3 lightPos[1];
 lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
-lightDirs[0] = float3(0.8498677, -0.5074472, 0.142205);
+lightDirs[0] = float3(0.8390074, -0.2160703, 0.4993799);
 int shadowType[1];
 shadowType[0] =0;
 float lightspace = 1;
@@ -347,7 +347,7 @@ else if (inx == 1 )
 {
 float4 subInfo = float4(4, 4, 2, 0);
 subInfo.z = (subInfo.z+16*frac(0.2*_Time.y))%16;
-float d = SDFSlice_Sub(p, float3(-2, 0, 0), float3(270.0198, 0, 0), float3(2.6451, 2.6451, 2.6451), cha_c00, 0.02, TraceThre, 0, 0, subInfo);
+float d = SDFSlice_Sub(p, float3(-4, 0, 0), float3(270.0198, 0, 0), float3(2.6451, 2.6451, 2.6451), cha_c00, 0.02, TraceThre, 0, 0, subInfo);
 re = min(re, d);
 }
 //@@@
@@ -365,22 +365,22 @@ if(inx == -1)
 
 		float id = (16*noise(5*center))%16;
 
-		float t = _Time.y;
-
-		float animTime = 10;
-		int waveID = (round(5*t - fmod(5*t, animTime)))/(int)animTime;
-		waveID = waveID%9;
-		float3 center_wave1 = 5*randP_sphere(waveID);
-		center_wave1.x = 0;
-		center_wave1 = floor(center_wave1);
-		float dis = length(center - center_wave1);
-		float x = dis;
-		center.x -= 0.5*ripple(x,fmod(5*t, animTime));
-
-		center.x -= 0.5*noise(0.5*center+0.2*t);
-
-		x = center.z;
-		center.x -= 0.5*cos(0.1*x+t)*exp(-sin(t));
+		//float t = _Time.y;
+		//
+		//float animTime = 10;
+		//int waveID = (round(5*t - fmod(5*t, animTime)))/(int)animTime;
+		//waveID = waveID%9;
+		//float3 center_wave1 = 5*randP_sphere(waveID);
+		//center_wave1.x = 0;
+		//center_wave1 = floor(center_wave1);
+		//float dis = length(center - center_wave1);
+		//float x = dis;
+		//center.x -= 0.5*ripple(x,fmod(5*t, animTime));
+		//
+		//center.x -= 0.5*noise(0.5*center+0.2*t);
+		//
+		//x = center.z;
+		//center.x -= 0.5*cos(0.1*x+t)*exp(-sin(t));
 
 		float3 bound = 0.2;
 		float d1 = SDFBox(p, center , 0.2);
