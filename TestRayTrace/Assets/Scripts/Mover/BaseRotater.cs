@@ -18,7 +18,7 @@ public class BaseRotater : MonoBehaviour
     {
         bool bRot = true;
 
-        bRot = bRot && (!Application.isEditor) || bRotInEditor;
+        bRot = (Application.isPlaying) || bRotInEditor;
 
         if (bRot)
         {

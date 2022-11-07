@@ -128,19 +128,21 @@ public class SDFGameSceneTrace : MonoBehaviour
     const int CoreY = 8;
     public Vector2Int renderSize = new Vector2Int(1024, 720);
     public bool useIndirectRT = false;
+    public bool useTAA = false;
     public bool usePostOp = true;
     public float indirectMultiplier = 1.0f;
+    public bool needEyeDepth = false;
 
-    //---Indirect
-    Vector3 lastPos;
-    Quaternion lastRot;
-    //___
-
-     RenderTexture rt;
-     RenderTexture directRT = null;
-     RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
-     RenderTexture uselessRT = null;
-     RenderTexture rt_beforePostOp;
+    RenderTexture rt;
+    RenderTexture uselessRT = null;
+    public RenderTexture rt_EyeDepth = null;
+    //Indirect RT
+    RenderTexture directRT = null;
+    RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
+    //TAA RT
+    RenderTexture rt_beforeTAA, rt_lastAfterTAA;
+    //PostOp RT
+    RenderTexture rt_beforePostOp;
     //FSR
     RenderTexture easuRT,finalRT;
 
@@ -150,7 +152,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     public string SceneName = "Undefined";
     public AutoCS autoCS;
     ComputeShader cs;
-    ComputeShader cs_blendResult;
+    ComputeShader cs_BlendFinal;
     ComputeShader cs_FSR;
     public Texture2DArray envSpecTex2DArr;
     public Texture2D envBgTex;
@@ -169,6 +171,11 @@ public class SDFGameSceneTrace : MonoBehaviour
     public KeyboardInputer keyboard;
     //___
 
+    //---LastFrameInfo, for indirect
+    Vector3 lastPos;
+    Quaternion lastRot;
+    //___
+
     bool hasInited = false;
 
     void Start()
@@ -184,21 +191,33 @@ public class SDFGameSceneTrace : MonoBehaviour
             maincamParam.h = renderSize.y;
             QualitySettings.vSyncCount = 0;
 
-            if(useIndirectRT)
+            needEyeDepth = useTAA;
+            if(needEyeDepth)
             {
-                CreateRT(ref directRT, 1, renderSize.x, renderSize.y);
-                CreateRT(ref indirectRT, 1, renderSize.x, renderSize.y);
-                CreateRT(ref frontIndirectRT, 1, renderSize.x, renderSize.y);
-                CreateRT(ref newFrontIndirectRT, 1, renderSize.x, renderSize.y);
+                CreateRT(ref rt_EyeDepth, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
+            }
+            
+            if (useIndirectRT)
+            {
+                CreateRT(ref directRT, renderSize.x, renderSize.y);
+                CreateRT(ref indirectRT, renderSize.x, renderSize.y);
+                CreateRT(ref frontIndirectRT, renderSize.x, renderSize.y);
+                CreateRT(ref newFrontIndirectRT, renderSize.x, renderSize.y);
             }
             else
             {
-                CreateRT(ref uselessRT, 1, 1, 1);
+                CreateRT(ref uselessRT, 1, 1);
             }
-            if(usePostOp)
+
+            if(useTAA)
             {
-                //rt_beforePostOp
-                CreateRT(ref rt_beforePostOp, 1, renderSize.x, renderSize.y);
+                CreateRT(ref rt_beforeTAA, renderSize.x, renderSize.y);
+                CreateRT(ref rt_lastAfterTAA, renderSize.x, renderSize.y);
+            }
+
+            if (usePostOp)
+            {
+                CreateRT(ref rt_beforePostOp, renderSize.x, renderSize.y);
             }
 
             Co_GoIter = GoIter();
@@ -318,6 +337,13 @@ public class SDFGameSceneTrace : MonoBehaviour
         return 2 * vec3Size;
     }
     //################################################################################################################
+    void CSInsertSystemValue(ref ComputeShader computeShader)
+    {
+        computeShader.SetInt("frameID", frameID);
+        computeShader.SetFloat("daoScale", daoScale);
+        computeShader.SetVector("_Time", Shader.GetGlobalVector("_Time"));
+    }
+    //################################################################################################################
     void Compute_Render(ref ComputeShader computeShader, ref RenderTexture rTex, in SDFCameraParam camParam)
     {
         if(!hasInited)
@@ -329,44 +355,9 @@ public class SDFGameSceneTrace : MonoBehaviour
         //##################################
         //### compute
         int kInx = computeShader.FindKernel("Render");
-
-        //####
-        //System Value
-        computeShader.SetInt("frameID", frameID);
-        computeShader.SetFloat("daoScale", daoScale);
-        computeShader.SetVector("_Time", Shader.GetGlobalVector("_Time"));
-        //??? 写成for循环
-        computeShader.SetTexture(kInx, "shiftNoiseTex", ShaderToyTool.Instance.shiftNoiseTex);
-        computeShader.SetTexture(kInx, "LUT_BRDF", ShaderToyTool.Instance.LUT_BRDF);
-        computeShader.SetTexture(kInx, "perlinNoise1", ShaderToyTool.Instance.perlinNoise1);
-        computeShader.SetTexture(kInx, "voronoiNoise1", ShaderToyTool.Instance.voronoiNoise1);
-        computeShader.SetTexture(kInx, "blueNoise", ShaderToyTool.Instance.blueNoise);
-        computeShader.SetTexture(kInx, "greyNoiseMedium", ShaderToyTool.Instance.greyNoiseMedium);
-        computeShader.SetTexture(kInx, "RGBANoiseMedium", ShaderToyTool.Instance.RGBANoiseMedium);
-        if (autoCS.texSys != null)
-        {
-            for (int i = 0; i < autoCS.texSys.outTextures.Count; i++)
-            {
-                computeShader.SetTexture(kInx, autoCS.texSys.outTextures[i].name, autoCS.texSys.outTextures[i].tex);
-            }
-        }
-        else
-        {
-            //Debug.Log("Warning:No Texture Sys");
-        }
-        if (autoCS.dyValSys != null)
-        {
-            for (int i = 0; i < autoCS.dyValSys.outFloats.Count; i++)
-            {
-                computeShader.SetFloat(autoCS.dyValSys.outFloats[i].name, autoCS.dyValSys.outFloats[i].GetVal());
-            }
-        }
-        else
-        {
-            //Debug.Log("Warning:No dyVal Sys");
-        }
-        //___
-        //####
+        CSInsertSystemValue(ref computeShader);
+        ShaderToyTool.Instance.CSInsertSystemValue(ref computeShader, kInx);
+        autoCS.CSInsertSystemValue(ref computeShader, kInx);
 
         computeShader.SetBool("useIndirectRT", useIndirectRT);
         if (useIndirectRT)
@@ -380,49 +371,81 @@ public class SDFGameSceneTrace : MonoBehaviour
             //!!! 反正不用到，但是参数要传进去，省得变shader代码
             computeShader.SetTexture(kInx, "IndirectResult", uselessRT);
         }
+
+        computeShader.SetBool("needEyeDepth", needEyeDepth);
+        if(needEyeDepth)
+        {
+            computeShader.SetTexture(kInx, "rt_EyeDepth", rt_EyeDepth);
+        }
+        else
+        {
+            computeShader.SetTexture(kInx, "rt_EyeDepth", uselessRT);
+        }
+
         computeShader.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
         computeShader.SetTexture(kInx, "envBgTex", envBgTex);
-
         camParam.InsertParamToComputeShader(ref computeShader);
-
         computeShader.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
         //### compute
         //#####################################;
+
+
         if(useIndirectRT)
         {
-            //???
             //Blend dir+indir=>rTex
             //###########
             //### compute
-            kInx = cs_blendResult.FindKernel("BlendFnial");
-            cs_blendResult.SetInt("frameID", frameID);
-            cs_blendResult.SetFloat("indirectMultiplier", indirectMultiplier);
-            cs_blendResult.SetTexture(kInx, "Result", rTex);
-            cs_blendResult.SetTexture(kInx, "Direct", directRT);
-            cs_blendResult.SetTexture(kInx, "Indirect", indirectRT);
-            cs_blendResult.SetTexture(kInx, "FrontIndirect", frontIndirectRT);
-            cs_blendResult.SetTexture(kInx, "NewFrontIndirect", newFrontIndirectRT);
-            cs_blendResult.SetTexture(kInx, "blueNoise", ShaderToyTool.Instance.blueNoise);
-            cs_blendResult.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+            kInx = cs_BlendFinal.FindKernel("BlendIndirect");
+            cs_BlendFinal.SetInt("frameID", frameID);
+            cs_BlendFinal.SetFloat("indirectMultiplier", indirectMultiplier);
+            cs_BlendFinal.SetTexture(kInx, "Result", rTex);
+            cs_BlendFinal.SetTexture(kInx, "Direct", directRT);
+            cs_BlendFinal.SetTexture(kInx, "Indirect", indirectRT);
+            cs_BlendFinal.SetTexture(kInx, "FrontIndirect", frontIndirectRT);
+            cs_BlendFinal.SetTexture(kInx, "NewFrontIndirect", newFrontIndirectRT);
+            cs_BlendFinal.SetTexture(kInx, "blueNoise", ShaderToyTool.Instance.blueNoise);
+            cs_BlendFinal.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
             //### compute
             //###########
             //Copy newFrontIndirectRT to frontIndirectRT
             {
                 //Graphics.CopyTexture(newFrontIndirectRT, frontIndirectRT);
-                kInx = cs_blendResult.FindKernel("CopyToNewFront");
-                cs_blendResult.SetTexture(kInx, "Result", frontIndirectRT);
-                cs_blendResult.SetTexture(kInx, "NewFrontIndirect", newFrontIndirectRT);
-                cs_blendResult.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+                kInx = cs_BlendFinal.FindKernel("CopyToNewFront");
+                cs_BlendFinal.SetTexture(kInx, "Result", frontIndirectRT);
+                cs_BlendFinal.SetTexture(kInx, "NewFrontIndirect", newFrontIndirectRT);
+                cs_BlendFinal.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
             }
+        }
+
+        if(useTAA)
+        {
+            //Debug.Log("Draw TAA");
+            Graphics.Blit(rTex, rt_beforeTAA);
+            //Blend rt_beforeTAA+rt_lastAfterTAA=>rTex
+            //###########
+            //### compute
+            kInx = cs_BlendFinal.FindKernel("BlendTAA");
+            cs_BlendFinal.SetInt("frameID", frameID);
+            cs_BlendFinal.SetFloat("TAAMultiplier", 0.1f);
+            cs_BlendFinal.SetTexture(kInx, "Result", rTex);
+            cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeTAA);
+            cs_BlendFinal.SetTexture(kInx, "TexB", rt_lastAfterTAA);
+            cs_BlendFinal.SetTexture(kInx, "TexADepth", rt_EyeDepth);
+            maincamParam.InsertParamToComputeShader(ref cs_BlendFinal);
+
+            cs_BlendFinal.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+            //### compute
+            //###########
+            Graphics.Blit(rTex, rt_lastAfterTAA);
         }
 
         if(usePostOp)
         {
-            Graphics.Blit(rt, rt_beforePostOp);
-            kInx = cs_blendResult.FindKernel("TextureAA");
-            cs_blendResult.SetTexture(kInx, "Result", rt);
-            cs_blendResult.SetTexture(kInx, "Direct", rt_beforePostOp);
-            cs_blendResult.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+            Graphics.Blit(rTex, rt_beforePostOp);
+            kInx = cs_BlendFinal.FindKernel("TextureAA");
+            cs_BlendFinal.SetTexture(kInx, "Result", rTex);
+            cs_BlendFinal.SetTexture(kInx, "Direct", rt_beforePostOp);
+            cs_BlendFinal.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
         }
     }
     //####################################################################################
@@ -436,15 +459,15 @@ public class SDFGameSceneTrace : MonoBehaviour
             rTex.Create();
             if (useFSR)
             {
-                CreateRT(ref easuRT, FSR_Scale, camParam.w, camParam.h);
-                CreateRT(ref finalRT, FSR_Scale, camParam.w, camParam.h);
+                CreateRT(ref easuRT, camParam.w, camParam.h, RenderTextureFormat.ARGBFloat, 0, FSR_Scale);
+                CreateRT(ref finalRT, camParam.w, camParam.h, RenderTextureFormat.ARGBFloat, 0, FSR_Scale);
             }
             var csResourcesPath = ChopEnd(autoCS.outs[0], ".compute");
             csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
             cs = (ComputeShader)Resources.Load(csResourcesPath);
-            if(useIndirectRT || usePostOp)
+            if(useIndirectRT || useTAA ||usePostOp )
             {
-                cs_blendResult = (ComputeShader)Resources.Load("LightingCS/BlendFinal");
+                cs_BlendFinal = (ComputeShader)Resources.Load("LightingCS/BlendFinal");
             }
             cs_FSR = (ComputeShader)Resources.Load("FSR/FSR");
         }
@@ -459,9 +482,9 @@ public class SDFGameSceneTrace : MonoBehaviour
         autoCS.Generate();
     }
 
-    void CreateRT(ref RenderTexture rTex, float scale, int w, int h, int depth = 0)
+    void CreateRT(ref RenderTexture rTex, int w, int h, RenderTextureFormat rtFormat = RenderTextureFormat.ARGBFloat, int depth = 0, float scale = 1)
     {
-        rTex = new RenderTexture((int)(w* scale), (int)(h* scale), depth, RenderTextureFormat.ARGBFloat);
+        rTex = new RenderTexture((int)(w* scale), (int)(h* scale), depth, rtFormat);
         rTex.enableRandomWrite = true;
         rTex.Create();
     }

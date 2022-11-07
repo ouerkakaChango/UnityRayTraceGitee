@@ -379,4 +379,22 @@ public class AutoCS : MonoBehaviour
     {
         bakerMgr.ClearMemory();
     }
+
+    public void CSInsertSystemValue(ref ComputeShader computeShader, int kInx)
+    {
+        if (texSys != null)
+        {
+            for (int i = 0; i < texSys.outTextures.Count; i++)
+            {
+                computeShader.SetTexture(kInx, texSys.outTextures[i].name, texSys.outTextures[i].tex);
+            }
+        }
+        if (dyValSys != null)
+        {
+            for (int i = 0; i < dyValSys.outFloats.Count; i++)
+            {
+                computeShader.SetFloat(dyValSys.outFloats[i].name, dyValSys.outFloats[i].GetVal());
+            }
+        }
+    }
 }

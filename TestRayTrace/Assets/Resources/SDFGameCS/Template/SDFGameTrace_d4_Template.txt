@@ -31,6 +31,8 @@ float3 screenU;
 float3 screenV;
 
 RWTexture2D<float4> Result;
+bool needEyeDepth;
+RWTexture2D<float> rt_EyeDepth;
 RWTexture2D<float4> IndirectResult;
 Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
@@ -77,6 +79,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 	float SSAA_unitDis = 1.0f / SSAA_edge;
 	float3 SSAA_colors[SSAA_num];
 	float3 SSAA_indirColors[SSAA_num];
+	float SSAA_eyeDepth[SSAA_num];
 
 	float3 camFoward = normalize(cross(screenU,screenV));
 
@@ -106,6 +109,15 @@ void Render(uint3 id : SV_DispatchThreadID)
 			{
 				SSAA_indirColors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameIndirColor(ray,seed,minHit,mat);
 			}
+			if(needEyeDepth)
+			{
+				float eyeDepth = -1;
+				if(minHit.bHit)
+				{
+					eyeDepth = length(minHit.P - ray.pos);
+				}
+				SSAA_eyeDepth[i - 1 + (j - 1)* SSAA_edge] = eyeDepth;
+			}
 		}
 	}
 
@@ -117,14 +129,25 @@ void Render(uint3 id : SV_DispatchThreadID)
 	re /= (float)SSAA_num;
 	Result[id.xy] = float4(re, 1);
 
+	if(needEyeDepth)
+	{
+		float3 d = 0;
+		for (int i = 0; i < SSAA_num; i++)
+		{
+			d += SSAA_eyeDepth[i];
+		}
+		d /= (float)SSAA_num;
+		rt_EyeDepth[id.xy] = d;
+	}
+
 	if(useIndirectRT)
 	{
-	re = 0;
-	for (int i = 0; i < SSAA_num; i++)
-	{
-		re += SSAA_indirColors[i];
-	}
-	re /= (float)SSAA_num;
-	IndirectResult[id.xy] = float4(re, 1);
+		re = 0;
+		for (int i = 0; i < SSAA_num; i++)
+		{
+			re += SSAA_indirColors[i];
+		}
+		re /= (float)SSAA_num;
+		IndirectResult[id.xy] = float4(re, 1);
 	}
 }

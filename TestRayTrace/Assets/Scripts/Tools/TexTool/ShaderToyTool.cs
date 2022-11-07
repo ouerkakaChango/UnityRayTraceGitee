@@ -32,6 +32,18 @@ public sealed class ShaderToyTool
         greyNoiseMedium = Resources.Load<Texture2D>("ShaderToy/greyNoiseMedium");
         RGBANoiseMedium = Resources.Load<Texture2D>("ShaderToy/RGBANoiseMedium");
     }
+
+    public void CSInsertSystemValue(ref ComputeShader computeShader, int kInx)
+    {
+        computeShader.SetTexture(kInx, "shiftNoiseTex", shiftNoiseTex);
+        computeShader.SetTexture(kInx, "LUT_BRDF", LUT_BRDF);
+        computeShader.SetTexture(kInx, "perlinNoise1", perlinNoise1);
+        computeShader.SetTexture(kInx, "voronoiNoise1", voronoiNoise1);
+        computeShader.SetTexture(kInx, "blueNoise", blueNoise);
+        computeShader.SetTexture(kInx, "greyNoiseMedium", greyNoiseMedium);
+        computeShader.SetTexture(kInx, "RGBANoiseMedium", RGBANoiseMedium);
+    }
+
     public static ShaderToyTool Instance
     {
         get

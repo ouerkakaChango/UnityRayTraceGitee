@@ -1,23 +1,22 @@
 // Each #kernel tells which function to compile; you can have many kernels
-#pragma kernel BlendFnial
+#pragma kernel BlendIndirect
 #pragma kernel CopyToNewFront
 #pragma kernel TextureAA
+#pragma kernel BlendTAA
 
 #include "../../HLSL/CommonDef.hlsl"
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
+
 RWTexture2D<float4> Result;
+int frameID;
+
 Texture2D<float4> Direct;
 Texture2D<float4> Indirect;
 Texture2D<float4> FrontIndirect;
 RWTexture2D<float4> NewFrontIndirect;
-int frameID;
 float indirectMultiplier;
-
 Texture2D<float3> blueNoise;
-
 [numthreads(8, 8, 1)]
-void BlendFnial(uint3 id : SV_DispatchThreadID)
+void BlendIndirect(uint3 id : SV_DispatchThreadID)
 {
 	float4 IndirectPart = 0;
 	if (frameID == 0)
@@ -83,3 +82,48 @@ void TextureAA(uint3 id : SV_DispatchThreadID)
 {
 	Result[id.xy] = Direct[id.xy];
 }
+//---TAA-------------------------------------------------------------------------------------------
+float pixW;
+float pixH;
+float3 screenLeftDownPix;
+float3 eyePos;
+float3 screenU;
+float3 screenV;
+
+Texture2D<float4> TexA;
+Texture2D<float4> TexB;
+Texture2D<float> TexADepth;
+float TAAMultiplier;
+[numthreads(8, 8, 1)]
+void BlendTAA(uint3 id : SV_DispatchThreadID)
+{
+	//A: rt_beforeTAA
+	//B: rt_lastAfterTAA
+	if (frameID == 0)
+	{
+		Result[id.xy] = TexA[id.xy];
+		return;
+	}
+	float3 col1 = TexA[id.xy].rgb;
+	float3 re = col1;
+	//1.eyeDepth
+	float eyeDepth = TexADepth[id.xy].r;
+	if (eyeDepth >= 0)
+	{
+		//2.rayPos,rayDir
+		float3 camFoward = normalize(cross(screenU, screenV));
+		float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (id.x - 0.5) + screenV * pixH * (id.y - 0.5);
+		//??? pixelLocalPos: Low Discrepancy Sequence
+		float2 pixelLocalPos = float2(0.5, 0.5);
+		float3 rayPos = pixLeftDownPos + screenU * pixW * pixelLocalPos.x + screenV * pixH * pixelLocalPos.y;
+		float3 rayDir = normalize(rayPos - eyePos);
+		//3.worldPos
+		float3 p = rayPos + eyeDepth * rayDir;
+
+		float3 col2 = TexB[id.xy].rgb;
+		re = col1 * (1 - TAAMultiplier) + col2 * TAAMultiplier;
+		re = p;
+	}
+	Result[id.xy] = float4(re, 1);
+}
+//___TAA________________________________________________________________________
