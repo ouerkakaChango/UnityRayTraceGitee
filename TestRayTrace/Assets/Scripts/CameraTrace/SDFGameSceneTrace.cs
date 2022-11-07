@@ -113,6 +113,14 @@ public class SDFGameCameraParam : SDFCameraParam
         cs.SetVector("screenU", screenU);
         cs.SetVector("screenV", screenV);
     }
+
+    public void InsertParamToComputeShader_TAA(ref ComputeShader cs)
+    {
+        cs.SetVector("last_screenLeftDownPix", screenLeftDownPix);
+        cs.SetVector("last_eyePos", eyePos);
+        cs.SetVector("last_screenU", screenU);
+        cs.SetVector("last_screenV", screenV);
+    }
 }
 
 //[ExecuteInEditMode]
@@ -158,6 +166,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     public Texture2D envBgTex;
 
     SDFGameCameraParam maincamParam;
+    SDFGameCameraParam lastTAAcamParam;
 
     float daoScale = 1.0f;
 
@@ -211,6 +220,8 @@ public class SDFGameSceneTrace : MonoBehaviour
 
             if(useTAA)
             {
+                lastTAAcamParam = new SDFGameCameraParam();
+                SDFGameCameraParam.Copy(maincamParam, lastTAAcamParam);
                 CreateRT(ref rt_beforeTAA, renderSize.x, renderSize.y);
                 CreateRT(ref rt_lastAfterTAA, renderSize.x, renderSize.y);
             }
@@ -426,17 +437,20 @@ public class SDFGameSceneTrace : MonoBehaviour
             //### compute
             kInx = cs_BlendFinal.FindKernel("BlendTAA");
             cs_BlendFinal.SetInt("frameID", frameID);
-            cs_BlendFinal.SetFloat("TAAMultiplier", 0.1f);
+            cs_BlendFinal.SetFloat("TAAMultiplier", 0.5f);
             cs_BlendFinal.SetTexture(kInx, "Result", rTex);
             cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeTAA);
             cs_BlendFinal.SetTexture(kInx, "TexB", rt_lastAfterTAA);
             cs_BlendFinal.SetTexture(kInx, "TexADepth", rt_EyeDepth);
             maincamParam.InsertParamToComputeShader(ref cs_BlendFinal);
+            lastTAAcamParam.InsertParamToComputeShader_TAA(ref cs_BlendFinal);
 
             cs_BlendFinal.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
             //### compute
             //###########
             Graphics.Blit(rTex, rt_lastAfterTAA);
+
+            SDFGameCameraParam.Copy(maincamParam, lastTAAcamParam);
         }
 
         if(usePostOp)

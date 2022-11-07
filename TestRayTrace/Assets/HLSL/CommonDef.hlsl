@@ -177,9 +177,15 @@ float invSmooth3(float x) {
 	//return 0.5f - sin(asin(1 - 2 * x) / 3);
 }
 
-bool Is01(float x)
+inline bool Is01(float x)
 {
 	return x > 0 && x < 1;
+}
+
+inline bool Is01(float2 v)
+{
+	return v.x >= 0 && v.x <= 1 &&
+		v.y >= 0 && v.y <= 1;
 }
 
 float length2(float2 x)

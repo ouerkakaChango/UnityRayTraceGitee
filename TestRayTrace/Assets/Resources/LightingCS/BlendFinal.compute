@@ -5,6 +5,7 @@
 #pragma kernel BlendTAA
 
 #include "../../HLSL/CommonDef.hlsl"
+#include "../../HLSL/RayMath.hlsl"
 
 RWTexture2D<float4> Result;
 int frameID;
@@ -90,6 +91,11 @@ float3 eyePos;
 float3 screenU;
 float3 screenV;
 
+float3 last_screenLeftDownPix;
+float3 last_eyePos;
+float3 last_screenU;
+float3 last_screenV;
+
 Texture2D<float4> TexA;
 Texture2D<float4> TexB;
 Texture2D<float> TexADepth;
@@ -119,10 +125,35 @@ void BlendTAA(uint3 id : SV_DispatchThreadID)
 		float3 rayDir = normalize(rayPos - eyePos);
 		//3.worldPos
 		float3 p = rayPos + eyeDepth * rayDir;
+		//4.Get lastUV from p
+		//4.1 rayCast last_eyePos to p
+		Ray lastRay;
+		lastRay.pos = last_eyePos;
+		lastRay.dir = normalize(p - last_eyePos);
 
-		float3 col2 = TexB[id.xy].rgb;
-		re = col1 * (1 - TAAMultiplier) + col2 * TAAMultiplier;
-		re = p;
+		Plane lastPlane;
+		lastPlane.p = last_screenLeftDownPix;
+		float3 lastCamFoward = normalize(cross(last_screenU, last_screenV));
+		lastPlane.n = -lastCamFoward;
+
+		float dis = RayCastPlane(lastRay, lastPlane);
+		if (dis > 0)
+		{
+			float3 lastScreenPos = lastRay.pos + dis * lastRay.dir;
+			float3 lastScreenLeftDownPos = screenLeftDownPix - screenU * pixW * 0.5 - screenV * pixH * 0.5;
+			float3 screenVec = lastScreenPos - lastScreenLeftDownPos;
+			uint2 size = GetSize(Result);
+			float screenULength = pixW * size.x;
+			float screenVLength = pixH * size.y;
+			float2 lastUV = 0;
+			lastUV.x = dot(screenVec, screenU) / screenULength;
+			lastUV.y = dot(screenVec, screenV) / screenVLength;
+			if (Is01(lastUV))
+			{
+				float3 col2 = TexB[lastUV*size].rgb;
+				re = col1 * (1 - TAAMultiplier) + col2 * TAAMultiplier;
+			}
+		}
 	}
 	Result[id.xy] = float4(re, 1);
 }
