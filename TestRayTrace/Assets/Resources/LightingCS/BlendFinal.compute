@@ -84,6 +84,52 @@ void TextureAA(uint3 id : SV_DispatchThreadID)
 	Result[id.xy] = Direct[id.xy];
 }
 //---TAA-------------------------------------------------------------------------------------------
+#include "../../HLSL/Random/RandUtility.hlsl"
+
+//https://zhuanlan.zhihu.com/p/425233743
+float3 TAA_clipedColor(Texture2D<float4> texA, float2 nowUV, float3 nowColor ,float3 HistoryColor)
+{
+	float3 AABBMin, AABBMax;
+	AABBMin = RGBToYCoCg(nowColor);
+	AABBMax = AABBMin;
+	int2 kOffsets3x3[9] = {
+		int2(-1,-1),
+		int2(-1,0),
+		int2(-1,1),
+		int2(0,-1),
+		int2(0,0),
+		int2(0,1),
+		int2(1,-1),
+		int2(1,0),
+		int2(1,1),
+	};
+	for(int k=0;k<9;k++)
+	{
+		float3 neighbourColor = texA.SampleLevel(common_point_clamp_sampler, nowUV, 0, kOffsets3x3[k]).rgb;
+		float3 C = RGBToYCoCg(neighbourColor);
+		AABBMin = min(AABBMin, C);
+		AABBMax = max(AABBMax, C);
+	}
+
+	float3 History = RGBToYCoCg(HistoryColor);
+
+	float3 Filtered = (AABBMin + AABBMax) * 0.5f;
+	float3 RayOrigin = History;
+	float3 RayDir = Filtered - History;
+	RayDir = abs(RayDir) < (1.0 / 65536.0) ? (1.0 / 65536.0) : RayDir;
+	float3 InvRayDir = rcp(RayDir);
+
+	float3 MinIntersect = (AABBMin - RayOrigin) * InvRayDir;
+	float3 MaxIntersect = (AABBMax - RayOrigin) * InvRayDir;
+	float3 EnterIntersect = min(MinIntersect, MaxIntersect);
+	float ClipBlend = max(EnterIntersect.x, max(EnterIntersect.y, EnterIntersect.z));
+	ClipBlend = saturate(ClipBlend);
+
+	float3 ResultYCoCg = lerp(History, Filtered, ClipBlend);
+
+	return YCoCgToRGB(ResultYCoCg);
+}
+
 float pixW;
 float pixH;
 float3 screenLeftDownPix;
@@ -119,8 +165,14 @@ void BlendTAA(uint3 id : SV_DispatchThreadID)
 		//2.rayPos,rayDir
 		float3 camFoward = normalize(cross(screenU, screenV));
 		float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (id.x - 0.5) + screenV * pixH * (id.y - 0.5);
-		//??? pixelLocalPos: Low Discrepancy Sequence
-		float2 pixelLocalPos = float2(0.5, 0.5);
+		// pixelLocalPos: Low Discrepancy Sequence
+		float3 seed = float3(id.xy, frameID);
+		//!!!
+		{
+			pixLeftDownPos += 0.0001*randP_sphere(seed);
+		}
+		float2 uv_lds = float2(rand01(seed.zxy), rand01(seed.zyx));
+		float2 pixelLocalPos = uv_lds;//sobolVec2(frameID, 0);//float2(0.5, 0.5);
 		float3 rayPos = pixLeftDownPos + screenU * pixW * pixelLocalPos.x + screenV * pixH * pixelLocalPos.y;
 		float3 rayDir = normalize(rayPos - eyePos);
 		//3.worldPos
@@ -148,13 +200,38 @@ void BlendTAA(uint3 id : SV_DispatchThreadID)
 			float2 lastUV = 0;
 			lastUV.x = dot(screenVec, screenU) / screenULength;
 			lastUV.y = dot(screenVec, screenV) / screenVLength;
+
+			//??? need solve ghost
+			
 			if (Is01(lastUV))
 			{
 				float3 col2 = TexB[lastUV*size].rgb;
+				float2 nowUV = id.xy / (float2)size;
+				col2 = TAA_clipedColor(TexA, nowUV, col1, col2);
 				re = col1 * (1 - TAAMultiplier) + col2 * TAAMultiplier;
+				//re = float3(, 0);
 			}
 		}
 	}
 	Result[id.xy] = float4(re, 1);
 }
 //___TAA________________________________________________________________________
+
+[numthreads(8, 8, 1)]
+void sdBlendTAA(uint3 id : SV_DispatchThreadID)
+{
+	//A: rt_beforeTAA
+	//B: rt_lastAfterTAA
+	if (frameID == 0)
+	{
+		Result[id.xy] = TexA[id.xy];
+		return;
+	}
+	float3 col1 = TexA[id.xy].rgb;
+	float3 re = col1;
+	//1.eyeDepth
+	float eyeDepth = TexADepth[id.xy].r;
+	float3 col2 = TexB[id.xy].rgb;
+	re = lerp(col1, col2,0.05);
+	Result[id.xy] = float4(re, 1);
+}

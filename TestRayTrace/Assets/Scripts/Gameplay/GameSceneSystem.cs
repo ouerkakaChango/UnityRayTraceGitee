@@ -29,6 +29,10 @@ public class GameSceneSystem : MonoBehaviour
                 keyboard.keyDic.Add("q", trace.Dao_GetSmall);
                 keyboard.keyDic.Add("e", trace.Dao_GetBig);
             }
+            else if(action == TriggerAction.Console_KeyBind_1TAA)
+            {
+                keyboard.keyDic.Add("1", trace.ToggleTAA);
+            }
         }
     }
 

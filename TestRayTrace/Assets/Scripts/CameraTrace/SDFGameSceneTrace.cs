@@ -132,11 +132,12 @@ public class SDFGameSceneTrace : MonoBehaviour
     };
 
     int frameID = 0;
+    int TAAframeID = 0;
     const int CoreX = 8;
     const int CoreY = 8;
     public Vector2Int renderSize = new Vector2Int(1024, 720);
     public bool useIndirectRT = false;
-    public bool useTAA = false;
+    bool useTAA = false;
     public bool usePostOp = true;
     public float indirectMultiplier = 1.0f;
     public bool needEyeDepth = false;
@@ -205,17 +206,15 @@ public class SDFGameSceneTrace : MonoBehaviour
             {
                 CreateRT(ref rt_EyeDepth, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
             }
-            
+
+            CreateRT(ref uselessRT, 1, 1);
+
             if (useIndirectRT)
             {
                 CreateRT(ref directRT, renderSize.x, renderSize.y);
                 CreateRT(ref indirectRT, renderSize.x, renderSize.y);
                 CreateRT(ref frontIndirectRT, renderSize.x, renderSize.y);
                 CreateRT(ref newFrontIndirectRT, renderSize.x, renderSize.y);
-            }
-            else
-            {
-                CreateRT(ref uselessRT, 1, 1);
             }
 
             if(useTAA)
@@ -295,6 +294,11 @@ public class SDFGameSceneTrace : MonoBehaviour
     public void Dao_GetBig()
     {
         daoScale *= 2;
+    }
+
+    public void ToggleTAA()
+    {
+        useTAA = !useTAA;
     }
 
     bool qToggle = true;
@@ -428,6 +432,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             }
         }
 
+        //???
         if(useTAA)
         {
             //Debug.Log("Draw TAA");
@@ -436,8 +441,8 @@ public class SDFGameSceneTrace : MonoBehaviour
             //###########
             //### compute
             kInx = cs_BlendFinal.FindKernel("BlendTAA");
-            cs_BlendFinal.SetInt("frameID", frameID);
-            cs_BlendFinal.SetFloat("TAAMultiplier", 0.5f);
+            cs_BlendFinal.SetInt("frameID", TAAframeID);
+            cs_BlendFinal.SetFloat("TAAMultiplier", 0.95f);
             cs_BlendFinal.SetTexture(kInx, "Result", rTex);
             cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeTAA);
             cs_BlendFinal.SetTexture(kInx, "TexB", rt_lastAfterTAA);
@@ -548,6 +553,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             yield return null;
             fps = fpsTimer.GetFPS();
             frameID += 1;
+            TAAframeID += 1;
         }
     }
 

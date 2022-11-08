@@ -101,6 +101,7 @@ float normalDistribution(float ave, float sqrtPhi,float3 seed1,float3 seed2)
 }
 
 //#########################################################################
+//https://blog.csdn.net/weixin_44176696/article/details/119988866
 // 1 ~ 8 维的 sobol 生成矩阵
 const uint V[8 * 32] = {
 	2147483648, 1073741824, 536870912, 268435456, 134217728, 67108864, 33554432, 16777216, 8388608, 4194304, 2097152, 1048576, 524288, 262144, 131072, 65536, 32768, 16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1,
@@ -130,46 +131,40 @@ float sobol(uint d, uint i) {
 }
 
 // 生成第 i 帧的第 b 次反弹需要的二维随机向量
-float2 randfloat2_unrot(uint i, uint b) {
+float2 sobolVec2(uint i, uint b) {
 	float u = sobol(b * 2, grayCode(i));
 	float v = sobol(b * 2 + 1, grayCode(i));
 	return float2(u, v);
 }
 
-uint wang_hash(inout uint seed) {
-	seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
-	seed *= uint(9);
-	seed = seed ^ (seed >> 4);
-	seed *= uint(0x27d4eb2d);
-	seed = seed ^ (seed >> 15);
-	return seed;
-}
-
-float2 CranleyPattersonRotation(int width ,int height, int pixX, int pixY, float2 p) {
-	uint pseed = uint(
-		uint((pixX * 0.5 + 0.5) * width)  * uint(1973) +
-		uint((pixY * 0.5 + 0.5) * height) * uint(9277) +
-		uint(114514 / 1919) * uint(26699)) | uint(1);
-
-	float u = float(wang_hash(pseed)) / 4294967296.0;
-	float v = float(wang_hash(pseed)) / 4294967296.0;
-
-	p.x += u;
-	if (p.x > 1) p.x -= 1;
-	if (p.x < 0) p.x += 1;
-
-	p.y += v;
-	if (p.y > 1) p.y -= 1;
-	if (p.y < 0) p.y += 1;
-
-	return p;
-}
-
-// 生成第 i 帧的第 b 次反弹需要的二维随机向量
-//w,h,i,j,?,?
-float2 randfloat2(int width, int height, int pixX, int pixY, uint i, uint b) {
-	return CranleyPattersonRotation(width, height, pixX, pixY, randfloat2_unrot(i,b));
-}
+//uint wang_hash(inout uint seed) {
+//	seed = uint(seed ^ uint(61)) ^ uint(seed >> uint(16));
+//	seed *= uint(9);
+//	seed = seed ^ (seed >> 4);
+//	seed *= uint(0x27d4eb2d);
+//	seed = seed ^ (seed >> 15);
+//	return seed;
+//}
+//
+//float2 CranleyPattersonRotation(int width ,int height, int pixX, int pixY, float2 p) {
+//	uint pseed = uint(
+//		uint((pixX * 0.5 + 0.5) * width)  * uint(1973) +
+//		uint((pixY * 0.5 + 0.5) * height) * uint(9277) +
+//		uint(114514 / 1919) * uint(26699)) | uint(1);
+//
+//	float u = float(wang_hash(pseed)) / 4294967296.0;
+//	float v = float(wang_hash(pseed)) / 4294967296.0;
+//
+//	p.x += u;
+//	if (p.x > 1) p.x -= 1;
+//	if (p.x < 0) p.x += 1;
+//
+//	p.y += v;
+//	if (p.y > 1) p.y -= 1;
+//	if (p.y < 0) p.y += 1;
+//
+//	return p;
+//}
 
 //#########################################################################
 //https://learnopengl-cn.github.io/07%20PBR/03%20IBL/02%20Specular%20IBL/

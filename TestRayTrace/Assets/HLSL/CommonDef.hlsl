@@ -411,7 +411,7 @@ float4 SampleRGBA(in Texture2D<float4> tex, float2 uv)
 {
 	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).rgba;
 }
-
+//###############################################################################
 //https://www.shadertoy.com/view/wt23Rt
 float3 RGBToHSV(float3 c) {
 	float4 K = float4(0., -1. / 3., 2. / 3., -1.),
@@ -435,6 +435,25 @@ float3 HSVToRGB(float3 c) {
 	float4 K = float4(1., 2. / 3., 1. / 3., 3.);
 	return c.z*lerp(K.xxx, saturate(abs(frac(c.x + K.xyz)*6. - K.w) - K.x), c.y);
 }
+
+//https://www.shadertoy.com/view/4dcSRN
+float3 RGBToYCoCg(float3 rgb)
+{
+	float tmp = 0.5*(rgb.r + rgb.b);
+	float y = rgb.g + tmp;
+	float Cg = rgb.g - tmp;
+	float Co = rgb.r - rgb.b;
+	return float3(y, Co, Cg) * 0.5;
+}
+
+
+float3 YCoCgToRGB(float3 ycocg)
+{
+	float2 br = float2(-ycocg.y, ycocg.y) - ycocg.z;
+	return ycocg.x + float3(br.y, ycocg.z, br.x);
+}
+
+//###############################################################################
 
 //glsl version mod,change from cg-language implementation --xc
 float2 gmod(float2 a, float2 b)

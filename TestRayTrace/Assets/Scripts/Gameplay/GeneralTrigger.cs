@@ -23,6 +23,7 @@ namespace XCGame
         GotoNextLevel,
         DebugLogMessage,
         TestKeyBind_qe,
+        Console_KeyBind_1TAA,
     }
     public class GeneralTrigger : MonoBehaviour
     {
