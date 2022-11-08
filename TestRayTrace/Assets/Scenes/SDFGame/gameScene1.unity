@@ -637,7 +637,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &441224767
 Transform:
   m_ObjectHideFlags: 0
@@ -2809,10 +2809,11 @@ MonoBehaviour:
   useIndirectRT: 0
   indirectMultiplier: 1
   useDOF: 0
-  needDOFDilation: 1
+  dof_needMeanFiliter: 1
+  dof_needDilation: 1
+  dof_needBoxBlur: 0
   usePostOp: 0
   rt_EyeDepth: {fileID: 0}
-  rt_DOFDilation: {fileID: 0}
   useFSR: 0
   FSR_Scale: 2
   SceneName: TestBake
@@ -2842,7 +2843,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1090c4c7b2894044f80ecdaf73b99902, type: 3}
   m_Name: 
@@ -3376,7 +3377,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nextLevelObj: {fileID: 507070198}
   trace: {fileID: 1666331705}
-  startActions: 
+  startActions: 07000000
 --- !u!1 &1984656564
 GameObject:
   m_ObjectHideFlags: 0

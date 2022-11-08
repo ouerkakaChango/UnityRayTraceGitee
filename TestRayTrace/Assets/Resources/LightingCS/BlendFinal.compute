@@ -223,20 +223,23 @@ void BlendTAA(uint3 id : SV_DispatchThreadID)
 //https://lettier.github.io/3d-game-shaders-for-beginners/dilation.html
 //grey vec3(0.21, 0.72, 0.07)
 //mix(fragColor.rgb, cmx.rgb, smoothstep(minThreshold, maxThreshold, mx));
+float minThreshold;
+float maxThreshold;
+float dilationSize;
 [numthreads(8, 8, 1)]
 void DOFDilation(uint3 id : SV_DispatchThreadID)
 {
-	float size = 3;
+	float size = dilationSize;
 	float mx = -1;
 	float3 cmx = 0;
-	float3 grey = float3(0.21, 0.72, 0.07);
+	float3 grey = float3(0.3, 0.6, 0.1);//float3(0.21, 0.72, 0.07);
 	float3 ori = 0;
 	for (int j = -size; j <= size; j++)
 	{
 		for (int i = -size; i <= size; i++)
 		{
 			if (length(float2(i, j)) > size) { continue; }
-			float3 c = TexA[id.xy + uint2(i, j)].rgb;
+			float3 c = TexA[id.xy + int2(i, j)].rgb;
 			if (i == 0 && j == 0)
 			{
 				ori = c;
@@ -250,8 +253,6 @@ void DOFDilation(uint3 id : SV_DispatchThreadID)
 		}
 	}
 
-	float minThreshold = 0.2;
-	float maxThreshold = 0.3;
 	float3 re = lerp(ori,cmx, smoothstep(minThreshold, maxThreshold, mx));
 
 	Result[id.xy] = float4(re, 1);
@@ -264,16 +265,22 @@ void DOFDilation(uint3 id : SV_DispatchThreadID)
 float focusEyeDepth;
 float minDistance;
 float maxDistance;
+bool needFixFocusDepth;
+
 [numthreads(8, 8, 1)]
 void BlendDOF(uint3 id : SV_DispatchThreadID)
 {
 	float eyeDepth = TexADepth[id.xy].r;
 	float2 size = GetSize(TexADepth);
-	//float f = TexADepth[size / 2].r;
-	//if (f < 0)
-	//{
-	//	f = focusEyeDepth;
-	//}
+	float f = focusEyeDepth;
+	if (!needFixFocusDepth)
+	{
+		f = TexADepth[size / 2].r;
+		if (f < 0)
+		{
+			f = focusEyeDepth;
+		}
+	}
 	
 	float3 blured = TexB[id.xy].rgb;
 	if (eyeDepth < 0)
@@ -283,7 +290,7 @@ void BlendDOF(uint3 id : SV_DispatchThreadID)
 	else
 	{
 		float3 ori = TexA[id.xy].rgb;
-		float blur = smoothstep(minDistance, maxDistance, abs(eyeDepth - focusEyeDepth));
+		float blur = smoothstep(minDistance, maxDistance, abs(eyeDepth - f));
 		float3 re = lerp(ori, blured, blur);
 		Result[id.xy] = float4(re, 1);
 	}

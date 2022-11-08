@@ -25,9 +25,9 @@ float flipAngle;
 float flipFreq;
 
 //@@@SDFBakerMgr TexSys
-Texture2D<float> slice_scene3_2;
 Texture2D<float> slice_scene3_1;
 Texture2D<float3> N_paper;
+Texture2D<float> slice_scene3_2;
 Texture2D<float3> woodTex;
 //@@@
 
@@ -119,20 +119,12 @@ re.reflect_ST = float2(1, 0);
 else if (obj == 1 )
 {
 re.albedo = float3(1, 1, 1);
-re.metallic = 0.5;
-re.roughness = 0.5;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
-}
-else if (obj == 2 )
-{
-re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
-else if (obj == 3 )
+else if (obj == 2 )
 {
 re.albedo = float3(0.03773582, 0.01787486, 0);
 re.metallic = 0;
@@ -140,7 +132,7 @@ re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
-else if (obj == 4 )
+else if (obj == 3 )
 {
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
@@ -148,7 +140,7 @@ re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
-else if (obj == 5 )
+else if (obj == 4 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0;
@@ -156,13 +148,21 @@ re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
-else if (obj == 6 )
+else if (obj == 5 )
 {
 re.albedo = float3(0.5, 0.5, 0.5);
 re.metallic = 0.9;
 re.roughness = 0.1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0.05);
+}
+else if (obj == 6 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0.5;
+re.roughness = 0.5;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
 }
 else if (obj == 7 )
 {
@@ -657,7 +657,7 @@ if(true)
 {
 //@@@SDFBakerMgr DirShadow
 int lightType[1];
-lightType[0] = -1;
+lightType[0] = 0;
 float3 lightPos[1];
 lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
@@ -731,87 +731,33 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-float3 localp = WorldToLocal(p, float3(10.16, 10.35, 0), float3(270, 0, 0), float3(15.801, 15.801, 15.801));
-float dh = abs(localp.y) - 0.015;
-dh = dh > 0 ? dh : 0;
-dh *= 15.801;
-
-float d = re;
-float d2d = re;
-float2 picBound = float2(0.5, 0.5) * 15.801;
-float2 p2d = localp.xz * 15.801;
-if (gtor(abs(p2d), picBound))
-{
-d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;
-d = sqrt(d2d * d2d + dh * dh);
-}
-else
-{
-float2 uv = p2d / picBound;
-uv = (uv + 1) * 0.5;
-uint2 picSize = GetSize(slice_scene3_2);
-float sdfFromPic = slice_scene3_2.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
-sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 15.801;
-sdfFromPic *= picBound.x;
-d2d = sdfFromPic;
-d2d += 0;
-d2d = max(d2d,0);
-d = sqrt(d2d * d2d + dh * dh);
-d += 0;
-}
+float d = SDFSlice(p, float3(-9.68, 10.24, 0), float3(270, 0, 0), float3(15.561, 15.561, 15.561), slice_scene3_1, 0.015, TraceThre, 0, 0);
 re = min(re, d);
 }
 else if (inx == 1 )
 {
-float3 localp = WorldToLocal(p, float3(-9.68, 10.24, 0), float3(270, 0, 0), float3(15.561, 15.561, 15.561));
-float dh = abs(localp.y) - 0.015;
-dh = dh > 0 ? dh : 0;
-dh *= 15.561;
-
-float d = re;
-float d2d = re;
-float2 picBound = float2(0.5, 0.5) * 15.561;
-float2 p2d = localp.xz * 15.561;
-if (gtor(abs(p2d), picBound))
-{
-d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;
-d = sqrt(d2d * d2d + dh * dh);
-}
-else
-{
-float2 uv = p2d / picBound;
-uv = (uv + 1) * 0.5;
-uint2 picSize = GetSize(slice_scene3_1);
-float sdfFromPic = slice_scene3_1.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
-sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 15.561;
-sdfFromPic *= picBound.x;
-d2d = sdfFromPic;
-d2d += 0;
-d2d = max(d2d,0);
-d = sqrt(d2d * d2d + dh * dh);
-d += 0;
-}
-re = min(re, d);
+inx = -11;
 }
 else if (inx == 2 )
 {
-inx = -11;
+inx = -8;
 }
 else if (inx == 3 )
 {
-inx = -8;
+inx = -12;
 }
 else if (inx == 4 )
 {
-inx = -12;
+inx = -7;
 }
 else if (inx == 5 )
 {
-inx = -7;
+inx = -2;
 }
 else if (inx == 6 )
 {
-inx = -2;
+float d = SDFSlice(p, float3(10.16, 10.35, 0), float3(270, 0, 0), float3(15.801, 15.801, 15.801), slice_scene3_2, 0.015, TraceThre, 0, 0);
+re = min(re, d);
 }
 else if (inx == 7 )
 {
@@ -1691,26 +1637,26 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+inx = -11;
 }
 else if (inx == 2 )
 {
-inx = -11;
+inx = -8;
 }
 else if (inx == 3 )
 {
-inx = -8;
+inx = -12;
 }
 else if (inx == 4 )
 {
-inx = -12;
+inx = -7;
 }
 else if (inx == 5 )
 {
-inx = -7;
+inx = -2;
 }
 else if (inx == 6 )
 {
-inx = -2;
 }
 else if (inx == 7 )
 {

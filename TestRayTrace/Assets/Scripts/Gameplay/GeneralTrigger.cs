@@ -24,6 +24,7 @@ namespace XCGame
         DebugLogMessage,
         TestKeyBind_qe,
         Console_KeyBind_1TAA,
+        Console_KeyBind_2DOF,
     }
     public class GeneralTrigger : MonoBehaviour
     {

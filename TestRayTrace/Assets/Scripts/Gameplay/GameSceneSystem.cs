@@ -33,6 +33,10 @@ public class GameSceneSystem : MonoBehaviour
             {
                 keyboard.keyDic.Add("1", trace.ToggleTAA);
             }
+            else if (action == TriggerAction.Console_KeyBind_2DOF)
+            {
+                keyboard.keyDic.Add("2", trace.ToggleDOF);
+            }
         }
     }
 

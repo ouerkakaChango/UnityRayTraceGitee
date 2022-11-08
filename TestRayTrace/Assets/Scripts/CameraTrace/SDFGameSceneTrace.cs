@@ -142,7 +142,10 @@ public class SDFGameSceneTrace : MonoBehaviour
     public float indirectMultiplier = 1.0f;
     bool useTAA = false;
     public bool useDOF = false;
-    public bool needDOFDilation = true;
+    public bool dof_needFixFocusDepth = false;
+    public bool dof_needMeanFiliter = true;
+    public bool dof_needDilation = true;
+    public bool dof_needBoxBlur = false;
     public bool usePostOp = true;
 
     RenderTexture rt;
@@ -155,7 +158,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     RenderTexture rt_beforeTAA=null, rt_lastAfterTAA=null;
     //DOF RT
     RenderTexture rt_beforeDOF = null;
-    public RenderTexture rt_DOFDilation = null;
+    public RenderTexture rt_DOFinput = null;
     //PostOp RT
     RenderTexture rt_beforePostOp;
     //FSR
@@ -168,6 +171,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     public AutoCS autoCS;
     ComputeShader cs;
     ComputeShader cs_BlendFinal;
+    ComputeShader cs_Blur;
     ComputeShader cs_FSR;
     public Texture2DArray envSpecTex2DArr;
     public Texture2D envBgTex;
@@ -195,6 +199,13 @@ public class SDFGameSceneTrace : MonoBehaviour
     //---DOF
     public float dof_minDistance = 0.5f;
     public float dof_maxDistance = 5.0f;
+    [Range(0.0f, 1.0f)]
+    public float dof_minThreshold = 0.2f;
+    [Range(0.0f,1.0f)]
+    public float dof_maxThreshold = 0.3f;
+    public float dof_fixFocusDepth =2.0f;
+    [Range(1.0f, 10.0f)]
+    public float dof_dilationSize = 3.0f;
     //___DOF
 
     bool hasInited = false;
@@ -236,13 +247,12 @@ public class SDFGameSceneTrace : MonoBehaviour
                 CreateRT(ref rt_lastAfterTAA, renderSize.x, renderSize.y);
             }
 
-            if(useDOF)
+            cs_Blur = (ComputeShader)Resources.Load("CommonFiliterCS/Blur");
+
+            if (useDOF)
             {
                 CreateRT(ref rt_beforeDOF, renderSize.x, renderSize.y);
-                if(needDOFDilation)
-                {
-                    CreateRT(ref rt_DOFDilation, renderSize.x, renderSize.y);
-                }
+                CreateRT(ref rt_DOFinput, renderSize.x, renderSize.y);            
             }
 
             if (usePostOp)
@@ -319,6 +329,11 @@ public class SDFGameSceneTrace : MonoBehaviour
     public void ToggleTAA()
     {
         useTAA = !useTAA;
+    }
+
+    public void ToggleDOF()
+    {
+        useDOF = !useDOF;
     }
 
     bool qToggle = true;
@@ -479,29 +494,60 @@ public class SDFGameSceneTrace : MonoBehaviour
         if(useDOF)
         {
             Graphics.Blit(rTex, rt_beforeDOF);
+            if (dof_needDilation)
+            {
+                if(dof_needMeanFiliter)
+                {
+                    //###########
+                    //### compute
+                    kInx = cs_Blur.FindKernel("MedianFiliter");
+                    cs_Blur.SetTexture(kInx, "Result", rt_beforeDOF);
+                    cs_Blur.SetTexture(kInx, "TexA", rTex);
 
-            //###########
-            //### compute
-            kInx = cs_BlendFinal.FindKernel("DOFDilation");
-            cs_BlendFinal.SetTexture(kInx, "Result", rt_DOFDilation);
-            cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeDOF);
-            
-            cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
-            //### compute
-            //###########
+                    cs_Blur.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
+                    //### compute
+                    //###########
+                }
+                //###########
+                //### compute
+                kInx = cs_BlendFinal.FindKernel("DOFDilation");
+                cs_BlendFinal.SetTexture(kInx, "Result", rt_DOFinput);
+                cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeDOF);
+                cs_BlendFinal.SetFloat("minThreshold", dof_minThreshold);
+                cs_BlendFinal.SetFloat("maxThreshold", dof_maxThreshold);
+                cs_BlendFinal.SetFloat("dilationSize", dof_dilationSize);
+
+                cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
+                //### compute
+                //###########
+            }
+            if (dof_needBoxBlur)
+            {
+                Graphics.Blit(rt_DOFinput, rt_beforeDOF);
+                //###########
+                //### compute
+                kInx = cs_Blur.FindKernel("BoxBlur");
+                cs_Blur.SetTexture(kInx, "Result", rt_DOFinput);
+                cs_Blur.SetTexture(kInx, "TexA", rt_beforeDOF);
+
+                cs_Blur.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
+                //### compute
+                //###########
+            }
 
             //???
-            float focusEyeDepth = 5;// SearchCenterFocusDepth(); 
+            float focusEyeDepth = dof_fixFocusDepth;// SearchCenterFocusDepth(); 
             //###########
             //### compute
             kInx = cs_BlendFinal.FindKernel("BlendDOF");
             cs_BlendFinal.SetTexture(kInx, "Result", rTex);
             cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeDOF);
-            cs_BlendFinal.SetTexture(kInx, "TexB", rt_DOFDilation);
+            cs_BlendFinal.SetTexture(kInx, "TexB", rt_DOFinput);
             cs_BlendFinal.SetTexture(kInx, "TexADepth", rt_EyeDepth);
             cs_BlendFinal.SetFloat("focusEyeDepth", focusEyeDepth);
             cs_BlendFinal.SetFloat("minDistance", dof_minDistance);
             cs_BlendFinal.SetFloat("maxDistance", dof_maxDistance);
+            cs_BlendFinal.SetBool("needFixFocusDepth", dof_needFixFocusDepth);
 
             cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
             //### compute

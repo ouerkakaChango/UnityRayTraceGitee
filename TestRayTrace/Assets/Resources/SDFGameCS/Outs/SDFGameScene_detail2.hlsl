@@ -791,16 +791,16 @@ float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
-if(false)
+if(true)
 {
 //@@@SDFBakerMgr DirShadow
 int lightType[6];
-lightType[0] = -2;
+lightType[0] = 1;
 lightType[1] = 1;
 lightType[2] = 1;
-lightType[3] = -2;
-lightType[4] = -2;
-lightType[5] = -2;
+lightType[3] = 1;
+lightType[4] = 1;
+lightType[5] = 1;
 float3 lightPos[6];
 lightPos[0] = float3(-0.07, 8.15, 3.42);
 lightPos[1] = float3(-1.713, 2.707, -2.17);
@@ -816,12 +816,12 @@ lightDirs[3] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
 lightDirs[4] = normalize(minHit.P - float3(3.357384, 8.15, 0));
 lightDirs[5] = normalize(minHit.P - float3(-3.83, 8.15, 0));
 int shadowType[6];
-shadowType[0] =0;
+shadowType[0] =1;
 shadowType[1] =1;
 shadowType[2] =1;
-shadowType[3] =0;
-shadowType[4] =0;
-shadowType[5] =0;
+shadowType[3] =1;
+shadowType[4] =1;
+shadowType[5] =1;
 float lightspace = 6;
 float maxLength = MaxSDF;
 float tsha = 1;
@@ -967,34 +967,7 @@ re = min(re, 0 + SDFBox(p, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0
 }
 else if (inx == 15 )
 {
-float3 localp = WorldToLocal(p, float3(-2.797, 2.721, 4.276), float3(270, 0, 0), float3(1, 1, 1));
-float dh = abs(localp.y) - 0.03;
-dh = dh > 0 ? dh : 0;
-dh *= 1;
-
-float d = re;
-float d2d = re;
-float2 picBound = float2(0.5, 0.5) * 1;
-float2 p2d = localp.xz * 1;
-if (gtor(abs(p2d), picBound))
-{
-d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;
-d = sqrt(d2d * d2d + dh * dh);
-}
-else
-{
-float2 uv = p2d / picBound;
-uv = (uv + 1) * 0.5;
-uint2 picSize = GetSize(slice_scene2);
-float sdfFromPic = slice_scene2.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
-sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 1;
-sdfFromPic *= picBound.x;
-d2d = sdfFromPic;
-d2d += 0;
-d2d = max(d2d,0);
-d = sqrt(d2d * d2d + dh * dh);
-d += 0;
-}
+float d = SDFSlice(p, float3(-2.797, 2.721, 4.276), float3(270, 0, 0), float3(1, 1, 1), slice_scene2, 0.03, TraceThre, 0, 0);
 re = min(re, d);
 }
 //@@@
