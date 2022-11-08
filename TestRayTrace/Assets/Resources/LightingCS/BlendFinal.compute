@@ -261,13 +261,31 @@ void DOFDilation(uint3 id : SV_DispatchThreadID)
 //---DOF-------------------------------------------------------------------------------------------
 //https://lettier.github.io/3d-game-shaders-for-beginners/depth-of-field.html
 //float blur =smoothstep( minDistance, maxDistance, abs(position.y - focusPoint.y));
+float focusEyeDepth;
+float minDistance;
+float maxDistance;
 [numthreads(8, 8, 1)]
 void BlendDOF(uint3 id : SV_DispatchThreadID)
 {
-	float3 col1 = TexA[id.xy].rgb;
 	float eyeDepth = TexADepth[id.xy].r;
-	float3 re = col1;
+	float2 size = GetSize(TexADepth);
+	//float f = TexADepth[size / 2].r;
+	//if (f < 0)
+	//{
+	//	f = focusEyeDepth;
+	//}
 	
-	Result[id.xy] = float4(re, 1);
+	float3 blured = TexB[id.xy].rgb;
+	if (eyeDepth < 0)
+	{
+		Result[id.xy] = float4(blured, 1);
+	}
+	else
+	{
+		float3 ori = TexA[id.xy].rgb;
+		float blur = smoothstep(minDistance, maxDistance, abs(eyeDepth - focusEyeDepth));
+		float3 re = lerp(ori, blured, blur);
+		Result[id.xy] = float4(re, 1);
+	}
 }
 //___DOF___________________________________________________________________________________________

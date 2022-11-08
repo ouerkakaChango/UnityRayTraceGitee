@@ -481,34 +481,7 @@ re = min(re, 0 + SDFBox(p, float3(-53.40586, -0.02504057, -55.8854), float3(0.07
 }
 else if (inx == 1 )
 {
-float3 localp = WorldToLocal(p, float3(-54.065, 0.378, -56.136), float3(291.8169, 168.0358, 1.048534), float3(1.5, 1.5, 1.5));
-float dh = abs(localp.y) - 0.03;
-dh = dh > 0 ? dh : 0;
-dh *= 1.5;
-
-float d = re;
-float d2d = re;
-float2 picBound = float2(0.5, 0.5) * 1.5;
-float2 p2d = localp.xz * 1.5;
-if (gtor(abs(p2d), picBound))
-{
-    d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;
-    d = sqrt(d2d * d2d + dh * dh);
-}
-else
-{
-    float2 uv = p2d / picBound;
-    uv = (uv + 1) * 0.5;
-    uint2 picSize = GetSize(slice_whiteboardText);
-    float sdfFromPic = slice_whiteboardText.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
-    sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 1.5;
-    sdfFromPic *= picBound.x;
-    d2d = sdfFromPic;
-    d2d += 0;
-    d2d = max(d2d,0);
-    d = sqrt(d2d * d2d + dh * dh);
-    d += 0;
-}
+float d = SDFSlice(p, float3(-54.065, 0.378, -56.136), float3(291.8169, 168.0358, 1.048534), float3(1.5, 1.5, 1.5), slice_whiteboardText, 0.03, TraceThre, 0, 0);
 re = min(re, d);
 }
 else if (inx == 2 )
@@ -533,34 +506,7 @@ inx = -3;
 }
 else if (inx == 7 && isShow )
 {
-float3 localp = WorldToLocal(p, float3(-41.31, 4.45, -53.24), float3(281.6757, 187.4573, 334.7128), float3(2, 2, 2));
-float dh = abs(localp.y) - 0.1;
-dh = dh > 0 ? dh : 0;
-dh *= 2;
-
-float d = re;
-float d2d = re;
-float2 picBound = float2(0.5, 0.5) * 2;
-float2 p2d = localp.xz * 2;
-if (gtor(abs(p2d), picBound))
-{
-    d2d = SDFBox(p2d, 0, picBound) + TraceThre * 2;
-    d = sqrt(d2d * d2d + dh * dh);
-}
-else
-{
-    float2 uv = p2d / picBound;
-    uv = (uv + 1) * 0.5;
-    uint2 picSize = GetSize(SDF_q);
-    float sdfFromPic = SDF_q.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
-    sdfFromPic /= picSize.x * 0.5 * sqrt(2) * 2;
-    sdfFromPic *= picBound.x;
-    d2d = sdfFromPic;
-    d2d += 0;
-    d2d = max(d2d,0);
-    d = sqrt(d2d * d2d + dh * dh);
-    d += -0.001;
-}
+float d = SDFSlice(p, float3(-41.31, 4.45, -53.24), float3(281.6757, 187.4573, 334.7128), float3(2, 2, 2), SDF_q, 0.1, TraceThre, 0, -0.001);
 re = min(re, d);
 }
 else if (inx == 8 )

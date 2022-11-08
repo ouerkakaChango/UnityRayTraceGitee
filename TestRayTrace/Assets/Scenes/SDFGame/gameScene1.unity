@@ -230,6 +230,9 @@ MonoBehaviour:
   plainTextures: []
   envTextures: []
   texInx: -1
+  useSubTex: 0
+  subTexID: 0
+  edgeNum: 4
 --- !u!114 &142421528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -615,7 +618,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats: []
-    m_Colors: []
+    m_Colors:
+    - _SubInfo: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!1 &441224766
 GameObject:
@@ -730,6 +734,9 @@ MonoBehaviour:
     channel: 3
   envTextures: []
   texInx: 0
+  useSubTex: 0
+  subTexID: 0
+  edgeNum: 4
 --- !u!114 &446652357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -951,6 +958,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enterOnceEvents: 00000000
+  sinceStartEvents: 
   actions: 03000000
   f_params: []
   str_params:
@@ -1461,6 +1469,9 @@ MonoBehaviour:
     channel: 3
   envTextures: []
   texInx: -1
+  useSubTex: 0
+  subTexID: 0
+  edgeNum: 4
 --- !u!1 &817168217
 GameObject:
   m_ObjectHideFlags: 0
@@ -2290,6 +2301,9 @@ MonoBehaviour:
     tex: {fileID: 18700000, guid: d37b2c39ff60a64418373d4106357100, type: 2}
     isPNGEnv: 1
   texInx: 1
+  useSubTex: 0
+  subTexID: 0
+  edgeNum: 4
 --- !u!114 &1355201449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2334,6 +2348,9 @@ MonoBehaviour:
     channel: 3
   envTextures: []
   texInx: 2
+  useSubTex: 0
+  subTexID: 0
+  edgeNum: 4
 --- !u!114 &1355201451
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2369,6 +2386,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enterOnceEvents: 00000000
+  sinceStartEvents: 
   actions: 000000000100000002000000
   f_params:
   - 1
@@ -2673,7 +2691,6 @@ GameObject:
   - component: {fileID: 1666331705}
   - component: {fileID: 1666331704}
   - component: {fileID: 1666331706}
-  - component: {fileID: 1666331707}
   - component: {fileID: 1666331708}
   - component: {fileID: 1666331709}
   - component: {fileID: 1666331710}
@@ -2743,8 +2760,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -53.93, y: 1.6, z: -49.74}
+  m_LocalRotation: {x: -0.026060306, y: 0.9329261, z: -0.06898578, w: -0.35243553}
+  m_LocalPosition: {x: -49.689846, y: 2.376799, z: -47.036057}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2790,8 +2807,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderSize: {x: 1024, y: 720}
   useIndirectRT: 0
-  usePostOp: 1
   indirectMultiplier: 1
+  useDOF: 0
+  needDOFDilation: 1
+  usePostOp: 0
+  rt_EyeDepth: {fileID: 0}
+  rt_DOFDilation: {fileID: 0}
   useFSR: 0
   FSR_Scale: 2
   SceneName: TestBake
@@ -2799,6 +2820,8 @@ MonoBehaviour:
   envSpecTex2DArr: {fileID: 18700000, guid: d37b2c39ff60a64418373d4106357100, type: 2}
   envBgTex: {fileID: 2800000, guid: e69badff72408fa4584d7a951c8d88fe, type: 3}
   keyboard: {fileID: 0}
+  dof_minDistance: 0.5
+  dof_maxDistance: 5
 --- !u!114 &1666331706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2812,20 +2835,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 80
---- !u!114 &1666331707
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1666331700}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 191fe419a3e75734a905e79ba9b149d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sensitivity: 2
-  smoothing: 2
 --- !u!114 &1666331708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2833,7 +2842,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666331700}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1090c4c7b2894044f80ecdaf73b99902, type: 3}
   m_Name: 

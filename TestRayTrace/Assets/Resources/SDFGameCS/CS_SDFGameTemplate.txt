@@ -7,6 +7,9 @@
 int w;
 int h;
 
+bool needEyeDepth;
+RWTexture2D<float> rt_EyeDepth;
+
 int camType; //0:normal 1:orthogonal
 int camGammaMode; //0:normal 1:notGamma
 //#########################################################################################################
@@ -30,11 +33,11 @@ Texture2D<float4> envBgTex;
 #include "SDFGameScene_(@SceneName).hlsl"
 //#########################################################################################################
 
-float3 GetSDFGameColor(in Ray ray)
+float3 GetSDFGameColor(in Ray ray, out HitInfo minHit, out Material_PBR mat)
 {
+	Init(mat);
 	float3 re = 0;
 	//---Trace
-	HitInfo minHit;
 	Init(minHit);
 	TraceScene(ray, minHit);
 	//___Trace
@@ -65,6 +68,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 	float3 pixLeftDownPos = screenLeftDownPix + screenU * pixW * (idx - 0.5) + screenV * pixH * (idy - 0.5);
 	float SSAA_unitDis = 1.0f / SSAA_edge;
 	float3 SSAA_colors[SSAA_num];
+	float SSAA_eyeDepth[SSAA_num];
 
 	float3 camFoward = normalize(cross(screenU,screenV));
 
@@ -85,7 +89,20 @@ void Render(uint3 id : SV_DispatchThreadID)
 				ray.dir = normalize(ray.pos - eyePos);
 			}
 
-			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray);
+			HitInfo minHit;
+			Material_PBR mat;
+
+			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray, minHit, mat);
+
+			if(needEyeDepth)
+			{
+				float eyeDepth = -1;
+				if(minHit.bHit)
+				{
+					eyeDepth = length(minHit.P - ray.pos);
+				}
+				SSAA_eyeDepth[i - 1 + (j - 1)* SSAA_edge] = eyeDepth;
+			}
 		}
 	}
 
@@ -97,4 +114,15 @@ void Render(uint3 id : SV_DispatchThreadID)
 	re /= (float)SSAA_num;
 
 	Result[id.xy] = float4(re, 1);
+
+	if(needEyeDepth)
+	{
+		float3 d = 0;
+		for (int i = 0; i < SSAA_num; i++)
+		{
+			d += SSAA_eyeDepth[i];
+		}
+		d /= (float)SSAA_num;
+		rt_EyeDepth[id.xy] = d;
+	}
 }

@@ -147,7 +147,7 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     RenderTexture rt;
     RenderTexture uselessRT = null;
-    RenderTexture rt_EyeDepth = null;
+    public RenderTexture rt_EyeDepth = null;
     //Indirect RT
     RenderTexture directRT = null;
     RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
@@ -191,6 +191,11 @@ public class SDFGameSceneTrace : MonoBehaviour
     Vector3 lastPos;
     Quaternion lastRot;
     //___
+
+    //---DOF
+    public float dof_minDistance = 0.5f;
+    public float dof_maxDistance = 5.0f;
+    //___DOF
 
     bool hasInited = false;
 
@@ -486,7 +491,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             //###########
 
             //???
-            float focusEyeDepth = 5.0f;
+            float focusEyeDepth = 5;// SearchCenterFocusDepth(); 
             //###########
             //### compute
             kInx = cs_BlendFinal.FindKernel("BlendDOF");
@@ -495,6 +500,8 @@ public class SDFGameSceneTrace : MonoBehaviour
             cs_BlendFinal.SetTexture(kInx, "TexB", rt_DOFDilation);
             cs_BlendFinal.SetTexture(kInx, "TexADepth", rt_EyeDepth);
             cs_BlendFinal.SetFloat("focusEyeDepth", focusEyeDepth);
+            cs_BlendFinal.SetFloat("minDistance", dof_minDistance);
+            cs_BlendFinal.SetFloat("maxDistance", dof_maxDistance);
 
             cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
             //### compute
@@ -559,7 +566,6 @@ public class SDFGameSceneTrace : MonoBehaviour
         rTex.enableRandomWrite = true;
         rTex.Create();
     }
-    //####################################################################################
 
     static public void SafeDispose(ComputeBuffer cb)
     {
@@ -573,6 +579,25 @@ public class SDFGameSceneTrace : MonoBehaviour
     {
         return daoScale;
     }
+
+    //float SearchCenterFocusDepth()
+    //{
+    //    if(!needEyeDepth)
+    //    {
+    //        Debug.LogError("");
+    //        return -1;
+    //    }
+    //    Vector2Int center = renderSize / 2;
+    //    float max = -1;
+    //    int r = 4;
+    //    for(int j=-r; j<=r;j++)
+    //    {
+    //        for(int i=-r;i<=r;i++)
+    //        {
+    //            float x = ;
+    //        }
+    //    }
+    //}
     //####################################################################################
     IEnumerator Co_GoIter;
     //@@@
