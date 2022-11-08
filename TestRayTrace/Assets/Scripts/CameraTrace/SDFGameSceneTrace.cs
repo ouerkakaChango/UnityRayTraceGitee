@@ -136,11 +136,13 @@ public class SDFGameSceneTrace : MonoBehaviour
     const int CoreX = 8;
     const int CoreY = 8;
     public Vector2Int renderSize = new Vector2Int(1024, 720);
+    bool needEyeDepth = false;
+
     public bool useIndirectRT = false;
-    bool useTAA = false;
-    public bool usePostOp = true;
     public float indirectMultiplier = 1.0f;
-    public bool needEyeDepth = false;
+    bool useTAA = false;
+    public bool useDOF = false;
+    public bool usePostOp = true;
 
     RenderTexture rt;
     RenderTexture uselessRT = null;
@@ -149,7 +151,9 @@ public class SDFGameSceneTrace : MonoBehaviour
     RenderTexture directRT = null;
     RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
     //TAA RT
-    RenderTexture rt_beforeTAA, rt_lastAfterTAA;
+    RenderTexture rt_beforeTAA=null, rt_lastAfterTAA=null;
+    //DOF RT
+    RenderTexture rt_beforeDOF = null;
     //PostOp RT
     RenderTexture rt_beforePostOp;
     //FSR
@@ -201,7 +205,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             maincamParam.h = renderSize.y;
             QualitySettings.vSyncCount = 0;
 
-            needEyeDepth = useTAA;
+            needEyeDepth = useTAA || useDOF;
             if(needEyeDepth)
             {
                 CreateRT(ref rt_EyeDepth, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
@@ -223,6 +227,11 @@ public class SDFGameSceneTrace : MonoBehaviour
                 SDFGameCameraParam.Copy(maincamParam, lastTAAcamParam);
                 CreateRT(ref rt_beforeTAA, renderSize.x, renderSize.y);
                 CreateRT(ref rt_lastAfterTAA, renderSize.x, renderSize.y);
+            }
+
+            if(useDOF)
+            {
+                CreateRT(ref rt_beforeDOF, renderSize.x, renderSize.y);
             }
 
             if (usePostOp)
@@ -400,7 +409,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         computeShader.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
         computeShader.SetTexture(kInx, "envBgTex", envBgTex);
         camParam.InsertParamToComputeShader(ref computeShader);
-        computeShader.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+        computeShader.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
         //### compute
         //#####################################;
 
@@ -419,7 +428,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             cs_BlendFinal.SetTexture(kInx, "FrontIndirect", frontIndirectRT);
             cs_BlendFinal.SetTexture(kInx, "NewFrontIndirect", newFrontIndirectRT);
             cs_BlendFinal.SetTexture(kInx, "blueNoise", ShaderToyTool.Instance.blueNoise);
-            cs_BlendFinal.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+            cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
             //### compute
             //###########
             //Copy newFrontIndirectRT to frontIndirectRT
@@ -428,14 +437,12 @@ public class SDFGameSceneTrace : MonoBehaviour
                 kInx = cs_BlendFinal.FindKernel("CopyToNewFront");
                 cs_BlendFinal.SetTexture(kInx, "Result", frontIndirectRT);
                 cs_BlendFinal.SetTexture(kInx, "NewFrontIndirect", newFrontIndirectRT);
-                cs_BlendFinal.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+                cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
             }
         }
 
-        //???
         if(useTAA)
         {
-            //Debug.Log("Draw TAA");
             Graphics.Blit(rTex, rt_beforeTAA);
             //Blend rt_beforeTAA+rt_lastAfterTAA=>rTex
             //###########
@@ -450,7 +457,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             maincamParam.InsertParamToComputeShader(ref cs_BlendFinal);
             lastTAAcamParam.InsertParamToComputeShader_TAA(ref cs_BlendFinal);
 
-            cs_BlendFinal.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+            cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
             //### compute
             //###########
             Graphics.Blit(rTex, rt_lastAfterTAA);
@@ -458,13 +465,28 @@ public class SDFGameSceneTrace : MonoBehaviour
             SDFGameCameraParam.Copy(maincamParam, lastTAAcamParam);
         }
 
-        if(usePostOp)
+        if(useDOF)
+        {
+            Graphics.Blit(rTex, rt_beforeDOF);
+            //###########
+            //### compute
+            kInx = cs_BlendFinal.FindKernel("BlendDOF");
+            cs_BlendFinal.SetTexture(kInx, "Result", rTex);
+            cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeDOF);
+            cs_BlendFinal.SetTexture(kInx, "TexADepth", rt_EyeDepth);
+
+            cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
+            //### compute
+            //###########
+        }
+
+        if (usePostOp)
         {
             Graphics.Blit(rTex, rt_beforePostOp);
             kInx = cs_BlendFinal.FindKernel("TextureAA");
             cs_BlendFinal.SetTexture(kInx, "Result", rTex);
             cs_BlendFinal.SetTexture(kInx, "Direct", rt_beforePostOp);
-            cs_BlendFinal.Dispatch(kInx, renderSize.x / CoreX, renderSize.y / CoreY, 1);
+            cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
         }
     }
     //####################################################################################
@@ -484,9 +506,13 @@ public class SDFGameSceneTrace : MonoBehaviour
             var csResourcesPath = ChopEnd(autoCS.outs[0], ".compute");
             csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
             cs = (ComputeShader)Resources.Load(csResourcesPath);
-            if(useIndirectRT || useTAA ||usePostOp )
+            if(useIndirectRT || useTAA || useDOF||usePostOp )
             {
                 cs_BlendFinal = (ComputeShader)Resources.Load("LightingCS/BlendFinal");
+            }
+            else
+            {
+                Debug.Log("Warning: Not Init BlendFinal");
             }
             cs_FSR = (ComputeShader)Resources.Load("FSR/FSR");
         }
