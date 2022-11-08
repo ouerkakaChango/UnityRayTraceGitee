@@ -4,7 +4,7 @@
 #pragma kernel TextureAA
 #pragma kernel BlendTAA
 #pragma kernel BlendDOF
-
+#pragma kernel DOFDilation
 
 #include "../../HLSL/CommonDef.hlsl"
 #include "../../HLSL/RayMath.hlsl"
@@ -217,17 +217,57 @@ void BlendTAA(uint3 id : SV_DispatchThreadID)
 	}
 	Result[id.xy] = float4(re, 1);
 }
-//___TAA________________________________________________________________________
+//___TAA___________________________________________________________________________________________
 
+//---DOFDilation-----------------------------------------------------------------------------------
+//https://lettier.github.io/3d-game-shaders-for-beginners/dilation.html
+//grey vec3(0.21, 0.72, 0.07)
+//mix(fragColor.rgb, cmx.rgb, smoothstep(minThreshold, maxThreshold, mx));
+[numthreads(8, 8, 1)]
+void DOFDilation(uint3 id : SV_DispatchThreadID)
+{
+	float size = 3;
+	float mx = -1;
+	float3 cmx = 0;
+	float3 grey = float3(0.21, 0.72, 0.07);
+	float3 ori = 0;
+	for (int j = -size; j <= size; j++)
+	{
+		for (int i = -size; i <= size; i++)
+		{
+			if (length(float2(i, j)) > size) { continue; }
+			float3 c = TexA[id.xy + uint2(i, j)].rgb;
+			if (i == 0 && j == 0)
+			{
+				ori = c;
+			}
+			float x = dot(grey, c);
+			if (x > mx)
+			{
+				mx = x;
+				cmx = c;
+			}
+		}
+	}
+
+	float minThreshold = 0.2;
+	float maxThreshold = 0.3;
+	float3 re = lerp(ori,cmx, smoothstep(minThreshold, maxThreshold, mx));
+
+	Result[id.xy] = float4(re, 1);
+}
+//___DOFDilation___________________________________________________________________________________
+
+//---DOF-------------------------------------------------------------------------------------------
+//https://lettier.github.io/3d-game-shaders-for-beginners/depth-of-field.html
+//float blur =smoothstep( minDistance, maxDistance, abs(position.y - focusPoint.y));
 [numthreads(8, 8, 1)]
 void BlendDOF(uint3 id : SV_DispatchThreadID)
 {
 	float3 col1 = TexA[id.xy].rgb;
 	float eyeDepth = TexADepth[id.xy].r;
 	float3 re = col1;
-	if (eyeDepth >= 0)
-	{
-		re *= 1 - saturate(eyeDepth / 20);
-	}
+	
 	Result[id.xy] = float4(re, 1);
 }
+//___DOF___________________________________________________________________________________________

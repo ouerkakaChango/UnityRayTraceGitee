@@ -142,11 +142,12 @@ public class SDFGameSceneTrace : MonoBehaviour
     public float indirectMultiplier = 1.0f;
     bool useTAA = false;
     public bool useDOF = false;
+    public bool needDOFDilation = true;
     public bool usePostOp = true;
 
     RenderTexture rt;
     RenderTexture uselessRT = null;
-    public RenderTexture rt_EyeDepth = null;
+    RenderTexture rt_EyeDepth = null;
     //Indirect RT
     RenderTexture directRT = null;
     RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
@@ -154,6 +155,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     RenderTexture rt_beforeTAA=null, rt_lastAfterTAA=null;
     //DOF RT
     RenderTexture rt_beforeDOF = null;
+    public RenderTexture rt_DOFDilation = null;
     //PostOp RT
     RenderTexture rt_beforePostOp;
     //FSR
@@ -232,6 +234,10 @@ public class SDFGameSceneTrace : MonoBehaviour
             if(useDOF)
             {
                 CreateRT(ref rt_beforeDOF, renderSize.x, renderSize.y);
+                if(needDOFDilation)
+                {
+                    CreateRT(ref rt_DOFDilation, renderSize.x, renderSize.y);
+                }
             }
 
             if (usePostOp)
@@ -468,12 +474,27 @@ public class SDFGameSceneTrace : MonoBehaviour
         if(useDOF)
         {
             Graphics.Blit(rTex, rt_beforeDOF);
+
+            //###########
+            //### compute
+            kInx = cs_BlendFinal.FindKernel("DOFDilation");
+            cs_BlendFinal.SetTexture(kInx, "Result", rt_DOFDilation);
+            cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeDOF);
+            
+            cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
+            //### compute
+            //###########
+
+            //???
+            float focusEyeDepth = 5.0f;
             //###########
             //### compute
             kInx = cs_BlendFinal.FindKernel("BlendDOF");
             cs_BlendFinal.SetTexture(kInx, "Result", rTex);
             cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeDOF);
+            cs_BlendFinal.SetTexture(kInx, "TexB", rt_DOFDilation);
             cs_BlendFinal.SetTexture(kInx, "TexADepth", rt_EyeDepth);
+            cs_BlendFinal.SetFloat("focusEyeDepth", focusEyeDepth);
 
             cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
             //### compute
@@ -506,6 +527,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             var csResourcesPath = ChopEnd(autoCS.outs[0], ".compute");
             csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
             cs = (ComputeShader)Resources.Load(csResourcesPath);
+            //---extra CS
             if(useIndirectRT || useTAA || useDOF||usePostOp )
             {
                 cs_BlendFinal = (ComputeShader)Resources.Load("LightingCS/BlendFinal");
@@ -514,7 +536,11 @@ public class SDFGameSceneTrace : MonoBehaviour
             {
                 Debug.Log("Warning: Not Init BlendFinal");
             }
-            cs_FSR = (ComputeShader)Resources.Load("FSR/FSR");
+            if (useFSR)
+            {
+                cs_FSR = (ComputeShader)Resources.Load("FSR/FSR");
+            }
+            //___
         }
         if (rTex == rt)
         {
