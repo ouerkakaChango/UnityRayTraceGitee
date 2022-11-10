@@ -853,7 +853,7 @@ else{
 ###BLOCK
 
 ###BLOCK SDFShadow
-if(true)
+if(false)
 {
 //@@@SDFBakerMgr DirShadow
 int lightType[6];

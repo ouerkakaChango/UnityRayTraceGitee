@@ -791,7 +791,7 @@ float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
-if(true)
+if(false)
 {
 //@@@SDFBakerMgr DirShadow
 int lightType[6];
