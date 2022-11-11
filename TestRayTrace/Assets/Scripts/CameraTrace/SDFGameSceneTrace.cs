@@ -132,7 +132,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     };
 
     int frameID = 0;
-    int TAAframeID = 0;
+    int gFrameID = 0;
     const int CoreX = 8;
     const int CoreY = 8;
     public Vector2Int renderSize = new Vector2Int(1024, 720);
@@ -400,6 +400,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     void CSInsertSystemValue(ref ComputeShader computeShader)
     {
         computeShader.SetInt("frameID", frameID);
+        computeShader.SetInt("gFrameID", gFrameID);
         computeShader.SetFloat("daoScale", daoScale);
         computeShader.SetVector("_Time", Shader.GetGlobalVector("_Time"));
     }
@@ -501,7 +502,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             //###########
             //### compute
             kInx = cs_BlendFinal.FindKernel("BlendTAA");
-            cs_BlendFinal.SetInt("frameID", TAAframeID);
+            cs_BlendFinal.SetInt("frameID", gFrameID);
             cs_BlendFinal.SetFloat("TAAMultiplier", 0.95f);
             cs_BlendFinal.SetTexture(kInx, "Result", rTex);
             cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeTAA);
@@ -703,7 +704,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             yield return null;
             fps = fpsTimer.GetFPS();
             frameID += 1;
-            TAAframeID += 1;
+            gFrameID += 1;
         }
     }
 

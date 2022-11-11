@@ -12,6 +12,7 @@ bool needEyeDepth;
 RWTexture2D<float> rt_EyeDepth;
 
 int frameID;
+int gFrameID;
 bool useIndirectRT;
 bool useMSDFShadow;
 
