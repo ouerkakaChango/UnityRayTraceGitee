@@ -13,6 +13,7 @@ RWTexture2D<float> rt_EyeDepth;
 
 int frameID;
 bool useIndirectRT;
+bool useMSDFShadow;
 
 int camType; //0:normal 1:orthogonal
 int camGammaMode; //0:normal 1:notGamma
@@ -28,9 +29,12 @@ float pixW;
 float pixH;
 float3 screenU;
 float3 screenV;
+float3 seed;
 
 RWTexture2D<float4> Result;
 RWTexture2D<float4> IndirectResult;
+Texture2D<float> LastShadow;
+RWTexture2D<float> NewShadow;
 Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
 
@@ -93,7 +97,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 
 	float3 camFoward = normalize(cross(screenU,screenV));
 
-	float3 seed = float3(id.xy,frameID);
+	seed = float3(id.xy,frameID);
 
 	[unroll(SSAA_edge)]
 	for (int j = 1; j <= SSAA_edge; j++)

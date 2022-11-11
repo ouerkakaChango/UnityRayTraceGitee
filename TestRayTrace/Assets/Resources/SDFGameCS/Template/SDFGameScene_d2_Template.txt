@@ -20,6 +20,8 @@
 ...
 ###BLOCK
 
+int GetSpecialID(int inx);
+
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
@@ -573,6 +575,13 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit, Material_PBR mat)
 {
 	###BLOCK IndirectColor
+	... 
+	###BLOCK
+}
+
+int GetSpecialID(int inx)
+{
+	###BLOCK SpecialID
 	... 
 	###BLOCK
 }

@@ -140,6 +140,7 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     public bool useIndirectRT = false;
     public float indirectMultiplier = 1.0f;
+    public bool useMSDFShadow = false;
     bool useTAA = false;
     public bool useDOF = false;
     public bool dof_needFixFocusDepth = false;
@@ -154,6 +155,9 @@ public class SDFGameSceneTrace : MonoBehaviour
     //Indirect RT
     RenderTexture directRT = null;
     RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
+    //MSDFShadow RT
+    public RenderTexture rt_LastShadow = null;
+    public RenderTexture rt_NewShadow = null;
     //TAA RT
     RenderTexture rt_beforeTAA=null, rt_lastAfterTAA=null;
     //DOF RT
@@ -237,6 +241,12 @@ public class SDFGameSceneTrace : MonoBehaviour
                 CreateRT(ref indirectRT, renderSize.x, renderSize.y);
                 CreateRT(ref frontIndirectRT, renderSize.x, renderSize.y);
                 CreateRT(ref newFrontIndirectRT, renderSize.x, renderSize.y);
+            }
+
+            if(useMSDFShadow)
+            {
+                CreateRT(ref rt_LastShadow, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
+                CreateRT(ref rt_NewShadow, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
             }
 
             if(useTAA)
@@ -422,6 +432,18 @@ public class SDFGameSceneTrace : MonoBehaviour
             computeShader.SetTexture(kInx, "IndirectResult", uselessRT);
         }
 
+        computeShader.SetBool("useMSDFShadow", useMSDFShadow);
+        if (useMSDFShadow)
+        {
+            computeShader.SetTexture(kInx, "LastShadow", rt_LastShadow);
+            computeShader.SetTexture(kInx, "NewShadow", rt_NewShadow);
+        }
+        else
+        {
+            computeShader.SetTexture(kInx, "LastShadow", uselessRT);
+            computeShader.SetTexture(kInx, "NewShadow", uselessRT);
+        }
+
         computeShader.SetBool("needEyeDepth", needEyeDepth);
         if(needEyeDepth)
         {
@@ -439,8 +461,13 @@ public class SDFGameSceneTrace : MonoBehaviour
         //### compute
         //#####################################;
 
+        if (useMSDFShadow)
+        {
+            Graphics.Blit(rt_NewShadow, rt_LastShadow);
+        }
 
-        if(useIndirectRT)
+
+        if (useIndirectRT)
         {
             //Blend dir+indir=>rTex
             //###########

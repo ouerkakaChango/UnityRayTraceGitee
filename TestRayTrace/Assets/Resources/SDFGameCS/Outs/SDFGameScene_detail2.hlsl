@@ -84,6 +84,8 @@ re = smin(re, d5);
 }
 
 
+int GetSpecialID(int inx);
+
 Material_PBR GetObjMaterial_PBR(int obj)
 {
 	Material_PBR re;
@@ -345,56 +347,7 @@ else if (inx == 15 )
 
 	//----------------------------------
 
-	//@@@SDFBakerMgr SpecialObj
-if(inx == 0 )
-{
-}
-else if (inx == 1 )
-{
-}
-else if (inx == 2 )
-{
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
-}
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-else if (inx == 7 )
-{
-}
-else if (inx == 8 )
-{
-}
-else if (inx == 9 )
-{
-}
-else if (inx == 10 )
-{
-}
-else if (inx == 11 )
-{
-}
-else if (inx == 12 )
-{
-}
-else if (inx == 13 )
-{
-}
-else if (inx == 14 )
-{
-}
-else if (inx == 15 )
-{
-}
-	//@@@
+	inx = GetSpecialID(inx);
 	if(inx == -2)
 	{
 		float3 center = float3(-2.81200004,2.68899989,-1.22000003);
@@ -553,104 +506,13 @@ mat.albedo = lerp(mat.albedo,co.rgb,co.a);
 }
 //@@@
 
-//@@@SDFBakerMgr SpecialObj
-if(inx == 0 )
-{
-}
-else if (inx == 1 )
-{
-}
-else if (inx == 2 )
-{
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
-}
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-else if (inx == 7 )
-{
-}
-else if (inx == 8 )
-{
-}
-else if (inx == 9 )
-{
-}
-else if (inx == 10 )
-{
-}
-else if (inx == 11 )
-{
-}
-else if (inx == 12 )
-{
-}
-else if (inx == 13 )
-{
-}
-else if (inx == 14 )
-{
-}
-else if (inx == 15 )
-{
-}
-//@@@
+inx = GetSpecialID(inx);
 
-	//if(inx == 0)
-	//{
-	//	float2 uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
-	//	float3 color = lightmap_ground.SampleLevel(common_linear_clamp_sampler, uv, 0).rgb;
-	//	SmoothWithDither(color,uv);
-	//	mat.albedo = float4(color,1);
-	//}
 	if(inx == -2)
 	{
 		float2 uv = GetObjUV(minHit);
-		////change from https://www.shadertoy.com/view/tldfD8
-		//float brushPower = 0.15;
-		//float g = 0.1, l=0.;
-		//g += -0.5+SampleR(grayNoiseMedium, uv*float2(.06,4.18));
-		//l += brushPower;
-		//l = exp(4.*l-1.5);
-		//g = exp(1.2*g-1.5);
-		//float v = .1*g+.2*l+2.*g*l;
-		//mat.metallic = saturate(v*2);
-		//mat.roughness = saturate((1-v)*0.5);
 		SetMatLib_BrushedMetal(mat,uv);
 	}
-
-	//if(inx==3)
-	//{
-	//	float2 uv = GetObjUV(minHit);
-	//	if(IsInBBox(uv,float2(0.2,0.2),float2(0.6,0.8)))
-	//	{
-	//		float2 uv2 = RemapUV(uv,float2(0.2,0.2),float2(0.6,0.8));
-	//		mat.albedo = SampleRGB(blueNoise,uv2);
-	//	}
-	//}
-	//mat.albedo = float3(GetObjUV(minHit),0);
-	//if(inx == 2)
-	//{
-	//	float2 uv = GetObjUV(minHit);
-	//	float3 T,B;
-	//	GetObjTB(T,B, minHit);
-	//	minHit.N = SampleNormalMap(N_paper, 4*uv, minHit.N,T,B,1.3);
-	//}
-	//if(inx == 13)
-	//{
-	//	float2 uv = GetObjUV(minHit);
-	//	float3 T,B;
-	//	GetObjTB(T,B, minHit);
-	//	SetMatLib_SwirlGold(mat,minHit,uv,T,B);
-	//}
 }
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
@@ -791,9 +653,77 @@ float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
-if(false)
+if(true)
 {
-//@@@SDFBakerMgr DirShadow
+if(useMSDFShadow)
+{
+int lightType[6];
+lightType[0] = 1;
+lightType[1] = 1;
+lightType[2] = 1;
+lightType[3] = 1;
+lightType[4] = 1;
+lightType[5] = 1;
+float3 lightPos[6];
+lightPos[0] = float3(-0.07, 8.15, 3.42);
+lightPos[1] = float3(-1.713, 2.707, -2.17);
+lightPos[2] = float3(-3.526, 2.707, -2.17);
+lightPos[3] = float3(0.04, 8.15, -3.29);
+lightPos[4] = float3(3.357384, 8.15, 0);
+lightPos[5] = float3(-3.83, 8.15, 0);
+float3 lightDirs[6];
+lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
+lightDirs[1] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
+lightDirs[2] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
+lightDirs[3] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
+lightDirs[4] = normalize(minHit.P - float3(3.357384, 8.15, 0));
+lightDirs[5] = normalize(minHit.P - float3(-3.83, 8.15, 0));
+int shadowType[6];
+shadowType[0] =1;
+shadowType[1] =1;
+shadowType[2] =1;
+shadowType[3] =1;
+shadowType[4] =1;
+shadowType[5] =1;
+float lightspace = 6;
+float maxLength = MaxSDF;
+float tsha = 1;
+
+int i = frameID % (int)lightspace;
+if(lightType[i]==0)
+{
+maxLength = MaxSDF;
+}
+if(lightType[i]==1)
+{
+maxLength = length(minHit.P - lightPos[i]);
+}
+if(lightType[i]<0)
+{
+tsha = 1;
+}
+else
+{
+if(shadowType[i]==0)
+{
+tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
+}
+if(shadowType[i]==1)
+{
+tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
+}
+}
+float n = frameID;
+sha = n / (n + 1)*LastShadow[seed.xy] + 1 / (n + 1)*tsha;
+NewShadow[seed.xy] = sha;
+if(frameID<lightspace)
+{
+	sha = 1;
+}
+}
+else
+{
+	//@@@SDFBakerMgr DirShadow
 int lightType[6];
 lightType[0] = 1;
 lightType[1] = 1;
@@ -855,7 +785,10 @@ lightspace -= (1 - tsha);
 }
 lightspace /= 6;
 sha = lightspace;
-//@@@
+	//@@@
+}
+
+
 }
 return sha;
 }
@@ -1004,56 +937,7 @@ float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonS
 
 float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 {
-//@@@SDFBakerMgr SpecialObj
-if(inx == 0 )
-{
-}
-else if (inx == 1 )
-{
-}
-else if (inx == 2 )
-{
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
-}
-else if (inx == 5 )
-{
-}
-else if (inx == 6 )
-{
-}
-else if (inx == 7 )
-{
-}
-else if (inx == 8 )
-{
-}
-else if (inx == 9 )
-{
-}
-else if (inx == 10 )
-{
-}
-else if (inx == 11 )
-{
-}
-else if (inx == 12 )
-{
-}
-else if (inx == 13 )
-{
-}
-else if (inx == 14 )
-{
-}
-else if (inx == 15 )
-{
-}
-//@@@
+	inx = GetSpecialID(inx);
 	return GetObjSDFNormal(inx, p, traceInfo);
 }
 
@@ -1169,6 +1053,8 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 			innerBoundStepScale[inx] = 1;
 		}
 
+//@@@SDFBakerMgr CheckInnerBound
+//@@@
 
 		if(bInnerBound)
 		{
@@ -1536,7 +1422,14 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 	float3 indirLightColor;
 	Material_PBR indirSourceMat;
 	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit, indirSourceMat);
-	indirLightColor *= RenderSceneSDFShadow(indirHit);
+	if(useMSDFShadow)
+	{
+		indirLightColor *= LastShadow[seed.xy];
+	}
+	else
+	{
+		indirLightColor *= RenderSceneSDFShadow(indirHit);
+	}
 	//---
 	float3 L = ray_indirect.dir;
 	float m_NL = saturate(dot(minHit.N,L));
@@ -1578,4 +1471,59 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit, Material_PBR mat)
 {
 	SetCheapIndirectColor(re, seed, ray, minHit, mat);
+}
+
+int GetSpecialID(int inx)
+{
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+}
+else if (inx == 1 )
+{
+}
+else if (inx == 2 )
+{
+}
+else if (inx == 3 )
+{
+}
+else if (inx == 4 )
+{
+}
+else if (inx == 5 )
+{
+}
+else if (inx == 6 )
+{
+}
+else if (inx == 7 )
+{
+}
+else if (inx == 8 )
+{
+}
+else if (inx == 9 )
+{
+}
+else if (inx == 10 )
+{
+}
+else if (inx == 11 )
+{
+}
+else if (inx == 12 )
+{
+}
+else if (inx == 13 )
+{
+}
+else if (inx == 14 )
+{
+}
+else if (inx == 15 )
+{
+}
+//@@@
+return inx;
 }
