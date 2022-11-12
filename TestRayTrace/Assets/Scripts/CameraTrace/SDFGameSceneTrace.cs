@@ -138,6 +138,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     public Vector2Int renderSize = new Vector2Int(1024, 720);
     bool needEyeDepth = false;
 
+    bool needSeperateShadow = false;
     public bool useIndirectRT = false;
     public float indirectMultiplier = 1.0f;
     public bool useMSDFShadow = false;
@@ -150,14 +151,17 @@ public class SDFGameSceneTrace : MonoBehaviour
     public bool usePostOp = true;
 
     RenderTexture rt;
+    RenderTexture tempRT;
+    RenderTexture tempRT1;
     RenderTexture uselessRT = null;
+    public RenderTexture rt_Shadow0 = null;
     public RenderTexture rt_EyeDepth = null;
     //Indirect RT
     RenderTexture directRT = null;
     RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
     //MSDFShadow RT
     public RenderTexture rt_LastShadow = null;
-    public RenderTexture rt_NewShadow = null;
+    public RenderTexture rt_FilteredShadow = null;
     //TAA RT
     RenderTexture rt_beforeTAA=null, rt_lastAfterTAA=null;
     //DOF RT
@@ -212,6 +216,9 @@ public class SDFGameSceneTrace : MonoBehaviour
     public float dof_dilationSize = 3.0f;
     //___DOF
 
+    [Range(1.0f, 10.0f)]
+    public float MSDFShadow_filterSize = 3.0f;
+
     bool hasInited = false;
 
     void Start()
@@ -227,13 +234,21 @@ public class SDFGameSceneTrace : MonoBehaviour
             maincamParam.h = renderSize.y;
             QualitySettings.vSyncCount = 0;
 
+            CreateRT(ref uselessRT, renderSize.x, renderSize.y);
+            CreateRT(ref tempRT, renderSize.x, renderSize.y);
+            CreateRT(ref tempRT1, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
+
             needEyeDepth = useTAA || useDOF;
             if(needEyeDepth)
             {
                 CreateRT(ref rt_EyeDepth, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
             }
 
-            CreateRT(ref uselessRT, 1, 1);
+            needSeperateShadow = useMSDFShadow;
+            if (needSeperateShadow)
+            {
+                CreateRT(ref rt_Shadow0, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
+            }
 
             if (useIndirectRT)
             {
@@ -246,7 +261,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             if(useMSDFShadow)
             {
                 CreateRT(ref rt_LastShadow, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
-                CreateRT(ref rt_NewShadow, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
+                CreateRT(ref rt_FilteredShadow, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
             }
 
             if(useTAA)
@@ -387,16 +402,6 @@ public class SDFGameSceneTrace : MonoBehaviour
             return;
         }
 
-        //MSDF Shadow提前滤波
-        if(useMSDFShadow)
-        {
-            int lightSpace = autoCS.bakerMgr.lightTags.Length;
-            if(frameID<lightSpace)
-            {
-                //对LastShadow进行滤波
-            }
-        }
-
         //主渲染
         //##################################
         //### compute
@@ -404,6 +409,16 @@ public class SDFGameSceneTrace : MonoBehaviour
         CSInsertSystemValue(ref computeShader);
         ShaderToyTool.Instance.CSInsertSystemValue(ref computeShader, kInx);
         autoCS.CSInsertSystemValue(ref computeShader, kInx);
+
+        computeShader.SetBool("needSeperateShadow", needSeperateShadow);
+        if (needSeperateShadow)
+        {
+            computeShader.SetTexture(kInx, "Shadow0", rt_Shadow0);
+        }
+        else
+        {
+            computeShader.SetTexture(kInx, "Shadow0", uselessRT);
+        }
 
         computeShader.SetBool("useIndirectRT", useIndirectRT);
         if (useIndirectRT)
@@ -422,12 +437,10 @@ public class SDFGameSceneTrace : MonoBehaviour
         if (useMSDFShadow)
         {
             computeShader.SetTexture(kInx, "LastShadow", rt_LastShadow);
-            computeShader.SetTexture(kInx, "NewShadow", rt_NewShadow);
         }
         else
         {
             computeShader.SetTexture(kInx, "LastShadow", uselessRT);
-            computeShader.SetTexture(kInx, "NewShadow", uselessRT);
         }
 
         computeShader.SetBool("needEyeDepth", needEyeDepth);
@@ -449,7 +462,50 @@ public class SDFGameSceneTrace : MonoBehaviour
 
         if (useMSDFShadow)
         {
-            Graphics.Blit(rt_NewShadow, rt_LastShadow);
+            Graphics.Blit(rt_Shadow0, tempRT1);
+            int lightSpace = autoCS.bakerMgr.lightTags.Length;
+            if (frameID < lightSpace)
+            {
+                //1.模糊shadow0
+                //###########
+                //### compute
+                kInx = cs_BlendFinal.FindKernel("MSDFShadowFilter");
+                cs_BlendFinal.SetTexture(kInx, "Result1", rt_Shadow0);
+                cs_BlendFinal.SetTexture(kInx, "TexA1", tempRT1);
+                cs_BlendFinal.SetFloat("filterSize", MSDFShadow_filterSize);
+
+                cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
+                //### compute
+                //###########
+            }
+            //2.混合
+            if (useIndirectRT)
+            {
+                Graphics.Blit(directRT, tempRT);
+            }
+            else
+            {
+                Graphics.Blit(rTex, tempRT);
+            }
+            //###########
+            //### compute
+            kInx = cs_BlendFinal.FindKernel("BlendShadow0");
+            if (useIndirectRT)
+            {
+                cs_BlendFinal.SetTexture(kInx, "Result", directRT);
+            }
+            else
+            {
+                cs_BlendFinal.SetTexture(kInx, "Result", rTex);
+            }
+            cs_BlendFinal.SetTexture(kInx, "TexA4", tempRT);
+            cs_BlendFinal.SetTexture(kInx, "TexB1", rt_Shadow0);
+
+            cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
+            //### compute
+            //###########
+            //3.copy到Lastshadow
+            Graphics.Blit(rt_Shadow0, rt_LastShadow);
         }
 
 
@@ -490,8 +546,8 @@ public class SDFGameSceneTrace : MonoBehaviour
             cs_BlendFinal.SetInt("frameID", gFrameID);
             cs_BlendFinal.SetFloat("TAAMultiplier", 0.95f);
             cs_BlendFinal.SetTexture(kInx, "Result", rTex);
-            cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeTAA);
-            cs_BlendFinal.SetTexture(kInx, "TexB", rt_lastAfterTAA);
+            cs_BlendFinal.SetTexture(kInx, "TexA4", rt_beforeTAA);
+            cs_BlendFinal.SetTexture(kInx, "TexB4", rt_lastAfterTAA);
             cs_BlendFinal.SetTexture(kInx, "TexADepth", rt_EyeDepth);
             maincamParam.InsertParamToComputeShader(ref cs_BlendFinal);
             lastTAAcamParam.InsertParamToComputeShader_TAA(ref cs_BlendFinal);
@@ -515,7 +571,7 @@ public class SDFGameSceneTrace : MonoBehaviour
                     //### compute
                     kInx = cs_Blur.FindKernel("MedianFiliter");
                     cs_Blur.SetTexture(kInx, "Result", rt_beforeDOF);
-                    cs_Blur.SetTexture(kInx, "TexA", rTex);
+                    cs_Blur.SetTexture(kInx, "TexA4", rTex);
 
                     cs_Blur.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
                     //### compute
@@ -525,10 +581,10 @@ public class SDFGameSceneTrace : MonoBehaviour
                 //### compute
                 kInx = cs_BlendFinal.FindKernel("DOFDilation");
                 cs_BlendFinal.SetTexture(kInx, "Result", rt_DOFinput);
-                cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeDOF);
+                cs_BlendFinal.SetTexture(kInx, "TexA4", rt_beforeDOF);
                 cs_BlendFinal.SetFloat("minThreshold", dof_minThreshold);
                 cs_BlendFinal.SetFloat("maxThreshold", dof_maxThreshold);
-                cs_BlendFinal.SetFloat("dilationSize", dof_dilationSize);
+                cs_BlendFinal.SetFloat("filterSize", dof_dilationSize);
 
                 cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
                 //### compute
@@ -541,7 +597,7 @@ public class SDFGameSceneTrace : MonoBehaviour
                 //### compute
                 kInx = cs_Blur.FindKernel("BoxBlur");
                 cs_Blur.SetTexture(kInx, "Result", rt_DOFinput);
-                cs_Blur.SetTexture(kInx, "TexA", rt_beforeDOF);
+                cs_Blur.SetTexture(kInx, "TexA4", rt_beforeDOF);
 
                 cs_Blur.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
                 //### compute
@@ -554,8 +610,8 @@ public class SDFGameSceneTrace : MonoBehaviour
             //### compute
             kInx = cs_BlendFinal.FindKernel("BlendDOF");
             cs_BlendFinal.SetTexture(kInx, "Result", rTex);
-            cs_BlendFinal.SetTexture(kInx, "TexA", rt_beforeDOF);
-            cs_BlendFinal.SetTexture(kInx, "TexB", rt_DOFinput);
+            cs_BlendFinal.SetTexture(kInx, "TexA4", rt_beforeDOF);
+            cs_BlendFinal.SetTexture(kInx, "TexB4", rt_DOFinput);
             cs_BlendFinal.SetTexture(kInx, "TexADepth", rt_EyeDepth);
             cs_BlendFinal.SetFloat("focusEyeDepth", focusEyeDepth);
             cs_BlendFinal.SetFloat("minDistance", dof_minDistance);
@@ -569,11 +625,11 @@ public class SDFGameSceneTrace : MonoBehaviour
 
         if (usePostOp)
         {
-            Graphics.Blit(rTex, rt_beforePostOp);
-            kInx = cs_BlendFinal.FindKernel("TextureAA");
-            cs_BlendFinal.SetTexture(kInx, "Result", rTex);
-            cs_BlendFinal.SetTexture(kInx, "Direct", rt_beforePostOp);
-            cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
+            //Graphics.Blit(rTex, rt_beforePostOp);
+            //kInx = cs_BlendFinal.FindKernel("TextureAA");
+            //cs_BlendFinal.SetTexture(kInx, "Result", rTex);
+            //cs_BlendFinal.SetTexture(kInx, "Direct", rt_beforePostOp);
+            //cs_BlendFinal.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
         }
     }
     //####################################################################################
@@ -594,7 +650,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
             cs = (ComputeShader)Resources.Load(csResourcesPath);
             //---extra CS
-            if(useIndirectRT || useTAA || useDOF||usePostOp )
+            if(useIndirectRT || useTAA || useDOF||usePostOp || useMSDFShadow)
             {
                 cs_BlendFinal = (ComputeShader)Resources.Load("LightingCS/BlendFinal");
             }

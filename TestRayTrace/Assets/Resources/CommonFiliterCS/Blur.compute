@@ -6,7 +6,7 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture2D<float4> Result;
-Texture2D<float4> TexA;
+Texture2D<float4> TexA4;
 
 //https://lettier.github.io/3d-game-shaders-for-beginners/blur.html#box-blur
 [numthreads(8, 8, 1)]
@@ -19,7 +19,7 @@ void BoxBlur(uint3 id : SV_DispatchThreadID)
 	{
 		for (int i = -size; i <= size; i++)
 		{
-			sum += TexA[id.xy + float2(i, j)*step].rgb;
+			sum += TexA4[id.xy + float2(i, j)*step].rgb;
 		}
 	}
 	sum /= (size * 2 + 1);
@@ -41,7 +41,7 @@ void MedianFiliter(uint3 id : SV_DispatchThreadID)
 		for (int i = -size; i <= size; i++)
 		{
 			int idx = i + size + (j + size)*(2 * size + 1);
-			cols[idx] = TexA[id.xy + float2(i, j)*step].rgb;
+			cols[idx] = TexA4[id.xy + float2(i, j)*step].rgb;
 			record[idx] = dot(cols[idx], float3(0.3, 0.6, 0.1));
 		}
 	}

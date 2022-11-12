@@ -8,7 +8,7 @@ Blocks:
 if (minHit.bHit)
 { 
 	re = RenderSceneObj(ray, minHit, mat);
-	re *= RenderSceneSDFShadow(minHit);
+	//re *= RenderSceneSDFShadow(minHit);
 }
 else
 {

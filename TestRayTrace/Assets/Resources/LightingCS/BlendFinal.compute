@@ -1,10 +1,11 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel BlendIndirect
 #pragma kernel CopyToNewFront
-#pragma kernel TextureAA
+#pragma kernel BlendShadow0
 #pragma kernel BlendTAA
 #pragma kernel BlendDOF
 #pragma kernel DOFDilation
+#pragma kernel MSDFShadowFilter
 
 #include "../../HLSL/CommonDef.hlsl"
 #include "../../HLSL/RayMath.hlsl"
@@ -12,6 +13,7 @@
 RWTexture2D<float4> Result;
 int frameID;
 
+//---BlendIndirect-------------------------------------------------------------------------------------------
 Texture2D<float4> Direct;
 Texture2D<float4> Indirect;
 Texture2D<float4> FrontIndirect;
@@ -48,42 +50,70 @@ void CopyToNewFront(uint3 id : SV_DispatchThreadID)
 {
 	Result[id.xy] = NewFrontIndirect[id.xy];
 }
+//___BlendIndirect
 
-float mfwidth(float x)
+RWTexture2D<float> Result1;
+Texture2D<float> TexA1;
+Texture2D<float4> TexA4;
+Texture2D<float> TexB1;
+Texture2D<float4> TexB4;
+float filterSize;
+//---MSDFShadowFilter-----------------------------------------------------------------------------------
+//https://lettier.github.io/3d-game-shaders-for-beginners/dilation.html
+float2 GetSequencePosOffset(float2 p, int offset, float2 size)
 {
-	return x;
+	//must positive offset
+	float dir = p.y < size.y * 0.5;
+	float x = p.x + offset*dir;
+	float y = p.y;
+	if (x >= size.x)
+	{
+		x = 0;
+		y +=1;
+	}
+	if (x < 0)
+	{
+		x = size.x - 1;
+		y -= 1;
+	}
+	return float2(x, y);
 }
-
-float3 texFiltered(Texture2D<float4> inTexture, in float3 rayDir)
-{
-	//Scale of the texture
-	float scale = 1.;
-	//This defines the width of the blur kernel 0.5 to 1. seems to work fine.
-	float wd = .75 / scale;
-
-	float w = mfwidth(rayDir.y)*wd;
-	float d1 = rayDir.y / scale - (w / 2.0);
-	float d2 = d1 + w;
-	float3 t1 = GetRGB(inTexture, float2(d1, rayDir.z / scale)).rgb;
-	float3 t2 = GetRGB(inTexture, float2(d2, rayDir.z / scale)).rgb;
-	float3 col = (t1 + t2)*0.5;
-
-	w = mfwidth(rayDir.z)*wd;
-	d1 = rayDir.z / scale - (w / 2.0);
-	d2 = d1 + w;
-	t1 = GetRGB(inTexture, float2(rayDir.y / scale, d1)).rgb;
-	t2 = GetRGB(inTexture, float2(rayDir.y / scale, d2)).rgb;
-	float3 col2 = (t1 + t2)*0.5;
-	col = lerp(col, col2, .5);
-
-	return col;
-}
-
 [numthreads(8, 8, 1)]
-void TextureAA(uint3 id : SV_DispatchThreadID)
+void MSDFShadowFilter(uint3 id : SV_DispatchThreadID)
 {
-	Result[id.xy] = Direct[id.xy];
+	float sum = 0;
+
+	float step = 1.0f;
+	for (int j = -filterSize; j <= filterSize; j++)
+	{
+		for (int i = -filterSize; i <= filterSize; i++)
+		{
+			sum += TexA1[id.xy + float2(i, j) * step];
+		}
+	}
+	sum /= (filterSize * 2 + 1);
+	sum /= 6;
+	sum *= 0.85;
+
+	//float2 size = (float2)GetSize(TexA1);
+	//float2 pos;
+	//for (int i = 0; i < 6; i++)
+	//{
+	//	pos = GetSequencePosOffset(id.xy, i-3, size);
+	//	sum += TexA1[pos];
+	//}
+	//sum /= 6;
+
+	Result1[id.xy] = sum;
 }
+//___MSDFShadowFilter
+//---BlendShadow0-------------------------------------------------------------------------------------------
+[numthreads(8, 8, 1)]
+void BlendShadow0(uint3 id : SV_DispatchThreadID)
+{
+	Result[id.xy] = float4(TexA4[id.xy].rgb * TexB1[id.xy], 1);
+}
+//___BlendShadow0
 //---TAA-------------------------------------------------------------------------------------------
 #include "../../HLSL/Random/RandUtility.hlsl"
 
@@ -143,8 +173,6 @@ float3 last_eyePos;
 float3 last_screenU;
 float3 last_screenV;
 
-Texture2D<float4> TexA;
-Texture2D<float4> TexB;
 Texture2D<float> TexADepth;
 float TAAMultiplier;
 [numthreads(8, 8, 1)]
@@ -154,10 +182,10 @@ void BlendTAA(uint3 id : SV_DispatchThreadID)
 	//B: rt_lastAfterTAA
 	if (frameID == 0)
 	{
-		Result[id.xy] = TexA[id.xy];
+		Result[id.xy] = TexA4[id.xy];
 		return;
 	}
-	float3 col1 = TexA[id.xy].rgb;
+	float3 col1 = TexA4[id.xy].rgb;
 	float3 re = col1;
 	//1.eyeDepth
 	float eyeDepth = TexADepth[id.xy].r;
@@ -206,9 +234,9 @@ void BlendTAA(uint3 id : SV_DispatchThreadID)
 			
 			if (Is01(lastUV))
 			{
-				float3 col2 = TexB[lastUV*size].rgb;
+				float3 col2 = TexB4[lastUV*size].rgb;
 				float2 nowUV = id.xy / (float2)size;
-				col2 = TAA_clipedColor(TexA, nowUV, col1, col2);
+				col2 = TAA_clipedColor(TexA4, nowUV, col1, col2);
 				re = col1 * (1 - TAAMultiplier) + col2 * TAAMultiplier;
 				//re = float3(, 0);
 			}
@@ -224,11 +252,10 @@ void BlendTAA(uint3 id : SV_DispatchThreadID)
 //mix(fragColor.rgb, cmx.rgb, smoothstep(minThreshold, maxThreshold, mx));
 float minThreshold;
 float maxThreshold;
-float dilationSize;
 [numthreads(8, 8, 1)]
 void DOFDilation(uint3 id : SV_DispatchThreadID)
 {
-	float size = dilationSize;
+	float size = filterSize;
 	float mx = -1;
 	float3 cmx = 0;
 	float3 grey = float3(0.3, 0.6, 0.1);//float3(0.21, 0.72, 0.07);
@@ -238,7 +265,7 @@ void DOFDilation(uint3 id : SV_DispatchThreadID)
 		for (int i = -size; i <= size; i++)
 		{
 			if (length(float2(i, j)) > size) { continue; }
-			float3 c = TexA[id.xy + int2(i, j)].rgb;
+			float3 c = TexA4[id.xy + int2(i, j)].rgb;
 			if (i == 0 && j == 0)
 			{
 				ori = c;
@@ -281,14 +308,14 @@ void BlendDOF(uint3 id : SV_DispatchThreadID)
 		}
 	}
 	
-	float3 blured = TexB[id.xy].rgb;
+	float3 blured = TexB4[id.xy].rgb;
 	if (eyeDepth < 0)
 	{
 		Result[id.xy] = float4(blured, 1);
 	}
 	else
 	{
-		float3 ori = TexA[id.xy].rgb;
+		float3 ori = TexA4[id.xy].rgb;
 		float blur = smoothstep(minDistance, maxDistance, abs(eyeDepth - f));
 		float3 re = lerp(ori, blured, blur);
 		Result[id.xy] = float4(re, 1);

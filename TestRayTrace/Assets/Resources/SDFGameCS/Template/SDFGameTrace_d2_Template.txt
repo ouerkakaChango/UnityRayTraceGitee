@@ -1,5 +1,6 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel Render
+#pragma kernel SceneBlendShadow0
 
 #include "../../../HLSL/UnityCommonDef.hlsl"
 #include "../../../HLSL/RayMath.hlsl"
@@ -8,13 +9,8 @@
 int w;
 int h;
 
-bool needEyeDepth;
-RWTexture2D<float> rt_EyeDepth;
-
 int frameID;
 int gFrameID;
-bool useIndirectRT;
-bool useMSDFShadow;
 
 int camType; //0:normal 1:orthogonal
 int camGammaMode; //0:normal 1:notGamma
@@ -33,9 +29,19 @@ float3 screenV;
 float3 seed;
 
 RWTexture2D<float4> Result;
+
+bool needEyeDepth;
+RWTexture2D<float> rt_EyeDepth;
+
+bool needSeperateShadow;
+RWTexture2D<float> Shadow0;
+
+bool useIndirectRT;
 RWTexture2D<float4> IndirectResult;
+
+bool useMSDFShadow;
 Texture2D<float> LastShadow;
-RWTexture2D<float> NewShadow;
+
 Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
 
@@ -82,6 +88,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 	float3 SSAA_colors[SSAA_num];
 	float3 SSAA_indirColors[SSAA_num];
 	float SSAA_eyeDepth[SSAA_num];
+	float SSAA_shadow0[SSAA_num];
 
 	float3 camFoward = normalize(cross(screenU,screenV));
 
@@ -105,10 +112,11 @@ void Render(uint3 id : SV_DispatchThreadID)
 			}
 			HitInfo minHit;
 			Material_PBR mat;
-			SSAA_colors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameColor(ray,minHit, mat);
+			int subInx = i - 1 + (j - 1)* SSAA_edge;
+			SSAA_colors[subInx] = GetSDFGameColor(ray,minHit, mat);
 			if(useIndirectRT)
 			{
-				SSAA_indirColors[i - 1 + (j - 1)* SSAA_edge] = GetSDFGameIndirColor(ray,seed,minHit,mat);
+				SSAA_indirColors[subInx] = GetSDFGameIndirColor(ray,seed,minHit,mat);
 			}
 			if(needEyeDepth)
 			{
@@ -117,7 +125,11 @@ void Render(uint3 id : SV_DispatchThreadID)
 				{
 					eyeDepth = length(minHit.P - ray.pos);
 				}
-				SSAA_eyeDepth[i - 1 + (j - 1)* SSAA_edge] = eyeDepth;
+				SSAA_eyeDepth[subInx] = eyeDepth;
+			}
+			if(needSeperateShadow)
+			{
+				 SSAA_shadow0[subInx] = RenderSceneSDFShadow(minHit);
 			}
 		}
 	}
@@ -143,7 +155,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 
 	if(needEyeDepth)
 	{
-		float3 d = 0;
+		float d = 0;
 		for (int i = 0; i < SSAA_num; i++)
 		{
 			d += SSAA_eyeDepth[i];
@@ -151,4 +163,23 @@ void Render(uint3 id : SV_DispatchThreadID)
 		d /= (float)SSAA_num;
 		rt_EyeDepth[id.xy] = d;
 	}
+
+	if(needSeperateShadow)
+	{
+		float d = 0;
+		for (int i = 0; i < SSAA_num; i++)
+		{
+			d += SSAA_shadow0[i];
+		}
+		d /= (float)SSAA_num;
+		Shadow0[id.xy] = d;
+	}
+}
+
+//##################################################################################
+Texture2D<float4> TexA;
+[numthreads(8, 8, 1)]
+void SceneBlendShadow0(uint3 id : SV_DispatchThreadID)
+{
+	Result[id.xy] = float4(TexA[id.xy].rgb * Shadow0[id.xy],TexA[id.xy].a);
 }

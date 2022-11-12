@@ -15,6 +15,7 @@ Blocks:
 #include "../../../HLSL/MatLib/CommonMatLib.hlsl"
 
 float daoScale;
+float newShadow;
 
 //@@@SDFBakerMgr TexSys
 Texture2D<float3> N_paper;
@@ -149,7 +150,7 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit, indirSourceMat);
 	if(useMSDFShadow)
 	{
-		indirLightColor *= NewShadow[seed.xy];
+		indirLightColor *= LastShadow[seed.xy];//newShadow;
 	}
 	else
 	{
@@ -757,7 +758,7 @@ float maxLength = MaxSDF;
 float tsha = 1;
 
 //int i = frameID % (int)lightspace;
-int i = lightspace * rand01(seed);
+int i = lightspace * rand01(float3(seed.xy,gFrameID));
 if(lightType[i]==0)
 {
     maxLength = MaxSDF;
@@ -783,7 +784,7 @@ else
 }
 float n = frameID;
 sha = n / (n + 1)*LastShadow[seed.xy] + 1 / (n + 1)*tsha;
-NewShadow[seed.xy] = sha;
+newShadow = sha;
 //if(frameID<lightspace)
 //{
 //	sha = 1;

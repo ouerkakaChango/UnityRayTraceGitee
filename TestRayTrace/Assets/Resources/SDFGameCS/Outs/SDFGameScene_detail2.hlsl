@@ -9,7 +9,7 @@
 #define SceneSDFShadowNormalBias 0.001
 
 #define SceneSDFSoftShadowBias 0.1
-#define SceneSDFSoftShadowK 16
+#define SceneSDFSoftShadowK 32
 
 #include "../../../HLSL/PBR/PBRCommonDef.hlsl"
 #include "../../../HLSL/PBR/PBR_IBL.hlsl"
@@ -23,6 +23,7 @@
 #include "../../../HLSL/MatLib/CommonMatLib.hlsl"
 
 float daoScale;
+float newShadow;
 
 //@@@SDFBakerMgr TexSys
 Texture2D<float3> N_paper;
@@ -652,6 +653,10 @@ float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 
 float RenderSceneSDFShadow(HitInfo minHit)
 {
+	if(!minHit.bHit)
+	{
+		return 1;
+	}
 	float sha = 1;
 if(true)
 {
@@ -690,7 +695,7 @@ float maxLength = MaxSDF;
 float tsha = 1;
 
 //int i = frameID % (int)lightspace;
-int i = lightspace * rand01(seed);
+int i = lightspace * rand01(float3(seed.xy,gFrameID));
 if(lightType[i]==0)
 {
 maxLength = MaxSDF;
@@ -716,7 +721,7 @@ tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
 }
 float n = frameID;
 sha = n / (n + 1)*LastShadow[seed.xy] + 1 / (n + 1)*tsha;
-NewShadow[seed.xy] = sha;
+newShadow = sha;
 //if(frameID<lightspace)
 //{
 //	sha = 1;
@@ -1425,7 +1430,7 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit, indirSourceMat);
 	if(useMSDFShadow)
 	{
-		indirLightColor *= NewShadow[seed.xy];
+		indirLightColor *= LastShadow[seed.xy];//newShadow;
 	}
 	else
 	{
