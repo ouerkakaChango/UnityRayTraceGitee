@@ -689,7 +689,8 @@ float lightspace = 6;
 float maxLength = MaxSDF;
 float tsha = 1;
 
-int i = frameID % (int)lightspace;
+//int i = frameID % (int)lightspace;
+int i = lightspace * rand01(seed);
 if(lightType[i]==0)
 {
 maxLength = MaxSDF;
@@ -716,10 +717,10 @@ tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
 float n = frameID;
 sha = n / (n + 1)*LastShadow[seed.xy] + 1 / (n + 1)*tsha;
 NewShadow[seed.xy] = sha;
-if(frameID<lightspace)
-{
-	sha = 1;
-}
+//if(frameID<lightspace)
+//{
+//	sha = 1;
+//}
 }
 else
 {
