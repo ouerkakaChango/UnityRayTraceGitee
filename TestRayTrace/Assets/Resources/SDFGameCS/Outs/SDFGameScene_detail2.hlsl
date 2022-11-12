@@ -1425,7 +1425,7 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit, indirSourceMat);
 	if(useMSDFShadow)
 	{
-		indirLightColor *= LastShadow[seed.xy];
+		indirLightColor *= NewShadow[seed.xy];
 	}
 	else
 	{

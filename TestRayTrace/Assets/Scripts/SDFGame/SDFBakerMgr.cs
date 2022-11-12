@@ -36,7 +36,7 @@ public class SDFBakerMgr : MonoBehaviour
     public List<string> bakedObjEnvTex = new List<string>();
 
     public SDFBakerTag[] tags;
-    SDFLightTag[] lightTags;
+    public SDFLightTag[] lightTags;
 
     bool hide = false;
     // Start is called before the first frame update

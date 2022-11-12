@@ -371,31 +371,6 @@ public class SDFGameSceneTrace : MonoBehaviour
         keyboard.keyDic.Add("q", TestChangeCamDir);
     }
 
-    //##################################################################################################
-
-    static public void PreComputeBuffer(ref ComputeBuffer buffer, int stride, in System.Array dataArr)
-    {
-        if (buffer != null)
-        {
-            return;
-        }
-        buffer = new ComputeBuffer(dataArr.Length, stride);
-        buffer.SetData(dataArr);
-    }
-
-    static public void PostComputeBuffer(ref ComputeBuffer buffer, System.Array arr)
-    {
-        return;
-        //buffer.GetData(arr);
-        //buffer.Dispose();
-    }
-
-
-    static public int GetRayStride()
-    {
-        int vec3Size = sizeof(float) * 3;
-        return 2 * vec3Size;
-    }
     //################################################################################################################
     void CSInsertSystemValue(ref ComputeShader computeShader)
     {
@@ -412,7 +387,17 @@ public class SDFGameSceneTrace : MonoBehaviour
             return;
         }
 
-        //PreComputeBuffer(ref buffer_vertices, sizeof(float) * 3, vertices);
+        //MSDF Shadow提前滤波
+        if(useMSDFShadow)
+        {
+            int lightSpace = autoCS.bakerMgr.lightTags.Length;
+            if(frameID<lightSpace)
+            {
+                //对LastShadow进行滤波
+            }
+        }
+
+        //主渲染
         //##################################
         //### compute
         int kInx = computeShader.FindKernel("Render");
