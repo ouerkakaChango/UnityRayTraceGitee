@@ -251,6 +251,12 @@ if(inx == -1)
 		//mat.albedo = float3(uv,0);
 		//minHit.N.xy = rotate (minHit.N.xy, 0.75 * PI * (uv.x - 0.5));
 		//minHit.N.zy = rotate (minHit.N.zy, 0.75 * PI * (uv.y - 0.5));
+
+		//float3 p = minHit.P;
+		//float3 grid = float3(1,1,1);
+		//float3 center = GetGridCenter_DownMode(p,grid,float3(0,0,1));
+		//float3 q = p - center;
+
 	}
 }
 ###BLOCK
@@ -412,9 +418,21 @@ inx = -1;
 
 if(inx == -1)
 {
+	float3 outCenter = float3(0, -1, 0);
+	float3 outBound = float3(10, 0.5, 30);
 	if(IsInBBox(p,eyePos - 300,eyePos+300))
 	{
-		re = min(re, 0 + SDFBox(p, float3(0, -1, 0), float3(10, 0.5, 30), float3(0, 0, 0)));
+		if(IsInBBox(p,outCenter - outBound,outCenter+outBound))
+		{
+		float3 grid = float3(1,1,1);
+		float3 center = GetGridCenter_DownMode(p,grid,float3(0,0,1));
+		float3 q = p - center;
+		re = min(re, 0 + SDFBox(p, center, float3(0.1,0.1,0.1), float3(0, 0, 0)));
+		}
+		else
+		{
+			re = SDFBox(p, outCenter, outBound)+2*TraceThre;
+		}
 	}
 }
 
