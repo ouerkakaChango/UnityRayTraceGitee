@@ -81,6 +81,7 @@ float3 randP_hemiRound(float3 seed)
 
 float rand01(float3 seed)
 {
+	seed = abs(seed);
 	uint stat = (uint)(seed.x) * 1973 + (uint)(seed.y) * 9277 + (uint)(seed.z) * 2699 | 1;
 
 	return random_float_01(stat);

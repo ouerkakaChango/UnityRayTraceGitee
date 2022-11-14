@@ -301,6 +301,24 @@ float SDFCircleSlice(float3 q, float r, float hBound)
 	return SDFCylinder(q, a, b, r);
 }
 
+//https://www.shadertoy.com/view/7dlGRf
+float SDFParallelogram(in float2 p, float wi, float he, float sk)
+{
+	float2  e = float2(sk, he);
+	float e2 = sk * sk + he * he;
+
+	p = (p.y < 0.0) ? -p : p;
+	// horizontal edge
+	float2  w = p - e; w.x -= clamp(w.x, -wi, wi);
+	float2  d = float2(dot(w, w), -w.y);
+	// vertical edge
+	float s = p.x*e.y - p.y*e.x;
+	p = (s < 0.0) ? -p : p;
+	float2  v = p - float2(wi, 0); v -= e * clamp(dot(v, e) / e2, -1.0, 1.0);
+	d = min(d, float2(dot(v, v), wi*he - abs(s)));
+	return sqrt(d.x)*sign(-d.y);
+}
+
 float SDFTex3D(float3 p, float3 center, float3 bound, Texture3D<float> SDFTex3D, float traceThre, float offset = 0)
 {
 	float3 q = p - center;
@@ -403,7 +421,7 @@ float3 SDFTexNorm3D(float3 p, float3 center, float3 bound, Texture3D<float3> SDF
 	return SDFNorm3D.SampleLevel(common_linear_clamp_sampler, q + 0.5, 0).rgb;
 }
 
-//---Grid-------------------------------------------------------
+//---Grid Cell-------------------------------------------------------
 float3 GetGridCenter_DownMode(float3 p, float3 grid, float3 offset = 0)
 {
 	p -= offset;
@@ -443,7 +461,19 @@ float3 GetGridCenterWithID_MidMode(float3 p, float3 grid, out float3 id, float3 
 	id = floor(p / grid);
 	return grid * (id + float3(0.5, 0, 0.5)) + offset;
 }
-//___Grid_____________________________________________________________
+
+float3 GetCellCenter_MidMode(float3 p, float3 grid, float3 offset = 0)
+{
+	float3 m = floor(p / grid);
+	return grid * (m + float3(0.5, 0.5, 0.5)) + offset;
+}
+
+float3 GetCellCenterWithID_MidMode(float3 p, float3 grid, out float3 id, float3 offset = 0)
+{
+	id = floor(p / grid);
+	return grid * (id + float3(0.5, 0.5, 0.5)) + offset;
+}
+//___Grid Cell_____________________________________________________________
 
 //---ShowInt-------------------------------------------------------
 float DigSeg(float2 q)
