@@ -3,7 +3,7 @@ valMaps:
 ObjNum 2
 //@@@
 TraceThre 0.001
-NormalEpsilon 0.001
+NormalEpsilon 0.01
 
 Blocks:
 
@@ -200,15 +200,12 @@ return renderMode[obj];
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(0, -1.096, 0), float3(2.5, 0.5, 2.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, -1.096, 0), float3(2.5, 0.5, 2.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 0, 15.06), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 0, 15.06), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return uv;
 }
 	//@@@
 
@@ -224,13 +221,11 @@ return uv;
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(0, -1.096, 0), float3(2.5, 0.5, 2.5), float3(0, 0, 0));
+BoxedTB(T,B,minHit.P, float3(0, 0, 15.06), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return;
 }
 if(inx == 1 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return;
 }
 //@@@
 basis_unstable(minHit.N, T, B);
@@ -247,7 +242,17 @@ int inx = minHit.obj;
 //@@@
 
 inx = GetSpecialID(inx);
-
+if(inx == -1)
+{
+	if(minHit.N.y>0.9)
+	{
+		//float2 uv = 5 * minHit.P.xz;
+		//uv = frac(uv);
+		//mat.albedo = float3(uv,0);
+		//minHit.N.xy = rotate (minHit.N.xy, 0.75 * PI * (uv.x - 0.5));
+		//minHit.N.zy = rotate (minHit.N.zy, 0.75 * PI * (uv.y - 0.5));
+	}
+}
 ###BLOCK
 
 ###BLOCK ObjRender
@@ -256,7 +261,7 @@ if(mode==0)
 {
   float3 lightDirs[1];
   float3 lightColors[1];
-  lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+  lightDirs[0] = float3(0.790262, -0.6127691, 0);
   lightColors[0] = float3(1, 0.9568627, 0.8392157);
   result.rgb = 0.03 * mat.albedo * mat.ao;
   for(int i=0;i<1;i++)
@@ -326,19 +331,19 @@ SmoothWithDither(result, suv);
 int inx = GetSpecialID(minHit.obj);
 if(true)
 {
-//@@SDFBakerMgr DirShadow
+//@@@SDFBakerMgr DirShadow
 int lightType[1];
-lightType[0] = -1;
+lightType[0] = 0;
 float3 lightPos[1];
 lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
-lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+lightDirs[0] = float3(0.790262, -0.6127691, 0);
 int shadowType[1];
 shadowType[0] =0;
 float lightspace = 1;
 float maxLength = MaxSDF;
 float tsha = 1;
-for (int i = 0; i < 0; i++)
+for (int i = 0; i < 1; i++)
 {
   float maxLength = MaxSDF;
   if(lightType[i]==0)
@@ -367,8 +372,8 @@ for (int i = 0; i < 0; i++)
   lightspace -= (1 - tsha);
 }
 lightspace /= 1;
-sha = GetDirHardShadow(lightDirs[0], minHit, maxLength);
-//@@
+sha = lightspace;
+//@@@
 }
 return sha;
 ###BLOCK
@@ -397,11 +402,11 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -1.096, 0), float3(2.5, 0.5, 2.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 0, 15.06), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+inx = -1;
 }
 //@@@
 
@@ -409,7 +414,7 @@ if(inx == -1)
 {
 	if(IsInBBox(p,eyePos - 300,eyePos+300))
 	{
-
+		re = min(re, 0 + SDFBox(p, float3(0, -1, 0), float3(10, 0.5, 30), float3(0, 0, 0)));
 	}
 }
 
@@ -449,6 +454,7 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+inx = -1;
 }
 //@@@
 return inx;

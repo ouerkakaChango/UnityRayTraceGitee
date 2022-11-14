@@ -487,4 +487,8 @@ float2 GetSubUV(float2 uv, float4 subInfo)
 	return uv;
 }
 
+float FixNormal(float x, float y)
+{
+	return sqrt(1 - x * x - y * y);
+}
 #endif

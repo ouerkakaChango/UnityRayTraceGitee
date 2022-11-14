@@ -4,7 +4,7 @@
 #define MaxTraceDis 100
 #define MaxTraceTime 6400
 #define TraceThre 0.001
-#define NormalEpsilon 0.001
+#define NormalEpsilon 0.01
 
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFSoftShadowK 16
@@ -114,15 +114,12 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(0, -1.096, 0), float3(2.5, 0.5, 2.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, -1.096, 0), float3(2.5, 0.5, 2.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 0, 15.06), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 0, 15.06), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return uv;
 }
 	//@@@
 
@@ -142,13 +139,11 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(0, -1.096, 0), float3(2.5, 0.5, 2.5), float3(0, 0, 0));
+BoxedTB(T,B,minHit.P, float3(0, 0, 15.06), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return;
 }
 if(inx == 1 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return;
 }
 //@@@
 basis_unstable(minHit.N, T, B);
@@ -166,7 +161,17 @@ int inx = minHit.obj;
 //@@@
 
 inx = GetSpecialID(inx);
-
+if(inx == -1)
+{
+	if(minHit.N.y>0.9)
+	{
+		//float2 uv = 5 * minHit.P.xz;
+		//uv = frac(uv);
+		//mat.albedo = float3(uv,0);
+		//minHit.N.xy = rotate (minHit.N.xy, 0.75 * PI * (uv.x - 0.5));
+		//minHit.N.zy = rotate (minHit.N.zy, 0.75 * PI * (uv.y - 0.5));
+	}
+}
 }
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
@@ -184,7 +189,7 @@ if(mode==0)
 {
 float3 lightDirs[1];
 float3 lightColors[1];
-lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+lightDirs[0] = float3(0.790262, -0.6127691, 0);
 lightColors[0] = float3(1, 0.9568627, 0.8392157);
 result.rgb = 0.03 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
@@ -256,7 +261,7 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 	ray.dir = -lightDir;
 	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
 	HitInfo hitInfo;
-	return HardShadow_TraceScene(ray, hitInfo, maxLength);
+	return Expensive_HardShadow_TraceScene(ray, hitInfo, maxLength);
 }
 
 float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
@@ -275,19 +280,19 @@ float RenderSceneSDFShadow(HitInfo minHit)
 int inx = GetSpecialID(minHit.obj);
 if(true)
 {
-//@@SDFBakerMgr DirShadow
+//@@@SDFBakerMgr DirShadow
 int lightType[1];
-lightType[0] = -1;
+lightType[0] = 0;
 float3 lightPos[1];
 lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
-lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+lightDirs[0] = float3(0.790262, -0.6127691, 0);
 int shadowType[1];
 shadowType[0] =0;
 float lightspace = 1;
 float maxLength = MaxSDF;
 float tsha = 1;
-for (int i = 0; i < 0; i++)
+for (int i = 0; i < 1; i++)
 {
 float maxLength = MaxSDF;
 if(lightType[i]==0)
@@ -316,8 +321,8 @@ tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
 lightspace -= (1 - tsha);
 }
 lightspace /= 1;
-sha = GetDirHardShadow(lightDirs[0], minHit, maxLength);
-//@@
+sha = lightspace;
+//@@@
 }
 return sha;
 }
@@ -351,11 +356,11 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -1.096, 0), float3(2.5, 0.5, 2.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 0, 15.06), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+inx = -1;
 }
 //@@@
 
@@ -363,7 +368,7 @@ if(inx == -1)
 {
 	if(IsInBBox(p,eyePos - 300,eyePos+300))
 	{
-
+		re = min(re, 0 + SDFBox(p, float3(0, -1, 0), float3(10, 0.5, 30), float3(0, 0, 0)));
 	}
 }
 
@@ -911,6 +916,7 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+inx = -1;
 }
 //@@@
 return inx;

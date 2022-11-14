@@ -67,9 +67,9 @@ if (minHit.bHit)
 }
 else
 {
-	re = float3(1,1,1);
+	//re = float3(1,1,1);
 	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
-	//re = stars(ray.pos, ray.dir);
+	re = stars(ray.pos, ray.dir);
 }
 
 	return re;
