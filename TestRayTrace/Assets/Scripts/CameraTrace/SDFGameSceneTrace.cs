@@ -148,25 +148,25 @@ public class SDFGameSceneTrace : MonoBehaviour
     public bool dof_needMeanFiliter = true;
     public bool dof_needDilation = true;
     public bool dof_needBoxBlur = false;
-    public bool usePostOp = true;
+    public bool usePostOp = false;
 
     RenderTexture rt;
     RenderTexture tempRT;
     RenderTexture tempRT1;
     RenderTexture uselessRT = null;
-    public RenderTexture rt_Shadow0 = null;
-    public RenderTexture rt_EyeDepth = null;
+    RenderTexture rt_Shadow0 = null;
+    RenderTexture rt_EyeDepth = null;
     //Indirect RT
     RenderTexture directRT = null;
     RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
     //MSDFShadow RT
-    public RenderTexture rt_LastShadow = null;
-    public RenderTexture rt_FilteredShadow = null;
+    RenderTexture rt_LastShadow = null;
+    RenderTexture rt_FilteredShadow = null;
     //TAA RT
     RenderTexture rt_beforeTAA=null, rt_lastAfterTAA=null;
     //DOF RT
     RenderTexture rt_beforeDOF = null;
-    public RenderTexture rt_DOFinput = null;
+    RenderTexture rt_DOFinput = null;
     //PostOp RT
     RenderTexture rt_beforePostOp;
     //FSR
@@ -223,6 +223,7 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     void Start()
     {
+        CheckAutoCS();
         if (Application.isEditor && !Application.isPlaying)
         {
             //RefreshAutoCS();
@@ -672,6 +673,7 @@ public class SDFGameSceneTrace : MonoBehaviour
 
     public void RefreshAutoCS()
     {
+        CheckAutoCS();
         autoCS.Generate();
     }
 
@@ -713,6 +715,18 @@ public class SDFGameSceneTrace : MonoBehaviour
     //        }
     //    }
     //}
+
+    public void CheckAutoCS()
+    {
+        if (autoCS == null)
+        {
+            autoCS = gameObject.GetComponent<AutoCS>();
+            if (autoCS == null)
+            {
+                Debug.LogError("Can't find AutoCS!");
+            }
+        }
+    }
     //####################################################################################
     IEnumerator Co_GoIter;
     //@@@

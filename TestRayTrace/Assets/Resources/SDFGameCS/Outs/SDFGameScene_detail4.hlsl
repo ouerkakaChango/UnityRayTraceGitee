@@ -280,7 +280,7 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 	Ray ray;
 	ray.pos = minHit.P;
 	ray.dir = -lightDir;
-	ray.pos += ray.dir*TraceThre*2 + minHit.N*0.05*2;
+	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
 	HitInfo hitInfo;
 	return HardShadow_TraceScene(ray, hitInfo, maxLength);
 }
@@ -377,12 +377,12 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-float d = SDFSlice(p, float3(-5.473, 0, -10.26), float3(270, 180, 0), float3(1, 1, 1), detail4_words, 0.02, TraceThre, 0, 0);
-re = min(re, d);
+inx = -1;
 }
 else if (inx == 1 )
 {
-inx = -1;
+float d = SDFSlice(p, float3(-5.473, 0, -10.26), float3(270, 180, 0), float3(1, 1, 1), detail4_words, 0.02, TraceThre, 0, 0);
+re = min(re, d);
 }
 else if (inx == 2 )
 {
@@ -977,10 +977,10 @@ int GetSpecialID(int inx)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -1;
 }
 else if (inx == 1 )
 {
-inx = -1;
 }
 else if (inx == 2 )
 {
