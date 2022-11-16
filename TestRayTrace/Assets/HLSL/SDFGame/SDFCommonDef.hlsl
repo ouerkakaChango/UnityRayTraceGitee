@@ -319,6 +319,50 @@ float SDFParallelogram(in float2 p, float wi, float he, float sk)
 	return sqrt(d.x)*sign(-d.y);
 }
 
+// https://www.shadertoy.com/view/Md2BWW
+float UDFQuad(in float3 p, in float3 v1, in float3 v2, in float3 v3, in float3 v4)
+{
+#if 1
+	// handle ill formed quads
+	if (dot(cross(v2 - v1, v4 - v1), cross(v4 - v3, v2 - v3)) < 0.0)
+	{
+		float3 tmp = v3;
+		v3 = v4;
+		v4 = tmp;
+	}
+#endif
+
+
+	float3 v21 = v2 - v1; float3 p1 = p - v1;
+	float3 v32 = v3 - v2; float3 p2 = p - v2;
+	float3 v43 = v4 - v3; float3 p3 = p - v3;
+	float3 v14 = v1 - v4; float3 p4 = p - v4;
+	float3 nor = cross(v21, v14);
+
+	return sqrt((sign(dot(cross(v21, nor), p1)) +
+		sign(dot(cross(v32, nor), p2)) +
+		sign(dot(cross(v43, nor), p3)) +
+		sign(dot(cross(v14, nor), p4)) < 3.0)
+		?
+		min(min(dot2(v21*clamp(dot(v21, p1) / dot2(v21), 0.0, 1.0) - p1),
+			dot2(v32*clamp(dot(v32, p2) / dot2(v32), 0.0, 1.0) - p2)),
+			min(dot2(v43*clamp(dot(v43, p3) / dot2(v43), 0.0, 1.0) - p3),
+				dot2(v14*clamp(dot(v14, p4) / dot2(v14), 0.0, 1.0) - p4)))
+		:
+		dot(nor, p1)*dot(nor, p1) / dot2(nor));
+}
+
+float UDFQuad2D(in float3 p, in float3 v1, in float3 v2, in float3 v3, in float3 v4)
+{
+	return UDFQuad(
+		float3(p.x,0,p.z),
+		float3(v1.x, 0, v1.z),
+		float3(v2.x, 0, v2.z),
+		float3(v3.x, 0, v3.z),
+		float3(v4.x, 0, v4.z)
+		);
+}
+
 float SDFTex3D(float3 p, float3 center, float3 bound, Texture3D<float> SDFTex3D, float traceThre, float offset = 0)
 {
 	float3 q = p - center;
@@ -408,6 +452,14 @@ float SDFSlice_Sub(float3 p, float3 center, float3 rotEuler, float3 size, Textur
 		d += offset;
 	}
 	return d;
+}
+
+float SDFHeightSlice(float3 q, float d2d, float hBound)
+{
+	d2d = max(d2d, 0);
+	float dh = abs(q.y) - hBound;
+	dh = dh > 0 ? dh : 0;
+	return sqrt(d2d*d2d + dh * dh);
 }
 
 float3 SDFTexNorm3D(float3 p, float3 center, float3 bound, Texture3D<float3> SDFNorm3D)

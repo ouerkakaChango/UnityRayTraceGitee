@@ -1,4 +1,4 @@
-﻿#define OBJNUM 3
+﻿#define OBJNUM 6
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -56,17 +56,9 @@ float GetPntlightAttenuation(float3 pos, float3 lightPos)
 	//return 1 / (1 + 0.01*d + 0.005*d*d);
 }
 
-//https://www.shadertoy.com/view/mdS3zD
-//https://graphtoy.com/?f1(x,t)=sin(2*clamp(x-t,-PI,0))*exp(-x)&v1=true&f2(x,t)=&v2=false&f3(x,t)=&v3=false&f4(x,t)=&v4=false&f5(x,t)=&v5=false&f6(x,t)=&v6=false&grid=1&coords=0,0,5.089171420469822
-float ripple(float x, float t, float damp=0.3) {
-
-// First wave, low
-float w1 = sin(2.*clamp(x - t, -2.*PI*0.5, 0.));
-
-// Second wave,high
-float w2 = (sin(2.*clamp(x - t, -4.5*PI*0.5, -2.5*PI*0.5))*0.5 + 0.5)*0.7;
-
-return (w1 + w2)*exp(-abs(x)*damp);
+float fastSign(float3 p, float scale = 0.5)
+{
+	return hash_uint3(abs(p)).x >0.5?-1:1;
 }
 
 int GetSpecialID(int inx);
@@ -80,14 +72,14 @@ Material_PBR GetObjMaterial_PBR(int obj)
 if(obj == 0 )
 {
 re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
+re.metallic = 0.4;
+re.roughness = 0.9;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
 else if (obj == 1 )
 {
-re.albedo = float3(0, 0.1761494, 1);
+re.albedo = float3(1, 1, 1);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
@@ -96,8 +88,32 @@ re.reflect_ST = float2(1, 0);
 else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 3 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 4 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0.4;
+re.roughness = 0.9;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
+else if (obj == 5 )
+{
+re.albedo = float3(1, 1, 1);
 re.metallic = 0.5;
-re.roughness = 0.5;
+re.roughness = 0.75;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
@@ -108,10 +124,13 @@ re.reflect_ST = float2(1, 0);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[3];
+int renderMode[6];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
+renderMode[3] = 0;
+renderMode[4] = 0;
+renderMode[5] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -123,17 +142,26 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(0, 0.5, 15), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, 0.5, 15), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(0, 0.5, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, 0.5, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return uv;
 }
 else if (inx == 2 )
+{
+}
+else if (inx == 3 )
+{
+}
+else if (inx == 4 )
+{
+uv = BoxedUV(minHit.P, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0));
+return uv;
+}
+else if (inx == 5 )
 {
 }
 	//@@@
@@ -154,15 +182,24 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 0.5, 15), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+BoxedTB(T,B,minHit.P, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0));
 return;
 }
 if(inx == 1 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 0.5, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return;
 }
 if(inx == 2 )
+{
+}
+if(inx == 3 )
+{
+}
+if(inx == 4 )
+{
+BoxedTB(T,B,minHit.P, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0));
+return;
+}
+if(inx == 5 )
 {
 }
 //@@@
@@ -183,11 +220,11 @@ int inx = minHit.obj;
 inx = GetSpecialID(inx);
 if(inx == -1)
 {
-	float3 grid = float3(2,2,2);
+	float3 grid = float3(1,1,0.75);
 	float3 id;
 	float3 p0 = GetCellCenterWithID_MidMode(minHit.P,grid,id);
-	mat.roughness = rand01(id);
-	mat.albedo *= rand01(id.zxy);
+	mat.roughness = rand01(0.3*id);
+	mat.albedo *= rand01(0.2*id.zxy);
 }
 }
 
@@ -278,7 +315,7 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 	ray.dir = -lightDir;
 	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
 	HitInfo hitInfo;
-	return Expensive_HardShadow_TraceScene(ray, hitInfo, maxLength);
+	return HardShadow_TraceScene(ray, hitInfo, maxLength);
 }
 
 float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
@@ -299,7 +336,7 @@ if(true)
 {
 //@@@SDFBakerMgr DirShadow
 int lightType[1];
-lightType[0] = -1;
+lightType[0] = 0;
 float3 lightPos[1];
 lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
@@ -373,13 +410,25 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0.5, 15), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0.5, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+inx = -4;
 }
 else if (inx == 2 )
+{
+inx = -3;
+}
+else if (inx == 3 )
+{
+inx = -2;
+}
+else if (inx == 4 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0)));
+}
+else if (inx == 5 )
 {
 inx = -1;
 }
@@ -387,8 +436,8 @@ inx = -1;
 
 if(inx == -1)
 {
-	float3 outCenter = float3(0, -3, 0);
-	float3 outBound = float3(10, 3, 30);
+	float3 outCenter = float3(0, -0.5, 0);
+	float3 outBound = float3(10, 0.5, 30);
 	if(IsInBBox(p,eyePos - 300,eyePos+300))
 	{
 		if(IsInBBox(p,outCenter - outBound,outCenter+outBound))
@@ -396,27 +445,16 @@ if(inx == -1)
 		//3 2
 		//0 1
 
-		float3 grid = float3(2,2,2);
-		float3 p0 = GetCellCenter_MidMode(p,grid);
-		float e = 0.49;
-		p0 = p0 + grid*float3(-e,0,-e);
-		float3 p1 = p0 + grid*float3(1,0,0)*e*2;
-		float3 p2 = p0 + grid*float3(1,0,1)*e*2;
-		float3 p3 = p0 + grid*float3(0,0,1)*e*2;
-
-		float3 c1 = 0.25*(p0+p1+p2+p3);
+		float3 grid = float3(1,1,0.75);
+		float3 c1 = GetCellCenter_MidMode(p,grid);
 		float3 q = p - c1;
 		
-		float d2d = SDFParallelogram(q.xz,0.7,0.7,0.2);
-		d2d = max(d2d, 0);
-		float dh = abs(q.y) - 0.03;
-		dh = dh>0?dh:0;
-		float d = 0.5*sqrt(d2d*d2d+dh*dh);
+		//float d2d = SDFParallelogram(q.xz,0.45,0.35,0.05);
+		float d = SDFBox(q,0,float3(grid.x*0.5,0.03,grid.z*0.5*0.95));//0.5*SDFHeightSlice(q,d2d,0.03);
+
+		d = max(d,-SDFCircleSlice(q-float3(0.15,0.03,0.15),0.04,0.03));
+		
 		re = min(re, d);
-
-		//re = min(re, 0 + SDFBox(p, c1, float3(0.1,0.1,0.1), float3(0, 0, 0)));
-		//re = min(re, 0 + SDFBox(p, center, float3(0.1,0.1,0.1), float3(0, 0, 0)));
-
 		}
 		else
 		{
@@ -424,6 +462,135 @@ if(inx == -1)
 		}
 	}
 }
+if(inx == -2)
+{
+	float3 outCenter = float3(0, -0.5, 0);
+	float3 outBound = float3(10, 0.5, 30);
+	if(IsInBBox(p,outCenter - outBound,outCenter+outBound))
+	{
+		float3 grid = float3(1,1,0.75);
+		float3 c1 = GetCellCenter_MidMode(p,grid);
+		float3 q = p - c1;
+		float3 ringoffset = float3(0.15,0.03,0.15);
+		q-=ringoffset;
+		float ringHBound = 0.01;
+		float d = SDFCircleSlice(q,0.06,ringHBound);
+		d = max(d,-SDFCircleSlice(q,0.04,ringHBound*2));
+		re = d;
+	}
+}
+if(inx == -3)
+{
+	float3 outCenter = float3(0, -0.5, 0);
+	float3 outBound = float3(10, 0.5, 30);
+	if(IsInBBox(p,eyePos - 300,eyePos+300))
+	{
+		if(IsInBBox(p,outCenter - outBound,outCenter+outBound))
+		{
+		//3 2
+		//0 1
+
+		float3 grid = float3(1,1,0.75);
+		float3 c1 = GetCellCenter_MidMode(p,grid,grid*float3(1,0,0)*0.5);
+		float3 q = p - c1;
+		
+		float d2d = SDFParallelogram(q.xz,0.15,0.35,0.02);
+		float d = 0.5*SDFHeightSlice(q,d2d,0.03);
+		
+		re = min(re, d);
+		}
+		else
+		{
+			re = SDFBox(p, outCenter, outBound)+2*TraceThre;
+		}
+	}
+}
+if(inx == -4)
+{
+	float3 outCenter = float3(0, -0.5, 0);
+	float3 outBound = float3(10, 0.5, 30);
+	if(IsInBBox(p,eyePos - 300,eyePos+300))
+	{
+		if(IsInBBox(p,outCenter - outBound,outCenter+outBound))
+		{
+		//3 2
+		//0 1
+
+		float3 grid = float3(1,1,0.75);
+		float3 c1 = GetCellCenter_MidMode(p,grid,grid*float3(-1,0,0)*0.5);
+		float3 q = p - c1;
+		
+		float d2d = SDFParallelogram(q.xz,0.15,0.35,0.02);
+		float d = 0.5*SDFHeightSlice(q,d2d,0.03);
+		
+		re = min(re, d);
+		}
+		else
+		{
+			re = SDFBox(p, outCenter, outBound)+2*TraceThre;
+		}
+	}
+}
+
+//float3 grid = float3(1,1,0.75);
+		//float3 p0 = GetCellCenter_MidMode(p,grid);
+		//float e = 0.5;
+		//p0 = p0 + grid*float3(-e,0,-e);
+		//float3 p1 = p0 + grid*float3(1,0,0)*e*2;
+		//float3 p2 = p0 + grid*float3(1,0,1)*e*2;
+		//float3 p3 = p0 + grid*float3(0,0,1)*e*2;
+		//float3 pa1 = p0 - grid*float3(1,0,0)*e*2;
+		//float3 pa2 = p3 - grid*float3(1,0,0)*e*2;
+		//float3 pb1 = p1 + grid*float3(1,0,0)*e*2;
+		//float3 pb2 = p2 + grid*float3(1,0,0)*e*2;
+		//
+		//
+		//float3 c1 = 0.25*(p0+p1+p2+p3);
+		//float3 q = p - c1;
+		//
+		//float3 ca = 0.25*(p0+p3+pa1+pa2);
+		//float3 qa = p - ca;
+		//
+		//float3 cb = 0.25*(p1+p2+pb1+pb2);
+		//float3 qb = p - cb;
+		//
+		//float k = 0.5;
+		//float3 delta = k*grid*float3(e,0,0);
+		//p0 += fastSign(p0) * delta;
+		//p1 += fastSign(p1) * delta;
+		//p2 += fastSign(p2) * delta;
+		//p3 += fastSign(p3) * delta;
+		//pa1 += fastSign(pa1) * delta;
+		//pa2 += fastSign(pa2) * delta;
+		//pb1 += fastSign(pb1) * delta;
+		//pb1 += fastSign(pb1) * delta;
+		//
+		//float s = 0.9;
+		//float3 v0 = lerp(c1,p0,s);
+		//float3 v1 = lerp(c1,p1,s);
+		//float3 v2 = lerp(c1,p2,s);
+		//float3 v3 = lerp(c1,p3,s);
+		//
+		//float d2d = UDFQuad2D(p,v0,v1,v2,v3);//SDFParallelogram(q.xz,0.7,0.7,0.05);
+		//float d = 0.5*SDFHeightSlice(q,d2d,0.03);
+		//
+		//v0 = lerp(ca,pa1,s);
+		//v1 = lerp(ca,p0,s);
+		//v2 = lerp(ca,p3,s);
+		//v3 = lerp(ca,pa2,s);
+		//d2d = UDFQuad2D(p,v0,v1,v2,v3);
+		//float da = 0.5*SDFHeightSlice(qa,d2d,0.03);
+		//
+		//v0 = lerp(cb,p1,s);
+		//v1 = lerp(cb,pb1,s);
+		//v2 = lerp(cb,pb2,s);
+		//v3 = lerp(cb,p2,s);
+		//d2d = UDFQuad2D(p,v0,v1,v2,v3);
+		//float db = 0.5*SDFHeightSlice(qb,d2d,0.03);
+		//
+		//d = min(d,da);
+		//d = min(d,db);
+		//
 
 return re;
 }
@@ -969,8 +1136,20 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+inx = -4;
 }
 else if (inx == 2 )
+{
+inx = -3;
+}
+else if (inx == 3 )
+{
+inx = -2;
+}
+else if (inx == 4 )
+{
+}
+else if (inx == 5 )
 {
 inx = -1;
 }

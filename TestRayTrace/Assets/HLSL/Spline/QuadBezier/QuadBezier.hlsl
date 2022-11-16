@@ -10,8 +10,8 @@
 //	float2 B = c - b - A;
 //	float2 C = p - a;
 //	float2 D = A * 2.;
-//	float2 T = clamp(solveCubic2(float3(-3. * dot(A, B), dot(C, B) - 2. * length2(A), dot(C, A)) / -length2(B)), 0., 1.);
-//	return sqrt(min(length2(C - (D + B * T.x) * T.x), length2(C - (D + B * T.y) * T.y)));
+//	float2 T = clamp(solveCubic2(float3(-3. * dot(A, B), dot(C, B) - 2. * dot2(A), dot(C, A)) / -dot2(B)), 0., 1.);
+//	return sqrt(min(dot2(C - (D + B * T.x) * T.x), dot2(C - (D + B * T.y) * T.y)));
 //}
 
 float2 QuadBezierGet(float t, float2 a, float2 b, float2 c)
@@ -51,13 +51,13 @@ SplineProjInfo ProjectQuadBezierBody(float3 p3d, float2 a, float2 b, float2 c, T
 	float2 B = c - b - A;
 	float2 C = p - a;
 	float2 D = A * 2.;
-	float2 T = solveCubic2(float3(-3. * dot(A, B), dot(C, B) - 2. * length2(A), dot(C, A)) / -length2(B));
+	float2 T = solveCubic2(float3(-3. * dot(A, B), dot(C, B) - 2. * dot2(A), dot(C, A)) / -dot2(B));
 
 	if (Is01(T.x) && Is01(T.y))
 	{
 		info.flag = 1;
-		float d1_2 = length2(C - (D + B * T.x) * T.x);
-		float d2_2 = length2(C - (D + B * T.y) * T.y);
+		float d1_2 = dot2(C - (D + B * T.x) * T.x);
+		float d2_2 = dot2(C - (D + B * T.y) * T.y);
 		if (d1_2 < d2_2)
 		{
 			info.dis = sqrt(d1_2);
@@ -76,7 +76,7 @@ SplineProjInfo ProjectQuadBezierBody(float3 p3d, float2 a, float2 b, float2 c, T
 	else if (Is01(T.x))
 	{
 		info.flag = 1;
-		float d1_2 = length2(C - (D + B * T.x) * T.x);
+		float d1_2 = dot2(C - (D + B * T.x) * T.x);
 		info.dis = sqrt(d1_2);
 		float2 local2d = QuadBezierGet(T.x, a, b, c);
 		//info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));
@@ -85,7 +85,7 @@ SplineProjInfo ProjectQuadBezierBody(float3 p3d, float2 a, float2 b, float2 c, T
 	else if (Is01(T.y))
 	{
 		info.flag = 1;
-		float d2_2 = length2(C - (D + B * T.y) * T.y);
+		float d2_2 = dot2(C - (D + B * T.y) * T.y);
 		info.dis = sqrt(d2_2);
 		float2 local2d = QuadBezierGet(T.y, a, b, c);
 		//info.projPnt = LocalToWorld(trans, float3(local2d.x, 0, local2d.y));

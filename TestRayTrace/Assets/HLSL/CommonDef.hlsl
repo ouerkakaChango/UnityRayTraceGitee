@@ -188,7 +188,12 @@ inline bool Is01(float2 v)
 		v.y >= 0 && v.y <= 1;
 }
 
-float length2(float2 x)
+float dot2(float2 x)
+{
+	return dot(x, x);
+}
+
+float dot2(float3 x)
 {
 	return dot(x, x);
 }
