@@ -39,7 +39,7 @@ public class SDFBakerMgr : MonoBehaviour
     public List<string> bakedObjEnvTex = new List<string>();
 
     public SDFBakerTag[] tags;
-    public SDFLightTag[] lightTags;
+    public SDFLightTag[] dirLightTags;
 
     bool hide = false;
     // Start is called before the first frame update
@@ -148,7 +148,7 @@ public class SDFBakerMgr : MonoBehaviour
         }
 
         SDFLightTag[] allLightTags = (SDFLightTag[])GameObject.FindObjectsOfType(typeof(SDFLightTag));
-        List<SDFLightTag> lightList = new List<SDFLightTag>();
+        List<SDFLightTag> dirLightList = new List<SDFLightTag>();
         for(int i=0;i< allLightTags.Length;i++)
         {
             if(!allLightTags[i].isActiveAndEnabled || 
@@ -161,15 +161,15 @@ public class SDFBakerMgr : MonoBehaviour
             if(IsDirectionalLight(allLightTags[i].gameObject)||
                 IsPointLight(allLightTags[i].gameObject))
             {
-                lightList.Add(allLightTags[i]);
+                dirLightList.Add(allLightTags[i]);
             }
             else
             {
                 Debug.LogError("this light type not support: " + allLightTags[i].gameObject);
             }
         }
-        lightTags = lightList.ToArray();
-        if(lightTags.Length==0)
+        dirLightTags = dirLightList.ToArray();
+        if(dirLightTags.Length==0)
         {
             Debug.LogError("No light has add SDF Light Tag,Stop");
         }
@@ -221,18 +221,18 @@ public class SDFBakerMgr : MonoBehaviour
     //    if(mode==0)
     //{
     //  float3 lightDirs[1];
-    //    float3 lightColors[1];
+    //    float3 dirLightColors[1];
 
     //    lightDirs[0] = float3(0.1363799, -0.720376, -0.6800438);
-    //    lightColors[0] = float3(1, 1, 1);
+    //    dirLightColors[0] = float3(1, 1, 1);
 
     //    lightDirs[1] = normalize(minHit.P - pntlightPos[x]);
-    //    lightColors[1] = pntlightColor[x] * GetPntLightAttenuation(minHit.P,pntlightPos[x]);
+    //    dirLightColors[1] = pntlightColor[x] * GetPntLightAttenuation(minHit.P,pntlightPos[x]);
 
     //    result.rgb = 0.03 * mat.albedo* mat.ao;
     //  for(int i=0;i<1;i++)
     //  {
-    //      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+    //      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);
     //}
     //}
 
@@ -243,30 +243,30 @@ public class SDFBakerMgr : MonoBehaviour
 
         bakedRenders.Add("if(mode==0)");
         bakedRenders.Add("{");
-        int lightNum = lightTags.Length;
-        bakedRenders.Add("  float3 lightDirs[" + lightNum + "];");
-        bakedRenders.Add("  float3 lightColors[" + lightNum + "];");
+        int dirLightNum = dirLightTags.Length;
+        bakedRenders.Add("  float3 lightDirs[" + dirLightNum + "];");
+        bakedRenders.Add("  float3 dirLightColors[" + dirLightNum + "];");
         Vector3 lightDir, lightColor;
         //###
-        for (int i = 0; i < lightNum; i++)
+        for (int i = 0; i < dirLightNum; i++)
         {
-            if (IsDirectionalLight(lightTags[i].gameObject))
+            if (IsDirectionalLight(dirLightTags[i].gameObject))
             {
                 ////lightDirs[0] = float3(0.1363799, -0.720376, -0.6800438);
-                ////lightColors[0] = float3(1, 1, 1);
-                lightDir = GetLightDir(lightTags[i].gameObject);
-                lightColor = GetLightColor(lightTags[i].gameObject);
+                ////dirLightColors[0] = float3(1, 1, 1);
+                lightDir = GetLightDir(dirLightTags[i].gameObject);
+                lightColor = GetLightColor(dirLightTags[i].gameObject);
                 bakedRenders.Add("  lightDirs[" + i + "] = " + Bake(lightDir) + ";");
-                bakedRenders.Add("  lightColors[" + i + "] = " + Bake(lightColor) + ";");
+                bakedRenders.Add("  dirLightColors[" + i + "] = " + Bake(lightColor) + ";");
             }
-            else if(IsPointLight(lightTags[i].gameObject))
+            else if(IsPointLight(dirLightTags[i].gameObject))
             {
                 ////lightDirs[1] = normalize(minHit.P - pntlightPos[x]);
-                ////lightColors[1] = pntlightColor[x] * GetPntLightAttenuation(minHit.P,pntlightPos[x]);
-                var lightPos = lightTags[i].gameObject.transform.position;
-                lightColor = GetLightColor(lightTags[i].gameObject);
+                ////dirLightColors[1] = pntlightColor[x] * GetPntLightAttenuation(minHit.P,pntlightPos[x]);
+                var lightPos = dirLightTags[i].gameObject.transform.position;
+                lightColor = GetLightColor(dirLightTags[i].gameObject);
                 bakedRenders.Add("  lightDirs[" + i + "] = normalize(minHit.P - "+Bake(lightPos) +");");
-                bakedRenders.Add("  lightColors[" + i + "] = " + Bake(lightColor) + " * GetPntlightAttenuation(minHit.P, "+Bake(lightPos)+");");
+                bakedRenders.Add("  dirLightColors[" + i + "] = " + Bake(lightColor) + " * PntlightAtten(minHit.P, "+Bake(lightPos)+");");
             }
             else
             {
@@ -275,9 +275,9 @@ public class SDFBakerMgr : MonoBehaviour
         }
         //###
         bakedRenders.Add("  result.rgb = " + ambientIntensity + " * mat.albedo * mat.ao;");
-        bakedRenders.Add("  for(int i=0;i<" + lightNum + ";i++)");
+        bakedRenders.Add("  for(int i=0;i<" + dirLightNum + ";i++)");
         bakedRenders.Add("  {");
-        bakedRenders.Add("      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);");
+        bakedRenders.Add("      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);");
         bakedRenders.Add("  }");
         bakedRenders.Add("}");
     }
@@ -298,16 +298,16 @@ public class SDFBakerMgr : MonoBehaviour
         //lightDirs[2] = normalize(minHit.P - lightPos[2]);));
         //lightDirs[3] = normalize(minHit.P - lightPos[3]);));
         //lightDirs[4] = normalize(minHit.P - lightPos[4]);
-        int n = lightTags.Length;
+        int n = dirLightTags.Length;
         bakedFullLightInfo.Add("int lightType[" + n + "];");
         int type = -999;
         for (int i = 0; i < n; i++)
         {
-            if (IsDirectionalLight(lightTags[i].gameObject))
+            if (IsDirectionalLight(dirLightTags[i].gameObject))
             {
                 type = 0;
             }
-            else if (IsPointLight(lightTags[i].gameObject))
+            else if (IsPointLight(dirLightTags[i].gameObject))
             {
                 type = 1;
             }
@@ -315,7 +315,7 @@ public class SDFBakerMgr : MonoBehaviour
             {
                 Debug.LogError("light type not handle");
             }
-            if (!lightTags[i].bakeShadow)
+            if (!dirLightTags[i].bakeShadow)
             {
                 type = -type - 1;
             }
@@ -325,7 +325,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedFullLightInfo.Add("float3 lightPos[" + n + "];");
         for (int i = 0; i < n; i++)
         {
-            Vector3 lp = lightTags[i].gameObject.transform.position;
+            Vector3 lp = dirLightTags[i].gameObject.transform.position;
             bakedFullLightInfo.Add("lightPos[" + i + "] = " + Bake(lp) + ";");
         }
 
@@ -333,14 +333,14 @@ public class SDFBakerMgr : MonoBehaviour
         for (int i = 0; i < n; i++)
         {
             Vector3 lightDir = Vector3.zero;
-            if (IsDirectionalLight(lightTags[i].gameObject))
+            if (IsDirectionalLight(dirLightTags[i].gameObject))
             {
-                lightDir = GetLightDir(lightTags[i].gameObject);
+                lightDir = GetLightDir(dirLightTags[i].gameObject);
                 bakedFullLightInfo.Add("lightDirs[" + i + "] = " + Bake(lightDir) + ";");
             }
-            else if (IsPointLight(lightTags[i].gameObject))
+            else if (IsPointLight(dirLightTags[i].gameObject))
             {
-                Vector3 lightPos = lightTags[i].gameObject.transform.position;
+                Vector3 lightPos = dirLightTags[i].gameObject.transform.position;
                 bakedFullLightInfo.Add("lightDirs[" + i + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
             }
             else
@@ -354,7 +354,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedFullLightInfo.Add("int shadowType[" + n + "];");
         for (int i = 0; i < n; i++)
         {
-            bakedFullLightInfo.Add("shadowType[" + i + "] =" + (int)lightTags[i].shadowType + ";");
+            bakedFullLightInfo.Add("shadowType[" + i + "] =" + (int)dirLightTags[i].shadowType + ";");
         }
 
         bakedFullLightInfo.Add("float lightspace = " + n + ";");
@@ -377,11 +377,11 @@ public class SDFBakerMgr : MonoBehaviour
         //lightDirs[2] = normalize(minHit.P - lightPos[2]);));
         //lightDirs[3] = normalize(minHit.P - lightPos[3]);));
         //lightDirs[4] = normalize(minHit.P - lightPos[4]);
-        int n = lightTags.Length;
+        int n = dirLightTags.Length;
         int tn = n;
         for(int i=0;i<n;i++)
         {
-            if(!lightTags[i].bakeShadow)
+            if(!dirLightTags[i].bakeShadow)
             {
                 tn -= 1;
             }
@@ -391,15 +391,15 @@ public class SDFBakerMgr : MonoBehaviour
         int lcount = 0;
         for (int i = 0; i < n; i++)
         {
-            if (!lightTags[i].bakeShadow)
+            if (!dirLightTags[i].bakeShadow)
             {
                 continue;
             }
-            if (IsDirectionalLight(lightTags[i].gameObject))
+            if (IsDirectionalLight(dirLightTags[i].gameObject))
             {
                 type = 0;
             }
-            else if (IsPointLight(lightTags[i].gameObject))
+            else if (IsPointLight(dirLightTags[i].gameObject))
             {
                 type = 1;
             }
@@ -416,11 +416,11 @@ public class SDFBakerMgr : MonoBehaviour
         bakedShadows.Add("float3 lightPos[" + n + "];");
         for (int i = 0; i < n; i++)
         {
-            if (!lightTags[i].bakeShadow)
+            if (!dirLightTags[i].bakeShadow)
             {
                 continue;
             }
-            Vector3 lp = lightTags[i].gameObject.transform.position;
+            Vector3 lp = dirLightTags[i].gameObject.transform.position;
             bakedShadows.Add("lightPos[" + lcount + "] = "+Bake(lp)+";");
             lcount++;
         }
@@ -429,19 +429,19 @@ public class SDFBakerMgr : MonoBehaviour
         lcount = 0;
         for (int i=0;i< n; i++)
         {
-            if (!lightTags[i].bakeShadow)
+            if (!dirLightTags[i].bakeShadow)
             {
                 continue;
             }
             Vector3 lightDir = Vector3.zero;
-            if (IsDirectionalLight(lightTags[i].gameObject))
+            if (IsDirectionalLight(dirLightTags[i].gameObject))
             {
-                lightDir = GetLightDir(lightTags[i].gameObject);
+                lightDir = GetLightDir(dirLightTags[i].gameObject);
                 bakedShadows.Add("lightDirs[" + lcount + "] = " + Bake(lightDir) + ";");
             }
-            else if(IsPointLight(lightTags[i].gameObject))
+            else if(IsPointLight(dirLightTags[i].gameObject))
             {
-                Vector3 lightPos = lightTags[i].gameObject.transform.position;
+                Vector3 lightPos = dirLightTags[i].gameObject.transform.position;
                 bakedShadows.Add("lightDirs[" + lcount + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
             }
             else
@@ -457,11 +457,11 @@ public class SDFBakerMgr : MonoBehaviour
         lcount = 0;
         for(int i=0;i< n; i++)
         {
-            if (!lightTags[i].bakeShadow)
+            if (!dirLightTags[i].bakeShadow)
             {
                 continue;
             }
-            bakedShadows.Add("shadowType[" + lcount + "] =" + (int)lightTags[i].shadowType + ";");
+            bakedShadows.Add("shadowType[" + lcount + "] =" + (int)dirLightTags[i].shadowType + ";");
             lcount++;
         }
 

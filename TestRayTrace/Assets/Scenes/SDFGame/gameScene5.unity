@@ -440,7 +440,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 0
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &520542744
@@ -494,7 +494,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 1
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &520542746
@@ -1190,7 +1190,7 @@ MonoBehaviour:
   renderSize: {x: 1024, y: 720}
   useIndirectRT: 0
   indirectMultiplier: 1
-  useMSDFShadow: 1
+  useMSDFShadow: 0
   useDOF: 0
   dof_needFixFocusDepth: 1
   dof_needMeanFiliter: 0
@@ -1288,7 +1288,7 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[2];
+  - int renderMode[6];
   bakedRenders: []
   bakedShadows: []
   bakedFullLightInfo: []
@@ -1296,9 +1296,13 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
+  - {fileID: 276605038}
   - {fileID: 336815351}
   - {fileID: 520542745}
-  lightTags:
+  - {fileID: 585464655}
+  - {fileID: 1755708949}
+  - {fileID: 2097505601}
+  dirLightTags:
   - {fileID: 2099006230}
 --- !u!4 &1427000038
 Transform:

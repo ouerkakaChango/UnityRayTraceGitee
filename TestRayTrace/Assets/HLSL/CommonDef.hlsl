@@ -496,4 +496,11 @@ float FixNormal(float x, float y)
 {
 	return sqrt(1 - x * x - y * y);
 }
+
+float PntlightAtten(float3 pos, float3 lightPos)
+{
+	float d = length(pos - lightPos);
+	return saturate(1 / (d*d));
+	//return 1 / (1 + 0.01*d + 0.005*d*d);
+}
 #endif

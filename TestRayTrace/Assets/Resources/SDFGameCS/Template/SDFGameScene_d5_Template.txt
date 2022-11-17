@@ -114,11 +114,37 @@ float RenderSceneSDFShadow(HitInfo minHit)
 	###BLOCK
 }
 
+float3 RenderSceneAdditionalColor(in Ray ray, in HitInfo minHit, in Material_PBR mat)
+{
+	float3 result = 0;
+
+	//int lightType[1];
+	//float3 lightPos[1];
+	//float3 lightDirs[1];
+	//float3 addLightColors[1];
+	//
+	//lightType[0] = 1;
+	//lightPos[0] = float3(0.42,2.4,-15.048);
+	//lightDirs[0] = normalize(minHit.P - lightPos[0]);
+	//addLightColors[0] = float3(1,0,0);
+	//
+	//result.rgb = 0.03 * mat.albedo * mat.ao;
+    //for(int i=0;i<1;i++)
+    //{
+	//	float atten = 1;
+	//	if(lightType[i]==1)
+	//	{
+	//		atten = PntlightAtten(minHit.P,lightPos[i]);
+	//	}
+    //   result.rgb += atten * PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], addLightColors[i]);
+    //}
+
+	return result;
+}
+
 //###################################################################################
 #include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
 #include "../../../HLSL/Noise/NoiseCommonDef.hlsl"
-
-//tutorial: iq modeling https://www.youtube.com/watch?v=-pdSjBPH3zM
 
 ###BLOCK ExtraSDF
 ...

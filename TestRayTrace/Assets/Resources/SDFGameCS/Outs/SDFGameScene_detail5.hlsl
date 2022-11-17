@@ -50,14 +50,6 @@ void GetEnvTexArrByObj(int objInx, inout bool isPNGEnv, inout Texture2DArray env
 	}
 }
 
-float GetPntlightAttenuation(float3 pos, float3 lightPos)
-{
-	//return 1;
-	float d = length(pos - lightPos);
-	return saturate(1 / (d*d));
-	//return 1 / (1 + 0.01*d + 0.005*d*d);
-}
-
 float fastSign(float3 p, float scale = 0.5)
 {
 	return hash_uint3(abs(p)).x >0.5?-1:1;
@@ -244,13 +236,13 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 if(mode==0)
 {
 float3 lightDirs[1];
-float3 lightColors[1];
+float3 dirLightColors[1];
 lightDirs[0] = float3(0.4255954, -0.7770073, -0.4638191);
-lightColors[0] = float3(1, 1, 1);
+dirLightColors[0] = float3(1, 1, 1);
 result.rgb = 0.03 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
 {
-result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);
 }
 }
 //@@@
@@ -441,11 +433,37 @@ sha = lightspace;
 return sha;
 }
 
+float3 RenderSceneAdditionalColor(in Ray ray, in HitInfo minHit, in Material_PBR mat)
+{
+	float3 result = 0;
+
+	//int lightType[1];
+	//float3 lightPos[1];
+	//float3 lightDirs[1];
+	//float3 addLightColors[1];
+	//
+	//lightType[0] = 1;
+	//lightPos[0] = float3(0.42,2.4,-15.048);
+	//lightDirs[0] = normalize(minHit.P - lightPos[0]);
+	//addLightColors[0] = float3(1,0,0);
+	//
+	//result.rgb = 0.03 * mat.albedo * mat.ao;
+//for(int i=0;i<1;i++)
+//{
+	//	float atten = 1;
+	//	if(lightType[i]==1)
+	//	{
+	//		atten = PntlightAtten(minHit.P,lightPos[i]);
+	//	}
+// result.rgb += atten * PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], addLightColors[i]);
+//}
+
+	return result;
+}
+
 //###################################################################################
 #include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
 #include "../../../HLSL/Noise/NoiseCommonDef.hlsl"
-
-//tutorial: iq modeling https://www.youtube.com/watch?v=-pdSjBPH3zM
 
 //change from https://iquilezles.org/articles/distfunctions/
 float3 opCheapBend_XY( float3 p , in float3 center, float k=10.0f)
@@ -1015,7 +1033,7 @@ float3 SceneRenderReflect(Ray ray,in HitInfo minHit,in Material_PBR mat)
 	if (reflectHit.bHit)
 	{
 		reflectSourceMat = GetObjMaterial_PBR(reflectHit.obj);
-		float atten = GetPntlightAttenuation(minHit.P,reflectHit.P);
+		float atten = PntlightAtten(minHit.P,reflectHit.P);
 		atten = saturate(mat.reflect_ST.x*atten+mat.reflect_ST.y);
 		re = atten * RenderSceneObj(ray, reflectHit, reflectSourceMat);
 	}
@@ -1093,7 +1111,7 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 		indirLightColor = 0;
 	}
 	//___
-	float3 Li = indirLightColor * GetPntlightAttenuation(minHit.P,indirHit.P);
+	float3 Li = indirLightColor * PntlightAtten(minHit.P,indirHit.P);
 	re = PBR_GGX(mat, minHit.N, -ray.dir, L, Li);
 	re = max(re,0);
 }

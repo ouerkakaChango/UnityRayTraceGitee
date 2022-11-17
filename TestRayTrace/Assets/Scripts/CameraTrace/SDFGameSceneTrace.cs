@@ -464,7 +464,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         if (useMSDFShadow)
         {
             Graphics.Blit(rt_Shadow0, tempRT1);
-            int lightSpace = autoCS.bakerMgr.lightTags.Length;
+            int lightSpace = autoCS.bakerMgr.dirLightTags.Length;
             if (frameID < lightSpace)
             {
                 //1.模糊shadow0

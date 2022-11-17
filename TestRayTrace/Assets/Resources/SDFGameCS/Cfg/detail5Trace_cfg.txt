@@ -25,6 +25,10 @@ if (minHit.bHit)
 	re = SceneRenderReflect(ray, minHit,mat);
 	}
 	re *= RenderSceneSDFShadow(minHit);
+	re = max(re,0);
+
+	//??? Need support MSDFShadow
+	re += RenderSceneAdditionalColor(ray, minHit, mat);
 }
 else
 {
