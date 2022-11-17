@@ -1,0 +1,525 @@
+﻿#define OBJNUM (@ObjNum)
+
+#define MaxSDF 100000
+#define MaxTraceDis 100
+#define MaxTraceTime 6400
+#define TraceThre (@TraceThre)
+#define NormalEpsilon (@NormalEpsilon)
+
+#define HardShadowExpensive true
+
+#define SceneSDFSoftShadowBias 0.1
+#define SceneSDFSoftShadowK 16
+
+#include "../../../HLSL/PBR/PBRCommonDef.hlsl"
+#include "../../../HLSL/PBR/PBR_IBL.hlsl"
+#include "../../../HLSL/PBR/PBR_GGX.hlsl"
+#include "../../../HLSL/UV/UVCommonDef.hlsl"
+
+###BLOCK ExtraInclude
+...
+###BLOCK
+int GetSpecialID(int inx);
+
+Material_PBR GetObjMaterial_PBR(int obj)
+{
+	Material_PBR re;
+	Init(re);
+
+	###BLOCK ObjMaterial
+	... 
+	###BLOCK
+	return re;
+}
+
+int GetObjRenderMode(int obj)
+{
+	###BLOCK ObjRenderMode
+	... 
+	###BLOCK
+}
+
+float2 GetObjUV(in HitInfo minHit)
+{
+	###BLOCK ObjUV
+	... 
+	###BLOCK
+}
+
+void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
+{
+	int inx = minHit.obj;
+	T=0;
+	B=0;
+	###BLOCK ObjTB
+	... 
+	###BLOCK
+}
+
+void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
+{
+	###BLOCK ObjPreRender
+	... 
+	###BLOCK
+}
+
+void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
+{
+	###BLOCK ObjPostRender
+	... 
+	###BLOCK
+}
+
+float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
+{
+	int mode = GetObjRenderMode(minHit.obj);
+	ObjPreRender(mode, mat, ray, minHit);
+	float3 result = 0;
+	###BLOCK ObjRender
+	... 
+	###BLOCK
+	ObjPostRender(result, mode, mat, ray, minHit);
+	return result;
+}
+
+
+float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, bool expensive = false);
+float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
+
+float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
+{
+	Ray ray;
+	ray.pos = minHit.P;
+	ray.dir = -lightDir;
+	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
+	HitInfo hitInfo;
+	return HardShadow_TraceScene(ray, hitInfo, maxLength, HardShadowExpensive);
+}
+
+float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
+{
+	Ray ray;
+	ray.pos = minHit.P;
+	ray.dir = -lightDir;
+	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
+	HitInfo hitInfo;
+	return SoftShadow_TraceScene(ray, hitInfo, maxLength);
+}
+
+float RenderSceneSDFShadow(HitInfo minHit)
+{
+	float sha = 1;
+	###BLOCK SDFShadow
+	... 
+	###BLOCK
+}
+
+float3 RenderSceneAdditionalColor(in Ray ray, in HitInfo minHit, in Material_PBR mat)
+{
+	float3 result = 0;
+
+	//int lightType[1];
+	//float3 lightPos[1];
+	//float3 lightDirs[1];
+	//float3 addLightColors[1];
+	//
+	//lightType[0] = 1;
+	//lightPos[0] = float3(0.42,2.4,-15.048);
+	//lightDirs[0] = normalize(minHit.P - lightPos[0]);
+	//addLightColors[0] = float3(1,0,0);
+	//
+	//result.rgb = 0.03 * mat.albedo * mat.ao;
+    //for(int i=0;i<1;i++)
+    //{
+	//	float atten = 1;
+	//	if(lightType[i]==1)
+	//	{
+	//		atten = PntlightAtten(minHit.P,lightPos[i]);
+	//	}
+    //   result.rgb += atten * PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], addLightColors[i]);
+    //}
+
+	return result;
+}
+
+//###################################################################################
+#include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
+#include "../../../HLSL/Noise/NoiseCommonDef.hlsl"
+
+###BLOCK ExtraSDF
+...
+###BLOCK
+
+float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
+{
+	###BLOCK ObjSDF
+	...
+	###BLOCK
+}
+
+float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonScale = 1.0f)
+{
+	float normalEpsilon = NormalEpsilon;
+	###BLOCK BeforeObjSDFNormal
+	...
+	###BLOCK
+	return normalize(float3(
+		GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
+		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
+		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon*eplisonScale), traceInfo) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon*eplisonScale), traceInfo)
+		));
+}
+
+float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
+{
+	###BLOCK ObjNormal
+	...
+	###BLOCK
+}
+
+
+void TraceScene(Ray ray, out HitInfo info)
+{
+	float traceThre = TraceThre;
+
+	###BLOCK BeforeTraceScene
+	...
+	###BLOCK
+
+	Init(info);
+
+	TraceInfo traceInfo;
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
+
+	float objSDF[OBJNUM];
+	bool innerBoundFlag[OBJNUM];
+	float innerBoundStepScale[OBJNUM];
+	int objInx = -1;
+	float sdf = MaxSDF;
+	bool bInnerBound = false;
+
+	while (traceInfo.traceCount <= MaxTraceTime)
+	{
+		objInx = -1;
+		sdf = MaxSDF;
+		bInnerBound = false;
+		for (int inx = 0; inx < OBJNUM; inx++)
+		{
+			innerBoundFlag[inx] = false;
+			innerBoundStepScale[inx] = 1;
+		}
+
+		###BLOCK CheckInnerBound
+		...
+		###BLOCK
+
+		if(bInnerBound)
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				if(innerBoundFlag[inx])
+				{
+					objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo) * innerBoundStepScale[inx];
+					if (objSDF[inx] < sdf)
+					{
+						sdf = objSDF[inx];
+						objInx = inx;
+					}
+				}
+			}
+		}
+		else
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+				if (objSDF[inx] < sdf)
+				{
+					sdf = objSDF[inx];
+					objInx = inx;
+				}
+			}
+
+		}
+
+		if(objInx == -1)
+		{
+			break;
+		}
+
+		if (sdf > MaxTraceDis)
+		{
+			break;
+		}
+
+		if (sdf <= traceThre)
+		{
+			info.bHit = true;
+			info.obj = objInx;
+			info.N = GetObjNormal(objInx, ray.pos, traceInfo);
+			info.P = ray.pos;
+			break;
+		}
+		ray.pos += sdf * ray.dir;
+		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
+	}
+}
+
+float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength, bool expensive)
+{
+	Init(info);
+
+	TraceInfo traceInfo;
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
+
+	float objSDF[OBJNUM];
+	bool innerBoundFlag[OBJNUM];
+	float innerBoundStepScale[OBJNUM];
+	int objInx = -1;
+	float sdf = MaxSDF;
+	bool bInnerBound = false;
+
+	while (traceInfo.traceCount <= MaxTraceTime*(expensive?1:0.01))
+	{
+		objInx = -1;
+		sdf = MaxSDF;
+		bInnerBound = false;
+		for (int inx = 0; inx < OBJNUM; inx++)
+		{
+			innerBoundFlag[inx] = false;
+			innerBoundStepScale[inx] = 1;
+		}
+
+		###BLOCK CheckInnerBound2
+		...
+		###BLOCK
+
+		if(bInnerBound)
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				if(innerBoundFlag[inx])
+				{
+					objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo) * innerBoundStepScale[inx];
+					if (objSDF[inx] < sdf)
+					{
+						sdf = objSDF[inx];
+						objInx = inx;
+					}
+				}
+			}
+		}
+		else
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+				if (objSDF[inx] < sdf)
+				{
+					sdf = objSDF[inx];
+					objInx = inx;
+				}
+			}
+		}
+
+		if(objInx == -1)
+		{
+			break;
+		}
+
+		if (sdf > MaxTraceDis*(expensive?1:0.1))
+		{
+			break;
+		}
+
+		if (sdf <= TraceThre)
+		{
+			info.bHit = true;
+			info.obj = objInx;
+			info.P = ray.pos;
+			break;
+		}
+		ray.pos += sdf * ray.dir;
+		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
+
+		if(traceInfo.traceSum>maxLength)
+		{
+			break;
+		}
+	}
+
+	if (info.bHit)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+//https://www.shadertoy.com/view/MsfGRr
+float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
+{
+	Init(info);
+	float sha = 1.0;
+	float t = 0.005 * 0.1; //一个非0小值，会避免极其细微的多余shadow
+
+	TraceInfo traceInfo;
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
+
+	while (traceInfo.traceCount <= MaxTraceTime*0.2)
+	{
+		int objInx = -1;
+		float objSDF[OBJNUM];
+		float sdf = MaxSDF;
+		for (int inx = 0; inx < OBJNUM; inx++)
+		{
+			objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+			if (objSDF[inx] < sdf)
+			{
+				sdf = objSDF[inx];
+				objInx = inx;
+			}
+		}
+
+		if (sdf <= 0)
+		{
+			sha = 0;
+			break;
+		}
+
+		if (sdf > MaxTraceDis)
+		{
+			break;
+		}
+
+		sha = min(sha, SceneSDFSoftShadowK * sdf / t);
+		if (sha < 0.001) break;
+
+		//*0.1f解决背面漏光问题
+		if (sdf <= TraceThre*0.1f)
+		{
+			info.bHit = true;
+			info.obj = objInx;
+			info.P = ray.pos;
+			break;
+		}
+
+		t += clamp(sdf, 0.01*SceneSDFSoftShadowBias, 0.5*SceneSDFSoftShadowBias);
+
+		ray.pos += sdf * ray.dir;
+		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
+
+		if(traceInfo.traceSum>maxLength)
+		{
+			break;
+		}
+	}
+
+	return saturate(sha);
+}
+
+void Indir_TraceScene(Ray ray, out HitInfo info)
+{
+	float traceThre = TraceThre;
+
+	Init(info);
+
+	TraceInfo traceInfo;
+	Init(traceInfo);
+	float3 oriPos = ray.pos;
+
+	float objSDF[OBJNUM];
+	bool innerBoundFlag[OBJNUM];
+	float innerBoundStepScale[OBJNUM];
+	int objInx = -1;
+	float sdf = MaxSDF;
+	bool bInnerBound = false;
+
+	while (traceInfo.traceCount <= 40)
+	{
+		objInx = -1;
+		sdf = MaxSDF;
+		bInnerBound = false;
+		for (int inx = 0; inx < OBJNUM; inx++)
+		{
+			innerBoundFlag[inx] = false;
+			innerBoundStepScale[inx] = 1;
+		}
+
+		if(bInnerBound)
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				if(innerBoundFlag[inx])
+				{
+					objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo) * innerBoundStepScale[inx];
+					if (objSDF[inx] < sdf)
+					{
+						sdf = objSDF[inx];
+						objInx = inx;
+					}
+				}
+			}
+		}
+		else
+		{
+			for (int inx = 0; inx < OBJNUM; inx++)
+			{
+				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
+				if (objSDF[inx] < sdf)
+				{
+					sdf = objSDF[inx];
+					objInx = inx;
+				}
+			}
+		}
+
+		if(objInx == -1)
+		{
+			break;
+		}
+
+		if (sdf > 100)
+		{
+			break;
+		}
+
+		if (sdf <= traceThre)
+		{
+			info.bHit = true;
+			info.obj = objInx;
+			info.N = GetObjNormal(objInx, ray.pos, traceInfo);
+			info.P = ray.pos;
+			break;
+		}
+		ray.pos += sdf * ray.dir;
+		Update(traceInfo,sdf);
+		traceInfo.traceSum = length(ray.pos - oriPos);
+	}
+}
+
+###BLOCK ExtraFuncDependOnTraceScene
+		...
+###BLOCK
+
+void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit, Material_PBR mat)
+{
+	###BLOCK IndirectColor
+	... 
+	###BLOCK
+}
+
+int GetSpecialID(int inx)
+{
+	###BLOCK SpecialID
+	... 
+	###BLOCK
+}
