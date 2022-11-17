@@ -27,7 +27,10 @@ public class SDFBakerMgr : MonoBehaviour
     [HideInInspector]
     public List<string> bakedRenders = new List<string>();
     [HideInInspector]
+    //---Deprecated
     public List<string> bakedShadows = new List<string>();
+    [HideInInspector]
+    public List<string> bakedFullLightInfo = new List<string>();
     [HideInInspector]
     public List<string> bakedBeforeSDF = new List<string>();    //used for SDF Bounds
     [HideInInspector]
@@ -66,6 +69,7 @@ public class SDFBakerMgr : MonoBehaviour
             var tag = tags[i];
 
             DoPreAddAction(i, tag);
+
             bool hasBound = HasSDFBound(tag.gameObject);
             if(hasBound)
             {
@@ -147,7 +151,10 @@ public class SDFBakerMgr : MonoBehaviour
         List<SDFLightTag> lightList = new List<SDFLightTag>();
         for(int i=0;i< allLightTags.Length;i++)
         {
-            if(!allLightTags[i].isActiveAndEnabled || !allLightTags[i].gameObject.activeInHierarchy)
+            if(!allLightTags[i].isActiveAndEnabled || 
+                !allLightTags[i].gameObject.activeInHierarchy ||
+                allLightTags[i].lightPass!=SDFLightPass.Direct
+                )
             {
                 continue;
             }
@@ -183,6 +190,7 @@ public class SDFBakerMgr : MonoBehaviour
 
         bakedRenders.Clear();
         bakedShadows.Clear();
+        bakedFullLightInfo.Clear();
 
         bakedSpecialObjects.Clear();
 
@@ -201,7 +209,7 @@ public class SDFBakerMgr : MonoBehaviour
         EndBakeRenderModes();
 
         EndBakeRenders();
-
+        EndBakeFullLightInfo();
         EndBakeShadows();
     }
 
@@ -274,8 +282,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedRenders.Add("}");
     }
 
-    //??? ´ý¸Ä
-    void EndBakeShadows()
+    void EndBakeFullLightInfo()
     {
         //int lightType[5];
         //....
@@ -292,7 +299,7 @@ public class SDFBakerMgr : MonoBehaviour
         //lightDirs[3] = normalize(minHit.P - lightPos[3]);));
         //lightDirs[4] = normalize(minHit.P - lightPos[4]);
         int n = lightTags.Length;
-        bakedShadows.Add("int lightType[" + n + "];");
+        bakedFullLightInfo.Add("int lightType[" + n + "];");
         int type = -999;
         for (int i = 0; i < n; i++)
         {
@@ -312,29 +319,29 @@ public class SDFBakerMgr : MonoBehaviour
             {
                 type = -type - 1;
             }
-            bakedShadows.Add("lightType[" + i + "] = "+type+";");
+            bakedFullLightInfo.Add("lightType[" + i + "] = " + type + ";");
         }
 
-        bakedShadows.Add("float3 lightPos[" + n + "];");
+        bakedFullLightInfo.Add("float3 lightPos[" + n + "];");
         for (int i = 0; i < n; i++)
         {
             Vector3 lp = lightTags[i].gameObject.transform.position;
-            bakedShadows.Add("lightPos[" + i + "] = "+Bake(lp)+";");
+            bakedFullLightInfo.Add("lightPos[" + i + "] = " + Bake(lp) + ";");
         }
 
-        bakedShadows.Add("float3 lightDirs[" + n + "];");
-        for(int i=0;i< n; i++)
+        bakedFullLightInfo.Add("float3 lightDirs[" + n + "];");
+        for (int i = 0; i < n; i++)
         {
             Vector3 lightDir = Vector3.zero;
             if (IsDirectionalLight(lightTags[i].gameObject))
             {
                 lightDir = GetLightDir(lightTags[i].gameObject);
-                bakedShadows.Add("lightDirs[" + i + "] = " + Bake(lightDir) + ";");
+                bakedFullLightInfo.Add("lightDirs[" + i + "] = " + Bake(lightDir) + ";");
             }
-            else if(IsPointLight(lightTags[i].gameObject))
+            else if (IsPointLight(lightTags[i].gameObject))
             {
                 Vector3 lightPos = lightTags[i].gameObject.transform.position;
-                bakedShadows.Add("lightDirs[" + i + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
+                bakedFullLightInfo.Add("lightDirs[" + i + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
             }
             else
             {
@@ -344,10 +351,118 @@ public class SDFBakerMgr : MonoBehaviour
 
         //int shadowType[5];
         //....
-        bakedShadows.Add("int shadowType[" + n + "];");
+        bakedFullLightInfo.Add("int shadowType[" + n + "];");
+        for (int i = 0; i < n; i++)
+        {
+            bakedFullLightInfo.Add("shadowType[" + i + "] =" + (int)lightTags[i].shadowType + ";");
+        }
+
+        bakedFullLightInfo.Add("float lightspace = " + n + ";");
+    }
+
+    //??? Deprecated
+    void EndBakeShadows()
+    {
+        //int lightType[5];
+        //....
+        //float3 lightPos[5];
+        //lightPos[0] = float3(-0.07, 8.15, 3.42);
+        //lightPos[1] = float3(0, 3.12, -0.91);
+        //lightPos[2] = float3(0.04, 8.15, -3.29);
+        //lightPos[3] = float3(3.357384, 8.15, 0);
+        //lightPos[4] = float3(-3.83, 8.15, 0);
+        //float3 lightDirs[5];
+        //lightDirs[0] = normalize(minHit.P - lightPos[0]);
+        //lightDirs[1] = normalize(minHit.P - lightPos[1]);
+        //lightDirs[2] = normalize(minHit.P - lightPos[2]);));
+        //lightDirs[3] = normalize(minHit.P - lightPos[3]);));
+        //lightDirs[4] = normalize(minHit.P - lightPos[4]);
+        int n = lightTags.Length;
+        int tn = n;
+        for(int i=0;i<n;i++)
+        {
+            if(!lightTags[i].bakeShadow)
+            {
+                tn -= 1;
+            }
+        }
+        bakedShadows.Add("int lightType[" + tn + "];");
+        int type = -999;
+        int lcount = 0;
+        for (int i = 0; i < n; i++)
+        {
+            if (!lightTags[i].bakeShadow)
+            {
+                continue;
+            }
+            if (IsDirectionalLight(lightTags[i].gameObject))
+            {
+                type = 0;
+            }
+            else if (IsPointLight(lightTags[i].gameObject))
+            {
+                type = 1;
+            }
+            else
+            {
+                Debug.LogError("light type not handle");
+            }
+
+            bakedShadows.Add("lightType[" + lcount + "] = "+type+";");
+            lcount++;
+        }
+
+        lcount = 0;
+        bakedShadows.Add("float3 lightPos[" + n + "];");
+        for (int i = 0; i < n; i++)
+        {
+            if (!lightTags[i].bakeShadow)
+            {
+                continue;
+            }
+            Vector3 lp = lightTags[i].gameObject.transform.position;
+            bakedShadows.Add("lightPos[" + lcount + "] = "+Bake(lp)+";");
+            lcount++;
+        }
+
+        bakedShadows.Add("float3 lightDirs[" + tn + "];");
+        lcount = 0;
+        for (int i=0;i< n; i++)
+        {
+            if (!lightTags[i].bakeShadow)
+            {
+                continue;
+            }
+            Vector3 lightDir = Vector3.zero;
+            if (IsDirectionalLight(lightTags[i].gameObject))
+            {
+                lightDir = GetLightDir(lightTags[i].gameObject);
+                bakedShadows.Add("lightDirs[" + lcount + "] = " + Bake(lightDir) + ";");
+            }
+            else if(IsPointLight(lightTags[i].gameObject))
+            {
+                Vector3 lightPos = lightTags[i].gameObject.transform.position;
+                bakedShadows.Add("lightDirs[" + lcount + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
+            }
+            else
+            {
+                Debug.LogError("No support type");
+            }
+            lcount++;
+        }
+
+        //int shadowType[5];
+        //....
+        bakedShadows.Add("int shadowType[" + tn + "];");
+        lcount = 0;
         for(int i=0;i< n; i++)
         {
-            bakedShadows.Add("shadowType[" + i + "] =" + (int)lightTags[i].shadowType + ";");
+            if (!lightTags[i].bakeShadow)
+            {
+                continue;
+            }
+            bakedShadows.Add("shadowType[" + lcount + "] =" + (int)lightTags[i].shadowType + ";");
+            lcount++;
         }
 
         //float lightspace = 5;
@@ -383,10 +498,10 @@ public class SDFBakerMgr : MonoBehaviour
         //lightspace /= 5;
         //sha = lightspace;
 
-        bakedShadows.Add("float lightspace = "+ n + ";");
+        bakedShadows.Add("float lightspace = "+ tn + ";");
         bakedShadows.Add("float maxLength = MaxSDF;");
         bakedShadows.Add("float tsha = 1;");
-        bakedShadows.Add("for (int i = 0; i < "+n+"; i++)");
+        bakedShadows.Add("for (int i = 0; i < "+tn+"; i++)");
         bakedShadows.Add("{");
         bakedShadows.Add("  float maxLength = MaxSDF;");
         bakedShadows.Add("  if(lightType[i]==0)");
@@ -414,7 +529,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedShadows.Add("  }");
         bakedShadows.Add("  lightspace -= (1 - tsha);");
         bakedShadows.Add("}");
-        bakedShadows.Add("lightspace /= "+n+";");
+        bakedShadows.Add("lightspace /= "+tn+";");
         bakedShadows.Add("sha = lightspace;");
     }
 
@@ -634,12 +749,10 @@ public class SDFBakerMgr : MonoBehaviour
             if(meshName == "Cube")
             {
                 AddBakeCube(tag);
-                return;
             }
             else if(meshName == "Sphere")
             {
                 AddBakeSphere(tag);
-                return;
             }
         }
 
@@ -647,10 +760,21 @@ public class SDFBakerMgr : MonoBehaviour
         if(quadBezier)
         {
             AddBakeQuadBezier(obj);
-            return;
         }
 
-        Debug.LogError("Nothing Baked!");
+        for(int i=0;i<tag.booleanTags.Count;i++)
+        {
+            AddBakeBooleanTag(tag.booleanTags[i]);
+        }
+    }
+
+    string GetSDFCubeLine(GameObject obj)
+    {
+        Vector3 bakeRot = obj.transform.rotation.eulerAngles;
+        string center_str = Bake(obj.transform.position);
+        string bound_str = Bake(obj.transform.lossyScale * 0.5f);
+        string rot_str = Bake(bakeRot);
+        return "SDFBox(p, " + center_str + ", " + bound_str + ", " + rot_str + ")";
     }
 
     void AddBakeCube(SDFBakerTag tag)
@@ -667,7 +791,7 @@ public class SDFBakerMgr : MonoBehaviour
         string line;
         if (expression == null)
         {
-            line = offset + " + SDFBox(p, " + center_str + ", " + bound_str + ", " + rot_str + ")";
+            line = offset + " + "+GetSDFCubeLine(obj);
             line = "re = min(re, " + line + ");";
             bakedSDFs.Add(line);
         }
@@ -922,6 +1046,30 @@ public class SDFBakerMgr : MonoBehaviour
         else
         {
             return true;
+        }
+    }
+
+    bool IsCube(GameObject obj)
+    {
+        var mf = obj.GetComponent<MeshFilter>();
+        var mr = obj.GetComponent<MeshRenderer>();
+        if (mf && mr)
+        {
+            var meshName = mf.sharedMesh.name;
+            //Debug.Log(meshName);
+            if (meshName == "Cube")
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void AddBakeBooleanTag(SDFBooleanTag boolean)
+    {
+        if(boolean.type == SDFBooleanType.maxCut && IsCube(boolean.gameObject))
+        {
+            bakedSDFs.Add("re = max(re, -" + GetSDFCubeLine(boolean.gameObject) + ");");
         }
     }
 

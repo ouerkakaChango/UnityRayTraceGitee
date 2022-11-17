@@ -6,6 +6,8 @@
 #define TraceThre (@TraceThre)
 #define NormalEpsilon (@NormalEpsilon)
 
+#define HardShadowExpensive true
+
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFSoftShadowK 16
 
@@ -81,8 +83,7 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 }
 
 
-float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
-float Expensive_HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
+float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, bool expensive = false);
 float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
 
 float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
@@ -92,7 +93,7 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 	ray.dir = -lightDir;
 	ray.pos += ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
 	HitInfo hitInfo;
-	return HardShadow_TraceScene(ray, hitInfo, maxLength);
+	return HardShadow_TraceScene(ray, hitInfo, maxLength, HardShadowExpensive);
 }
 
 float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
@@ -213,6 +214,7 @@ void TraceScene(Ray ray, out HitInfo info)
 					objInx = inx;
 				}
 			}
+
 		}
 
 		if(objInx == -1)
@@ -239,7 +241,7 @@ void TraceScene(Ray ray, out HitInfo info)
 	}
 }
 
-float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
+float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength, bool expensive)
 {
 	Init(info);
 
@@ -254,7 +256,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 	float sdf = MaxSDF;
 	bool bInnerBound = false;
 
-	while (traceInfo.traceCount <= MaxTraceTime*0.1)
+	while (traceInfo.traceCount <= MaxTraceTime*(expensive?1:0.01))
 	{
 		objInx = -1;
 		sdf = MaxSDF;
@@ -288,9 +290,6 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 		{
 			for (int inx = 0; inx < OBJNUM; inx++)
 			{
-				//###BLOCK HardShadow_BeforeLoopBody
-				//...
-				//###BLOCK
 				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
 				if (objSDF[inx] < sdf)
 				{
@@ -305,7 +304,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 			break;
 		}
 
-		if (sdf > MaxTraceDis*0.01)
+		if (sdf > MaxTraceDis*(expensive?1:0.1))
 		{
 			break;
 		}
@@ -321,96 +320,6 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 		Update(traceInfo,sdf);
 		traceInfo.traceSum = length(ray.pos - oriPos);
 
-		if(traceInfo.traceSum>maxLength)
-		{
-			break;
-		}
-	}
-
-	if (info.bHit)
-	{
-		return 0;
-	}
-	else
-	{
-		return 1;
-	}
-}
-
-float Expensive_HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
-{
-	Init(info);
-
-	TraceInfo traceInfo;
-	Init(traceInfo);
-	float3 oriPos = ray.pos;
-
-	float objSDF[OBJNUM];
-	bool innerBoundFlag[OBJNUM];
-	float innerBoundStepScale[OBJNUM];
-	int objInx = -1;
-	float sdf = MaxSDF;
-	bool bInnerBound = false;
-
-	while (traceInfo.traceCount <= MaxTraceTime)
-	{
-		objInx = -1;
-		sdf = MaxSDF;
-		bInnerBound = false;
-		for (int inx = 0; inx < OBJNUM; inx++)
-		{
-			innerBoundFlag[inx] = false;
-			innerBoundStepScale[inx] = 1;
-		}
-
-		if(bInnerBound)
-		{
-			for (int inx = 0; inx < OBJNUM; inx++)
-			{
-				if(innerBoundFlag[inx])
-				{
-					objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo) * innerBoundStepScale[inx];
-					if (objSDF[inx] < sdf)
-					{
-						sdf = objSDF[inx];
-						objInx = inx;
-					}
-				}
-			}
-		}
-		else
-		{
-			for (int inx = 0; inx < OBJNUM; inx++)
-			{
-				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
-				if (objSDF[inx] < sdf)
-				{
-					sdf = objSDF[inx];
-					objInx = inx;
-				}
-			}
-		}
-
-		if(objInx == -1)
-		{
-			break;
-		}
-
-		if (sdf > MaxTraceDis)
-		{
-			break;
-		}
-
-		if (sdf <= TraceThre)
-		{
-			info.bHit = true;
-			info.obj = objInx;
-			info.P = ray.pos;
-			break;
-		}
-		ray.pos += sdf * ray.dir;
-		Update(traceInfo,sdf);
-		traceInfo.traceSum = length(ray.pos - oriPos);
 		if(traceInfo.traceSum>maxLength)
 		{
 			break;

@@ -23,7 +23,6 @@
 #include "../../../HLSL/MatLib/CommonMatLib.hlsl"
 
 float daoScale;
-float newShadow;
 
 //@@@SDFBakerMgr TexSys
 Texture2D<float3> N_paper;
@@ -721,7 +720,6 @@ tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
 }
 float n = frameID;
 sha = n / (n + 1)*LastShadow[seed.xy] + 1 / (n + 1)*tsha;
-newShadow = sha;
 //if(frameID<lightspace)
 //{
 //	sha = 1;

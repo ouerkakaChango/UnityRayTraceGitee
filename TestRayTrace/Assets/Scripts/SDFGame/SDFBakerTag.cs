@@ -27,6 +27,7 @@ public class SDFBakerTag : MonoBehaviour
     public float SDF_offset = 0.0f;
     public int renderMode = 0;
     public SDFShapeType shapeType = SDFShapeType.Normal;
+    public List<SDFBooleanTag> booleanTags = new List<SDFBooleanTag>();
 
     //---Special
     [HideInInspector]

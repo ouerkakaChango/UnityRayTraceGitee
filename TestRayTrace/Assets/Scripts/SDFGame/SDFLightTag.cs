@@ -8,10 +8,17 @@ public enum SDFShadowType
     SDFSoftShadow,
 }
 
+public enum SDFLightPass
+{
+    Direct,
+    Additional,
+}
+
 public class SDFLightTag : MonoBehaviour
 {
     public bool bakeShadow = true;
     public SDFShadowType shadowType = SDFShadowType.SDFHardShadow;
+    public SDFLightPass lightPass = SDFLightPass.Direct;
     // Start is called before the first frame update
     void Start()
     {
