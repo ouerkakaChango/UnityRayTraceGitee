@@ -3,7 +3,7 @@
 #define MaxSDF 100000
 #define MaxTraceDis 100
 #define MaxTraceTime 6400
-#define TraceThre 0.001
+#define TraceThre 0.01
 #define NormalEpsilon 0.01
 
 #define HardShadowExpensive true
@@ -62,6 +62,14 @@ float mrand01(float3 seed)
 	uint stat = (uint)(seed.x) * 197 + (uint)(seed.y) * 927 + (uint)(seed.z) * 269;
 
 	return random_float_01(stat);
+}
+
+float testSDFEmissive(float3 p)
+{
+	float3 center = float3(10.5,-4,10);
+	float re = SDFBox(p,center, float3(0.5,1.5,1.5));
+	re = max(re,-SDFBox(p,center,float3(1, 0.5, 0.5)));
+	return re;
 }
 int GetSpecialID(int inx);
 
@@ -232,7 +240,20 @@ if(inx == -1)
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
-//SmoothWithDither(result, suv);
+if(minHit.obj == 1)
+{
+float3 p = minHit.P;
+float s = 0.01*testSDFEmissive(p);
+
+float f1 = clamp(1.-pow(s,0.5),0.,1.);//pow(s+2.,-2.);
+f1 = pow(f1,20.);
+float f = f1;
+float3 em = f*float3(1,0,0.5);
+result += em;
+}
+
+float2 suv = seed.xy/float2(w,h);
+SmoothWithDither(result, suv);
 }
 
 float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF);
@@ -305,7 +326,7 @@ sha = GetDirSoftShadow(lightDir, minHit, maxShadowTraceLength);
 
 	//blend
 	float n = frameID;
-	result = n / (n + 1)*LastLig[seed.xy] + 1 / (n + 1)*newLig;
+	result = n / (n + 1)*LastLig[seed.xy].rgb + 1 / (n + 1)*newLig;
 }
 else if (mode == 1)
 {
@@ -354,6 +375,7 @@ else
 
 int inx = GetSpecialID(minHit.obj);
 
+	NewLig[seed.xy] = float4(result,1);
 	ObjPostRender(result, mode, mat, ray, minHit);
 	return result;
 }

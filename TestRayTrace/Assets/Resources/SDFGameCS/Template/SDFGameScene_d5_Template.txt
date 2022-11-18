@@ -81,6 +81,7 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 	###BLOCK ObjRender
 	... 
 	###BLOCK
+	NewLig[seed.xy] = float4(result,1);
 	ObjPostRender(result, mode, mat, ray, minHit);
 	return result;
 }

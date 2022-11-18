@@ -47,6 +47,7 @@ Texture2D<float> LastShadow;
 
 bool useLigdow;
 Texture2D<float4> LastLig;
+RWTexture2D<float4> NewLig;
 
 Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;

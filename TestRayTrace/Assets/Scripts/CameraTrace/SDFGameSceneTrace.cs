@@ -165,6 +165,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     RenderTexture rt_FilteredShadow = null;
     //Ligdow RT
     RenderTexture rt_LastLig = null;
+    RenderTexture rt_NewLig = null;
     //TAA RT
     RenderTexture rt_beforeTAA=null, rt_lastAfterTAA=null;
     //DOF RT
@@ -271,6 +272,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             if(useLigdow)
             {
                 CreateRT(ref rt_LastLig, renderSize.x, renderSize.y);
+                CreateRT(ref rt_NewLig, renderSize.x, renderSize.y);
             }
 
             if(useTAA)
@@ -456,6 +458,7 @@ public class SDFGameSceneTrace : MonoBehaviour
         if (useLigdow)
         {
             computeShader.SetTexture(kInx, "LastLig", rt_LastLig);
+            computeShader.SetTexture(kInx, "NewLig", rt_NewLig);
         }
         else
         {
@@ -545,7 +548,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             //    //### compute
             //    //###########
             //}
-            Graphics.Blit(rTex, rt_LastLig);
+            Graphics.Blit(rt_NewLig, rt_LastLig);
         }
 
 
