@@ -142,6 +142,7 @@ public class SDFGameSceneTrace : MonoBehaviour
     public bool useIndirectRT = false;
     public float indirectMultiplier = 1.0f;
     public bool useMSDFShadow = false;
+    public bool useLigdow = false;
     bool useTAA = false;
     public bool useDOF = false;
     public bool dof_needFixFocusDepth = false;
@@ -162,6 +163,8 @@ public class SDFGameSceneTrace : MonoBehaviour
     //MSDFShadow RT
     RenderTexture rt_LastShadow = null;
     RenderTexture rt_FilteredShadow = null;
+    //Ligdow RT
+    RenderTexture rt_LastLig = null;
     //TAA RT
     RenderTexture rt_beforeTAA=null, rt_lastAfterTAA=null;
     //DOF RT
@@ -263,6 +266,11 @@ public class SDFGameSceneTrace : MonoBehaviour
             {
                 CreateRT(ref rt_LastShadow, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
                 CreateRT(ref rt_FilteredShadow, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
+            }
+
+            if(useLigdow)
+            {
+                CreateRT(ref rt_LastLig, renderSize.x, renderSize.y);
             }
 
             if(useTAA)
@@ -444,6 +452,16 @@ public class SDFGameSceneTrace : MonoBehaviour
             computeShader.SetTexture(kInx, "LastShadow", uselessRT);
         }
 
+        computeShader.SetBool("useLigdow", useLigdow);
+        if (useLigdow)
+        {
+            computeShader.SetTexture(kInx, "LastLig", rt_LastLig);
+        }
+        else
+        {
+            computeShader.SetTexture(kInx, "LastLig", uselessRT);
+        }
+
         computeShader.SetBool("needEyeDepth", needEyeDepth);
         if(needEyeDepth)
         {
@@ -507,6 +525,11 @@ public class SDFGameSceneTrace : MonoBehaviour
             //###########
             //3.copy到Lastshadow
             Graphics.Blit(rt_Shadow0, rt_LastShadow);
+        }
+
+        if(useLigdow)
+        {
+            Graphics.Blit(rTex, rt_LastLig);
         }
 
 

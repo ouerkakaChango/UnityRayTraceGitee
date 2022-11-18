@@ -70,6 +70,9 @@ void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, 
 	###BLOCK
 }
 
+float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF);
+float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF);
+
 float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 {
 	int mode = GetObjRenderMode(minHit.obj);
@@ -86,7 +89,7 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, bool expensive = false);
 float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
 
-float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
+float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength)
 {
 	Ray ray;
 	ray.pos = minHit.P;
@@ -96,7 +99,7 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 	return HardShadow_TraceScene(ray, hitInfo, maxLength, HardShadowExpensive);
 }
 
-float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
+float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength)
 {
 	Ray ray;
 	ray.pos = minHit.P;

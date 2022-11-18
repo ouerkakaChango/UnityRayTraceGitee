@@ -190,8 +190,8 @@ return uv;
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-0.84, 1, 0.99), float3(1.50175, 0.02935212, 3.01255), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-0.84, 1, 0.99), float3(1.50175, 0.02935212, 3.01255), float3(0, 0, 0));
 return uv;
 }
 	//@@@
@@ -213,7 +213,7 @@ return;
 }
 if(inx == 1 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+BoxedTB(T,B,minHit.P, float3(-0.84, 1, 0.99), float3(1.50175, 0.02935212, 3.01255), float3(0, 0, 0));
 return;
 }
 //@@@
@@ -248,20 +248,24 @@ if(mode == 0)
 	float3 lightPos[2];
 	float3 lightDir[2];
 	float3 lightColor[2];
+	int shadowType[2];
 	
 	lightType[0] = 0;
 	lightPos[0] = 0;
 	lightDir[0] = float3(-0.3213938, -0.7660444, 0.5566705);
 	lightColor[0] = 1;
+	shadowType[0] = 0;
 
 	lightType[1] = 1;
-	lightPos[1] = float3(-1, 0.25, 1.5);
-	lightDir[1] = float3(-0.3213938, -0.7660444, 0.5566705);
+	lightPos[1] = float3(-1, 2, 1.5);
+	lightDir[1] = normalize(minHit.P - lightPos[1]);
 	lightColor[1] = float3(1,0,0);
+	shadowType[1] = 0;
 
 	result.rgb = 0.03 * mat.albedo * mat.ao;
 
 	//$$$
+	//lig
 	int lightspace = 2;
 	int i = lightspace * rand01(float3(seed.xy,gFrameID));
 
@@ -269,11 +273,29 @@ if(mode == 0)
 	if(lightType[i]==1)
 	{
 		atten = PntLightAtten(minHit.P, lightPos[i]);
+	}	
+	float3 newLig = atten * PBR_GGX(mat, minHit.N, -ray.dir, -lightDir[i], lightColor[i]);
+
+	//sha
+	float maxShadowTraceLength = MaxSDF;
+	if(lightType[i]==1)
+	{
+	    maxShadowTraceLength = length(minHit.P - lightPos[i]);
 	}
-	
-	float3 newLigh = atten * PBR_GGX(mat, minHit.N, -ray.dir, -lightDir[i], lightColor[i]);
-	result = newLigh;
-	//result = n / (n + 1)*LastLig[seed.xy] + 1 / (n + 1)*newLigh;
+	float sha = 1;
+	if(shadowType[i]==0)
+    {
+        sha = GetDirHardShadow(lightDir[i], minHit, maxShadowTraceLength);
+    }
+    if(shadowType[i]==1)
+    {
+        sha = GetDirSoftShadow(lightDir[i], minHit, maxShadowTraceLength);
+    }
+	newLig *= sha;
+
+	//blend
+	float n = frameID;
+	result = n / (n + 1)*LastLig[seed.xy] + 1 / (n + 1)*newLig;
 }
 else if (mode == 1)
 {
@@ -344,10 +366,10 @@ lightType[0] = 0;
 lightType[1] = 1;
 float3 lightPos[2];
 lightPos[0] = float3(0, 3, 0);
-lightPos[1] = float3(-1, 0.25, 1.5);
+lightPos[1] = float3(-1, 2, 1.5);
 float3 lightDirs[2];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-lightDirs[1] = normalize(minHit.P - float3(-1, 0.25, 1.5));
+lightDirs[1] = normalize(minHit.P - float3(-1, 2, 1.5));
 int shadowType[2];
 shadowType[0] =0;
 shadowType[1] =0;
@@ -404,10 +426,10 @@ lightType[0] = 0;
 lightType[1] = 1;
 float3 lightPos[2];
 lightPos[0] = float3(0, 3, 0);
-lightPos[1] = float3(-1, 0.25, 1.5);
+lightPos[1] = float3(-1, 2, 1.5);
 float3 lightDirs[2];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-lightDirs[1] = normalize(minHit.P - float3(-1, 0.25, 1.5));
+lightDirs[1] = normalize(minHit.P - float3(-1, 2, 1.5));
 int shadowType[2];
 shadowType[0] =0;
 shadowType[1] =0;
@@ -478,7 +500,7 @@ re = min(re, 0 + SDFBox(p, float3(0, -1.08, 0), float3(10, 0.5, 10), float3(0, 0
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-0.84, 1, 0.99), float3(1.50175, 0.02935212, 3.01255), float3(0, 0, 0)));
 }
 //@@@
 
