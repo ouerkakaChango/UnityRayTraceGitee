@@ -55,6 +55,14 @@ float fastSign(float3 p, float scale = 0.5)
 	return hash_uint3(abs(p)).x >0.5?-1:1;
 }
 
+float mrand01(float3 seed)
+{
+	seed = abs(seed);
+	//uint stat = (uint)(seed.x) * 1973 + (uint)(seed.y) * 9277 + (uint)(seed.z) * 2699 | 1;
+	uint stat = (uint)(seed.x) * 197 + (uint)(seed.y) * 927 + (uint)(seed.z) * 269;
+
+	return random_float_01(stat);
+}
 int GetSpecialID(int inx);
 
 Material_PBR GetObjMaterial_PBR(int obj)
@@ -227,25 +235,78 @@ void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, 
 //SmoothWithDither(result, suv);
 }
 
+float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF);
+float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF);
+
 float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 {
 	int mode = GetObjRenderMode(minHit.obj);
 	ObjPreRender(mode, mat, ray, minHit);
 	float3 result = 0;
-//@@@SDFBakerMgr ObjRender
-if(mode==0)
+//@@SDFBakerMgr ObjRender
+//if(mode==0)
+//{
+// float3 lightDirs[1];
+// float3 dirLightColors[1];
+// lightDirs[0] = float3(0.4255954, -0.7770073, -0.4638191);
+// dirLightColors[0] = float3(1, 1, 1);
+// result.rgb = 0.03 * mat.albedo * mat.ao;
+// for(int i=0;i<1;i++)
+// {
+// result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);
+// }
+//}
+//@@
+if(mode == 0)
 {
-float3 lightDirs[1];
-float3 dirLightColors[1];
-lightDirs[0] = float3(0.4255954, -0.7770073, -0.4638191);
-dirLightColors[0] = float3(1, 1, 1);
-result.rgb = 0.03 * mat.albedo * mat.ao;
-for(int i=0;i<1;i++)
-{
-result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);
-}
-}
+//@@@SDFBakerMgr FullLightInfo
+const static int lightType[5] = {1, 1, 1, 1, 0};
+const static float3 lightColor[5] = {float3(0, 0.3806472, 5), float3(1, 0, 0), float3(0.4041135, 5, 0), float3(5, 0, 3.903966), float3(1, 1, 1)};
+const static float3 lightPos[5] = {float3(-4.2, 1, -7.66), float3(0.42, 2.4, -15.048), float3(1.66, 1, -7.66), float3(6.45, 1, -7.66), float3(0, 3, 0)};
+const static float3 lightDirs[5] = {float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0.4255954, -0.7770073, -0.4638191)};
+const static int shadowType[5] = {0, 0, 0, 0, 0};
+const static float lightspace = 5;
 //@@@
+
+	result.rgb = 0.03 * mat.albedo * mat.ao;
+
+	//lig
+	int i = lightspace * mrand01(float3(seed.xy,gFrameID));
+
+	float3 lightDir = lightDirs[i];
+	if(lightType[i]==1)
+	{
+		lightDir = normalize(minHit.P - lightPos[i]);
+	}	
+
+	float atten = 1;
+	if(lightType[i]==1)
+	{
+		atten = PntLightAtten(minHit.P, lightPos[i]);
+	}	
+	float3 newLig = atten * PBR_GGX(mat, minHit.N, -ray.dir, -lightDir, lightColor[i]);
+
+	//sha
+	float maxShadowTraceLength = MaxSDF;
+	if(lightType[i]==1)
+	{
+	 maxShadowTraceLength = length(minHit.P - lightPos[i]);
+	}
+	float sha = 1;
+	if(shadowType[i]==0)
+{
+sha = GetDirHardShadow(lightDir, minHit, maxShadowTraceLength);
+}
+if(shadowType[i]==1)
+{
+sha = GetDirSoftShadow(lightDir, minHit, maxShadowTraceLength);
+}
+	newLig *= sha;
+
+	//blend
+	float n = frameID;
+	result = n / (n + 1)*LastLig[seed.xy] + 1 / (n + 1)*newLig;
+}
 else if (mode == 1)
 {
 	result = PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
@@ -301,7 +362,7 @@ int inx = GetSpecialID(minHit.obj);
 float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, bool expensive = false);
 float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
 
-float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
+float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength)
 {
 	Ray ray;
 	ray.pos = minHit.P;
@@ -311,7 +372,7 @@ float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 	return HardShadow_TraceScene(ray, hitInfo, maxLength, HardShadowExpensive);
 }
 
-float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
+float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength)
 {
 	Ray ray;
 	ray.pos = minHit.P;
@@ -324,112 +385,130 @@ float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength = Max
 float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
-int inx = GetSpecialID(minHit.obj);
-if(true)
-{
-if(useMSDFShadow)
-{
-//@@@SDFBakerMgr FullLightInfo
-int lightType[1];
-lightType[0] = 0;
-float3 lightPos[1];
-lightPos[0] = float3(0, 3, 0);
-float3 lightDirs[1];
-lightDirs[0] = float3(0.4255954, -0.7770073, -0.4638191);
-int shadowType[1];
-shadowType[0] =0;
-float lightspace = 1;
-//@@@
-
-//float tt = lightspace;
-//for(int i1=0;i1<lightspace;i1++)
+//int inx = GetSpecialID(minHit.obj);
+//if(true)
 //{
-//	if(lightType[i1]<0)
-//	{
-//		tt-=1;
-//	}
+//if(useMSDFShadow)
+//{
+////@@@SDFBakerMgr FullLightInfo
+//const static int lightType[5] = {1, 1, 1, 1, 0};
+//const static float3 lightColor[5] = {float3(0, 0.3806472, 5), float3(1, 0, 0), float3(0.4041135, 5, 0), float3(5, 0, 3.903966), float3(1, 1, 1)};
+//const static float3 lightPos[5] = {float3(-4.2, 1, -7.66), float3(0.42, 2.4, -15.048), float3(1.66, 1, -7.66), float3(6.45, 1, -7.66), float3(0, 3, 0)};
+//static float3 lightDir[5];
+//lightDir[0] = normalize(minHit.P - float3(-4.2, 1, -7.66));
+//lightDir[1] = normalize(minHit.P - float3(0.42, 2.4, -15.048));
+//lightDir[2] = normalize(minHit.P - float3(1.66, 1, -7.66));
+//lightDir[3] = normalize(minHit.P - float3(6.45, 1, -7.66));
+//lightDir[4] = float3(0.4255954, -0.7770073, -0.4638191);
+//const static int shadowType[5] = {0, 0, 0, 0, 0};
+//const static float lightspace = 5;
+////@@@
+//
+////float tt = lightspace;
+////for(int i1=0;i1<lightspace;i1++)
+////{
+////	if(lightType[i1]<0)
+////	{
+////		tt-=1;
+////	}
+////}
+////lightspace = tt;
+//
+//
+//float maxLength = MaxSDF;
+//float tsha = 1;
+//
+////int i = frameID % (int)lightspace;
+//int i = lightspace * rand01(float3(seed.xy,gFrameID));
+//if(lightType[i]==0)
+//{
+// maxLength = MaxSDF;
 //}
-//lightspace = tt;
-
-
-float maxLength = MaxSDF;
-float tsha = 1;
-
-//int i = frameID % (int)lightspace;
-int i = lightspace * rand01(float3(seed.xy,gFrameID));
-if(lightType[i]==0)
-{
-maxLength = MaxSDF;
-}
-if(lightType[i]==1)
-{
-maxLength = length(minHit.P - lightPos[i]);
-}
-if(lightType[i]<0)
-{
-tsha = 1;
-}
-else
-{
-if(shadowType[i]==0)
-{
-tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
-}
-if(shadowType[i]==1)
-{
-tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
-}
-}
-float n = frameID;
-sha = n / (n + 1)*LastShadow[seed.xy] + 1 / (n + 1)*tsha;
-}
-else
-{
-//@@@SDFBakerMgr DirShadow
-int lightType[1];
-lightType[0] = 0;
-float3 lightPos[1];
-lightPos[0] = float3(0, 3, 0);
-float3 lightDirs[1];
-lightDirs[0] = float3(0.4255954, -0.7770073, -0.4638191);
-int shadowType[1];
-shadowType[0] =0;
-float lightspace = 1;
-float maxLength = MaxSDF;
-float tsha = 1;
-for (int i = 0; i < 1; i++)
-{
-float maxLength = MaxSDF;
-if(lightType[i]==0)
-{
-maxLength = MaxSDF;
-}
-if(lightType[i]==1)
-{
-maxLength = length(minHit.P - lightPos[i]);
-}
-if(lightType[i]<0)
-{
-tsha = 1;
-}
-else
-{
-if(shadowType[i]==0)
-{
-tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
-}
-if(shadowType[i]==1)
-{
-tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
-}
-}
-lightspace -= (1 - tsha);
-}
-lightspace /= 1;
-sha = lightspace;
-//@@@
-}
-}
+//if(lightType[i]==1)
+//{
+// maxLength = length(minHit.P - lightPos[i]);
+//}
+//if(lightType[i]<0)
+//{
+// tsha = 1;
+//}
+//else
+//{
+// if(shadowType[i]==0)
+// {
+// tsha = GetDirHardShadow(lightDir[i], minHit, maxLength);
+// }
+// if(shadowType[i]==1)
+// {
+// tsha = GetDirSoftShadow(lightDir[i], minHit, maxLength);
+// }
+//}
+//float n = frameID;
+//sha = n / (n + 1)*LastShadow[seed.xy] + 1 / (n + 1)*tsha;
+//}
+//else
+//{
+////@@@SDFBakerMgr DirShadow
+//int lightType[5];
+//lightType[0] = 1;
+//lightType[1] = 1;
+//lightType[2] = 1;
+//lightType[3] = 1;
+//lightType[4] = 0;
+//float3 lightPos[5];
+//lightPos[0] = float3(-4.2, 1, -7.66);
+//lightPos[1] = float3(0.42, 2.4, -15.048);
+//lightPos[2] = float3(1.66, 1, -7.66);
+//lightPos[3] = float3(6.45, 1, -7.66);
+//lightPos[4] = float3(0, 3, 0);
+//float3 lightDirs[5];
+//lightDirs[0] = normalize(minHit.P - float3(-4.2, 1, -7.66));
+//lightDirs[1] = normalize(minHit.P - float3(0.42, 2.4, -15.048));
+//lightDirs[2] = normalize(minHit.P - float3(1.66, 1, -7.66));
+//lightDirs[3] = normalize(minHit.P - float3(6.45, 1, -7.66));
+//lightDirs[4] = float3(0.4255954, -0.7770073, -0.4638191);
+//int shadowType[5];
+//shadowType[0] =0;
+//shadowType[1] =0;
+//shadowType[2] =0;
+//shadowType[3] =0;
+//shadowType[4] =0;
+//float lightspace = 5;
+//float maxLength = MaxSDF;
+//float tsha = 1;
+//for (int i = 0; i < 5; i++)
+//{
+// float maxLength = MaxSDF;
+// if(lightType[i]==0)
+// {
+// maxLength = MaxSDF;
+// }
+// if(lightType[i]==1)
+// {
+// maxLength = length(minHit.P - lightPos[i]);
+// }
+// if(lightType[i]<0)
+// {
+// tsha = 1;
+// }
+// else
+// {
+// if(shadowType[i]==0)
+// {
+// tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
+// }
+// if(shadowType[i]==1)
+// {
+// tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
+// }
+// }
+// lightspace -= (1 - tsha);
+//}
+//lightspace /= 5;
+//sha = lightspace;
+////@@@
+//}
+//}
 return sha;
 }
 

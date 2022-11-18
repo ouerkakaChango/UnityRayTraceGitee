@@ -284,22 +284,9 @@ public class SDFBakerMgr : MonoBehaviour
 
     void EndBakeFullLightInfo()
     {
-        //int lightType[5];
-        //....
-        //float3 lightPos[5];
-        //lightPos[0] = float3(-0.07, 8.15, 3.42);
-        //lightPos[1] = float3(0, 3.12, -0.91);
-        //lightPos[2] = float3(0.04, 8.15, -3.29);
-        //lightPos[3] = float3(3.357384, 8.15, 0);
-        //lightPos[4] = float3(-3.83, 8.15, 0);
-        //float3 lightDirs[5];
-        //lightDirs[0] = normalize(minHit.P - lightPos[0]);
-        //lightDirs[1] = normalize(minHit.P - lightPos[1]);
-        //lightDirs[2] = normalize(minHit.P - lightPos[2]);));
-        //lightDirs[3] = normalize(minHit.P - lightPos[3]);));
-        //lightDirs[4] = normalize(minHit.P - lightPos[4]);
         int n = dirLightTags.Length;
-        bakedFullLightInfo.Add("int lightType[" + n + "];");
+        string str = "const static int lightType[" + n + "] = {";
+        
         int type = -999;
         for (int i = 0; i < n; i++)
         {
@@ -319,45 +306,80 @@ public class SDFBakerMgr : MonoBehaviour
             {
                 type = -type - 1;
             }
-            bakedFullLightInfo.Add("lightType[" + i + "] = " + type + ";");
+            str += type + (i==n-1 ? "":", ");
         }
+        str += "};";
+        bakedFullLightInfo.Add(str);
 
-        bakedFullLightInfo.Add("float3 lightPos[" + n + "];");
+        str = "const static float3 lightColor[" + n + "] = {";
+        for (int i = 0; i < n; i++)
+        {
+            Vector3 lc = GetLightColor(dirLightTags[i].gameObject);
+            str += Bake(lc) + (i == n - 1 ? "" : ", ");
+        }
+        str += "};";
+        bakedFullLightInfo.Add(str);
+
+        str = "const static float3 lightPos[" + n + "] = {";
         for (int i = 0; i < n; i++)
         {
             Vector3 lp = dirLightTags[i].gameObject.transform.position;
-            bakedFullLightInfo.Add("lightPos[" + i + "] = " + Bake(lp) + ";");
+            str += Bake(lp) + (i == n - 1 ? "" : ", ");
         }
+        str += "};";
+        bakedFullLightInfo.Add(str);
 
-        bakedFullLightInfo.Add("float3 lightDirs[" + n + "];");
+        //bakedFullLightInfo.Add("static float3 lightDir[" + n + "];");
+        //for (int i = 0; i < n; i++)
+        //{
+        //    Vector3 lightDir = Vector3.zero;
+        //    if (IsDirectionalLight(dirLightTags[i].gameObject))
+        //    {
+        //        lightDir = GetLightDir(dirLightTags[i].gameObject);
+        //        bakedFullLightInfo.Add("lightDir[" + i + "] = " + Bake(lightDir) + ";");
+        //    }
+        //    else if (IsPointLight(dirLightTags[i].gameObject))
+        //    {
+        //        Vector3 lightPos = dirLightTags[i].gameObject.transform.position;
+        //        bakedFullLightInfo.Add("lightDir[" + i + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
+        //    }
+        //    else
+        //    {
+        //        Debug.LogError("No support type");
+        //    }
+        //}
+
+        str = "const static float3 lightDirs[" + n + "] = {";
         for (int i = 0; i < n; i++)
         {
             Vector3 lightDir = Vector3.zero;
             if (IsDirectionalLight(dirLightTags[i].gameObject))
             {
                 lightDir = GetLightDir(dirLightTags[i].gameObject);
-                bakedFullLightInfo.Add("lightDirs[" + i + "] = " + Bake(lightDir) + ";");
+                str += Bake(lightDir);
             }
             else if (IsPointLight(dirLightTags[i].gameObject))
             {
-                Vector3 lightPos = dirLightTags[i].gameObject.transform.position;
-                bakedFullLightInfo.Add("lightDirs[" + i + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
+                str += Bake(Vector3.zero);
             }
             else
             {
                 Debug.LogError("No support type");
             }
+            str += (i == n - 1 ? "" : ", "); 
         }
+        str += "};";
+        bakedFullLightInfo.Add(str);
 
-        //int shadowType[5];
-        //....
-        bakedFullLightInfo.Add("int shadowType[" + n + "];");
+        str = "const static int shadowType[" + n + "] = {";
         for (int i = 0; i < n; i++)
         {
-            bakedFullLightInfo.Add("shadowType[" + i + "] =" + (int)dirLightTags[i].shadowType + ";");
+            str += (int)dirLightTags[i].shadowType + (i == n - 1 ? "" : ", ");
         }
+        str += "};";
+        bakedFullLightInfo.Add(str);
 
-        bakedFullLightInfo.Add("float lightspace = " + n + ";");
+        bakedFullLightInfo.Add("const static float lightspace = " + n + ";");
     }
 
     //??? Deprecated

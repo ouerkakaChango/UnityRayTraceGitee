@@ -178,29 +178,28 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 	float3 result = 0;
 if(mode == 0)
 {
-	int lightType[2];
-	float3 lightPos[2];
-	float3 lightDir[2];
-	float3 lightColor[2];
-	int shadowType[2];
-	
-	lightType[0] = 0;
-	lightPos[0] = 0;
-	lightDir[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-	lightColor[0] = 1;
-	shadowType[0] = 0;
-
-	lightType[1] = 1;
-	lightPos[1] = float3(-1, 2, 1.5);
-	lightDir[1] = normalize(minHit.P - lightPos[1]);
-	lightColor[1] = float3(1,0,0);
-	shadowType[1] = 0;
+	//@@@SDFBakerMgr FullLightInfo
+int lightType[2];
+lightType[0] = 0;
+lightType[1] = 1;
+float3 lightColor[2];
+lightColor[0] = float3(1, 1, 1);
+lightColor[1] = float3(1, 0.004716992, 0.004716992);
+float3 lightPos[2];
+lightPos[0] = float3(0, 3, 0);
+lightPos[1] = float3(-1, 2, 1.5);
+float3 lightDir[2];
+lightDir[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+lightDir[1] = normalize(minHit.P - float3(-1, 2, 1.5));
+int shadowType[2];
+shadowType[0] =0;
+shadowType[1] =0;
+float lightspace = 2;
+	//@@@
 
 	result.rgb = 0.03 * mat.albedo * mat.ao;
 
-	//$$$
 	//lig
-	int lightspace = 2;
 	int i = lightspace * mrand01(float3(seed.xy,gFrameID));
 
 	float atten = 1;
@@ -230,7 +229,6 @@ sha = GetDirSoftShadow(lightDir[i], minHit, maxShadowTraceLength);
 	//blend
 	float n = frameID;
 	result = n / (n + 1)*LastLig[seed.xy] + 1 / (n + 1)*newLig;
-	//result = newLig;
 }
 else if (mode == 1)
 {
