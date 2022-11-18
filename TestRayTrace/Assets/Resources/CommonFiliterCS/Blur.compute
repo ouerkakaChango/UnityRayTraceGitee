@@ -8,12 +8,14 @@
 RWTexture2D<float4> Result;
 Texture2D<float4> TexA4;
 
+float filterSize;
+float resultScale;
 //https://lettier.github.io/3d-game-shaders-for-beginners/blur.html#box-blur
 [numthreads(8, 8, 1)]
 void BoxBlur(uint3 id : SV_DispatchThreadID)
 {
 	float step = 1.0f;
-	float size = 1;
+	float size = filterSize;
 	float3 sum = 0;
 	for (int j = -size; j <= size; j++)
 	{
@@ -22,15 +24,15 @@ void BoxBlur(uint3 id : SV_DispatchThreadID)
 			sum += TexA4[id.xy + float2(i, j)*step].rgb;
 		}
 	}
-	sum /= (size * 2 + 1);
-	Result[id.xy] = float4(sum, 1);
+	sum /= (size * 2 + 1)*(size * 2 + 1);
+	Result[id.xy] = float4(resultScale * sum, 1);
 }
 
 [numthreads(8, 8, 1)]
 void MedianFiliter(uint3 id : SV_DispatchThreadID)
 {
 	float step = 1.0f;
-	float size = 1;
+	float size = filterSize;
 	float3 sum = 0;
 	float record[9];
 	int inx[9] = {0,1,2,3,4,5,6,7,8};
@@ -48,7 +50,7 @@ void MedianFiliter(uint3 id : SV_DispatchThreadID)
 
 	for (int i = 0; i < 9; i++)
 	{
-		for (int j = i+1; j < 9; j++)
+		for (int j = 0; j < 9; j++)
 		{
 			if (record[j] < record[i])
 			{

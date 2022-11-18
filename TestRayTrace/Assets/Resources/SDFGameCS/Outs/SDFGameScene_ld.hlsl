@@ -55,6 +55,15 @@ float fastSign(float3 p, float scale = 0.5)
 	return hash_uint3(abs(p)).x >0.5?-1:1;
 }
 
+float mrand01(float3 seed)
+{
+	seed = abs(seed);
+	//uint stat = (uint)(seed.x) * 1973 + (uint)(seed.y) * 9277 + (uint)(seed.z) * 2699 | 1;
+	uint stat = (uint)(seed.x) * 197 + (uint)(seed.y) * 927 + (uint)(seed.z) * 269;
+
+	return random_float_01(stat);
+}
+
 int GetSpecialID(int inx);
 
 Material_PBR GetObjMaterial_PBR(int obj)
@@ -152,14 +161,6 @@ int inx = minHit.obj;
 //@@@
 
 inx = GetSpecialID(inx);
-if(inx == -1)
-{
-	float3 grid = float3(1,1,0.75);
-	float3 id;
-	float3 p0 = GetCellCenterWithID_MidMode(minHit.P,grid,id);
-	mat.roughness = rand01(0.3*id);
-	mat.albedo *= rand01(0.2*id.zxy);
-}
 }
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
@@ -200,7 +201,7 @@ if(mode == 0)
 	//$$$
 	//lig
 	int lightspace = 2;
-	int i = lightspace * rand01(float3(seed.xy,gFrameID));
+	int i = lightspace * mrand01(float3(seed.xy,gFrameID));
 
 	float atten = 1;
 	if(lightType[i]==1)
@@ -229,6 +230,7 @@ sha = GetDirSoftShadow(lightDir[i], minHit, maxShadowTraceLength);
 	//blend
 	float n = frameID;
 	result = n / (n + 1)*LastLig[seed.xy] + 1 / (n + 1)*newLig;
+	//result = newLig;
 }
 else if (mode == 1)
 {
@@ -308,120 +310,6 @@ float GetDirSoftShadow(float3 lightDir, in HitInfo minHit, float maxLength)
 float RenderSceneSDFShadow(HitInfo minHit)
 {
 	float sha = 1;
-int inx = GetSpecialID(minHit.obj);
-if(true)
-{
-if(useMSDFShadow)
-{
-//@@@SDFBakerMgr FullLightInfo
-int lightType[2];
-lightType[0] = 0;
-lightType[1] = 1;
-float3 lightPos[2];
-lightPos[0] = float3(0, 3, 0);
-lightPos[1] = float3(-1, 2, 1.5);
-float3 lightDirs[2];
-lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-lightDirs[1] = normalize(minHit.P - float3(-1, 2, 1.5));
-int shadowType[2];
-shadowType[0] =0;
-shadowType[1] =0;
-float lightspace = 2;
-//@@@
-
-//float tt = lightspace;
-//for(int i1=0;i1<lightspace;i1++)
-//{
-//	if(lightType[i1]<0)
-//	{
-//		tt-=1;
-//	}
-//}
-//lightspace = tt;
-
-
-float maxLength = MaxSDF;
-float tsha = 1;
-
-//int i = frameID % (int)lightspace;
-int i = lightspace * rand01(float3(seed.xy,gFrameID));
-if(lightType[i]==0)
-{
-maxLength = MaxSDF;
-}
-if(lightType[i]==1)
-{
-maxLength = length(minHit.P - lightPos[i]);
-}
-if(lightType[i]<0)
-{
-tsha = 1;
-}
-else
-{
-if(shadowType[i]==0)
-{
-tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
-}
-if(shadowType[i]==1)
-{
-tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
-}
-}
-float n = frameID;
-sha = n / (n + 1)*LastShadow[seed.xy] + 1 / (n + 1)*tsha;
-}
-else
-{
-//@@@SDFBakerMgr DirShadow
-int lightType[2];
-lightType[0] = 0;
-lightType[1] = 1;
-float3 lightPos[2];
-lightPos[0] = float3(0, 3, 0);
-lightPos[1] = float3(-1, 2, 1.5);
-float3 lightDirs[2];
-lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-lightDirs[1] = normalize(minHit.P - float3(-1, 2, 1.5));
-int shadowType[2];
-shadowType[0] =0;
-shadowType[1] =0;
-float lightspace = 2;
-float maxLength = MaxSDF;
-float tsha = 1;
-for (int i = 0; i < 2; i++)
-{
-float maxLength = MaxSDF;
-if(lightType[i]==0)
-{
-maxLength = MaxSDF;
-}
-if(lightType[i]==1)
-{
-maxLength = length(minHit.P - lightPos[i]);
-}
-if(lightType[i]<0)
-{
-tsha = 1;
-}
-else
-{
-if(shadowType[i]==0)
-{
-tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
-}
-if(shadowType[i]==1)
-{
-tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
-}
-}
-lightspace -= (1 - tsha);
-}
-lightspace /= 2;
-sha = lightspace;
-//@@@
-}
-}
 return sha;
 }
 

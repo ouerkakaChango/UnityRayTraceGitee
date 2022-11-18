@@ -529,6 +529,22 @@ public class SDFGameSceneTrace : MonoBehaviour
 
         if(useLigdow)
         {
+            //int lightSpace = autoCS.bakerMgr.dirLightTags.Length;
+            //if (frameID < lightSpace)
+            //{
+            //    Graphics.Blit(rTex, tempRT);
+            //    //###########
+            //    //### compute
+            //    kInx = cs_Blur.FindKernel("BoxBlur");
+            //    cs_Blur.SetTexture(kInx, "Result", rTex);
+            //    cs_Blur.SetTexture(kInx, "TexA4", tempRT);
+            //    cs_Blur.SetFloat("filterSize", 2.0f);
+            //    cs_Blur.SetFloat("resultScale", 1.0f);
+            //
+            //    cs_Blur.Dispatch(kInx, camParam.w / CoreX, camParam.h / CoreY, 1);
+            //    //### compute
+            //    //###########
+            //}
             Graphics.Blit(rTex, rt_LastLig);
         }
 
