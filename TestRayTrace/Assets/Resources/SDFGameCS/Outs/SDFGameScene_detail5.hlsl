@@ -453,7 +453,7 @@ float3 RenderSceneAdditionalColor(in Ray ray, in HitInfo minHit, in Material_PBR
 	//	float atten = 1;
 	//	if(lightType[i]==1)
 	//	{
-	//		atten = PntlightAtten(minHit.P,lightPos[i]);
+	//		atten = PntLightAtten(minHit.P,lightPos[i]);
 	//	}
 // result.rgb += atten * PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], addLightColors[i]);
 //}
@@ -1033,7 +1033,7 @@ float3 SceneRenderReflect(Ray ray,in HitInfo minHit,in Material_PBR mat)
 	if (reflectHit.bHit)
 	{
 		reflectSourceMat = GetObjMaterial_PBR(reflectHit.obj);
-		float atten = PntlightAtten(minHit.P,reflectHit.P);
+		float atten = PntLightAtten(minHit.P,reflectHit.P);
 		atten = saturate(mat.reflect_ST.x*atten+mat.reflect_ST.y);
 		re = atten * RenderSceneObj(ray, reflectHit, reflectSourceMat);
 	}
@@ -1111,7 +1111,7 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 		indirLightColor = 0;
 	}
 	//___
-	float3 Li = indirLightColor * PntlightAtten(minHit.P,indirHit.P);
+	float3 Li = indirLightColor * PntLightAtten(minHit.P,indirHit.P);
 	re = PBR_GGX(mat, minHit.N, -ray.dir, L, Li);
 	re = max(re,0);
 }

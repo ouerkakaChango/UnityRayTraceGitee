@@ -134,7 +134,7 @@ float3 RenderSceneAdditionalColor(in Ray ray, in HitInfo minHit, in Material_PBR
 	//	float atten = 1;
 	//	if(lightType[i]==1)
 	//	{
-	//		atten = PntlightAtten(minHit.P,lightPos[i]);
+	//		atten = PntLightAtten(minHit.P,lightPos[i]);
 	//	}
     //   result.rgb += atten * PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], addLightColors[i]);
     //}

@@ -266,7 +266,7 @@ public class SDFBakerMgr : MonoBehaviour
                 var lightPos = dirLightTags[i].gameObject.transform.position;
                 lightColor = GetLightColor(dirLightTags[i].gameObject);
                 bakedRenders.Add("  lightDirs[" + i + "] = normalize(minHit.P - "+Bake(lightPos) +");");
-                bakedRenders.Add("  dirLightColors[" + i + "] = " + Bake(lightColor) + " * PntlightAtten(minHit.P, "+Bake(lightPos)+");");
+                bakedRenders.Add("  dirLightColors[" + i + "] = " + Bake(lightColor) + " * PntLightAtten(minHit.P, "+Bake(lightPos)+");");
             }
             else
             {

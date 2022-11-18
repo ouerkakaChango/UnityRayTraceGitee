@@ -1,4 +1,4 @@
-﻿#define OBJNUM 1
+﻿#define OBJNUM 2
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -71,6 +71,14 @@ re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
+else if (obj == 1 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(1, 0);
+}
 //@@@
 	return re;
 }
@@ -78,8 +86,9 @@ re.reflect_ST = float2(1, 0);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[1];
+int renderMode[2];
 renderMode[0] = 0;
+renderMode[1] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -90,6 +99,12 @@ float2 GetObjUV(in HitInfo minHit)
 	int inx = minHit.obj;
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
+{
+uv = BoxedUV(minHit.P, float3(0, -1.08, 0), float3(10, 0.5, 10), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, -1.08, 0), float3(10, 0.5, 10), float3(0, 0, 0));
+return uv;
+}
+else if (inx == 1 )
 {
 uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
@@ -112,6 +127,11 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 	B=0;
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
+{
+BoxedTB(T,B,minHit.P, float3(0, -1.08, 0), float3(10, 0.5, 10), float3(0, 0, 0));
+return;
+}
+if(inx == 1 )
 {
 BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return;
@@ -152,20 +172,39 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 	int mode = GetObjRenderMode(minHit.obj);
 	ObjPreRender(mode, mat, ray, minHit);
 	float3 result = 0;
-//@@@SDFBakerMgr ObjRender
-if(mode==0)
+if(mode == 0)
 {
-float3 lightDirs[1];
-float3 dirLightColors[1];
-lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-dirLightColors[0] = float3(1, 1, 1);
-result.rgb = 0.03 * mat.albedo * mat.ao;
-for(int i=0;i<1;i++)
-{
-result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);
+	int lightType[2];
+	float3 lightPos[2];
+	float3 lightDir[2];
+	float3 lightColor[2];
+	
+	lightType[0] = 0;
+	lightPos[0] = 0;
+	lightDir[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+	lightColor[0] = 1;
+
+	lightType[1] = 1;
+	lightPos[1] = float3(-1, 0.25, 1.5);
+	lightDir[1] = float3(-0.3213938, -0.7660444, 0.5566705);
+	lightColor[1] = float3(1,0,0);
+
+	result.rgb = 0.03 * mat.albedo * mat.ao;
+
+	//$$$
+	int lightspace = 2;
+	int i = lightspace * rand01(float3(seed.xy,gFrameID));
+
+	float atten = 1;
+	if(lightType[i]==1)
+	{
+		atten = PntLightAtten(minHit.P, lightPos[i]);
+	}
+	
+	float3 newLigh = atten * PBR_GGX(mat, minHit.N, -ray.dir, -lightDir[i], lightColor[i]);
+	result = newLigh;
+	//result = n / (n + 1)*LastLig[seed.xy] + 1 / (n + 1)*newLigh;
 }
-}
-//@@@
 else if (mode == 1)
 {
 	result = PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
@@ -250,15 +289,19 @@ if(true)
 if(useMSDFShadow)
 {
 //@@@SDFBakerMgr FullLightInfo
-int lightType[1];
+int lightType[2];
 lightType[0] = 0;
-float3 lightPos[1];
+lightType[1] = 1;
+float3 lightPos[2];
 lightPos[0] = float3(0, 3, 0);
-float3 lightDirs[1];
+lightPos[1] = float3(-1, 0.25, 1.5);
+float3 lightDirs[2];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-int shadowType[1];
+lightDirs[1] = normalize(minHit.P - float3(-1, 0.25, 1.5));
+int shadowType[2];
 shadowType[0] =0;
-float lightspace = 1;
+shadowType[1] =0;
+float lightspace = 2;
 //@@@
 
 //float tt = lightspace;
@@ -306,18 +349,22 @@ sha = n / (n + 1)*LastShadow[seed.xy] + 1 / (n + 1)*tsha;
 else
 {
 //@@@SDFBakerMgr DirShadow
-int lightType[1];
+int lightType[2];
 lightType[0] = 0;
-float3 lightPos[1];
+lightType[1] = 1;
+float3 lightPos[2];
 lightPos[0] = float3(0, 3, 0);
-float3 lightDirs[1];
+lightPos[1] = float3(-1, 0.25, 1.5);
+float3 lightDirs[2];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-int shadowType[1];
+lightDirs[1] = normalize(minHit.P - float3(-1, 0.25, 1.5));
+int shadowType[2];
 shadowType[0] =0;
-float lightspace = 1;
+shadowType[1] =0;
+float lightspace = 2;
 float maxLength = MaxSDF;
 float tsha = 1;
-for (int i = 0; i < 1; i++)
+for (int i = 0; i < 2; i++)
 {
 float maxLength = MaxSDF;
 if(lightType[i]==0)
@@ -345,7 +392,7 @@ tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
 }
 lightspace -= (1 - tsha);
 }
-lightspace /= 1;
+lightspace /= 2;
 sha = lightspace;
 //@@@
 }
@@ -373,7 +420,7 @@ float3 RenderSceneAdditionalColor(in Ray ray, in HitInfo minHit, in Material_PBR
 	//	float atten = 1;
 	//	if(lightType[i]==1)
 	//	{
-	//		atten = PntlightAtten(minHit.P,lightPos[i]);
+	//		atten = PntLightAtten(minHit.P,lightPos[i]);
 	//	}
 // result.rgb += atten * PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], addLightColors[i]);
 //}
@@ -407,6 +454,10 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
+{
+re = min(re, 0 + SDFBox(p, float3(0, -1.08, 0), float3(10, 0.5, 10), float3(0, 0, 0)));
+}
+else if (inx == 1 )
 {
 re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
@@ -930,7 +981,7 @@ float3 SceneRenderReflect(Ray ray,in HitInfo minHit,in Material_PBR mat)
 	if (reflectHit.bHit)
 	{
 		reflectSourceMat = GetObjMaterial_PBR(reflectHit.obj);
-		float atten = PntlightAtten(minHit.P,reflectHit.P);
+		float atten = PntLightAtten(minHit.P,reflectHit.P);
 		atten = saturate(mat.reflect_ST.x*atten+mat.reflect_ST.y);
 		re = atten * RenderSceneObj(ray, reflectHit, reflectSourceMat);
 	}
@@ -1008,20 +1059,23 @@ void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit
 		indirLightColor = 0;
 	}
 	//___
-	float3 Li = indirLightColor * PntlightAtten(minHit.P,indirHit.P);
+	float3 Li = indirLightColor * PntLightAtten(minHit.P,indirHit.P);
 	re = PBR_GGX(mat, minHit.N, -ray.dir, L, Li);
 	re = max(re,0);
 }
 
 void SetIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit, Material_PBR mat)
 {
-	SetCheapIndirectColor(re, seed, ray, minHit, mat);
+	//SetCheapIndirectColor(re, seed, ray, minHit, mat);
 }
 
 int GetSpecialID(int inx)
 {
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
+{
+}
+else if (inx == 1 )
 {
 }
 //@@@
