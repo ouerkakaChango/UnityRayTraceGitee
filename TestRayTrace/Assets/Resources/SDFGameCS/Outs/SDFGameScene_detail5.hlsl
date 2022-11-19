@@ -3,8 +3,8 @@
 #define MaxSDF 100000
 #define MaxTraceDis 100
 #define MaxTraceTime 6400
-#define TraceThre 0.01
-#define NormalEpsilon 0.01
+#define TraceThre 0.001
+#define NormalEpsilon 0.001
 
 #define HardShadowExpensive true
 
@@ -243,8 +243,23 @@ void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, 
 if(minHit.obj == 1)
 {
 float3 p = minHit.P;
+	//blur too expensive,and has alias problem
+	//float sum = 0;
+	//float off = 0.1;
+	//for(int k=-1;k<=1;k++)
+	//{
+	//for(int j=-1;j<=1;j++)
+	//{
+	//for(int i=-1;i<=1;i++)
+	//{
+	//	float w = 1/9.0;
+	//	sum+=w*testSDFEmissive(p+off*float3(i,j,k));
+	//}
+	//}
+	//}
 float s = 0.01*testSDFEmissive(p);
-
+s = max(s,0);
+//float s = 0.01*sum;
 float f1 = clamp(1.-pow(s,0.5),0.,1.);//pow(s+2.,-2.);
 f1 = pow(f1,20.);
 float f = f1;
