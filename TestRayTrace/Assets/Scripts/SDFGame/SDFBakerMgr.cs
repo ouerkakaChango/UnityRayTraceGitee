@@ -59,11 +59,6 @@ public class SDFBakerMgr : MonoBehaviour
     {
         //Debug.Log("BakerMgr Bake");
         PrepareBake();
-        StartBake();
-        for (int i = 0; i < tags.Length; i++)
-        {
-            tags[i].objInx = i;
-        }
         for (int i=0;i<tags.Length;i++)
         {
             var tag = tags[i];
@@ -174,6 +169,18 @@ public class SDFBakerMgr : MonoBehaviour
         {
             Debug.LogError("No light has add SDF Light Tag,Stop");
         }
+
+        for (int i = 0; i < tags.Length; i++)
+        {
+            tags[i].objInx = i;
+        }
+
+        for(int i=0;i<dirLightTags.Length;i++)
+        {
+            dirLightTags[i].lightInx = i;
+        }
+
+        ClearMemory();
     }
 
     public void ClearMemory()
@@ -198,11 +205,6 @@ public class SDFBakerMgr : MonoBehaviour
         bakedCheckInnerBound.Clear();
 
         bakedObjEnvTex.Clear();
-    }
-
-    void StartBake()
-    {
-        ClearMemory();
     }
 
     void EndBake()
