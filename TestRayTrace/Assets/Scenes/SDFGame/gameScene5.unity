@@ -170,6 +170,7 @@ MonoBehaviour:
   bakeShadow: 1
   shadowType: 0
   lightPass: 0
+  lightInx: 0
 --- !u!108 &66970282
 Light:
   m_ObjectHideFlags: 0
@@ -420,7 +421,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &336815346
@@ -549,7 +550,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 2
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &520542744
@@ -603,7 +604,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 3
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &520542746
@@ -791,6 +792,7 @@ MonoBehaviour:
   bakeShadow: 1
   shadowType: 0
   lightPass: 0
+  lightInx: 1
 --- !u!1 &585464653
 GameObject:
   m_ObjectHideFlags: 0
@@ -851,7 +853,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 4
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &687769464
@@ -901,6 +903,7 @@ MonoBehaviour:
   bakeShadow: 1
   shadowType: 0
   lightPass: 0
+  lightInx: 2
 --- !u!108 &687769467
 Light:
   m_ObjectHideFlags: 0
@@ -1329,6 +1332,7 @@ MonoBehaviour:
   bakeShadow: 1
   shadowType: 0
   lightPass: 0
+  lightInx: 3
 --- !u!108 &1110577414
 Light:
   m_ObjectHideFlags: 0
@@ -1472,8 +1476,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1171519927}
-  m_LocalRotation: {x: -0.087317444, y: 0.87143606, z: -0.16890083, w: -0.45215863}
-  m_LocalPosition: {x: 15.9831705, y: -1.127068, z: 13.976832}
+  m_LocalRotation: {x: -0.045442745, y: 0.77765405, z: -0.056794506, w: -0.6244706}
+  m_LocalPosition: {x: 15.016057, y: -3.536988, z: 12.013992}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1627,19 +1631,19 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 1464217460}
   - {fileID: 276605038}
   - {fileID: 336815351}
   - {fileID: 520542745}
   - {fileID: 585464655}
+  - {fileID: 1464217460}
   - {fileID: 1755708949}
   - {fileID: 2097505601}
   dirLightTags:
-  - {fileID: 1464217459}
   - {fileID: 66970281}
   - {fileID: 579246072}
   - {fileID: 687769466}
   - {fileID: 1110577413}
+  - {fileID: 1464217459}
   - {fileID: 2099006230}
 --- !u!4 &1427000038
 Transform:
@@ -1797,6 +1801,7 @@ MonoBehaviour:
   bakeShadow: 1
   shadowType: 0
   lightPass: 0
+  lightInx: 4
 --- !u!114 &1464217460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1827,7 +1832,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 0
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &1710808183
@@ -2431,3 +2436,4 @@ MonoBehaviour:
   bakeShadow: 1
   shadowType: 0
   lightPass: 0
+  lightInx: 5

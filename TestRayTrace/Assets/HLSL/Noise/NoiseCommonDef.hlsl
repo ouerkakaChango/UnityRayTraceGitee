@@ -90,9 +90,9 @@ float voronoiNoiseFromTex(float2 uv)
 }
 
 //https://www.shadertoy.com/view/NldfRl
-void SmoothWithDither(inout float3 color, in float2 uv)
+void SmoothWithDither(inout float3 color, in float2 uv, float scale = 1.0)
 {
 	int2 fragCoord = uv * 1024;//blueNoise is 1024*1024
-	color += blueNoise.Load(int3(fragCoord & 1023, 0)).rgb * (1.0 / 256.0);//For our mornitor only support 32bit 
+	color += blueNoise.Load(int3(fragCoord & 1023, 0)).rgb * (scale / 256.0);//For our mornitor only support 32bit 
 }
 #endif

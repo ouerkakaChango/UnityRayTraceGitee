@@ -90,8 +90,8 @@ re.reflect_ST = float2(1, 0);
 else if (obj == 1 )
 {
 re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
+re.metallic = 0.4;
+re.roughness = 0.9;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
@@ -106,8 +106,8 @@ re.reflect_ST = float2(1, 0);
 else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
-re.metallic = 0.4;
-re.roughness = 0.9;
+re.metallic = 0;
+re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
@@ -161,27 +161,27 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(10.5, -4, 10), float3(0.5, 1.5, 1.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(10.5, -4, 10), float3(0.5, 1.5, 1.5), float3(0, 0, 0));
-return uv;
 }
 else if (inx == 1 )
 {
+uv = BoxedUV(minHit.P, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 2 )
 {
-uv = BoxedUV(minHit.P, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 3 )
 {
-uv = BoxedUV(minHit.P, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0));
-return uv;
 }
 else if (inx == 4 )
 {
+uv = BoxedUV(minHit.P, float3(10.5, -4, 10), float3(0.5, 1.5, 1.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(10.5, -4, 10), float3(0.5, 1.5, 1.5), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 5 )
 {
@@ -207,24 +207,24 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(10.5, -4, 10), float3(0.5, 1.5, 1.5), float3(0, 0, 0));
-return;
 }
 if(inx == 1 )
-{
-}
-if(inx == 2 )
 {
 BoxedTB(T,B,minHit.P, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0));
 return;
 }
-if(inx == 3 )
+if(inx == 2 )
 {
 BoxedTB(T,B,minHit.P, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0));
 return;
 }
+if(inx == 3 )
+{
+}
 if(inx == 4 )
 {
+BoxedTB(T,B,minHit.P, float3(10.5, -4, 10), float3(0.5, 1.5, 1.5), float3(0, 0, 0));
+return;
 }
 if(inx == 5 )
 {
@@ -260,15 +260,14 @@ if(inx == -1)
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
-//if(minHit.obj == 1)
+//if(minHit.obj == 1 || minHit.obj == 4)
 //{
-//	float3 p = minHit.P;
-//	float s = 0.01*testSDFEmissive(p);
-//	s = max(s,0);
+//	float s = 0.01*testSDFEmissive(minHit.P);
+//	s = max(s,0.001);
 //	float f = clamp(1.-pow(s,0.5),0.,1.);
-//	f = pow(f1,20.);
-//	float3 em = f*float3(1,0,0.5);
-//	result += em;
+//	f = pow(f,20.);
+//	f = smoothstep(0,1,f);
+//	result+= f*float3(1,0,0.5);
 //}
 
 float2 suv = seed.xy/float2(w,h);
@@ -300,9 +299,9 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 if(mode == 0)
 {
 //@@@SDFBakerMgr FullLightInfo
-const static int lightType[6] = {2, 1, 1, 1, 1, 0};
-const static float3 lightColor[6] = {float3(1, 0, 0.5), float3(0, 0.3806472, 5), float3(1, 0, 0), float3(0.4041135, 5, 0), float3(5, 0, 3.903966), float3(1, 1, 1)};
-const static float3 lightPos[6] = {float3(10.5, -4, 10), float3(-4.2, 1, -7.66), float3(0.42, 2.4, -15.048), float3(1.66, 1, -7.66), float3(6.45, 1, -7.66), float3(0, 3, 0)};
+const static int lightType[6] = {1, 1, 1, 1, 2, 0};
+const static float3 lightColor[6] = {float3(0, 0.3806472, 5), float3(1, 0, 0), float3(0.4041135, 5, 0), float3(5, 0, 3.903966), float3(1, 0, 0.5), float3(1, 1, 1)};
+const static float3 lightPos[6] = {float3(-4.2, 1, -7.66), float3(0.42, 2.4, -15.048), float3(1.66, 1, -7.66), float3(6.45, 1, -7.66), float3(10.5, -4, 10), float3(0, 3, 0)};
 const static float3 lightDirs[6] = {float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0.4255954, -0.7770073, -0.4638191)};
 const static int shadowType[6] = {0, 0, 0, 0, 0, 0};
 const static float lightspace = 6;
@@ -332,10 +331,10 @@ const static float lightspace = 6;
 	}
 	else if(lightType[i] == 2)
 	{
-		if(minHit.obj == 2 || minHit.obj == 0)
+		if(minHit.obj == 1 || minHit.obj == 4)
 		{
 			float s = 0.01*testSDFEmissive(minHit.P);
-			s = max(s,0);
+			s = max(s,0.001);
 			float f = clamp(1.-pow(s,0.5),0.,1.);
 			f = pow(f,20.);
 			newLig = f*lightColor[i];
@@ -366,10 +365,14 @@ const static float lightspace = 6;
 		}
 	}
 	newLig *= sha;
-
+	{
+	static float2 suv = seed.xy/float2(w,h);
+	SmoothWithDither(newLig, suv);
+	}
 	//blend
 	float n = frameID;
 	result = n / (n + 1)*LastLig[seed.xy].rgb + 1 / (n + 1)*newLig;
+
 }
 else if (mode == 1)
 {
@@ -632,27 +635,27 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(10.5, -4, 10), float3(0.5, 1.5, 1.5), float3(0, 0, 0)));
-re = max(re, -SDFBox(p, float3(10.5, -4, 10), float3(1, 0.5, 0.5), float3(0, 0, 0)));
-}
-else if (inx == 1 )
-{
 inx = -3;
 }
-else if (inx == 2 )
+else if (inx == 1 )
 {
 re = min(re, 0 + SDFBox(p, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0)));
 re = max(re, -SDFBox(p, float3(0, -3.06, -15.47), float3(2, 3.946151, 2), float3(0, 0, 0)));
 }
-else if (inx == 3 )
+else if (inx == 2 )
 {
 re = min(re, 0 + SDFBox(p, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0)));
 re = max(re, -SDFBox(p, float3(0, 2.02, -13.92), float3(2, 2, 2), float3(0, 0, 0)));
 re = max(re, -SDFBox(p, float3(0, -3.06, -15.47), float3(2, 3.946151, 2), float3(0, 0, 0)));
 }
-else if (inx == 4 )
+else if (inx == 3 )
 {
 inx = -4;
+}
+else if (inx == 4 )
+{
+re = min(re, 0 + SDFBox(p, float3(10.5, -4, 10), float3(0.5, 1.5, 1.5), float3(0, 0, 0)));
+re = max(re, -SDFBox(p, float3(10.5, -4, 10), float3(1, 0.5, 0.5), float3(0, 0, 0)));
 }
 else if (inx == 5 )
 {
@@ -1275,20 +1278,20 @@ int GetSpecialID(int inx)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -3;
 }
 else if (inx == 1 )
 {
-inx = -3;
 }
 else if (inx == 2 )
 {
 }
 else if (inx == 3 )
 {
+inx = -4;
 }
 else if (inx == 4 )
 {
-inx = -4;
 }
 else if (inx == 5 )
 {
