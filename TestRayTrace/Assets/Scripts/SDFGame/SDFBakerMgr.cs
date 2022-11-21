@@ -158,14 +158,15 @@ public class SDFBakerMgr : MonoBehaviour
             {
                 continue;
             }
-            if(IsDirectionalLight(allLightTags[i].gameObject)||
-                IsPointLight(allLightTags[i].gameObject))
+            //if(IsDirectionalLight(allLightTags[i].gameObject)||
+            //    IsPointLight(allLightTags[i].gameObject))
+            //{
+            //    dirLightList.Add(allLightTags[i]);
+            //}
+            //else
             {
+                //Debug.LogError("this light type not support: " + allLightTags[i].gameObject);
                 dirLightList.Add(allLightTags[i]);
-            }
-            else
-            {
-                Debug.LogError("this light type not support: " + allLightTags[i].gameObject);
             }
         }
         dirLightTags = dirLightList.ToArray();
@@ -270,7 +271,8 @@ public class SDFBakerMgr : MonoBehaviour
             }
             else
             {
-                Debug.LogError("No support type");
+                //Debug.LogError("No support type");
+                Debug.Log("Warning: emissiveLight for default render not handled!");
             }
         }
         //###
@@ -300,10 +302,12 @@ public class SDFBakerMgr : MonoBehaviour
             }
             else
             {
-                Debug.LogError("light type not handle");
+                //Debug.LogError("light type not handle");
+                type = 2; //emissive
             }
             if (!dirLightTags[i].bakeShadow)
             {
+                //!!!
                 type = -type - 1;
             }
             str += type + (i==n-1 ? "":", ");
@@ -356,16 +360,16 @@ public class SDFBakerMgr : MonoBehaviour
             if (IsDirectionalLight(dirLightTags[i].gameObject))
             {
                 lightDir = GetLightDir(dirLightTags[i].gameObject);
-                str += Bake(lightDir);
+                
             }
             else if (IsPointLight(dirLightTags[i].gameObject))
             {
-                str += Bake(Vector3.zero);
             }
             else
             {
-                Debug.LogError("No support type");
+                //Debug.LogError("No support type");
             }
+            str += Bake(lightDir);
             str += (i == n - 1 ? "" : ", "); 
         }
         str += "};";
@@ -427,7 +431,9 @@ public class SDFBakerMgr : MonoBehaviour
             }
             else
             {
-                Debug.LogError("light type not handle");
+                //Debug.LogError("light type not handle");
+                Debug.Log("Warning: emissive for default shadow not handled");
+                type = 2;
             }
 
             bakedShadows.Add("lightType[" + lcount + "] = "+type+";");
@@ -468,7 +474,11 @@ public class SDFBakerMgr : MonoBehaviour
             }
             else
             {
-                Debug.LogError("No support type");
+                //Debug.LogError("No support type");
+                Debug.Log("Warning: emissive for default shadow not handled");
+                Vector3 lightPos = dirLightTags[i].gameObject.transform.position;
+                //??? 错的lightdir,先就这样，之后处理
+                bakedShadows.Add("lightDirs[" + lcount + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
             }
             lcount++;
         }

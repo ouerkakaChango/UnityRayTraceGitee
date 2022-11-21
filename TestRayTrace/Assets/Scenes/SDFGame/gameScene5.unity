@@ -420,7 +420,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 0
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &336815346
@@ -549,7 +549,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 1
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &520542744
@@ -603,7 +603,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 2
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &520542746
@@ -851,7 +851,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 3
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &687769464
@@ -1619,7 +1619,7 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[6];
+  - int renderMode[7];
   bakedRenders: []
   bakedShadows: []
   bakedFullLightInfo: []
@@ -1627,6 +1627,7 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
+  - {fileID: 1464217460}
   - {fileID: 276605038}
   - {fileID: 336815351}
   - {fileID: 520542745}
@@ -1634,6 +1635,7 @@ MonoBehaviour:
   - {fileID: 1755708949}
   - {fileID: 2097505601}
   dirLightTags:
+  - {fileID: 1464217459}
   - {fileID: 66970281}
   - {fileID: 579246072}
   - {fileID: 687769466}
@@ -1680,8 +1682,11 @@ GameObject:
   - component: {fileID: 1464217456}
   - component: {fileID: 1464217455}
   - component: {fileID: 1464217454}
+  - component: {fileID: 1464217459}
+  - component: {fileID: 1464217458}
+  - component: {fileID: 1464217460}
   m_Layer: 0
-  m_Name: Cube (3)
+  m_Name: EmissiveCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1719,7 +1724,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8065b24dfec4e7544ab035bcc40a1c8e, type: 2}
+  - {fileID: 2100000, guid: 0b058be65a755164e8be16b8570d594f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1763,6 +1768,68 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1464217458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464217453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee4fa660c277bc54ca73b019ece236de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 1, g: 0, b: 0.5, a: 1}
+  intensity: 1
+--- !u!114 &1464217459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464217453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bakeShadow: 1
+  shadowType: 0
+  lightPass: 0
+--- !u!114 &1464217460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464217453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 0
+  booleanTags:
+  - {fileID: 1888736148}
+  specialID: -1
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.02
+  SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
+  mergeType: 1
+  objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
 --- !u!1 &1710808183
 GameObject:
   m_ObjectHideFlags: 0
@@ -1951,7 +2018,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 4
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &1765637316
@@ -2094,8 +2161,9 @@ GameObject:
   - component: {fileID: 1888736146}
   - component: {fileID: 1888736145}
   - component: {fileID: 1888736144}
+  - component: {fileID: 1888736148}
   m_Layer: 0
-  m_Name: Cube (4)
+  m_Name: Cut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2177,6 +2245,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1888736148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1888736143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca0f117a943235040a61336bf609ab75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 0
 --- !u!1 &2097505599
 GameObject:
   m_ObjectHideFlags: 0
@@ -2238,7 +2319,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 5
+  objInx: 6
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2099006227
