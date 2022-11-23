@@ -311,7 +311,7 @@ public class SDFBakerMgr : MonoBehaviour
             else
             {
                 //Debug.LogError("light type not handle");
-                type = 2; //emissive
+                type = 1000 + GetSelfObjInx(dirLightTags[i].gameObject); //emissive
             }
             if (!dirLightTags[i].bakeShadow)
             {
@@ -341,26 +341,6 @@ public class SDFBakerMgr : MonoBehaviour
         str += "};";
         bakedFullLightInfo.Add(str);
 
-        //bakedFullLightInfo.Add("static float3 lightDir[" + n + "];");
-        //for (int i = 0; i < n; i++)
-        //{
-        //    Vector3 lightDir = Vector3.zero;
-        //    if (IsDirectionalLight(dirLightTags[i].gameObject))
-        //    {
-        //        lightDir = GetLightDir(dirLightTags[i].gameObject);
-        //        bakedFullLightInfo.Add("lightDir[" + i + "] = " + Bake(lightDir) + ";");
-        //    }
-        //    else if (IsPointLight(dirLightTags[i].gameObject))
-        //    {
-        //        Vector3 lightPos = dirLightTags[i].gameObject.transform.position;
-        //        bakedFullLightInfo.Add("lightDir[" + i + "] = normalize(minHit.P - " + Bake(lightPos) + ");");
-        //    }
-        //    else
-        //    {
-        //        Debug.LogError("No support type");
-        //    }
-        //}
-
         str = "const static float3 lightDirs[" + n + "] = {";
         for (int i = 0; i < n; i++)
         {
@@ -375,7 +355,7 @@ public class SDFBakerMgr : MonoBehaviour
             }
             else
             {
-                //Debug.LogError("No support type");
+
             }
             str += Bake(lightDir);
             str += (i == n - 1 ? "" : ", "); 
@@ -441,7 +421,7 @@ public class SDFBakerMgr : MonoBehaviour
             {
                 //Debug.LogError("light type not handle");
                 Debug.Log("Warning: emissive for default shadow not handled");
-                type = 2;
+                type = 1000 + GetSelfObjInx(dirLightTags[i].gameObject);
             }
 
             bakedShadows.Add("lightType[" + lcount + "] = "+type+";");
@@ -611,7 +591,7 @@ public class SDFBakerMgr : MonoBehaviour
                 line1 += "))";
                 bakedRenderEmissive.Add(line1);
                 bakedRenderEmissive.Add("{");
-                bakedRenderEmissive.Add("    TraceInfo tt;");
+                //bakedRenderEmissive.Add("    TraceInfo tt;");
                 bakedRenderEmissive.Add("    float d = GetObjSDF("+selftag.objInx+", minHit.P, tt);");
                 bakedRenderEmissive.Add("    float s = max(0.01 * d,0.001);");
                 bakedRenderEmissive.Add("    float f = clamp(1.- pow(s, 0.5), 0., 1.);");
@@ -658,8 +638,6 @@ public class SDFBakerMgr : MonoBehaviour
 
     void PreAdd(int[] ids, ref List<string> lines, string inxName = "inx")
     {
-        //if(inx == 1 || inx == 2 || inx == 3)
-        //{
         string s1 = "if(";
         for(int i=0;i<ids.Length;i++)
         {
@@ -1158,6 +1136,20 @@ public class SDFBakerMgr : MonoBehaviour
         if(boolean.type == SDFBooleanType.maxCut && IsCube(boolean.gameObject))
         {
             bakedSDFs.Add("re = max(re, -" + GetSDFCubeLine(boolean.gameObject) + ");");
+        }
+    }
+
+    int GetSelfObjInx(GameObject obj)
+    {
+        var selftag = obj.GetComponent<SDFBakerTag>();
+        if (selftag != null)
+        {
+            return selftag.objInx;
+        }
+        else
+        {
+            Debug.LogError("No self");
+            return -1;
         }
     }
 
