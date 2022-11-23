@@ -313,11 +313,6 @@ public class SDFBakerMgr : MonoBehaviour
                 //Debug.LogError("light type not handle");
                 type = 1000 + GetSelfObjInx(dirLightTags[i].gameObject); //emissive
             }
-            if (!dirLightTags[i].bakeShadow)
-            {
-                //!!!
-                type = -type - 1;
-            }
             str += type + (i==n-1 ? "":", ");
         }
         str += "};";
@@ -366,7 +361,12 @@ public class SDFBakerMgr : MonoBehaviour
         str = "const static int shadowType[" + n + "] = {";
         for (int i = 0; i < n; i++)
         {
-            str += (int)dirLightTags[i].shadowType + (i == n - 1 ? "" : ", ");
+            int shadowtype = (int)dirLightTags[i].shadowType;
+            if(!dirLightTags[i].bakeShadow)
+            {
+                shadowtype = -shadowtype - 1;
+            }
+            str += shadowtype + (i == n - 1 ? "" : ", ");
         }
         str += "};";
         bakedFullLightInfo.Add(str);
