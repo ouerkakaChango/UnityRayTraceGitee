@@ -20,6 +20,7 @@
 ...
 ###BLOCK
 int GetSpecialID(int inx);
+float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo);
 
 Material_PBR GetObjMaterial_PBR(int obj)
 {

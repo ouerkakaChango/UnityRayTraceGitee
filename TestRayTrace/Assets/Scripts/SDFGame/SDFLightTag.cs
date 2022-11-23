@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using XUtility;
 
+public enum SDFLightType
+{
+    Auto,
+    Emissive,
+}
+
 public enum SDFShadowType
 {
     SDFHardShadow,
@@ -20,7 +26,8 @@ public class SDFLightTag : MonoBehaviour
     public bool bakeShadow = true;
     public SDFShadowType shadowType = SDFShadowType.SDFHardShadow;
     public SDFLightPass lightPass = SDFLightPass.Direct;
-
+    [ReadOnly]
+    public SDFLightType lightType = SDFLightType.Auto;
     [ReadOnly]
     public int lightInx = -1;
     // Start is called before the first frame update

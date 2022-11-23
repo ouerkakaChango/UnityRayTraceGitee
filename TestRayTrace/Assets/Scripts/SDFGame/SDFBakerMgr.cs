@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using static LightUtility.LightFuncs;
 using XUtility;
@@ -31,6 +32,8 @@ public class SDFBakerMgr : MonoBehaviour
     public List<string> bakedShadows = new List<string>();
     [HideInInspector]
     public List<string> bakedFullLightInfo = new List<string>();
+    [HideInInspector]
+    public List<string> bakedRenderEmissive = new List<string>();
     [HideInInspector]
     public List<string> bakedBeforeSDF = new List<string>();    //used for SDF Bounds
     [HideInInspector]
@@ -153,14 +156,14 @@ public class SDFBakerMgr : MonoBehaviour
             {
                 continue;
             }
-            //if(IsDirectionalLight(allLightTags[i].gameObject)||
-            //    IsPointLight(allLightTags[i].gameObject))
-            //{
-            //    dirLightList.Add(allLightTags[i]);
-            //}
-            //else
+            if(IsDirectionalLight(allLightTags[i].gameObject)||
+                IsPointLight(allLightTags[i].gameObject))
             {
-                //Debug.LogError("this light type not support: " + allLightTags[i].gameObject);
+                dirLightList.Add(allLightTags[i]);
+            }
+            else
+            {
+                allLightTags[i].lightType = SDFLightType.Emissive;
                 dirLightList.Add(allLightTags[i]);
             }
         }
@@ -199,6 +202,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedRenders.Clear();
         bakedShadows.Clear();
         bakedFullLightInfo.Clear();
+        bakedRenderEmissive.Clear();
 
         bakedSpecialObjects.Clear();
 
@@ -214,6 +218,8 @@ public class SDFBakerMgr : MonoBehaviour
         EndBakeRenders();
         EndBakeFullLightInfo();
         EndBakeShadows();
+
+        EndBakeRenderEmissive();
     }
 
     void EndBakeRenderModes()
@@ -567,6 +573,54 @@ public class SDFBakerMgr : MonoBehaviour
         bakedShadows.Add("sha = lightspace;");
     }
 
+    void EndBakeRenderEmissive()
+    {
+        //一个lightInx(i)对多个可接收自发光物体inx(1,4)
+        //if (i == 3 && (minHit.obj == 1 || minHit.obj == 4))
+        //{
+        //    TraceInfo tt;
+        //    float d = GetObjSDF(4, minHit.P, tt);
+        //    float s = max(0.01 * d,0.001);
+        //    float f = clamp(1.- pow(s, 0.5), 0., 1.);
+        //    newLig = pow(f, 20.) * lightColor[i];
+        //}
+        for (int i=0;i<dirLightTags.Length;i++)
+        {
+            if(dirLightTags[i].lightType == SDFLightType.Emissive)
+            {
+                var emtag = dirLightTags[i].gameObject.GetComponent<SDFEmissiveLightTag>();
+                if(emtag == null)
+                {
+                    Debug.LogError("No emissive tag!");
+                }
+                List<SDFBakerTag> objs = new List<SDFBakerTag>(emtag.objs);
+                var selftag = emtag.gameObject.GetComponent<SDFBakerTag>();
+                if(selftag!=null)
+                {
+                    objs.Add(selftag);
+                }
+                string line1 = "if (i == " + dirLightTags[i].lightInx + " && (";
+                for(int i1 = 0;i1<objs.Count;i1++)
+                {
+                    line1 += "minHit.obj == "+objs[i1].objInx+"";
+                    if(i1!=objs.Count-1)
+                    {
+                        line1 += " || ";
+                    }
+                }
+                line1 += "))";
+                bakedRenderEmissive.Add(line1);
+                bakedRenderEmissive.Add("{");
+                bakedRenderEmissive.Add("    TraceInfo tt;");
+                bakedRenderEmissive.Add("    float d = GetObjSDF("+selftag.objInx+", minHit.P, tt);");
+                bakedRenderEmissive.Add("    float s = max(0.01 * d,0.001);");
+                bakedRenderEmissive.Add("    float f = clamp(1.- pow(s, 0.5), 0., 1.);");
+                bakedRenderEmissive.Add("    newLig = pow(f, 20.) * lightColor[i];");
+                bakedRenderEmissive.Add("}");
+            }
+        }
+    }
+
     void PreAdd(int inx, ref List<string> lines, string inxName = "inx", bool ignoreElse = false)
     {
         if(inx==0 || ignoreElse)
@@ -713,7 +767,7 @@ public class SDFBakerMgr : MonoBehaviour
         if (texTag.useSubTex)
         {
             string subInfoStr = Bake(texTag.GetSubInfoVec());
-            if (expression == null)
+            if (expression == null || !expression.isActiveAndEnabled)
             {
                 bakedSDFs.Add("float d = SDFSlice_Sub(p, " + centerStr + ", " + rotStr + ", " + sizeStr + ", " + sliceTexName + ", " + tag.hBound + ", TraceThre, " + tag.SDF_offset2D + ", " + tag.SDF_offset + ", " + subInfoStr + ");");
             }
@@ -823,7 +877,7 @@ public class SDFBakerMgr : MonoBehaviour
         var expression = obj.GetComponent<SDFBakerExpression>();
 
         string line;
-        if (expression == null)
+        if (expression == null || !expression.isActiveAndEnabled)
         {
             line = offset + " + "+GetSDFCubeLine(obj);
             line = "re = min(re, " + line + ");";
@@ -862,7 +916,7 @@ public class SDFBakerMgr : MonoBehaviour
         var expression = obj.GetComponent<SDFBakerExpression>();
         float offset = obj.GetComponent<SDFBakerTag>().SDF_offset;
         string center_str = Bake(obj.transform.position);
-        if (expression == null)
+        if (expression == null || !expression.isActiveAndEnabled)
         {
             string line = offset + " + SDFSphere(p, " + center_str + ", " + obj.transform.localScale.x * 0.5 + ")";
             line = "re = min(re, " + line + ");";
