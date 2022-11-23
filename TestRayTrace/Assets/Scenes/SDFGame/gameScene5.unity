@@ -156,10 +156,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee4fa660c277bc54ca73b019ece236de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0.9529412, g: 0.8862745, b: 0.6, a: 1}
+  color: {r: 1, g: 0.83724666, b: 0.13836467, a: 1}
   intensity: 2
   objs:
   - {fileID: 336815351}
+  fadeScale: 1
 --- !u!114 &30071081
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,7 +177,7 @@ MonoBehaviour:
   shadowType: 0
   lightPass: 0
   lightType: 1
-  lightInx: 2
+  lightInx: 1
 --- !u!114 &30071082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,7 +191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {r: 0.9528302, g: 0.88482875, b: 0.59926426, a: 1}
+    albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
     reflective: 0
@@ -206,7 +207,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 2
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &30071083
@@ -320,7 +321,7 @@ MonoBehaviour:
   shadowType: 0
   lightPass: 0
   lightType: 0
-  lightInx: 4
+  lightInx: 2
 --- !u!108 &66970282
 Light:
   m_ObjectHideFlags: 0
@@ -571,9 +572,159 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 4
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
+--- !u!1 &286988854
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 286988860}
+  - component: {fileID: 286988859}
+  - component: {fileID: 286988858}
+  - component: {fileID: 286988857}
+  - component: {fileID: 286988856}
+  - component: {fileID: 286988855}
+  m_Layer: 0
+  m_Name: InnerLight_ceiling3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &286988855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286988854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee4fa660c277bc54ca73b019ece236de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 1, g: 1, b: 1, a: 1}
+  intensity: 2
+  objs:
+  - {fileID: 336815351}
+  fadeScale: 0.25
+--- !u!114 &286988856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286988854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bakeShadow: 0
+  shadowType: 0
+  lightPass: 0
+  lightType: 1
+  lightInx: 0
+--- !u!114 &286988857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286988854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
+  SDF_offset: 0
+  renderMode: 0
+  shapeType: 0
+  booleanTags: []
+  specialID: -1
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.02
+  SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
+  mergeType: 1
+  objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
+--- !u!23 &286988858
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286988854}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 0b058be65a755164e8be16b8570d594f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &286988859
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286988854}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &286988860
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 286988854}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.09, y: -2.69, z: 3.28}
+  m_LocalScale: {x: 12.604729, y: 0.2, z: 30.873354}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 19
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &311485791
 GameObject:
   m_ObjectHideFlags: 0
@@ -607,10 +758,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee4fa660c277bc54ca73b019ece236de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0.9529412, g: 0.8862745, b: 0.6, a: 1}
+  color: {r: 1, g: 0.83724666, b: 0.13836467, a: 1}
   intensity: 2
   objs:
   - {fileID: 336815351}
+  fadeScale: 1
 --- !u!114 &311485793
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -627,7 +779,7 @@ MonoBehaviour:
   shadowType: 0
   lightPass: 0
   lightType: 1
-  lightInx: 1
+  lightInx: 3
 --- !u!114 &311485794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -641,7 +793,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {r: 0.9528302, g: 0.88482875, b: 0.59926426, a: 1}
+    albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
     reflective: 0
@@ -657,7 +809,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 1
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &311485795
@@ -854,7 +1006,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 5
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &520542744
@@ -908,7 +1060,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 6
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &520542746
@@ -1097,7 +1249,7 @@ MonoBehaviour:
   shadowType: 0
   lightPass: 0
   lightType: 0
-  lightInx: 5
+  lightInx: 4
 --- !u!1 &585464653
 GameObject:
   m_ObjectHideFlags: 0
@@ -1158,7 +1310,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 7
+  objInx: 6
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &687769464
@@ -1209,7 +1361,7 @@ MonoBehaviour:
   shadowType: 0
   lightPass: 0
   lightType: 0
-  lightInx: 6
+  lightInx: 5
 --- !u!108 &687769467
 Light:
   m_ObjectHideFlags: 0
@@ -1853,6 +2005,7 @@ MonoBehaviour:
   objs:
   - {fileID: 336815351}
   - {fileID: 520542745}
+  fadeScale: 1
 --- !u!114 &1087415592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1869,7 +2022,7 @@ MonoBehaviour:
   shadowType: 0
   lightPass: 0
   lightType: 1
-  lightInx: 7
+  lightInx: 6
 --- !u!114 &1087415593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1899,7 +2052,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 8
+  objInx: 7
   needExtraCondition: 0
   extraCondition: 
 --- !u!135 &1087415594
@@ -2011,10 +2164,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee4fa660c277bc54ca73b019ece236de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0.9529412, g: 0.8862745, b: 0.6, a: 1}
+  color: {r: 1, g: 0.83724666, b: 0.13836467, a: 1}
   intensity: 2
   objs:
   - {fileID: 336815351}
+  fadeScale: 1
 --- !u!114 &1109228270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2031,7 +2185,7 @@ MonoBehaviour:
   shadowType: 0
   lightPass: 0
   lightType: 1
-  lightInx: 3
+  lightInx: 7
 --- !u!114 &1109228271
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2045,7 +2199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {r: 0.9528302, g: 0.88482875, b: 0.59926426, a: 1}
+    albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
     reflective: 0
@@ -2061,7 +2215,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 3
+  objInx: 8
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1109228272
@@ -2467,6 +2621,7 @@ MonoBehaviour:
   intensity: 1
   objs:
   - {fileID: 336815351}
+  fadeScale: 1
 --- !u!135 &1185084558
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2747,10 +2902,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee4fa660c277bc54ca73b019ece236de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0.9529412, g: 0.8862745, b: 0.6, a: 1}
+  color: {r: 1, g: 0.83724666, b: 0.13836467, a: 1}
   intensity: 2
   objs:
   - {fileID: 336815351}
+  fadeScale: 1
 --- !u!114 &1211381441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2767,7 +2923,7 @@ MonoBehaviour:
   shadowType: 0
   lightPass: 0
   lightType: 1
-  lightInx: 0
+  lightInx: 9
 --- !u!114 &1211381442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2781,7 +2937,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat_PBR:
-    albedo: {r: 0.9528302, g: 0.88482875, b: 0.59926426, a: 1}
+    albedo: {r: 1, g: 1, b: 1, a: 1}
     metallic: 0
     roughness: 1
     reflective: 0
@@ -2797,7 +2953,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 0
+  objInx: 9
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1211381443
@@ -2901,7 +3057,7 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[12];
+  - int renderMode[13];
   bakedRenders: []
   bakedShadows: []
   bakedFullLightInfo: []
@@ -2910,28 +3066,30 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 1211381442}
-  - {fileID: 311485794}
+  - {fileID: 286988857}
   - {fileID: 30071082}
-  - {fileID: 1109228271}
   - {fileID: 276605038}
+  - {fileID: 311485794}
   - {fileID: 336815351}
   - {fileID: 520542745}
   - {fileID: 585464655}
   - {fileID: 1087415593}
+  - {fileID: 1109228271}
+  - {fileID: 1211381442}
   - {fileID: 1755708949}
   - {fileID: 1941780502}
   - {fileID: 2097505601}
   dirLightTags:
-  - {fileID: 1211381441}
-  - {fileID: 311485793}
+  - {fileID: 286988856}
   - {fileID: 30071081}
-  - {fileID: 1109228270}
   - {fileID: 66970281}
+  - {fileID: 311485793}
   - {fileID: 579246072}
   - {fileID: 687769466}
   - {fileID: 1087415592}
+  - {fileID: 1109228270}
   - {fileID: 1110577413}
+  - {fileID: 1211381441}
   - {fileID: 1941780501}
   - {fileID: 2099006230}
 --- !u!4 &1427000038
@@ -3077,6 +3235,7 @@ MonoBehaviour:
   intensity: 1
   objs:
   - {fileID: 336815351}
+  fadeScale: 1
 --- !u!114 &1464217459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3315,7 +3474,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 9
+  objInx: 10
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &1765637316
@@ -3703,6 +3862,7 @@ MonoBehaviour:
   objs:
   - {fileID: 336815351}
   - {fileID: 520542745}
+  fadeScale: 1
 --- !u!114 &1941780501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3719,7 +3879,7 @@ MonoBehaviour:
   shadowType: 0
   lightPass: 0
   lightType: 1
-  lightInx: 9
+  lightInx: 10
 --- !u!114 &1941780502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3749,7 +3909,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 10
+  objInx: 11
   needExtraCondition: 0
   extraCondition: 
 --- !u!135 &1941780503
@@ -3998,7 +4158,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 11
+  objInx: 12
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2099006227
@@ -4111,4 +4271,4 @@ MonoBehaviour:
   shadowType: 0
   lightPass: 0
   lightType: 0
-  lightInx: 10
+  lightInx: 11

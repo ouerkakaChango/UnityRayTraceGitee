@@ -595,7 +595,7 @@ public class SDFBakerMgr : MonoBehaviour
                 bakedRenderEmissive.Add("    float d = GetObjSDF("+selftag.objInx+", minHit.P, tt);");
                 bakedRenderEmissive.Add("    float s = max(0.01 * d,0.001);");
                 bakedRenderEmissive.Add("    float f = clamp(1.- pow(s, 0.5), 0., 1.);");
-                bakedRenderEmissive.Add("    newLig = pow(f, 20.) * lightColor[i];");
+                bakedRenderEmissive.Add("    newLig = pow(f, "+ emtag .fadeScale+ "*20.) * lightColor[i];");
                 bakedRenderEmissive.Add("}");
             }
         }
