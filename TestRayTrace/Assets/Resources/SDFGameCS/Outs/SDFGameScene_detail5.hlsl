@@ -6,7 +6,7 @@
 #define TraceThre 0.001
 #define NormalEpsilon 0.001
 
-#define HardShadowExpensive true
+#define HardShadowExpensive false
 
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFSoftShadowK 16
@@ -219,18 +219,18 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.43668), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.43668), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(8.51, -6.97, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(8.51, -6.97, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(8.51, -6.97, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(8.51, -6.97, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
-return uv;
 }
 else if (inx == 2 )
 {
+uv = BoxedUV(minHit.P, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.43668), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.43668), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 3 )
 {
@@ -301,16 +301,16 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.43668), float3(0, 0, 0));
+BoxedTB(T,B,minHit.P, float3(8.51, -6.97, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
 return;
 }
 if(inx == 1 )
 {
-BoxedTB(T,B,minHit.P, float3(8.51, -6.97, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
-return;
 }
 if(inx == 2 )
 {
+BoxedTB(T,B,minHit.P, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.43668), float3(0, 0, 0));
+return;
 }
 if(inx == 3 )
 {
@@ -414,11 +414,11 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 if(mode == 0)
 {
 //@@@SDFBakerMgr FullLightInfo
-const static int lightType[12] = {1000, 1001, 1, 1003, 1, 1, 1007, 1008, 1, 1009, 1011, 0};
-const static float3 lightColor[12] = {float3(2, 2, 2), float3(2, 1.674493, 0.2767293), float3(0, 0.3806472, 5), float3(2, 1.674493, 0.2767293), float3(1, 0, 0), float3(0.4041135, 5, 0), float3(1.989246, 2, 1.314465), float3(2, 1.674493, 0.2767293), float3(5, 0, 3.903966), float3(2, 1.674493, 0.2767293), float3(0, 1.5639, 2), float3(1, 1, 1)};
-const static float3 lightPos[12] = {float3(-0.09, -2.69, 3.28), float3(8.51, -6.97, 1.29), float3(-4.2, 1, -7.66), float3(-8.88, -2.69, 1.29), float3(0.42, 2.4, -15.048), float3(1.66, 1, -7.66), float3(0.26, 3.61, -15.22), float3(-8.65, -6.44, 1.29), float3(6.45, 1, -7.66), float3(8.94, -2.69, 1.29), float3(0.26, -5.15, -17.07), float3(0, 3, 0)};
+const static int lightType[12] = {1000, 1, 1002, 1003, 1, 1, 1007, 1008, 1, 1009, 1011, 0};
+const static float3 lightColor[12] = {float3(2, 1.674493, 0.2767293), float3(0, 0.3806472, 5), float3(2, 2, 2), float3(2, 1.674493, 0.2767293), float3(1, 0, 0), float3(0.4041135, 5, 0), float3(1.989246, 2, 1.314465), float3(2, 1.674493, 0.2767293), float3(5, 0, 3.903966), float3(2, 1.674493, 0.2767293), float3(0, 1.5639, 2), float3(1, 1, 1)};
+const static float3 lightPos[12] = {float3(8.51, -6.97, 1.29), float3(-4.2, 1, -7.66), float3(-0.09, -2.69, 3.28), float3(-8.88, -2.69, 1.29), float3(0.42, 2.4, -15.048), float3(1.66, 1, -7.66), float3(0.26, 3.61, -15.22), float3(-8.65, -6.44, 1.29), float3(6.45, 1, -7.66), float3(8.94, -2.69, 1.29), float3(0.26, -5.15, -17.07), float3(0, 3, 0)};
 const static float3 lightDirs[12] = {float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0, 0, 0), float3(0.4255954, -0.7770073, -0.4638191)};
-const static int shadowType[12] = {-1, -1, 0, -1, 0, 0, 0, -1, 0, -1, 0, 0};
+const static int shadowType[12] = {0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 const static float lightspace = 12;
 //@@@
 
@@ -435,6 +435,10 @@ const static float lightspace = 12;
 	else if(lightType[i]>=1000)
 	{
 		lightDir = normalize(minHit.P - lightPos[i]);
+		if(length(lightDir)<0.001)
+		{
+			lightDir = float3(0,-1,0);
+		}
 		//lightDir = GetObjNormal(lightType[i] - 1000,minHit.P,tt);
 	}
 
@@ -458,14 +462,14 @@ if (i == 0 && (minHit.obj == 4 || minHit.obj == 0))
 float d = GetObjSDF(0, minHit.P, tt);
 float s = max(0.01 * d,0.001);
 float f = clamp(1.- pow(s, 0.5), 0., 1.);
-newLig = pow(f, 0.25*20.) * lightColor[i];
+newLig = pow(f, 1*20.) * lightColor[i];
 }
-if (i == 1 && (minHit.obj == 4 || minHit.obj == 1))
+if (i == 2 && (minHit.obj == 4 || minHit.obj == 2))
 {
-float d = GetObjSDF(1, minHit.P, tt);
+float d = GetObjSDF(2, minHit.P, tt);
 float s = max(0.01 * d,0.001);
 float f = clamp(1.- pow(s, 0.5), 0., 1.);
-newLig = pow(f, 1*20.) * lightColor[i];
+newLig = pow(f, 0.25*20.) * lightColor[i];
 }
 if (i == 3 && (minHit.obj == 4 || minHit.obj == 3))
 {
@@ -541,8 +545,8 @@ newLig = pow(f, 1*20.) * lightColor[i];
 	}
 	newLig *= sha;
 	{
-	static float2 suv = seed.xy/float2(w,h);
-	SmoothWithDither(newLig, suv);
+	//static float2 suv = seed.xy/float2(w,h);
+	//SmoothWithDither(newLig, suv);
 	}
 	//blend
 	float n = frameID;
@@ -809,15 +813,15 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.43668), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(8.51, -6.97, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(8.51, -6.97, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0)));
+inx = -3;
 }
 else if (inx == 2 )
 {
-inx = -3;
+re = min(re, 0 + SDFBox(p, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.43668), float3(0, 0, 0)));
 }
 else if (inx == 3 )
 {
@@ -1187,6 +1191,10 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength, bool exp
 		{
 			for (int inx = 0; inx < OBJNUM; inx++)
 			{
+				if(GetSpecialID(inx)<0)
+				{
+					continue;
+				}
 				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
 				if (objSDF[inx] < sdf)
 				{
@@ -1487,10 +1495,10 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+inx = -3;
 }
 else if (inx == 2 )
 {
-inx = -3;
 }
 else if (inx == 3 )
 {

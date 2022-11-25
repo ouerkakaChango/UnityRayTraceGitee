@@ -6,7 +6,7 @@
 #define TraceThre (@TraceThre)
 #define NormalEpsilon (@NormalEpsilon)
 
-#define HardShadowExpensive true
+#define HardShadowExpensive false
 
 #define SceneSDFSoftShadowBias 0.1
 #define SceneSDFSoftShadowK 16
@@ -321,6 +321,10 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength, bool exp
 		{
 			for (int inx = 0; inx < OBJNUM; inx++)
 			{
+				if(GetSpecialID(inx)<0)
+				{
+					continue;
+				}
 				objSDF[inx] = GetObjSDF(inx, ray.pos, traceInfo);
 				if (objSDF[inx] < sdf)
 				{
