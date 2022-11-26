@@ -564,6 +564,19 @@ public class SDFBakerMgr : MonoBehaviour
         //    float f = clamp(1.- pow(s, 0.5), 0., 1.);
         //    newLig = pow(f, 20.) * lightColor[i];
         //}
+        //if (i == 2 && minHit.obj == 7)
+        //{
+        //    float s = GetObjSDF(minHit.obj, minHit.P, tt);
+        //    s -= 0.12;
+        //    float fakeEmmisive = -0.1 * 5. / s;//pow(s+2.,-2.);
+        //    fakeEmmisive = pow(fakeEmmisive, 1.0);
+        //    newLig += fakeEmmisive * lightColor[i];
+        //    float nl = saturate(dot(minHit.N, -lightDir));
+        //    nl = nl * 0.5 + 0.5;
+        //    newLig += 0.1 * nl * lightColor[i];
+        //    float nv = saturate(dot(minHit.N, -ray.dir));
+        //    newLig += 0.1 * pow(1.0 - nv, 1.);
+        //}
         for (int i=0;i<dirLightTags.Length;i++)
         {
             if(dirLightTags[i].lightType == SDFLightType.Emissive)
@@ -573,12 +586,8 @@ public class SDFBakerMgr : MonoBehaviour
                 {
                     Debug.LogError("No emissive tag!");
                 }
-                List<SDFBakerTag> objs = new List<SDFBakerTag>(emtag.objs);
+                List<SDFBakerTag> objs = emtag.objs;
                 var selftag = emtag.gameObject.GetComponent<SDFBakerTag>();
-                if(selftag!=null)
-                {
-                    objs.Add(selftag);
-                }
                 string line1 = "if (i == " + dirLightTags[i].lightInx + " && (";
                 for(int i1 = 0;i1<objs.Count;i1++)
                 {
@@ -596,6 +605,20 @@ public class SDFBakerMgr : MonoBehaviour
                 bakedRenderEmissive.Add("    float s = max(0.01 * d,0.001);");
                 bakedRenderEmissive.Add("    float f = clamp(1.- pow(s, 0.5), 0., 1.);");
                 bakedRenderEmissive.Add("    newLig = pow(f, "+ emtag .fadeScale+ "*20.) * lightColor[i];");
+                bakedRenderEmissive.Add("}");
+
+                bakedRenderEmissive.Add("if (i == "+ dirLightTags[i].lightInx + " && minHit.obj == "+ selftag .objInx+ ")");
+                bakedRenderEmissive.Add("{");
+                bakedRenderEmissive.Add("    float s = GetObjSDF(minHit.obj, minHit.P, tt);");
+                bakedRenderEmissive.Add("    s -= 0.12;");
+                bakedRenderEmissive.Add("    float fakeEmmisive = -0.1 * 5. / s;//pow(s+2.,-2.);");
+                bakedRenderEmissive.Add("    fakeEmmisive = pow(fakeEmmisive, 1.0);");
+                bakedRenderEmissive.Add("    newLig += fakeEmmisive * lightColor[i];");
+                bakedRenderEmissive.Add("    float nl = saturate(dot(minHit.N, -lightDir));");
+                bakedRenderEmissive.Add("    nl = nl * 0.5 + 0.5;");
+                bakedRenderEmissive.Add("    newLig += 0.1 * nl * lightColor[i];");
+                bakedRenderEmissive.Add("    float nv = saturate(dot(minHit.N, -ray.dir));");
+                bakedRenderEmissive.Add("    newLig += 0.1 * pow(1.0 - nv, 1.);");
                 bakedRenderEmissive.Add("}");
             }
         }
