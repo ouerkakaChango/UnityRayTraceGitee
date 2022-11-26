@@ -207,7 +207,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 5
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &30071083
@@ -572,7 +572,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 6
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &286988854
@@ -664,7 +664,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 7
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &286988858
@@ -743,6 +743,8 @@ GameObject:
   - component: {fileID: 308221760}
   - component: {fileID: 308221759}
   - component: {fileID: 308221758}
+  - component: {fileID: 308221763}
+  - component: {fileID: 308221762}
   m_Layer: 0
   m_Name: couch_up
   m_TagString: Untagged
@@ -782,7 +784,7 @@ MonoBehaviour:
     roughness: 1
     reflective: 0
     reflect_ST: {x: 1, y: 0}
-  SDF_offset: -0.05
+  SDF_offset: 0
   renderMode: 0
   shapeType: 0
   booleanTags: []
@@ -793,7 +795,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 0
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &308221759
@@ -858,6 +860,51 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 308221756}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &308221762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308221756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  pbrTextures: []
+  heightTextures: []
+  plainTextures:
+  - name: N_paper
+    tex: {fileID: 2800000, guid: 3f2ea3910af41804396e1036204466df, type: 3}
+    channel: 1
+  envTextures: []
+  texInx: 0
+  useSubTex: 0
+  subTexID: 0
+  edgeNum: 4
+--- !u!114 &308221763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308221756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: N
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  - 3
+  texParams:
+  - {fileID: 308221762}
 --- !u!1 &311485791
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,7 +989,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 8
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &311485795
@@ -1139,7 +1186,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 9
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &392099990
@@ -1228,7 +1275,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 10
+  objInx: 6
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &520542746
@@ -1478,7 +1525,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 11
+  objInx: 7
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &687769464
@@ -2234,7 +2281,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 12
+  objInx: 8
   needExtraCondition: 0
   extraCondition: 
 --- !u!135 &1087415594
@@ -2326,6 +2373,7 @@ GameObject:
   - component: {fileID: 1098443578}
   - component: {fileID: 1098443577}
   - component: {fileID: 1098443576}
+  - component: {fileID: 1098443581}
   m_Layer: 0
   m_Name: couch_base
   m_TagString: Untagged
@@ -2362,7 +2410,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 4
+  objInx: 9
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1098443577
@@ -2441,6 +2489,27 @@ Transform:
   m_Father: {fileID: 392099991}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1098443581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1098443575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: N
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  - 3
+  texParams:
+  - {fileID: 308221762}
 --- !u!1 &1109228268
 GameObject:
   m_ObjectHideFlags: 0
@@ -2525,7 +2594,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 13
+  objInx: 10
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1109228272
@@ -2803,9 +2872,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bakerMgr: {fileID: 1427000037}
-  texSys: {fileID: 0}
+  texSys: {fileID: 1427000040}
   dyValSys: {fileID: 0}
-  systems: []
+  systems:
+  - {fileID: 1427000041}
   templates:
   - Resources/SDFGameCS/Template/SDFGameTrace_d5_Template.txt
   - Resources/SDFGameCS/Template/SDFGameScene_d5_Template.txt
@@ -3263,7 +3333,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 14
+  objInx: 11
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1211381443
@@ -3342,6 +3412,7 @@ GameObject:
   - component: {fileID: 1332211089}
   - component: {fileID: 1332211088}
   - component: {fileID: 1332211087}
+  - component: {fileID: 1332211091}
   m_Layer: 0
   m_Name: couch_left
   m_TagString: Untagged
@@ -3392,7 +3463,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 2
+  objInx: 12
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1332211088
@@ -3457,6 +3528,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1332211085}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1332211091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332211085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: N
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  - 3
+  texParams:
+  - {fileID: 308221762}
 --- !u!1 &1360174881
 GameObject:
   m_ObjectHideFlags: 0
@@ -3470,6 +3562,7 @@ GameObject:
   - component: {fileID: 1360174885}
   - component: {fileID: 1360174884}
   - component: {fileID: 1360174883}
+  - component: {fileID: 1360174887}
   m_Layer: 0
   m_Name: couch_right
   m_TagString: Untagged
@@ -3520,7 +3613,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 1
+  objInx: 13
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1360174884
@@ -3585,6 +3678,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1360174881}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1360174887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360174881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: N
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  - 3
+  texParams:
+  - {fileID: 308221762}
 --- !u!1 &1391646424
 GameObject:
   m_ObjectHideFlags: 0
@@ -3598,6 +3712,7 @@ GameObject:
   - component: {fileID: 1391646428}
   - component: {fileID: 1391646427}
   - component: {fileID: 1391646426}
+  - component: {fileID: 1391646430}
   m_Layer: 0
   m_Name: couch_back
   m_TagString: Untagged
@@ -3648,7 +3763,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 3
+  objInx: 14
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1391646427
@@ -3713,6 +3828,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1391646424}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1391646430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1391646424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: N
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  - 3
+  texParams:
+  - {fileID: 308221762}
 --- !u!1 &1427000036
 GameObject:
   m_ObjectHideFlags: 0
@@ -3724,6 +3860,8 @@ GameObject:
   - component: {fileID: 1427000038}
   - component: {fileID: 1427000037}
   - component: {fileID: 1427000039}
+  - component: {fileID: 1427000041}
+  - component: {fileID: 1427000040}
   m_Layer: 0
   m_Name: System
   m_TagString: Untagged
@@ -3760,21 +3898,21 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 308221758}
-  - {fileID: 1360174883}
-  - {fileID: 1332211087}
-  - {fileID: 1391646426}
-  - {fileID: 1098443576}
   - {fileID: 30071082}
   - {fileID: 276605038}
   - {fileID: 286988857}
+  - {fileID: 308221758}
   - {fileID: 311485794}
   - {fileID: 336815351}
   - {fileID: 520542745}
   - {fileID: 585464655}
   - {fileID: 1087415593}
+  - {fileID: 1098443576}
   - {fileID: 1109228271}
   - {fileID: 1211381442}
+  - {fileID: 1332211087}
+  - {fileID: 1360174883}
+  - {fileID: 1391646426}
   - {fileID: 1755708949}
   - {fileID: 1941780502}
   - {fileID: 2097505601}
@@ -3820,6 +3958,49 @@ MonoBehaviour:
   nextLevelObj: {fileID: 0}
   trace: {fileID: 1171519932}
   startActions: 05000000
+--- !u!114 &1427000040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1427000036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38a12b99d3cda0f4eaf5dab605c29be0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outTextures:
+  - name: N_paper
+    tex: {fileID: 2800000, guid: 3f2ea3910af41804396e1036204466df, type: 3}
+    channel: 1
+  tags:
+  - {fileID: 308221762}
+  bakedDeclares:
+  - Texture2D<float3> N_paper;
+  bakedEnvTexSettings: []
+--- !u!114 &1427000041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1427000036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe99e65b93aa2214fb1959533dfc4e6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tags:
+  - {fileID: 308221763}
+  bakedObjMatLib:
+  - if(inx==3)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - "\tminHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);"
+  - '}'
 --- !u!1 &1464217453
 GameObject:
   m_ObjectHideFlags: 0

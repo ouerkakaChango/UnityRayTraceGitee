@@ -3,8 +3,8 @@
 #define MaxSDF 100000
 #define MaxTraceDis 100
 #define MaxTraceTime 6400
-#define TraceThre 0.001
-#define NormalEpsilon 0.001
+#define TraceThre 0.01
+#define NormalEpsilon 0.01
 
 #define HardShadowExpensive false
 
@@ -25,6 +25,7 @@
 static TraceInfo tt;
 
 //@@@SDFBakerMgr TexSys
+Texture2D<float3> N_paper;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
@@ -265,7 +266,6 @@ float2 GetObjUV(in HitInfo minHit)
 if(inx == 0 )
 {
 uv = BoxedUV(minHit.P, float3(8.51, -6.97, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(8.51, -6.97, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 1 )
@@ -274,30 +274,25 @@ else if (inx == 1 )
 else if (inx == 2 )
 {
 uv = BoxedUV(minHit.P, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.43668), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.43668), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 3 )
 {
-uv = BoxedUV(minHit.P, float3(-1.53, -5.443, -2.17), float3(0.5, 0.07957316, 0.5), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(-1.53, -5.443, -2.17), float3(0.5, 0.07957316, 0.5), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 4 )
 {
 uv = BoxedUV(minHit.P, float3(-8.88, -2.69, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(-8.88, -2.69, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 5 )
 {
 uv = BoxedUV(minHit.P, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, -4.87, 0), float3(10, 4.2246, 30), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 6 )
 {
-uv = BoxedUV(minHit.P, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(0, 1.95, -15.31), float3(2.5, 2.5, 2.5), float3(0, 0, 0));
 return uv;
 }
@@ -307,42 +302,35 @@ else if (inx == 7 )
 else if (inx == 8 )
 {
 uv = BoxedUV(minHit.P, float3(0.26, 3.61, -15.22), float3(1.732038, 0.19472, 1.77028), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0.26, 3.61, -15.22), float3(1.732038, 0.19472, 1.77028), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 9 )
 {
-uv = BoxedUV(minHit.P, float3(-1.53, -5.81, -2.17), float3(0.5, 0.25817, 0.5), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(-1.53, -5.81, -2.17), float3(0.5, 0.25817, 0.5), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 10 )
 {
 uv = BoxedUV(minHit.P, float3(-8.65, -6.44, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(-8.65, -6.44, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 11 )
 {
-uv = BoxedUV(minHit.P, float3(8.94, -2.69, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(8.94, -2.69, 1.29), float3(0.1, 0.1, 18.75295), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 12 )
 {
 uv = BoxedUV(minHit.P, float3(-0.775, -5.627, -2.091), float3(0.5000001, 0.2581701, 0.5), float3(0, 0, 90));
-uv = BoxedUV(minHit.P, float3(-0.775, -5.627, -2.091), float3(0.5000001, 0.2581701, 0.5), float3(0, 0, 90));
 return uv;
 }
 else if (inx == 13 )
 {
 uv = BoxedUV(minHit.P, float3(-2.287, -5.627, -2.091), float3(0.5000001, 0.2581701, 0.5), float3(0, 0, 90));
-uv = BoxedUV(minHit.P, float3(-2.287, -5.627, -2.091), float3(0.5000001, 0.2581701, 0.5), float3(0, 0, 90));
 return uv;
 }
 else if (inx == 14 )
 {
-uv = BoxedUV(minHit.P, float3(-1.53, -5.438, -1.474), float3(0.5, 0.2581701, 0.6315001), float3(270, 0, 0));
 uv = BoxedUV(minHit.P, float3(-1.53, -5.438, -1.474), float3(0.5, 0.2581701, 0.6315001), float3(270, 0, 0));
 return uv;
 }
@@ -351,7 +339,6 @@ else if (inx == 15 )
 }
 else if (inx == 16 )
 {
-uv = BoxedUV(minHit.P, float3(0.26, -5.15, -17.07), float3(1.732038, 0.09421722, 1.77028), float3(87.11724, 0, 0));
 uv = BoxedUV(minHit.P, float3(0.26, -5.15, -17.07), float3(1.732038, 0.09421722, 1.77028), float3(87.11724, 0, 0));
 return uv;
 }
@@ -464,7 +451,41 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-
+if(inx==14)
+{
+	float2 uv = GetObjUV(minHit);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);
+}
+if(inx==12)
+{
+	float2 uv = GetObjUV(minHit);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);
+}
+if(inx==13)
+{
+	float2 uv = GetObjUV(minHit);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);
+}
+if(inx==9)
+{
+	float2 uv = GetObjUV(minHit);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);
+}
+if(inx==3)
+{
+	float2 uv = GetObjUV(minHit);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);
+}
 //@@@
 
 //@@@SDFBakerMgr ObjImgAttach
@@ -559,6 +580,7 @@ const static float lightspace = 12;
 	else if(lightType[i] >=1000)
 	{
 
+	int emInx = -1;
 		//@@@SDFBakerMgr RenderEmissive
 if (i == 0 && (minHit.obj == 5))
 {
@@ -566,6 +588,7 @@ float d = GetObjSDF(0, minHit.P, tt);
 float s = max(0.01 * d,0.001);
 float f = clamp(1.- pow(s, 0.5), 0., 1.);
 newLig = pow(f, 1*20.) * lightColor[i];
+emInx = 1;
 }
 if (i == 0 && minHit.obj == 0)
 {
@@ -579,6 +602,7 @@ nl = nl * 0.5 + 0.5;
 newLig += 0.1 * nl * lightColor[i];
 float nv = saturate(dot(minHit.N, -ray.dir));
 newLig += 0.1 * pow(1.0 - nv, 1.);
+emInx = 0;
 }
 if (i == 2 && (minHit.obj == 5 || minHit.obj == 9 || minHit.obj == 14 || minHit.obj == 12 || minHit.obj == 13 || minHit.obj == 3))
 {
@@ -586,6 +610,7 @@ float d = GetObjSDF(2, minHit.P, tt);
 float s = max(0.01 * d,0.001);
 float f = clamp(1.- pow(s, 0.5), 0., 1.);
 newLig = pow(f, 0.25*20.) * lightColor[i];
+emInx = 1;
 }
 if (i == 2 && minHit.obj == 2)
 {
@@ -599,6 +624,7 @@ nl = nl * 0.5 + 0.5;
 newLig += 0.1 * nl * lightColor[i];
 float nv = saturate(dot(minHit.N, -ray.dir));
 newLig += 0.1 * pow(1.0 - nv, 1.);
+emInx = 0;
 }
 if (i == 3 && (minHit.obj == 5))
 {
@@ -606,6 +632,7 @@ float d = GetObjSDF(4, minHit.P, tt);
 float s = max(0.01 * d,0.001);
 float f = clamp(1.- pow(s, 0.5), 0., 1.);
 newLig = pow(f, 1*20.) * lightColor[i];
+emInx = 1;
 }
 if (i == 3 && minHit.obj == 4)
 {
@@ -619,6 +646,7 @@ nl = nl * 0.5 + 0.5;
 newLig += 0.1 * nl * lightColor[i];
 float nv = saturate(dot(minHit.N, -ray.dir));
 newLig += 0.1 * pow(1.0 - nv, 1.);
+emInx = 0;
 }
 if (i == 6 && (minHit.obj == 5 || minHit.obj == 6))
 {
@@ -626,6 +654,7 @@ float d = GetObjSDF(8, minHit.P, tt);
 float s = max(0.01 * d,0.001);
 float f = clamp(1.- pow(s, 0.5), 0., 1.);
 newLig = pow(f, 1*20.) * lightColor[i];
+emInx = 1;
 }
 if (i == 6 && minHit.obj == 8)
 {
@@ -639,6 +668,7 @@ nl = nl * 0.5 + 0.5;
 newLig += 0.1 * nl * lightColor[i];
 float nv = saturate(dot(minHit.N, -ray.dir));
 newLig += 0.1 * pow(1.0 - nv, 1.);
+emInx = 0;
 }
 if (i == 7 && (minHit.obj == 5))
 {
@@ -646,6 +676,7 @@ float d = GetObjSDF(10, minHit.P, tt);
 float s = max(0.01 * d,0.001);
 float f = clamp(1.- pow(s, 0.5), 0., 1.);
 newLig = pow(f, 1*20.) * lightColor[i];
+emInx = 1;
 }
 if (i == 7 && minHit.obj == 10)
 {
@@ -659,6 +690,7 @@ nl = nl * 0.5 + 0.5;
 newLig += 0.1 * nl * lightColor[i];
 float nv = saturate(dot(minHit.N, -ray.dir));
 newLig += 0.1 * pow(1.0 - nv, 1.);
+emInx = 0;
 }
 if (i == 9 && (minHit.obj == 5))
 {
@@ -666,6 +698,7 @@ float d = GetObjSDF(11, minHit.P, tt);
 float s = max(0.01 * d,0.001);
 float f = clamp(1.- pow(s, 0.5), 0., 1.);
 newLig = pow(f, 1*20.) * lightColor[i];
+emInx = 1;
 }
 if (i == 9 && minHit.obj == 11)
 {
@@ -679,6 +712,7 @@ nl = nl * 0.5 + 0.5;
 newLig += 0.1 * nl * lightColor[i];
 float nv = saturate(dot(minHit.N, -ray.dir));
 newLig += 0.1 * pow(1.0 - nv, 1.);
+emInx = 0;
 }
 if (i == 10 && (minHit.obj == 5 || minHit.obj == 6))
 {
@@ -686,6 +720,7 @@ float d = GetObjSDF(16, minHit.P, tt);
 float s = max(0.01 * d,0.001);
 float f = clamp(1.- pow(s, 0.5), 0., 1.);
 newLig = pow(f, 1*20.) * lightColor[i];
+emInx = 1;
 }
 if (i == 10 && minHit.obj == 16)
 {
@@ -699,14 +734,17 @@ nl = nl * 0.5 + 0.5;
 newLig += 0.1 * nl * lightColor[i];
 float nv = saturate(dot(minHit.N, -ray.dir));
 newLig += 0.1 * pow(1.0 - nv, 1.);
+emInx = 0;
 }
 		//@@@
-		if(minHit.obj!=9)
+		//???
+		if(emInx == 1)
 		{
-		float nl = saturate(dot(minHit.N,-lightDir));
-		float k = 0.5;
-		nl = nl*k+k;
-		newLig*=nl;
+		//float nl = saturate(dot(minHit.N,-lightDir));
+		float3 artL = normalize(float3(0, 1, -1));
+		float nl = saturate(dot(minHit.N, lerp(-lightDir, artL,1)));
+		//nl = nl*0.5+0.5;
+		newLig*=nl*mat.albedo;
 		}
 	}
 
@@ -1026,7 +1064,7 @@ re = min(re, 0 + SDFBox(p, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.
 }
 else if (inx == 3 )
 {
-re = min(re, -0.05 + SDFBox(p, float3(-1.53, -5.443, -2.17), float3(0.5, 0.07957316, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(-1.53, -5.443, -2.17), float3(0.5, 0.07957316, 0.5), float3(0, 0, 0)));
 }
 else if (inx == 4 )
 {

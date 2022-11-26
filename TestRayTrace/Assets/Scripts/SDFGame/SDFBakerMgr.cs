@@ -605,6 +605,7 @@ public class SDFBakerMgr : MonoBehaviour
                 bakedRenderEmissive.Add("    float s = max(0.01 * d,0.001);");
                 bakedRenderEmissive.Add("    float f = clamp(1.- pow(s, 0.5), 0., 1.);");
                 bakedRenderEmissive.Add("    newLig = pow(f, "+ emtag .fadeScale+ "*20.) * lightColor[i];");
+                bakedRenderEmissive.Add("    emInx = 1;");
                 bakedRenderEmissive.Add("}");
 
                 bakedRenderEmissive.Add("if (i == "+ dirLightTags[i].lightInx + " && minHit.obj == "+ selftag .objInx+ ")");
@@ -619,6 +620,7 @@ public class SDFBakerMgr : MonoBehaviour
                 bakedRenderEmissive.Add("    newLig += 0.1 * nl * lightColor[i];");
                 bakedRenderEmissive.Add("    float nv = saturate(dot(minHit.N, -ray.dir));");
                 bakedRenderEmissive.Add("    newLig += 0.1 * pow(1.0 - nv, 1.);");
+                bakedRenderEmissive.Add("    emInx = 0;");
                 bakedRenderEmissive.Add("}");
             }
         }
@@ -898,7 +900,6 @@ public class SDFBakerMgr : MonoBehaviour
         //Bake ObjUV
         //uv = BoxedUV(minHit.P, center, bound, rot);
         line = "uv = BoxedUV(minHit.P, " + center_str + ", " + bound_str + ", " + rot_str + ");";
-        bakedObjUVs.Add(line);
         bakedObjUVs.Add(line);
         bakedObjUVs.Add("return uv;");
 
