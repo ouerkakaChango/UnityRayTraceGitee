@@ -451,7 +451,14 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==14)
+if(inx==3)
+{
+	float2 uv = GetObjUV(minHit);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);
+}
+if(inx==9)
 {
 	float2 uv = GetObjUV(minHit);
 float3 T,B;
@@ -472,14 +479,7 @@ float3 T,B;
 	GetObjTB(T,B, minHit);
 	minHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);
 }
-if(inx==9)
-{
-	float2 uv = GetObjUV(minHit);
-float3 T,B;
-	GetObjTB(T,B, minHit);
-	minHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);
-}
-if(inx==3)
+if(inx==14)
 {
 	float2 uv = GetObjUV(minHit);
 float3 T,B;
@@ -740,10 +740,10 @@ emInx = 0;
 		//???
 		if(emInx == 1)
 		{
-		//float nl = saturate(dot(minHit.N,-lightDir));
+		//newLig *= 0.5;
 		float3 artL = normalize(float3(0, 1, -1));
-		float nl = saturate(dot(minHit.N, lerp(-lightDir, artL,1)));
-		//nl = nl*0.5+0.5;
+		float nl = saturate(dot(minHit.N, lerp(-lightDir, artL,0)));
+		nl = nl*0.5+0.5;
 		newLig*=nl*mat.albedo;
 		}
 	}
@@ -1064,7 +1064,13 @@ re = min(re, 0 + SDFBox(p, float3(-0.09, -2.69, 3.28), float3(6.302364, 0.1, 15.
 }
 else if (inx == 3 )
 {
-re = min(re, 0 + SDFBox(p, float3(-1.53, -5.443, -2.17), float3(0.5, 0.07957316, 0.5), float3(0, 0, 0)));
+float3 center = float3(-1.53, -5.443, -2.17);
+float3 bound = float3(0.5, 0.07957316, 0.5);
+float3 rot = float3(0, 0, 0);
+float offset = 0;
+offset -= 0.025*sin(1000*p.x);
+float d = offset + SDFBox(p,center,bound, rot);
+re = min(re,d);
 }
 else if (inx == 4 )
 {
@@ -1096,7 +1102,13 @@ re = min(re, 0 + SDFBox(p, float3(0.26, 3.61, -15.22), float3(1.732038, 0.19472,
 }
 else if (inx == 9 )
 {
-re = min(re, -0.1 + SDFBox(p, float3(-1.53, -5.81, -2.17), float3(0.5, 0.25817, 0.5), float3(0, 0, 0)));
+float3 center = float3(-1.53, -5.81, -2.17);
+float3 bound = float3(0.5, 0.25817, 0.5);
+float3 rot = float3(0, 0, 0);
+float offset = -0.1;
+offset -= 0.025*sin(1000*p.x);
+float d = offset + SDFBox(p,center,bound, rot);
+re = min(re,d);
 }
 else if (inx == 10 )
 {
@@ -1108,15 +1120,33 @@ re = min(re, 0 + SDFBox(p, float3(8.94, -2.69, 1.29), float3(0.1, 0.1, 18.75295)
 }
 else if (inx == 12 )
 {
-re = min(re, -0.08 + SDFBox(p, float3(-0.775, -5.627, -2.091), float3(0.5000001, 0.2581701, 0.5), float3(0, 0, 90)));
+float3 center = float3(-0.775, -5.627, -2.091);
+float3 bound = float3(0.5000001, 0.2581701, 0.5);
+float3 rot = float3(0, 0, 90);
+float offset = -0.08;
+offset -= 0.025*sin(1000*p.x);
+float d = offset + SDFBox(p,center,bound, rot);
+re = min(re,d);
 }
 else if (inx == 13 )
 {
-re = min(re, -0.08 + SDFBox(p, float3(-2.287, -5.627, -2.091), float3(0.5000001, 0.2581701, 0.5), float3(0, 0, 90)));
+float3 center = float3(-2.287, -5.627, -2.091);
+float3 bound = float3(0.5000001, 0.2581701, 0.5);
+float3 rot = float3(0, 0, 90);
+float offset = -0.08;
+offset -= 0.025*sin(1000*p.x);
+float d = offset + SDFBox(p,center,bound, rot);
+re = min(re,d);
 }
 else if (inx == 14 )
 {
-re = min(re, -0.1 + SDFBox(p, float3(-1.53, -5.438, -1.474), float3(0.5, 0.2581701, 0.6315001), float3(270, 0, 0)));
+float3 center = float3(-1.53, -5.438, -1.474);
+float3 bound = float3(0.5, 0.2581701, 0.6315001);
+float3 rot = float3(270, 0, 0);
+float offset = -0.1;
+offset -= 0.025*sin(1000*p.x);
+float d = offset + SDFBox(p,center,bound, rot);
+re = min(re,d);
 }
 else if (inx == 15 )
 {

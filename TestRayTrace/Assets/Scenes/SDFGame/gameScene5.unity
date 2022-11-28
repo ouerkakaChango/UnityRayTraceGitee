@@ -745,6 +745,7 @@ GameObject:
   - component: {fileID: 308221758}
   - component: {fileID: 308221763}
   - component: {fileID: 308221762}
+  - component: {fileID: 308221764}
   m_Layer: 0
   m_Name: couch_up
   m_TagString: Untagged
@@ -905,6 +906,19 @@ MonoBehaviour:
   - 3
   texParams:
   - {fileID: 308221762}
+--- !u!114 &308221764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 308221756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d5fb7499814c5540afc2e246b52b52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  expressionStr: offset -= 0.025*sin(1000*p.x);
 --- !u!1 &311485791
 GameObject:
   m_ObjectHideFlags: 0
@@ -2374,6 +2388,7 @@ GameObject:
   - component: {fileID: 1098443577}
   - component: {fileID: 1098443576}
   - component: {fileID: 1098443581}
+  - component: {fileID: 1098443582}
   m_Layer: 0
   m_Name: couch_base
   m_TagString: Untagged
@@ -2510,6 +2525,19 @@ MonoBehaviour:
   - 3
   texParams:
   - {fileID: 308221762}
+--- !u!114 &1098443582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1098443575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d5fb7499814c5540afc2e246b52b52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  expressionStr: offset -= 0.025*sin(1000*p.x);
 --- !u!1 &1109228268
 GameObject:
   m_ObjectHideFlags: 0
@@ -3413,6 +3441,7 @@ GameObject:
   - component: {fileID: 1332211088}
   - component: {fileID: 1332211087}
   - component: {fileID: 1332211091}
+  - component: {fileID: 1332211092}
   m_Layer: 0
   m_Name: couch_left
   m_TagString: Untagged
@@ -3549,6 +3578,19 @@ MonoBehaviour:
   - 3
   texParams:
   - {fileID: 308221762}
+--- !u!114 &1332211092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332211085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d5fb7499814c5540afc2e246b52b52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  expressionStr: offset -= 0.025*sin(1000*p.x);
 --- !u!1 &1360174881
 GameObject:
   m_ObjectHideFlags: 0
@@ -3563,6 +3605,7 @@ GameObject:
   - component: {fileID: 1360174884}
   - component: {fileID: 1360174883}
   - component: {fileID: 1360174887}
+  - component: {fileID: 1360174888}
   m_Layer: 0
   m_Name: couch_right
   m_TagString: Untagged
@@ -3699,6 +3742,19 @@ MonoBehaviour:
   - 3
   texParams:
   - {fileID: 308221762}
+--- !u!114 &1360174888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360174881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d5fb7499814c5540afc2e246b52b52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  expressionStr: offset -= 0.025*sin(1000*p.x);
 --- !u!1 &1391646424
 GameObject:
   m_ObjectHideFlags: 0
@@ -3713,6 +3769,7 @@ GameObject:
   - component: {fileID: 1391646427}
   - component: {fileID: 1391646426}
   - component: {fileID: 1391646430}
+  - component: {fileID: 1391646431}
   m_Layer: 0
   m_Name: couch_back
   m_TagString: Untagged
@@ -3849,6 +3906,19 @@ MonoBehaviour:
   - 3
   texParams:
   - {fileID: 308221762}
+--- !u!114 &1391646431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1391646424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d5fb7499814c5540afc2e246b52b52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  expressionStr: offset -= 0.025*sin(1000*p.x);
 --- !u!1 &1427000036
 GameObject:
   m_ObjectHideFlags: 0
@@ -3993,8 +4063,40 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tags:
   - {fileID: 308221763}
+  - {fileID: 1098443581}
+  - {fileID: 1332211091}
+  - {fileID: 1360174887}
+  - {fileID: 1391646430}
   bakedObjMatLib:
   - if(inx==3)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - "\tminHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);"
+  - '}'
+  - if(inx==9)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - "\tminHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);"
+  - '}'
+  - if(inx==12)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - "\tminHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);"
+  - '}'
+  - if(inx==13)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - "\tminHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,3);"
+  - '}'
+  - if(inx==14)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' float3 T,B;'
