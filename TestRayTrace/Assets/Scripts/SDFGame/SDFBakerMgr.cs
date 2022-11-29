@@ -5,6 +5,7 @@ using UnityEngine;
 using static LightUtility.LightFuncs;
 using XUtility;
 using Spline;
+using static ShaderEqualision.RayMathFuncs;
 
 public class SDFBakerMgr : MonoBehaviour
 {
@@ -586,27 +587,47 @@ public class SDFBakerMgr : MonoBehaviour
                 {
                     Debug.LogError("No emissive tag!");
                 }
-                List<SDFBakerTag> objs = emtag.objs;
                 var selftag = emtag.gameObject.GetComponent<SDFBakerTag>();
-                string line1 = "if (i == " + dirLightTags[i].lightInx + " && (";
-                for(int i1 = 0;i1<objs.Count;i1++)
+
+                List<SDFBakerTag> objs = null;
+
+                if (emtag.rangeType == SDFEmissiveRangeType.objList)
                 {
-                    line1 += "minHit.obj == "+objs[i1].objInx+"";
-                    if(i1!=objs.Count-1)
+                    objs = emtag.objs;
+                }
+                else if (emtag.rangeType == SDFEmissiveRangeType.boxRange)
+                {
+                    objs = new List<SDFBakerTag>();
+                    for (int i1 = 0;i1<tags.Length;i1++)
                     {
-                        line1 += " || ";
+                        if(IsInBBox(tags[i1].gameObject.transform.position,
+                            emtag.boxCenter-emtag.boxBound,
+                            emtag.boxCenter+emtag.boxBound))
+                        {
+                            objs.Add(tags[i1]);
+                        }
                     }
                 }
-                line1 += "))";
-                bakedRenderEmissive.Add(line1);
-                bakedRenderEmissive.Add("{");
-                //bakedRenderEmissive.Add("    TraceInfo tt;");
-                bakedRenderEmissive.Add("    float d = GetObjSDF("+selftag.objInx+", minHit.P, tt);");
-                bakedRenderEmissive.Add("    float s = max(0.01 * d,0.001);");
-                bakedRenderEmissive.Add("    float f = clamp(1.- pow(s, 0.5), 0., 1.);");
-                bakedRenderEmissive.Add("    newLig = pow(f, "+ emtag .fadeScale+ "*20.) * lightColor[i];");
-                bakedRenderEmissive.Add("    emInx = 1;");
-                bakedRenderEmissive.Add("}");
+                string line1 = "if (i == " + dirLightTags[i].lightInx + " && (";
+                    for (int i1 = 0; i1 < objs.Count; i1++)
+                    {
+                        line1 += "minHit.obj == " + objs[i1].objInx + "";
+                        if (i1 != objs.Count - 1)
+                        {
+                            line1 += " || ";
+                        }
+                    }
+                    line1 += "))";
+                    bakedRenderEmissive.Add(line1);
+                    bakedRenderEmissive.Add("{");
+                    //bakedRenderEmissive.Add("    TraceInfo tt;");
+                    bakedRenderEmissive.Add("    float d = GetObjSDF(" + selftag.objInx + ", minHit.P, tt);");
+                    bakedRenderEmissive.Add("    float s = max(0.01 * d,0.001);");
+                    bakedRenderEmissive.Add("    float f = clamp(1.- pow(s, 0.5), 0., 1.);");
+                    bakedRenderEmissive.Add("    newLig = pow(f, " + emtag.fadeScale + "*20.) * lightColor[i];");
+                    bakedRenderEmissive.Add("    emInx = 1;");
+                    bakedRenderEmissive.Add("}");
+                
 
                 bakedRenderEmissive.Add("if (i == "+ dirLightTags[i].lightInx + " && minHit.obj == "+ selftag .objInx+ ")");
                 bakedRenderEmissive.Add("{");
