@@ -822,6 +822,7 @@ public class SDFBakerMgr : MonoBehaviour
         //Vector3 center = obj.transform.position;
         string centerStr = Bake(obj.transform.position);
         string boundStr = Bake(obj.transform.lossyScale * 0.5f);
+        string rotStr = BakeRotEuler(obj.transform.rotation);
         var textag = tag.tex3DTag;
         if(textag==null)
         {
@@ -836,7 +837,7 @@ public class SDFBakerMgr : MonoBehaviour
 
         //---Shape
         string texName = textag.plainTextures[0].name;
-        bakedSDFs.Add("re = SDFTex3D(p, "+centerStr+", "+ boundStr + ", "+texName+", TraceThre);");
+        bakedSDFs.Add("re = SDFTex3D(p, "+centerStr+", "+ boundStr + ", " + rotStr+", "+texName+", TraceThre);");
         //___Shape
 
         //---Normal

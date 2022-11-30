@@ -210,7 +210,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &30071083
@@ -575,7 +575,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 2
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &286988854
@@ -670,7 +670,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 3
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &286988858
@@ -965,7 +965,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 5
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &311485795
@@ -1162,7 +1162,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 6
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &392099990
@@ -1251,7 +1251,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 7
+  objInx: 5
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &520542746
@@ -1501,7 +1501,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 8
+  objInx: 6
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &687769464
@@ -1714,7 +1714,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 1677314388}
   mergeType: 1
-  objInx: 0
+  objInx: 7
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &742580214
@@ -1774,7 +1774,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 742580211}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 4.27, y: -5.47, z: -8.9}
+  m_LocalPosition: {x: 4.27, y: -5.99, z: -8.9}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2388,7 +2388,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 9
+  objInx: 8
   needExtraCondition: 0
   extraCondition: 
 --- !u!135 &1087415594
@@ -2696,7 +2696,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 11
+  objInx: 9
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1109228272
@@ -2954,8 +2954,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1171519927}
-  m_LocalRotation: {x: -0.10950873, y: 0.03818586, z: -0.0041803825, w: -0.9932433}
-  m_LocalPosition: {x: -0.11161518, y: -4.072437, z: -9.229253}
+  m_LocalRotation: {x: 0.14204153, y: 0.060783047, z: -0.008977341, w: 0.987952}
+  m_LocalPosition: {x: 1.9575117, y: -4.113191, z: -12.698227}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3441,7 +3441,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 12
+  objInx: 10
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1211381443
@@ -3973,7 +3973,7 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[19];
+  - int renderMode[17];
   bakedRenders: []
   bakedShadows: []
   bakedFullLightInfo: []
@@ -3982,25 +3982,23 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 1677314390}
   - {fileID: 30071082}
   - {fileID: 276605038}
   - {fileID: 286988857}
-  - {fileID: 308221758}
   - {fileID: 311485794}
   - {fileID: 336815351}
   - {fileID: 520542745}
   - {fileID: 585464655}
+  - {fileID: 742580213}
   - {fileID: 1087415593}
-  - {fileID: 1098443576}
   - {fileID: 1109228271}
   - {fileID: 1211381442}
-  - {fileID: 1332211087}
-  - {fileID: 1360174883}
-  - {fileID: 1391646426}
+  - {fileID: 1677314390}
   - {fileID: 1755708949}
+  - {fileID: 1787346845}
   - {fileID: 1941780502}
   - {fileID: 2097505601}
+  - {fileID: 2129178121}
   dirLightTags:
   - {fileID: 30071081}
   - {fileID: 66970281}
@@ -4333,7 +4331,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 1677314388}
   mergeType: 1
-  objInx: 0
+  objInx: 11
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1677314391
@@ -4393,7 +4391,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1677314387}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -3.38, y: -5.47, z: -2.55}
+  m_LocalPosition: {x: -3.38, y: -5.99, z: -2.55}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
@@ -4587,7 +4585,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 16
+  objInx: 12
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &1765637316
@@ -4780,7 +4778,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 1677314388}
   mergeType: 1
-  objInx: 0
+  objInx: 13
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &1787346846
@@ -4840,7 +4838,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1787346843}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -3.38, y: -5.47, z: -8.9}
+  m_LocalPosition: {x: -3.38, y: -5.99, z: -8.9}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
@@ -5153,7 +5151,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 17
+  objInx: 14
   needExtraCondition: 0
   extraCondition: 
 --- !u!135 &1941780503
@@ -5437,7 +5435,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 18
+  objInx: 15
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &2099006227
@@ -5613,7 +5611,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 1677314388}
   mergeType: 1
-  objInx: 0
+  objInx: 16
   needExtraCondition: 0
   extraCondition: 
 --- !u!23 &2129178122
@@ -5673,7 +5671,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2129178119}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 4.27, y: -5.47, z: -2.43}
+  m_LocalPosition: {x: 4.27, y: -5.99, z: -2.43}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
