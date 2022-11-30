@@ -1,0 +1,43 @@
+valMaps:
+SceneName Detail6
+BackGroundColor float3(1,1,1)
+
+Blocks:
+
+###BLOCK ExtraDef
+#include "../../../HLSL/MatLib/CommonBgMat.hlsl"
+###BLOCK
+
+###BLOCK MainRender
+if (minHit.bHit)
+{ 
+	mat = GetObjMaterial_PBR(minHit.obj);
+	if(mat.reflective<0.001)
+	{
+	re = RenderSceneObj(ray, minHit, mat);
+	}
+	else if (mat.reflective<0.999)
+	{
+		re = lerp(RenderSceneObj(ray, minHit, mat),SceneRenderReflect(ray, minHit,mat),mat.reflective);
+	}
+	else
+	{
+	re = SceneRenderReflect(ray, minHit,mat);
+	}
+	re *= RenderSceneSDFShadow(minHit);
+}
+else
+{
+	re = (@BackGroundColor);
+	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
+	//re = stars(ray.pos, ray.dir);
+}
+###BLOCK
+
+###BLOCK IndirectRender
+	if(mat.reflective<0.5)
+	{
+	SetIndirectColor(re, seed, ray, minHit, mat);
+	}
+
+###BLOCK
