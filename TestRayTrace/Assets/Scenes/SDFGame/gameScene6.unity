@@ -319,8 +319,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
-    metallic: 1
-    roughness: 0
+    metallic: 0.9
+    roughness: 0.1
     reflective: 0
     reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
@@ -462,7 +462,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.5005
+      value: -5.503959
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_LocalPosition.y
@@ -470,27 +470,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.081
+      value: -0.078568146
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: 0.14400192
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.7071068
+      value: -0.14400192
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.000000106770166
+      value: 0.69228864
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.000000106770166
+      value: 0.6922885
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -498,12 +498,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 156.499
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_Name
       value: godness
       objectReference: {fileID: 0}
+    - target: {fileID: 3087628351153997959, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 45777d4767efb224ca7b575bd3e22866, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
 --- !u!1 &1162570998
@@ -747,9 +751,9 @@ MonoBehaviour:
   indirectMultiplier: 1
   useMSDFShadow: 0
   useLigdow: 0
-  useDOF: 0
-  dof_needFixFocusDepth: 0
-  dof_needMeanFiliter: 1
+  useDOF: 1
+  dof_needFixFocusDepth: 1
+  dof_needMeanFiliter: 0
   dof_needDilation: 1
   dof_needBoxBlur: 0
   usePostOp: 0
@@ -846,17 +850,163 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ambientIntensity: 0.03
-  bakedSDFs: []
-  bakedObjNormals: []
-  bakedObjUVs: []
-  bakedObjTBs: []
-  bakedSpecialObjects: []
-  bakedMaterials: []
+  bakedSDFs:
+  - if(inx == 0 )
+  - '{'
+  - re = min(re, 0 + SDFBox(p, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
+    0, 0)));
+  - '}'
+  - else if (inx == 1 )
+  - '{'
+  - re = min(re, 0 + SDFBox(p, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
+    0, 0)));
+  - '}'
+  - else if (inx == 2 )
+  - '{'
+  - re = SDFTex3D(p, float3(0, 2.21, 0), float3(2.000001, 2, 2.000001), float3(0,
+    178.868, 0), SDF_godness, TraceThre);
+  - '}'
+  bakedObjNormals:
+  - if(inx == 0 )
+  - '{'
+  - '}'
+  - else if (inx == 1 )
+  - '{'
+  - '}'
+  - else if (inx == 2 )
+  - '{'
+  - '}'
+  bakedObjUVs:
+  - if(inx == 0 )
+  - '{'
+  - uv = BoxedUV(minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
+    0, 0));
+  - return uv;
+  - '}'
+  - else if (inx == 1 )
+  - '{'
+  - uv = BoxedUV(minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
+    0, 0));
+  - return uv;
+  - '}'
+  - else if (inx == 2 )
+  - '{'
+  - '}'
+  bakedObjTBs:
+  - if(inx == 0 )
+  - '{'
+  - BoxedTB(T,B,minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
+    0, 0));
+  - return;
+  - '}'
+  - if(inx == 1 )
+  - '{'
+  - BoxedTB(T,B,minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
+    0, 0));
+  - return;
+  - '}'
+  - if(inx == 2 )
+  - '{'
+  - '}'
+  bakedSpecialObjects:
+  - if(inx == 0 )
+  - '{'
+  - '}'
+  - else if (inx == 1 )
+  - '{'
+  - '}'
+  - else if (inx == 2 )
+  - '{'
+  - '}'
+  bakedMaterials:
+  - if(obj == 0 )
+  - '{'
+  - re.albedo = float3(1, 1, 1);
+  - re.metallic = 0;
+  - re.roughness = 1;
+  - re.reflective = 0;
+  - re.reflect_ST = float2(1, 0);
+  - '}'
+  - else if (obj == 1 )
+  - '{'
+  - re.albedo = float3(1, 1, 1);
+  - re.metallic = 0;
+  - re.roughness = 1;
+  - re.reflective = 0;
+  - re.reflect_ST = float2(1, 0);
+  - '}'
+  - else if (obj == 2 )
+  - '{'
+  - re.albedo = float3(1, 1, 1);
+  - re.metallic = 0.9;
+  - re.roughness = 0.1;
+  - re.reflective = 0;
+  - re.reflect_ST = float2(1, 0);
+  - '}'
   bakedRenderModes:
   - int renderMode[3];
-  bakedRenders: []
-  bakedShadows: []
-  bakedFullLightInfo: []
+  - renderMode[0] = 0;
+  - renderMode[1] = 0;
+  - renderMode[2] = 1;
+  - return renderMode[obj];
+  bakedRenders:
+  - if(mode==0)
+  - '{'
+  - '  float3 lightDirs[1];'
+  - '  float3 dirLightColors[1];'
+  - '  lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);'
+  - '  dirLightColors[0] = float3(1, 0.9568627, 0.8392157);'
+  - '  result.rgb = 0.03 * mat.albedo * mat.ao;'
+  - '  for(int i=0;i<1;i++)'
+  - '  {'
+  - '      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);'
+  - '  }'
+  - '}'
+  bakedShadows:
+  - int lightType[1];
+  - float3 lightPos[1];
+  - float3 lightDirs[1];
+  - int shadowType[1];
+  - float lightspace = 1;
+  - float maxLength = MaxSDF;
+  - float tsha = 1;
+  - for (int i = 0; i < 0; i++)
+  - '{'
+  - '  float maxLength = MaxSDF;'
+  - '  if(lightType[i]==0)'
+  - '  {'
+  - '      maxLength = MaxSDF;'
+  - '  }'
+  - '  if(lightType[i]==1)'
+  - '  {'
+  - '      maxLength = length(minHit.P - lightPos[i]);'
+  - '  }'
+  - '  if(lightType[i]<0)'
+  - '  {'
+  - '      tsha = 1;'
+  - '  }'
+  - '  else'
+  - '  {'
+  - '      if(shadowType[i]==0)'
+  - '      {'
+  - '          tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);'
+  - '      }'
+  - '      if(shadowType[i]==1)'
+  - '      {'
+  - '          tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);'
+  - '      }'
+  - '  }'
+  - '  lightspace -= (1 - tsha);'
+  - '}'
+  - lightspace /= 1;
+  - sha = lightspace;
+  bakedFullLightInfo:
+  - const static int lightType[1] = {0};
+  - const static float3 lightColor[1] = {float3(1, 0.9568627, 0.8392157)};
+  - const static float3 lightPos[1] = {float3(0, 3, 0)};
+  - const static float3 lightDirs[1] = {float3(-0.3213938, -0.7660444, 0.5566705)};
+  - const static int shadowType[1] = {-2};
+  - const static float lightspace = 1;
   bakedRenderEmissive: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []

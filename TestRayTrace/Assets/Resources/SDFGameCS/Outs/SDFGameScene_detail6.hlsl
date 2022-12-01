@@ -74,8 +74,8 @@ re.reflect_ST = float2(1, 0);
 else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
-re.metallic = 1;
-re.roughness = 0;
+re.metallic = 0.9;
+re.roughness = 0.1;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
@@ -376,7 +376,7 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 	inx = GetSpecialID(inx);
 	if(inx == 2 )
 {
-return GetObjSDFNormal(inx, p, traceInfo, 5);
+return GetObjSDFNormal(inx, p, traceInfo, 20);
 }
 	return GetObjSDFNormal(inx, p, traceInfo);
 }
