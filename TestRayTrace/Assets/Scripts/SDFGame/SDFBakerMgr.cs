@@ -401,7 +401,7 @@ public class SDFBakerMgr : MonoBehaviour
                 tn -= 1;
             }
         }
-        bakedShadows.Add("int lightType[" + tn + "];");
+        bakedShadows.Add("int lightType[" + n + "];");
         int type = -999;
         int lcount = 0;
         for (int i = 0; i < n; i++)
@@ -442,7 +442,7 @@ public class SDFBakerMgr : MonoBehaviour
             lcount++;
         }
 
-        bakedShadows.Add("float3 lightDirs[" + tn + "];");
+        bakedShadows.Add("float3 lightDirs[" + n + "];");
         lcount = 0;
         for (int i=0;i< n; i++)
         {
@@ -474,7 +474,7 @@ public class SDFBakerMgr : MonoBehaviour
 
         //int shadowType[5];
         //....
-        bakedShadows.Add("int shadowType[" + tn + "];");
+        bakedShadows.Add("int shadowType[" + n + "];");
         lcount = 0;
         for(int i=0;i< n; i++)
         {
@@ -519,7 +519,7 @@ public class SDFBakerMgr : MonoBehaviour
         //lightspace /= 5;
         //sha = lightspace;
 
-        bakedShadows.Add("float lightspace = "+ tn + ";");
+        bakedShadows.Add("float lightspace = "+ (tn<=0?1:tn )+ ";");
         bakedShadows.Add("float maxLength = MaxSDF;");
         bakedShadows.Add("float tsha = 1;");
         bakedShadows.Add("for (int i = 0; i < "+tn+"; i++)");
@@ -550,7 +550,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedShadows.Add("  }");
         bakedShadows.Add("  lightspace -= (1 - tsha);");
         bakedShadows.Add("}");
-        bakedShadows.Add("lightspace /= "+tn+";");
+        bakedShadows.Add("lightspace /= "+ (tn <= 0 ? 1 : tn) + ";");
         bakedShadows.Add("sha = lightspace;");
     }
 

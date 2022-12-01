@@ -19,6 +19,7 @@
 #include "../../../HLSL/MatLib/CommonMatLib.hlsl"
 
 //@@@SDFBakerMgr TexSys
+Texture3D<float> SDF_godness;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
@@ -73,8 +74,8 @@ re.reflect_ST = float2(1, 0);
 else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
+re.metallic = 1;
+re.roughness = 0;
 re.reflective = 0;
 re.reflect_ST = float2(1, 0);
 }
@@ -88,7 +89,7 @@ int GetObjRenderMode(int obj)
 int renderMode[3];
 renderMode[0] = 0;
 renderMode[1] = 0;
-renderMode[2] = 0;
+renderMode[2] = 1;
 return renderMode[obj];
 //@@@
 }
@@ -110,8 +111,6 @@ return uv;
 }
 else if (inx == 2 )
 {
-uv = BoxedUV(minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return uv;
 }
 	//@@@
 
@@ -141,8 +140,6 @@ return;
 }
 if(inx == 2 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return;
 }
 //@@@
 basis_unstable(minHit.N, T, B);
@@ -271,17 +268,13 @@ if(true)
 {
 //@@@SDFBakerMgr DirShadow
 int lightType[1];
-lightType[0] = 0;
 float3 lightPos[1];
-lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
-lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
 int shadowType[1];
-shadowType[0] =1;
 float lightspace = 1;
 float maxLength = MaxSDF;
 float tsha = 1;
-for (int i = 0; i < 1; i++)
+for (int i = 0; i < 0; i++)
 {
 float maxLength = MaxSDF;
 if(lightType[i]==0)
@@ -353,7 +346,7 @@ re = min(re, 0 + SDFBox(p, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(
 }
 else if (inx == 2 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, 0, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = SDFTex3D(p, float3(0, 2.21, 0), float3(2.000001, 2, 2.000001), float3(0, 178.868, 0), SDF_godness, TraceThre);
 }
 //@@@
 
@@ -381,6 +374,10 @@ float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonS
 float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 {
 	inx = GetSpecialID(inx);
+	if(inx == 2 )
+{
+return GetObjSDFNormal(inx, p, traceInfo, 5);
+}
 	return GetObjSDFNormal(inx, p, traceInfo);
 }
 

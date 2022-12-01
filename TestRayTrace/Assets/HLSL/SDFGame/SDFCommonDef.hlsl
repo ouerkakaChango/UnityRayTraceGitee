@@ -363,6 +363,7 @@ float UDFQuad2D(in float3 p, in float3 v1, in float3 v2, in float3 v3, in float3
 		);
 }
 
+//??? only support Cube SDF_Tex3D for now
 float SDFTex3D(float3 p, float3 center, float3 bound, float3 rotEuler, Texture3D<float> SDFTex3D, float traceThre, float offset = 0)
 {
 	float3 q = p - center;

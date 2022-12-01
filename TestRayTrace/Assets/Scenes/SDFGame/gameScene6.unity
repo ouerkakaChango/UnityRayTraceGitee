@@ -282,7 +282,7 @@ Transform:
   m_LocalScale: {x: 20, y: 1, z: 20}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &472640113
 GameObject:
@@ -297,8 +297,9 @@ GameObject:
   - component: {fileID: 472640116}
   - component: {fileID: 472640115}
   - component: {fileID: 472640114}
+  - component: {fileID: 472640119}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: godness
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -318,20 +319,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
-    metallic: 0
-    roughness: 1
+    metallic: 1
+    roughness: 0
     reflective: 0
     reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
-  renderMode: 0
-  shapeType: 0
+  renderMode: 1
+  shapeType: 4
   booleanTags: []
   specialID: -1
   fontCharacter: 0
   sliceTexTag: {fileID: 0}
   hBound: 0.02
   SDF_offset2D: 0
-  tex3DTag: {fileID: 0}
+  tex3DTag: {fileID: 472640119}
   mergeType: 1
   objInx: 2
   needExtraCondition: 0
@@ -405,13 +406,106 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 472640113}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: 0.99995124, z: -0, w: 0.0098783765}
+  m_LocalPosition: {x: 0, y: 2.21, z: 0}
+  m_LocalScale: {x: 4, y: 4, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 178.868, z: 0}
+--- !u!114 &472640119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472640113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cde27f4ccdaf1aa499880dabc968b5e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: 2
+  pbrTextures: []
+  heightTextures: []
+  plainTextures:
+  - name: SDF_godness
+    tex: {fileID: 11700000, guid: f2f3f7a5bcfd92840ba9e56db30ab765, type: 2}
+    channel: 3
+  envTextures: []
+  texInx: 0
+  useSubTex: 0
+  subTexID: 0
+  edgeNum: 4
+--- !u!1001 &1034412556
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 9.0896
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 9.0896
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 9.0896
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -5.5005
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.533
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.081
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.000000106770166
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.000000106770166
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_Name
+      value: godness
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
 --- !u!1 &1162570998
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,7 +598,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!114 &1162571001
 MonoBehaviour:
@@ -518,7 +612,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bakeShadow: 1
+  bakeShadow: 0
   shadowType: 1
   lightPass: 0
   lightType: 0
@@ -603,8 +697,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1383017743}
-  m_LocalRotation: {x: 0.096802786, y: 0.82725984, z: -0.15096442, w: 0.5324285}
-  m_LocalPosition: {x: -3.4513345, y: 1.3753623, z: 1.2697098}
+  m_LocalRotation: {x: 0.14437181, y: -0.37009448, z: 0.05823285, w: 0.915858}
+  m_LocalPosition: {x: 1.2168474, y: 3.7467887, z: -1.2637408}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -730,9 +824,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38a12b99d3cda0f4eaf5dab605c29be0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outTextures: []
-  tags: []
-  bakedDeclares: []
+  outTextures:
+  - name: SDF_godness
+    tex: {fileID: 11700000, guid: f2f3f7a5bcfd92840ba9e56db30ab765, type: 2}
+    channel: 3
+  tags:
+  - {fileID: 472640119}
+  bakedDeclares:
+  - Texture3D<float> SDF_godness;
   bakedEnvTexSettings: []
 --- !u!114 &1691347758
 MonoBehaviour:
@@ -780,5 +879,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
