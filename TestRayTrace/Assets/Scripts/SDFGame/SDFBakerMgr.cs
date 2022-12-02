@@ -837,7 +837,7 @@ public class SDFBakerMgr : MonoBehaviour
 
         //---Shape
         string texName = textag.plainTextures[0].name;
-        bakedSDFs.Add("re = SDFTex3D(p, "+centerStr+", "+ boundStr + ", " + rotStr+", "+texName+", TraceThre);");
+        bakedSDFs.Add("re = "+tag.SDF_offset+" + 0.5*SDFTex3D(p, "+centerStr+", "+ boundStr + ", " + rotStr+", "+texName+", TraceThre);");
         //___Shape
 
         //---Normal
@@ -846,6 +846,11 @@ public class SDFBakerMgr : MonoBehaviour
         {
             string normTexName = textag.plainTextures[1].name;
             bakedObjNormals.Add("return SDFTexNorm3D(p, "+centerStr+", "+ boundStr + ", "+normTexName+");");
+        }
+        else
+        {
+            //return GetObjSDFNormal(inx, p, traceInfo, 20);
+            bakedObjNormals.Add("return GetObjSDFNormal(inx, p, traceInfo, "+tag.normEplison+");");
         }
         //___Normal
     }

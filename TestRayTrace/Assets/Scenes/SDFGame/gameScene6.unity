@@ -135,7 +135,6 @@ GameObject:
   - component: {fileID: 351523965}
   - component: {fileID: 351523964}
   - component: {fileID: 351523963}
-  - component: {fileID: 351523962}
   - component: {fileID: 351523961}
   m_Layer: 0
   m_Name: Ground
@@ -163,38 +162,7 @@ MonoBehaviour:
     reflective: 0
     reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
-  renderMode: 0
-  shapeType: 0
-  booleanTags: []
-  specialID: -1
-  fontCharacter: 0
-  sliceTexTag: {fileID: 0}
-  hBound: 0.02
-  SDF_offset2D: 0
-  tex3DTag: {fileID: 0}
-  mergeType: 0
-  objInx: 0
-  needExtraCondition: 0
-  extraCondition: 
---- !u!114 &351523962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 351523960}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mat_PBR:
-    albedo: {r: 1, g: 1, b: 1, a: 1}
-    metallic: 0
-    roughness: 1
-    reflective: 0
-    reflect_ST: {x: 1, y: 0}
-  SDF_offset: 0
+  normEplison: 1
   renderMode: 0
   shapeType: 0
   booleanTags: []
@@ -319,12 +287,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
-    metallic: 0.9
-    roughness: 0.1
+    metallic: 0
+    roughness: 1
     reflective: 0
     reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
-  renderMode: 1
+  normEplison: 10
+  renderMode: 0
   shapeType: 4
   booleanTags: []
   specialID: -1
@@ -407,7 +376,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 472640113}
   m_LocalRotation: {x: -0, y: 0.99995124, z: -0, w: 0.0098783765}
-  m_LocalPosition: {x: 0, y: 2.21, z: 0}
+  m_LocalPosition: {x: 0, y: 1.68, z: 0}
   m_LocalScale: {x: 4, y: 4, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
@@ -502,7 +471,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_Name
-      value: godness
+      value: moesh_godness
       objectReference: {fileID: 0}
     - target: {fileID: 3087628351153997959, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -616,7 +585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bakeShadow: 0
+  bakeShadow: 1
   shadowType: 1
   lightPass: 0
   lightType: 0
@@ -636,6 +605,7 @@ GameObject:
   - component: {fileID: 1383017747}
   - component: {fileID: 1383017750}
   - component: {fileID: 1383017749}
+  - component: {fileID: 1383017751}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -701,8 +671,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1383017743}
-  m_LocalRotation: {x: 0.14437181, y: -0.37009448, z: 0.05823285, w: 0.915858}
-  m_LocalPosition: {x: 1.2168474, y: 3.7467887, z: -1.2637408}
+  m_LocalRotation: {x: 0.12479266, y: 0.7427029, z: -0.1443605, w: 0.6418562}
+  m_LocalPosition: {x: -1.468708, y: 2.9169078, z: -0.61384666}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -798,6 +768,147 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sensitivity: 2
   smoothing: 2
+--- !u!114 &1383017751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383017743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ac8431640d49a43869e926f5c1d5b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1671140145
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1671140150}
+  - component: {fileID: 1671140149}
+  - component: {fileID: 1671140148}
+  - component: {fileID: 1671140147}
+  - component: {fileID: 1671140146}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1671140146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671140145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 0
+    roughness: 1
+    reflective: 0
+    reflect_ST: {x: 1, y: 0}
+  SDF_offset: 0
+  normEplison: 1
+  renderMode: 0
+  shapeType: 0
+  booleanTags: []
+  specialID: -1
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.02
+  SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
+  mergeType: 1
+  objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
+--- !u!65 &1671140147
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671140145}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1671140148
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671140145}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1671140149
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671140145}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1671140150
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671140145}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.08, y: -0, z: -5.27}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1691347756
 GameObject:
   m_ObjectHideFlags: 0
@@ -809,6 +920,7 @@ GameObject:
   - component: {fileID: 1691347759}
   - component: {fileID: 1691347758}
   - component: {fileID: 1691347757}
+  - component: {fileID: 1691347760}
   m_Layer: 0
   m_Name: System
   m_TagString: Untagged
@@ -850,170 +962,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ambientIntensity: 0.03
-  bakedSDFs:
-  - if(inx == 0 )
-  - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
-    0, 0)));
-  - '}'
-  - else if (inx == 1 )
-  - '{'
-  - re = min(re, 0 + SDFBox(p, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
-    0, 0)));
-  - '}'
-  - else if (inx == 2 )
-  - '{'
-  - re = SDFTex3D(p, float3(0, 2.21, 0), float3(2.000001, 2, 2.000001), float3(0,
-    178.868, 0), SDF_godness, TraceThre);
-  - '}'
-  bakedObjNormals:
-  - if(inx == 0 )
-  - '{'
-  - '}'
-  - else if (inx == 1 )
-  - '{'
-  - '}'
-  - else if (inx == 2 )
-  - '{'
-  - '}'
-  bakedObjUVs:
-  - if(inx == 0 )
-  - '{'
-  - uv = BoxedUV(minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
-    0, 0));
-  - return uv;
-  - '}'
-  - else if (inx == 1 )
-  - '{'
-  - uv = BoxedUV(minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
-    0, 0));
-  - return uv;
-  - '}'
-  - else if (inx == 2 )
-  - '{'
-  - '}'
-  bakedObjTBs:
-  - if(inx == 0 )
-  - '{'
-  - BoxedTB(T,B,minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
-    0, 0));
-  - return;
-  - '}'
-  - if(inx == 1 )
-  - '{'
-  - BoxedTB(T,B,minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0,
-    0, 0));
-  - return;
-  - '}'
-  - if(inx == 2 )
-  - '{'
-  - '}'
-  bakedSpecialObjects:
-  - if(inx == 0 )
-  - '{'
-  - '}'
-  - else if (inx == 1 )
-  - '{'
-  - '}'
-  - else if (inx == 2 )
-  - '{'
-  - '}'
-  bakedMaterials:
-  - if(obj == 0 )
-  - '{'
-  - re.albedo = float3(1, 1, 1);
-  - re.metallic = 0;
-  - re.roughness = 1;
-  - re.reflective = 0;
-  - re.reflect_ST = float2(1, 0);
-  - '}'
-  - else if (obj == 1 )
-  - '{'
-  - re.albedo = float3(1, 1, 1);
-  - re.metallic = 0;
-  - re.roughness = 1;
-  - re.reflective = 0;
-  - re.reflect_ST = float2(1, 0);
-  - '}'
-  - else if (obj == 2 )
-  - '{'
-  - re.albedo = float3(1, 1, 1);
-  - re.metallic = 0.9;
-  - re.roughness = 0.1;
-  - re.reflective = 0;
-  - re.reflect_ST = float2(1, 0);
-  - '}'
+  bakedSDFs: []
+  bakedObjNormals: []
+  bakedObjUVs: []
+  bakedObjTBs: []
+  bakedSpecialObjects: []
+  bakedMaterials: []
   bakedRenderModes:
   - int renderMode[3];
-  - renderMode[0] = 0;
-  - renderMode[1] = 0;
-  - renderMode[2] = 1;
-  - return renderMode[obj];
-  bakedRenders:
-  - if(mode==0)
-  - '{'
-  - '  float3 lightDirs[1];'
-  - '  float3 dirLightColors[1];'
-  - '  lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);'
-  - '  dirLightColors[0] = float3(1, 0.9568627, 0.8392157);'
-  - '  result.rgb = 0.03 * mat.albedo * mat.ao;'
-  - '  for(int i=0;i<1;i++)'
-  - '  {'
-  - '      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);'
-  - '  }'
-  - '}'
-  bakedShadows:
-  - int lightType[1];
-  - float3 lightPos[1];
-  - float3 lightDirs[1];
-  - int shadowType[1];
-  - float lightspace = 1;
-  - float maxLength = MaxSDF;
-  - float tsha = 1;
-  - for (int i = 0; i < 0; i++)
-  - '{'
-  - '  float maxLength = MaxSDF;'
-  - '  if(lightType[i]==0)'
-  - '  {'
-  - '      maxLength = MaxSDF;'
-  - '  }'
-  - '  if(lightType[i]==1)'
-  - '  {'
-  - '      maxLength = length(minHit.P - lightPos[i]);'
-  - '  }'
-  - '  if(lightType[i]<0)'
-  - '  {'
-  - '      tsha = 1;'
-  - '  }'
-  - '  else'
-  - '  {'
-  - '      if(shadowType[i]==0)'
-  - '      {'
-  - '          tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);'
-  - '      }'
-  - '      if(shadowType[i]==1)'
-  - '      {'
-  - '          tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);'
-  - '      }'
-  - '  }'
-  - '  lightspace -= (1 - tsha);'
-  - '}'
-  - lightspace /= 1;
-  - sha = lightspace;
-  bakedFullLightInfo:
-  - const static int lightType[1] = {0};
-  - const static float3 lightColor[1] = {float3(1, 0.9568627, 0.8392157)};
-  - const static float3 lightPos[1] = {float3(0, 3, 0)};
-  - const static float3 lightDirs[1] = {float3(-0.3213938, -0.7660444, 0.5566705)};
-  - const static int shadowType[1] = {-2};
-  - const static float lightspace = 1;
+  bakedRenders: []
+  bakedShadows: []
+  bakedFullLightInfo: []
   bakedRenderEmissive: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
+  - {fileID: 1671140146}
   - {fileID: 351523961}
-  - {fileID: 351523962}
   - {fileID: 472640114}
   dirLightTags:
   - {fileID: 1162571001}
@@ -1031,3 +997,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1691347760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1691347756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e57f28516c177b343be8369b83c83cd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nextLevelObj: {fileID: 0}
+  trace: {fileID: 1383017748}
+  startActions: 05000000
