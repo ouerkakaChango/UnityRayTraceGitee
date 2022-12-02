@@ -101,16 +101,16 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(4.08, 0, -5.27), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0, 0, 0));
-return uv;
 }
 else if (inx == 2 )
 {
+uv = BoxedUV(minHit.P, float3(4.08, 0, -5.27), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return uv;
 }
 	//@@@
 
@@ -130,16 +130,16 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(4.08, 0, -5.27), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+BoxedTB(T,B,minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0, 0, 0));
 return;
 }
 if(inx == 1 )
 {
-BoxedTB(T,B,minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0, 0, 0));
-return;
 }
 if(inx == 2 )
 {
+BoxedTB(T,B,minHit.P, float3(4.08, 0, -5.27), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return;
 }
 //@@@
 basis_unstable(minHit.N, T, B);
@@ -341,15 +341,15 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(4.08, 0, -5.27), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
+re = min(re, 0 + SDFBox(p, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0, 0, 0)));
 }
 else if (inx == 1 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0, 0, 0)));
+re = 0 + 0.5*SDFTex3D(p, float3(0, 1.68, 0), float3(2.000001, 2, 2.000001), float3(0, 178.868, 0), SDF_godness, TraceThre);
 }
 else if (inx == 2 )
 {
-re = 0 + 0.5*SDFTex3D(p, float3(0, 1.68, 0), float3(2.000001, 2, 2.000001), float3(0, 178.868, 0), SDF_godness, TraceThre);
+re = min(re, 0 + SDFBox(p, float3(4.08, 0, -5.27), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
 }
 //@@@
 
@@ -383,10 +383,10 @@ if(inx == 0 )
 }
 else if (inx == 1 )
 {
+return GetObjSDFNormal(inx, p, traceInfo, 10);
 }
 else if (inx == 2 )
 {
-return GetObjSDFNormal(inx, p, traceInfo, 10);
 }
 	//@@@
 	return GetObjSDFNormal(inx, p, traceInfo);
@@ -613,7 +613,7 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 			break;
 		}
 
-		if (sdf > MaxTraceDis*0.001)
+		if (sdf > MaxTraceDis)
 		//if(traceInfo.traceSum>100)
 		{
 			break;

@@ -173,7 +173,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &351523963
@@ -303,7 +303,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 472640119}
   mergeType: 1
-  objInx: 2
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &472640115
@@ -830,7 +830,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 0
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1671140147
@@ -978,9 +978,9 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 1671140146}
   - {fileID: 351523961}
   - {fileID: 472640114}
+  - {fileID: 1671140146}
   dirLightTags:
   - {fileID: 1162571001}
 --- !u!4 &1691347759

@@ -363,6 +363,17 @@ float UDFQuad2D(in float3 p, in float3 v1, in float3 v2, in float3 v3, in float3
 		);
 }
 
+float3 FixBound01(float3 p, float thre = 0)
+{
+	if (p.x < 0) { p.x = 0 + thre; }
+	if (p.x > 1) { p.x = 1 - thre; }
+	if (p.y < 0) { p.y = 0 + thre; }
+	if (p.y > 1) { p.y = 1 - thre; }
+	if (p.x < 0) { p.z = 0 + thre; }
+	if (p.x > 1) { p.z = 1 - thre; }
+	return p;
+}
+
 //??? only support Cube SDF_Tex3D for now
 float SDFTex3D(float3 p, float3 center, float3 bound, float3 rotEuler, Texture3D<float> SDFTex3D, float traceThre, float offset = 0)
 {
@@ -373,6 +384,17 @@ float SDFTex3D(float3 p, float3 center, float3 bound, float3 rotEuler, Texture3D
 	{
 		//not hit,than the sdf is sdfBox
 		d = SDFBox(q, 0, bound) + traceThre * 2;
+
+		//!Take scale.x to restore actual sdf
+		float scale = bound.x / 0.5;
+		//normalize to [0-1]
+		q = q / scale + 0.5;
+		q = FixBound01(q,0.01);
+		float d2 = offset + SDFTex3D.SampleLevel(common_linear_clamp_sampler, q, 0).r;
+		//restore sdf
+		d2 *= scale;
+
+		d += d2;
 	}
 	else
 	{
