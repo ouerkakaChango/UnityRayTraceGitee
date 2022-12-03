@@ -25,7 +25,7 @@ namespace ShaderEqualision
                 re.metallic = 0.9f;
                 re.roughness = 0.1f;
                 re.reflective = 0.0f;
-                re.reflect_ST = new Vector2(1.0f, 0.0f);
+                re.reflect_ST = new Vector2(0.5f, 0.5f);
                 return re;
             }
         }
@@ -39,7 +39,7 @@ namespace ShaderEqualision
                 re.metallic = 0.0f;
                 re.roughness = 1.0f;
                 re.reflective = 0.0f;
-                re.reflect_ST = new Vector2(1.0f, 0.0f);
+                re.reflect_ST = new Vector2(0.5f, 0.5f);
                 return re;
             }
         }
