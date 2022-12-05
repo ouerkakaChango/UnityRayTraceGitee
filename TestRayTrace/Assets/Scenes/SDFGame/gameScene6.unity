@@ -173,7 +173,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &351523963
@@ -303,7 +303,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 472640119}
   mergeType: 1
-  objInx: 2
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &472640115
@@ -376,7 +376,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 472640113}
   m_LocalRotation: {x: -0, y: 0.99995124, z: -0, w: 0.0098783765}
-  m_LocalPosition: {x: 0, y: 1.68, z: 0}
+  m_LocalPosition: {x: 2.29, y: 1.68, z: 0.23}
   m_LocalScale: {x: 4, y: 4, z: 4}
   m_Children: []
   m_Father: {fileID: 0}
@@ -473,6 +473,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: moesh_godness
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3087628351153997959, guid: d4485ab42dce86442b9d06a599035e70, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -498,7 +502,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1058207652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -513,10 +517,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mat_PBR:
     albedo: {r: 1, g: 1, b: 1, a: 1}
-    metallic: 1
-    roughness: 0
-    reflective: 0.5
-    reflect_ST: {x: 0, y: 1}
+    metallic: 0.9
+    roughness: 0.1
+    reflective: 0.3
+    reflect_ST: {x: 1, y: 0}
   SDF_offset: 0
   normEplison: 1
   renderMode: 0
@@ -529,7 +533,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 0
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1058207653
@@ -959,7 +963,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 3
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1443066384
@@ -1088,7 +1092,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 4
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1671140147
@@ -1227,7 +1231,7 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[6];
+  - int renderMode[5];
   bakedRenders: []
   bakedShadows: []
   bakedFullLightInfo: []
@@ -1236,7 +1240,6 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 1058207652}
   - {fileID: 351523961}
   - {fileID: 472640114}
   - {fileID: 1443066383}
@@ -1323,7 +1326,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 5
+  objInx: 4
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &1765178387

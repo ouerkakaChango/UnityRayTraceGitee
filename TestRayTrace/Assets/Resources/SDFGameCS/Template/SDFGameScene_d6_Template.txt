@@ -80,7 +80,7 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, bool expensive = false);
-float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF);
+float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, int method = 1);
 
 float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
 {
@@ -338,7 +338,7 @@ float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength, bool exp
 
 //https://www.shadertoy.com/view/MsfGRr
 //https://www.shadertoy.com/view/lsKcDD
-float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
+float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength,int method)
 {
 	Init(info);
 	static float sha = 1.0;
@@ -373,17 +373,9 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 		}
 
 		if (sdf > MaxTraceDis)
-		//if(traceInfo.traceSum>100)
 		{
 			break;
 		}
-
-		//sha = min(sha, 4 * sdf / t);
-		float h = sdf;
-		float y = traceInfo.traceCount ==0 ? 0 : h*h/(2.0*ph);
-        float d = sqrt(h*h-y*y);
-        sha = min( sha, SoftShadowK * d/max(0.0,t-y));
-        ph = h;
 
 		if (sdf <= TraceThre)
 		{
@@ -394,8 +386,20 @@ float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength)
 			break;
 		}
 
-		t += h;
-		//t += clamp(sdf, 0.1*0.01, 0.1*0.5);
+		if(method == 0)
+		{
+			sha = min(sha, 4 * sdf / t);
+			t += clamp(sdf, 0.1*0.01, 0.1*0.5);
+		}
+		else if(method == 1)
+		{
+			float h = sdf;
+			float y = traceInfo.traceCount ==0 ? 0 : h*h/(2.0*ph);
+			float d = sqrt(h*h-y*y);
+			sha = min( sha, SoftShadowK * d/max(0.0,t-y));
+			ph = h;
+			t += h;
+		}
 
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
