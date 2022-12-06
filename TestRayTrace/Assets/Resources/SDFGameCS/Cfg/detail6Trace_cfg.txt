@@ -28,9 +28,10 @@ if (minHit.bHit)
 }
 else
 {
-	re = (@BackGroundColor);
+	//re = (@BackGroundColor);
 	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
 	//re = stars(ray.pos, ray.dir);
+	re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.1));
 }
 ###BLOCK
 

@@ -27,6 +27,7 @@ float pixW;
 float pixH;
 float3 screenU;
 float3 screenV;
+float3 seed;
 
 RWTexture2D<float4> Result;
 bool needEyeDepth;
@@ -67,9 +68,10 @@ if (minHit.bHit)
 }
 else
 {
-	re = float3(1,1,1);
+	//re = float3(1,1,1);
 	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
 	//re = stars(ray.pos, ray.dir);
+	re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.1));
 }
 
 	return re;
@@ -103,7 +105,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 
 	float3 camFoward = normalize(cross(screenU,screenV));
 
-	float3 seed = float3(id.xy,frameID);
+	seed = float3(id.xy,frameID);
 	suv = float2(id.x/(float)w,id.y/(float)h);
 
 	[unroll(SSAA_edge)]

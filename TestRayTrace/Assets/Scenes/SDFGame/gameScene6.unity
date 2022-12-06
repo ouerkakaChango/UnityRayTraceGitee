@@ -804,8 +804,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1383017743}
-  m_LocalRotation: {x: 0.19915114, y: -0.17955066, z: 0.037154444, w: 0.962663}
-  m_LocalPosition: {x: 2.6198683, y: 4.3859267, z: -4.775028}
+  m_LocalRotation: {x: 0.0025805708, y: -0.99335814, z: 0.11254174, w: 0.023817938}
+  m_LocalPosition: {x: 2.1212006, y: 5.4538784, z: 11.058338}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -894,7 +894,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1383017743}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1090c4c7b2894044f80ecdaf73b99902, type: 3}
   m_Name: 
@@ -932,7 +932,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1443066383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1061,7 +1061,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1671140146
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1223,7 +1223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1f5d13b1d98fa4ca18ee249cef77d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ambientIntensity: 0.03
+  ambientIntensity: 0.2
   bakedSDFs: []
   bakedObjNormals: []
   bakedObjUVs: []
@@ -1231,7 +1231,7 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[5];
+  - int renderMode[2];
   bakedRenders: []
   bakedShadows: []
   bakedFullLightInfo: []
@@ -1242,9 +1242,6 @@ MonoBehaviour:
   tags:
   - {fileID: 351523961}
   - {fileID: 472640114}
-  - {fileID: 1443066383}
-  - {fileID: 1671140146}
-  - {fileID: 1765178386}
   dirLightTags:
   - {fileID: 1162571001}
 --- !u!4 &1691347759
@@ -1295,7 +1292,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1765178386
 MonoBehaviour:
   m_ObjectHideFlags: 0

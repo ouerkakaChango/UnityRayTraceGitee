@@ -1,4 +1,4 @@
-﻿#define OBJNUM 5
+﻿#define OBJNUM 2
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -71,30 +71,6 @@ re.roughness = 0.3;
 re.reflective = 0.2;
 re.reflect_ST = float2(0.5, 0.5);
 }
-else if (obj == 2 )
-{
-re.albedo = float3(0, 0.0475955, 1);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
-}
-else if (obj == 3 )
-{
-re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
-}
-else if (obj == 4 )
-{
-re.albedo = float3(1, 0, 0);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
-}
 //@@@
 	return re;
 }
@@ -102,12 +78,9 @@ re.reflect_ST = float2(1, 0);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[5];
+int renderMode[2];
 renderMode[0] = 0;
 renderMode[1] = 0;
-renderMode[2] = 0;
-renderMode[3] = 0;
-renderMode[4] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -124,21 +97,6 @@ return uv;
 }
 else if (inx == 1 )
 {
-}
-else if (inx == 2 )
-{
-uv = BoxedUV(minHit.P, float3(5.52, 1.468529, 4.95), float3(0.5000001, 4.581281, 10.3233), float3(0, 308.5699, 0));
-return uv;
-}
-else if (inx == 3 )
-{
-uv = BoxedUV(minHit.P, float3(4.08, 0, -5.27), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return uv;
-}
-else if (inx == 4 )
-{
-uv = BoxedUV(minHit.P, float3(-3.13, 1.468529, 2.24), float3(0.5, 4.581281, 10.3233), float3(0, 0, 0));
-return uv;
 }
 	//@@@
 
@@ -163,21 +121,6 @@ return;
 }
 if(inx == 1 )
 {
-}
-if(inx == 2 )
-{
-BoxedTB(T,B,minHit.P, float3(5.52, 1.468529, 4.95), float3(0.5000001, 4.581281, 10.3233), float3(0, 308.5699, 0));
-return;
-}
-if(inx == 3 )
-{
-BoxedTB(T,B,minHit.P, float3(4.08, 0, -5.27), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return;
-}
-if(inx == 4 )
-{
-BoxedTB(T,B,minHit.P, float3(-3.13, 1.468529, 2.24), float3(0.5, 4.581281, 10.3233), float3(0, 0, 0));
-return;
 }
 //@@@
 basis_unstable(minHit.N, T, B);
@@ -215,7 +158,7 @@ float3 lightDirs[1];
 float3 dirLightColors[1];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
 dirLightColors[0] = float3(1, 1, 1);
-result.rgb = 0.03 * mat.albedo * mat.ao;
+result.rgb = 0.2 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
 {
 result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);
@@ -385,18 +328,6 @@ else if (inx == 1 )
 {
 re = 0 + 0.5*SDFTex3D(p, float3(2.29, 1.68, 0.23), float3(2.000001, 2, 2.000001), float3(0, 178.868, 0), SDF_godness, TraceThre);
 }
-else if (inx == 2 )
-{
-re = min(re, 0 + SDFBox(p, float3(5.52, 1.468529, 4.95), float3(0.5000001, 4.581281, 10.3233), float3(0, 308.5699, 0)));
-}
-else if (inx == 3 )
-{
-re = min(re, 0 + SDFBox(p, float3(4.08, 0, -5.27), float3(0.5, 0.5, 0.5), float3(0, 0, 0)));
-}
-else if (inx == 4 )
-{
-re = min(re, 0 + SDFBox(p, float3(-3.13, 1.468529, 2.24), float3(0.5, 4.581281, 10.3233), float3(0, 0, 0)));
-}
 //@@@
 
 if(inx == -1)
@@ -430,15 +361,6 @@ if(inx == 0 )
 else if (inx == 1 )
 {
 return GetObjSDFNormal(inx, p, traceInfo, 10);
-}
-else if (inx == 2 )
-{
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
-{
 }
 	//@@@
 	return GetObjSDFNormal(inx, p, traceInfo);
@@ -896,15 +818,6 @@ if(inx == 0 )
 {
 }
 else if (inx == 1 )
-{
-}
-else if (inx == 2 )
-{
-}
-else if (inx == 3 )
-{
-}
-else if (inx == 4 )
 {
 }
 //@@@
