@@ -731,7 +731,7 @@ float3 SceneRenderReflect(Ray ray,in HitInfo minHit,in Material_PBR mat)
 	}
 	else
 	{
-		re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.1));
+		re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.7));
 	}
 	return re;
 }
