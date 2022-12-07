@@ -17,6 +17,7 @@
 #include "../../../HLSL/Transform/TransformCommonDef.hlsl"
 #include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
 #include "../../../HLSL/MatLib/CommonMatLib.hlsl"
+#include "../../../HLSL/MatLib/Ocean.hlsl"
 
 //@@@SDFBakerMgr TexSys
 Texture3D<float> SDF_godness;
@@ -57,18 +58,18 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
-re.albedo = float3(1, 1, 1);
-re.metallic = 0.9;
-re.roughness = 0.1;
-re.reflective = 1;
-re.reflect_ST = float2(0.5, 0.5);
-}
-else if (obj == 1 )
-{
 re.albedo = float3(0.8588235, 0.7490196, 0.3215686);
 re.metallic = 0.7;
 re.roughness = 0.3;
 re.reflective = 0;
+re.reflect_ST = float2(0.5, 0.5);
+}
+else if (obj == 1 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 0.9;
+re.roughness = 0.1;
+re.reflective = 1;
 re.reflect_ST = float2(0.5, 0.5);
 }
 //@@@
@@ -318,11 +319,11 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -1;
+re = 0 + 0.5*SDFTex3D(p, float3(2.29, 1.68, 0.23), float3(2.000001, 2, 2.000001), float3(0, 178.868, 0), SDF_godness, TraceThre);
 }
 else if (inx == 1 )
 {
-re = 0 + 0.5*SDFTex3D(p, float3(2.29, 1.68, 0.23), float3(2.000001, 2, 2.000001), float3(0, 178.868, 0), SDF_godness, TraceThre);
+inx = -1;
 }
 //@@@
 
@@ -330,7 +331,8 @@ if(inx == -1)
 {
 	if(IsInBBox(p,eyePos - 300,eyePos+300))
 	{
-		float height = 0.3*sin(0.2*p.x+_Time.y);
+		//float height = 0.3*sin(0.2*p.x+_Time.y);
+		float height = Water_GetHeight(p.xz,3,0.3 * _Time.y);
 		re = 0.5*abs(p.y-height);
 	}
 }
@@ -355,10 +357,10 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 	//@@@SDFBakerMgr ObjNormal
 if(inx == 0 )
 {
+return GetObjSDFNormal(inx, p, traceInfo, 10);
 }
 else if (inx == 1 )
 {
-return GetObjSDFNormal(inx, p, traceInfo, 10);
 }
 	//@@@
 	return GetObjSDFNormal(inx, p, traceInfo);
@@ -720,10 +722,12 @@ float3 SceneRenderReflect(Ray ray,in HitInfo minHit,in Material_PBR mat)
 	TraceScene(ray, reflectHit);
 	if (reflectHit.bHit)
 	{
-		reflectSourceMat = GetObjMaterial_PBR(reflectHit.obj);
-		float atten = PntLightAtten(minHit.P,reflectHit.P);
-		atten = saturate(mat.reflect_ST.x*atten+mat.reflect_ST.y);
-		re = atten * RenderSceneObj(ray, reflectHit, reflectSourceMat);
+		//reflectSourceMat = GetObjMaterial_PBR(reflectHit.obj);
+		//float atten = PntLightAtten(minHit.P,reflectHit.P);
+		//atten = saturate(mat.reflect_ST.x*atten+mat.reflect_ST.y);
+		//re = atten * RenderSceneObj(ray, reflectHit, reflectSourceMat);
+		//!!! has problem now,might be zero just for now
+		//re*=RenderSceneSDFShadow(minHit);
 	}
 	else
 	{
@@ -818,10 +822,10 @@ int GetSpecialID(int inx)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -1;
 }
 else if (inx == 1 )
 {
+inx = -1;
 }
 //@@@
 return inx;

@@ -31,7 +31,10 @@ else
 	//re = (@BackGroundColor);
 	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
 	//re = stars(ray.pos, ray.dir);
-	re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.1));
+	Ray tray = ray;
+	//warp skybox a little to fit vanish line
+	tray.dir = normalize(tray.dir+float3(0,0.015,0));
+	re = CommonBg_WaterSky(tray, seed.xy, float2(w,h), float2(0.5,0.1));
 }
 ###BLOCK
 

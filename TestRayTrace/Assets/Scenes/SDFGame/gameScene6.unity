@@ -399,7 +399,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 472640119}
   mergeType: 1
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &472640115
@@ -880,7 +880,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 0
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!1 &1383017743
@@ -964,8 +964,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1383017743}
-  m_LocalRotation: {x: 0.0025805708, y: -0.99335814, z: 0.11254174, w: 0.023817938}
-  m_LocalPosition: {x: 2.1212006, y: 5.4538784, z: 11.058338}
+  m_LocalRotation: {x: 0.117036246, y: 0.011601858, z: -0.0012022799, w: 0.9930592}
+  m_LocalPosition: {x: 1.7484891, y: 5.570898, z: -8.938991}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1400,8 +1400,8 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 1174446216}
   - {fileID: 472640114}
+  - {fileID: 1174446216}
   dirLightTags:
   - {fileID: 1162571001}
 --- !u!4 &1691347759
