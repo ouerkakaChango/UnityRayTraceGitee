@@ -425,6 +425,20 @@ float SDFSlice(float3 p, float3 center, float3 rotEuler, float3 size, Texture2D<
 	{
 		d2d = SDFBox(p2d, 0, picBound) + traceThre * 2;
 		d = sqrt(d2d * d2d + dh * dh);
+
+		//float2 uv = p2d / picBound;
+		//uv = (uv + 1) * 0.5;
+		//uint2 picSize = GetSize(SliceTex);
+		//float sdfFromPic = SliceTex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+		//sdfFromPic /= picSize.x * 0.5 * sqrt(2) * scale;
+		//sdfFromPic *= picBound.x;
+		//d2d = sdfFromPic;
+		//d2d += offset2D;
+		//d2d = max(d2d, 0);
+		//d = sqrt(d2d * d2d + dh * dh);
+		//d += offset;
+		//
+		//d += d1;
 	}
 	else
 	{
