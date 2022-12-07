@@ -1041,7 +1041,7 @@ inx = -4;
 }
 else if (inx == 8 )
 {
-re = SDFTex3D(p, float3(4.27, -5.99, -8.9), float3(1, 1, 1), float3(0, 180, 0), SDF_couch, TraceThre);
+re = -0.1 + 0.5*SDFTex3D(p, float3(4.27, -5.99, -8.9), float3(1, 1, 1), float3(0, 180, 0), SDF_couch, TraceThre);
 }
 else if (inx == 9 )
 {
@@ -1057,7 +1057,7 @@ re = min(re, 0 + SDFBox(p, float3(8.94, -2.69, 1.29), float3(0.1, 0.1, 18.75295)
 }
 else if (inx == 12 )
 {
-re = SDFTex3D(p, float3(-3.38, -5.99, -2.55), float3(1, 1, 1), float3(0, 180, 0), SDF_couch, TraceThre);
+re = -0.1 + 0.5*SDFTex3D(p, float3(-3.38, -5.99, -2.55), float3(1, 1, 1), float3(0, 180, 0), SDF_couch, TraceThre);
 }
 else if (inx == 13 )
 {
@@ -1065,7 +1065,7 @@ inx = -2;
 }
 else if (inx == 14 )
 {
-re = SDFTex3D(p, float3(-3.38, -5.99, -8.9), float3(1, 1, 1), float3(0, 180, 0), SDF_couch, TraceThre);
+re = -0.1 + 0.5*SDFTex3D(p, float3(-3.38, -5.99, -8.9), float3(1, 1, 1), float3(0, 180, 0), SDF_couch, TraceThre);
 }
 else if (inx == 15 )
 {
@@ -1077,7 +1077,7 @@ inx = -1;
 }
 else if (inx == 17 )
 {
-re = SDFTex3D(p, float3(4.27, -5.99, -2.43), float3(1, 1, 1), float3(0, 180, 0), SDF_couch, TraceThre);
+re = -0.1 + 0.5*SDFTex3D(p, float3(4.27, -5.99, -2.43), float3(1, 1, 1), float3(0, 180, 0), SDF_couch, TraceThre);
 }
 //@@@
 

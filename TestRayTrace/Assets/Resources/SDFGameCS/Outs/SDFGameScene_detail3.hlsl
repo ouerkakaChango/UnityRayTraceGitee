@@ -362,14 +362,14 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==2)
+if(inx==1)
 {
 	float2 uv = GetObjUV(minHit);
 float3 T,B;
 	GetObjTB(T,B, minHit);
 	minHit.N = SampleNormalMap(N_paper, float2(1, 1)*uv+float2(0, 0), minHit.N,T,B,1);
 }
-if(inx==5)
+if(inx==4)
 {
 	float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
@@ -514,13 +514,13 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 if(mode==0)
 {
 float3 lightDirs[1];
-float3 lightColors[1];
+float3 dirLightColors[1];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-lightColors[0] = float3(1, 1, 1);
+dirLightColors[0] = float3(1, 1, 1);
 result.rgb = 0.003 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
 {
-result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);
 }
 }
 //@@@

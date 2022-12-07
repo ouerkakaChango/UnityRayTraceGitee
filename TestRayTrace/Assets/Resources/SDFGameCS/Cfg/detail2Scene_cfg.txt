@@ -357,66 +357,55 @@ return renderMode[obj];
 if(inx == 0 )
 {
 uv = BoxedUV(minHit.P, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(-3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(0, 4.14, 4.86), float3(3.33305, 2.025228, 0.475035), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(0, 4.14, 4.86), float3(3.33305, 2.025228, 0.475035), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 2 )
 {
 uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, 9.55, 0), float3(5, 0.5, 5), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 3 )
 {
-uv = BoxedUV(minHit.P, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 4 )
 {
 uv = BoxedUV(minHit.P, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(3, 0.99, 0.7), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 5 )
 {
-uv = BoxedUV(minHit.P, float3(-2.371201, 2.37087, -1.158671), float3(0.00838451, 0.09840991, 0.007551101), float3(3.093163, 1.942568, 359.1576));
 uv = BoxedUV(minHit.P, float3(-2.371201, 2.37087, -1.158671), float3(0.00838451, 0.09840991, 0.007551101), float3(3.093163, 1.942568, 359.1576));
 return uv;
 }
 else if (inx == 6 )
 {
 uv = BoxedUV(minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
-uv = BoxedUV(minHit.P, float3(-2.2165, 2.376, -1.2513), float3(0.005697916, 0.09840989, 0.1790531), float3(1.31041, 300.0943, 357.0246));
 return uv;
 }
 else if (inx == 7 )
 {
-uv = BoxedUV(minHit.P, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576));
 uv = BoxedUV(minHit.P, float3(-2.567963, 2.372937, -1.153289), float3(0.185, 0.09, 0.001), float3(3.093163, 1.942568, 359.1576));
 return uv;
 }
 else if (inx == 8 )
 {
 uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, -0.5, 0), float3(5, 0.5, 5), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 9 )
 {
 uv = BoxedUV(minHit.P, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576));
-uv = BoxedUV(minHit.P, float3(-2.567901, 2.37376, -1.151844), float3(0.1921598, 0.09840991, 0.001), float3(3.093163, 1.942568, 359.1576));
 return uv;
 }
 else if (inx == 10 )
 {
-uv = BoxedUV(minHit.P, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(0, 2.12, -0.75), float3(3.27828, 0.1262217, 1.7315), float3(0, 0, 0));
 return uv;
 }
@@ -426,18 +415,15 @@ else if (inx == 11 )
 else if (inx == 12 )
 {
 uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
-uv = BoxedUV(minHit.P, float3(0, 3.98, 5), float3(5, 0.5000001, 5.000001), float3(90, 0, 0));
 return uv;
 }
 else if (inx == 13 )
 {
 uv = BoxedUV(minHit.P, float3(-2.45, 2.88, -0.964), float3(0.20343, 0.20343, 0.20343), float3(0, 0, 0));
-uv = BoxedUV(minHit.P, float3(-2.45, 2.88, -0.964), float3(0.20343, 0.20343, 0.20343), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 14 )
 {
-uv = BoxedUV(minHit.P, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
 uv = BoxedUV(minHit.P, float3(-3, 0.99, -2.2), float3(0.1663568, 1.028534, 0.1951089), float3(0, 0, 0));
 return uv;
 }
@@ -618,23 +604,23 @@ inx = GetSpecialID(inx);
 if(mode==0)
 {
   float3 lightDirs[6];
-  float3 lightColors[6];
+  float3 dirLightColors[6];
   lightDirs[0] = normalize(minHit.P - float3(-0.07, 8.15, 3.42));
-  lightColors[0] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(-0.07, 8.15, 3.42));
+  dirLightColors[0] = float3(2, 2, 2) * PntLightAtten(minHit.P, float3(-0.07, 8.15, 3.42));
   lightDirs[1] = normalize(minHit.P - float3(-1.713, 2.707, -2.17));
-  lightColors[1] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-1.713, 2.707, -2.17));
+  dirLightColors[1] = float3(1.5, 1.5, 1.5) * PntLightAtten(minHit.P, float3(-1.713, 2.707, -2.17));
   lightDirs[2] = normalize(minHit.P - float3(-3.526, 2.707, -2.17));
-  lightColors[2] = float3(1.5, 1.5, 1.5) * GetPntlightAttenuation(minHit.P, float3(-3.526, 2.707, -2.17));
+  dirLightColors[2] = float3(1.5, 1.5, 1.5) * PntLightAtten(minHit.P, float3(-3.526, 2.707, -2.17));
   lightDirs[3] = normalize(minHit.P - float3(0.04, 8.15, -3.29));
-  lightColors[3] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(0.04, 8.15, -3.29));
+  dirLightColors[3] = float3(2, 2, 2) * PntLightAtten(minHit.P, float3(0.04, 8.15, -3.29));
   lightDirs[4] = normalize(minHit.P - float3(3.357384, 8.15, 0));
-  lightColors[4] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(3.357384, 8.15, 0));
+  dirLightColors[4] = float3(2, 2, 2) * PntLightAtten(minHit.P, float3(3.357384, 8.15, 0));
   lightDirs[5] = normalize(minHit.P - float3(-3.83, 8.15, 0));
-  lightColors[5] = float3(2, 2, 2) * GetPntlightAttenuation(minHit.P, float3(-3.83, 8.15, 0));
+  dirLightColors[5] = float3(2, 2, 2) * PntLightAtten(minHit.P, float3(-3.83, 8.15, 0));
   result.rgb = 0 * mat.albedo * mat.ao;
   for(int i=0;i<6;i++)
   {
-      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], lightColors[i]);
+      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);
   }
 }
 //@@@
