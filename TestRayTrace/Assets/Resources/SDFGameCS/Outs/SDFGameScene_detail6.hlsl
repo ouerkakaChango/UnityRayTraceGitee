@@ -58,17 +58,17 @@ Material_PBR GetObjMaterial_PBR(int obj)
 if(obj == 0 )
 {
 re.albedo = float3(1, 1, 1);
-re.metallic = 0;
-re.roughness = 1;
-re.reflective = 0;
-re.reflect_ST = float2(1, 0);
+re.metallic = 0.9;
+re.roughness = 0.1;
+re.reflective = 1;
+re.reflect_ST = float2(0.5, 0.5);
 }
 else if (obj == 1 )
 {
 re.albedo = float3(0.8588235, 0.7490196, 0.3215686);
 re.metallic = 0.7;
 re.roughness = 0.3;
-re.reflective = 0.2;
+re.reflective = 0;
 re.reflect_ST = float2(0.5, 0.5);
 }
 //@@@
@@ -92,8 +92,6 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0, 0, 0));
-return uv;
 }
 else if (inx == 1 )
 {
@@ -116,8 +114,6 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0, 0, 0));
-return;
 }
 if(inx == 1 )
 {
@@ -322,7 +318,7 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(0, -0.85, -0.97), float3(10, 0.5, 10), float3(0, 0, 0)));
+inx = -1;
 }
 else if (inx == 1 )
 {
@@ -334,6 +330,8 @@ if(inx == -1)
 {
 	if(IsInBBox(p,eyePos - 300,eyePos+300))
 	{
+		float height = 0.3*sin(0.2*p.x+_Time.y);
+		re = 0.5*abs(p.y-height);
 	}
 }
 
@@ -727,6 +725,10 @@ float3 SceneRenderReflect(Ray ray,in HitInfo minHit,in Material_PBR mat)
 		atten = saturate(mat.reflect_ST.x*atten+mat.reflect_ST.y);
 		re = atten * RenderSceneObj(ray, reflectHit, reflectSourceMat);
 	}
+	else
+	{
+		re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.1));
+	}
 	return re;
 }
 
@@ -816,6 +818,7 @@ int GetSpecialID(int inx)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -1;
 }
 else if (inx == 1 )
 {
