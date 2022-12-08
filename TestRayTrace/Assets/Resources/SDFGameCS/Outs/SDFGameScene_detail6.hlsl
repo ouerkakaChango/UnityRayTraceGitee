@@ -1,4 +1,4 @@
-﻿#define OBJNUM 2
+﻿#define OBJNUM 3
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -58,13 +58,21 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
+re.albedo = float3(0, 0, 0);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(0.5, 0.5);
+}
+else if (obj == 1 )
+{
 re.albedo = float3(0.8588235, 0.7490196, 0.3215686);
 re.metallic = 0.7;
 re.roughness = 0.3;
 re.reflective = 0;
 re.reflect_ST = float2(0.5, 0.5);
 }
-else if (obj == 1 )
+else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 0.9;
@@ -79,9 +87,10 @@ re.reflect_ST = float2(0.5, 0.5);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[2];
+int renderMode[3];
 renderMode[0] = 0;
 renderMode[1] = 0;
+renderMode[2] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -93,8 +102,13 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
+uv = BoxedUV(minHit.P, float3(15.644, 2.61, 6.91), float3(2.00225, 3.38485, 0.25073), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 1 )
+{
+}
+else if (inx == 2 )
 {
 }
 	//@@@
@@ -115,8 +129,13 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
+BoxedTB(T,B,minHit.P, float3(15.644, 2.61, 6.91), float3(2.00225, 3.38485, 0.25073), float3(0, 0, 0));
+return;
 }
 if(inx == 1 )
+{
+}
+if(inx == 2 )
 {
 }
 //@@@
@@ -319,9 +338,13 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = 0 + 0.5*SDFTex3D(p, float3(2.29, 1.68, 0.23), float3(2.000001, 2, 2.000001), float3(0, 178.868, 0), SDF_godness, TraceThre);
+re = min(re, 0 + SDFBox(p, float3(15.644, 2.61, 6.91), float3(2.00225, 3.38485, 0.25073), float3(0, 0, 0)));
 }
 else if (inx == 1 )
+{
+re = 0 + 0.5*SDFTex3D(p, float3(2.29, 1.68, 0.23), float3(2.000001, 2, 2.000001), float3(0, 178.868, 0), SDF_godness, TraceThre);
+}
+else if (inx == 2 )
 {
 inx = -1;
 }
@@ -357,9 +380,12 @@ float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
 	//@@@SDFBakerMgr ObjNormal
 if(inx == 0 )
 {
-return GetObjSDFNormal(inx, p, traceInfo, 10);
 }
 else if (inx == 1 )
+{
+return GetObjSDFNormal(inx, p, traceInfo, 10);
+}
+else if (inx == 2 )
 {
 }
 	//@@@
@@ -731,7 +757,7 @@ float3 SceneRenderReflect(Ray ray,in HitInfo minHit,in Material_PBR mat)
 	}
 	else
 	{
-		re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.7));
+		re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.1));
 	}
 	return re;
 }
@@ -824,6 +850,9 @@ if(inx == 0 )
 {
 }
 else if (inx == 1 )
+{
+}
+else if (inx == 2 )
 {
 inx = -1;
 }
