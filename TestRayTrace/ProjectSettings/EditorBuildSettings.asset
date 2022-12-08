@@ -26,4 +26,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SDFGame/gameScene6.unity
     guid: 1d557a353d4d1ca468e9563b688ce069
+  - enabled: 1
+    path: Assets/Scenes/SDFGame/gameScene7.unity
+    guid: 8b0ab4920b4ce774eb52a2361d00d6b6
   m_configObjects: {}
