@@ -20,6 +20,7 @@
 #include "../../../HLSL/MatLib/Ocean.hlsl"
 
 //@@@SDFBakerMgr TexSys
+Texture2D<float> WaterHeightMap;
 Texture3D<float> SDF_godness;
 //@@@
 
@@ -355,7 +356,17 @@ if(inx == -1)
 	if(IsInBBox(p,eyePos - 300,eyePos+300))
 	{
 		//float height = 0.3*sin(0.2*p.x+_Time.y);
-		float height = Water_GetHeight(p.xz,3,0.3 * _Time.y);
+		float height =0;
+
+		if(traceInfo.lastTrace<0.5)// && abs(p.y)<0.4)
+		{
+			height += Water_GetHeight(p.xz,3,0.3 * _Time.y);
+		}
+
+		//float2 uv = p.xz;
+		//height += perlinNoise1.SampleLevel(noise_linear_repeat_sampler, uv*0.01+0.01*_Time.y, 0).x;
+		//height += 0.1*WaterHeightMap.SampleLevel(noise_linear_repeat_sampler, uv*0.1-0.01*_Time.y, 0).x;
+
 		re = 0.5*abs(p.y-height);
 	}
 }
@@ -757,7 +768,7 @@ float3 SceneRenderReflect(Ray ray,in HitInfo minHit,in Material_PBR mat)
 	}
 	else
 	{
-		re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.1));
+		re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.5*(1+sin(0.1*_Time.y))));
 	}
 	return re;
 }
