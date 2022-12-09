@@ -23,13 +23,23 @@ public class SDFBakerExpressionEditor : Editor
         //    testShowBakeResult = Target.GetBakeCode();
         //
         //}
-        var expression = serializedObject.FindProperty("expressionStr");
+
         GUILayout.Label("Expression");
+        var expression = serializedObject.FindProperty("expressionStr");
         var newStr = GUILayout.TextArea(expression.stringValue);
         if(newStr!=expression.stringValue)
         {
             expression.stringValue = newStr;
         }
+
+        GUILayout.Label("PostExpression");
+        var postExpressionStr = serializedObject.FindProperty("postExpressionStr");
+        newStr = GUILayout.TextArea(postExpressionStr.stringValue);
+        if (newStr != postExpressionStr.stringValue)
+        {
+            postExpressionStr.stringValue = newStr;
+        }
+
         if (EditorGUI.EndChangeCheck())
         {
             serializedObject.ApplyModifiedProperties();

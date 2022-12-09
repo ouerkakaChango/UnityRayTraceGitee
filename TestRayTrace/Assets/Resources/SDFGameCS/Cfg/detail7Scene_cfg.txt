@@ -1,0 +1,534 @@
+valMaps:
+//@@@SDFBakerMgr ValMaps
+ObjNum 2
+//@@@
+TraceThre 0.001
+NormalEpsilon 0.001
+
+Blocks:
+
+###BLOCK ExtraInclude
+#include "../../../HLSL/Random/RandUtility.hlsl"
+#include "../../../HLSL/Noise/NoiseCommonDef.hlsl"
+#include "../../../HLSL/Transform/TransformCommonDef.hlsl" 
+#include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
+#include "../../../HLSL/MatLib/CommonMatLib.hlsl"
+#include "../../../HLSL/MatLib/Ocean.hlsl"
+
+//@@@SDFBakerMgr TexSys
+Texture2D<float> mud_ground_height;
+Texture2D<float3> mud_ground_albedo;
+Texture2D<float3> mud_ground_normal;
+Texture2D<float> mud_ground_metallic;
+Texture2D<float> mud_ground_roughness;
+Texture2D<float> mud_ground_ao;
+Texture2D<float> Rocks_height;
+Texture2D<float3> Rocks_albedo;
+Texture2D<float3> Rocks_normal;
+Texture2D<float> Rocks_metallic;
+Texture2D<float> Rocks_roughness;
+Texture2D<float> Rocks_ao;
+//@@@
+
+//@@@SDFBakerMgr DyValSys
+//@@@
+
+void GetEnvInfoByID(int texInx, inout bool isPNGEnv, inout Texture2DArray envTexArr)
+{
+	//@@@SDFBakerMgr TexSys_EnvTexSettings
+	//@@@
+	if(texInx == 9999)
+	{
+		isPNGEnv = false;
+		envTexArr = envSpecTex2DArr;
+	}
+}
+
+void GetEnvTexArrByObj(int objInx, inout bool isPNGEnv, inout Texture2DArray envTexArr)
+{
+	//@@@SDFBakerMgr ObjEnvTex
+	//@@@
+	if(objInx == 9999)
+	{
+		isPNGEnv = false;
+		envTexArr = envSpecTex2DArr;
+	}
+}
+
+###BLOCK
+
+###BLOCK ExtraFuncDependOnTraceScene
+
+float3 SceneRenderReflect(Ray ray,in HitInfo minHit,in Material_PBR mat)
+{
+	float3 re = 0;
+	ray.dir = reflect(ray.dir,minHit.N);
+	ray.pos = minHit.P + ray.dir*TraceThre*2 + minHit.N*TraceThre*2;
+	Material_PBR reflectSourceMat;
+	Init(reflectSourceMat);
+	HitInfo reflectHit;
+	Init(reflectHit);
+	TraceScene(ray, reflectHit);
+	if (reflectHit.bHit)
+	{
+		//reflectSourceMat = GetObjMaterial_PBR(reflectHit.obj);
+		//float atten = PntLightAtten(minHit.P,reflectHit.P);
+		//atten = saturate(mat.reflect_ST.x*atten+mat.reflect_ST.y);
+		//re = atten * RenderSceneObj(ray, reflectHit, reflectSourceMat);
+		//!!! has problem now,might be zero just for now
+		//re*=RenderSceneSDFShadow(minHit);
+	}
+	else
+	{
+		re = CommonBg_WaterSky(ray, seed.xy, float2(w,h), float2(0.5,0.5*(1+sin(0.1*_Time.y))));
+	}
+	return re;
+}
+
+void SceneRenderIndirRay(in Ray ray, out float3 re, out HitInfo minHit, out Material_PBR indirSourceMat)
+{
+	re = 0;
+	//---Trace
+	Init(minHit);
+	TraceScene(ray, minHit);
+	//Indir_TraceScene(ray, minHit);
+	//___Trace
+
+	if (minHit.bHit)
+	{ 
+		indirSourceMat = GetObjMaterial_PBR(minHit.obj);
+		re = RenderSceneObj(ray, minHit, indirSourceMat);
+	}
+}
+
+float3 Sample_MIS_H(float3 Xi, float3 N, in Material_PBR mat, float p_diffuse) {
+    float rd = Xi.z;
+
+    if(rd <= p_diffuse) {
+        return IS_SampleDiffuseH(N,mat.roughness,Xi.x,Xi.y);
+    } 
+	else
+	{
+		return IS_SampleSpecularH(N,mat.roughness,Xi.x,Xi.y);
+	}
+    return 0;
+}
+
+void SetCheapIndirectColor(inout float3 re, float3 seed, Ray ray, HitInfo minHit, Material_PBR mat)
+{
+	Ray ray_indirect;
+	ray_indirect.pos = minHit.P;
+	float3 Xi = float3(rand01(seed),rand01(seed.zxy),rand01(seed.zyx));
+
+	float r_diffuse = saturate(1.0 - mat.metallic);
+	float r_specular = saturate(1.0);
+	float r_sum = r_diffuse + r_specular;
+	float p_diffuse = r_diffuse / r_sum;
+	float p_specular = r_specular / r_sum;
+
+	float3 H = Sample_MIS_H(Xi, minHit.N, mat,p_diffuse);
+	ray_indirect.dir = reflect(ray.dir,H);
+	{
+		//float3 d1 = Vec2NormalHemisphere(randDir,minHit.N);
+		//float3 d2 = reflect(ray.dir,minHit.N);
+		//ray_indirect.dir = lerp(d2, d1, mat.roughness);
+		//ray_indirect.dir = reflect(ray.dir,minHit.N);
+		//ray_indirect.dir = toNormalHemisphere(randP_hemiRound(seed), minHit.N);
+	}
+	//minHit.N*TraceThre*2 ensure escape from 'judging surface'
+	ray_indirect.pos = minHit.P + ray_indirect.dir*TraceThre*2 + minHit.N*TraceThre*2;
+	HitInfo indirHit;
+	float3 indirLightColor;
+	Material_PBR indirSourceMat;
+	SceneRenderIndirRay(ray_indirect, indirLightColor, indirHit, indirSourceMat);
+	indirLightColor *= RenderSceneSDFShadow(indirHit);
+	//---
+	float3 L = ray_indirect.dir;
+	float pdf_diffuse = IS_DiffusePDF(L,minHit);
+	float pdf_specular = IS_SpecularPDF(L,H,mat,minHit);
+
+	float pdf = p_diffuse * pdf_diffuse
+				+ p_specular * pdf_specular;
+	pdf = max(0.001f, pdf);
+	indirLightColor /= pdf;
+	if(indirSourceMat.roughness<0.5 && mat.roughness>0.2)
+	{
+		indirLightColor = 0;
+	}
+	//___
+	float3 Li = indirLightColor * PntLightAtten(minHit.P,indirHit.P);
+	re = PBR_GGX(mat, minHit.N, -ray.dir, L, Li);
+	re = max(re,0);
+}
+###BLOCK
+
+###BLOCK ObjMaterial
+//@@@SDFBakerMgr ObjMaterial
+if(obj == 0 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 1;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(0.5, 0.5);
+}
+else if (obj == 1 )
+{
+re.albedo = float3(1, 1, 1);
+re.metallic = 1;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(0.5, 0.5);
+}
+//@@@
+###BLOCK
+
+###BLOCK ObjRenderMode
+//@@@SDFBakerMgr ObjRenderMode
+int renderMode[2];
+renderMode[0] = 0;
+renderMode[1] = 0;
+return renderMode[obj];
+//@@@
+###BLOCK
+
+###BLOCK PreGetObjUV
+	float2 uv = 0;
+	if(inx == 0 )
+{
+}
+else if (inx == 1 )
+{
+uv = BoxedUV(p, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return uv;
+}
+return uv;
+###BLOCK
+
+###BLOCK ObjUV
+	float2 uv = 0;
+	int inx = minHit.obj;
+	//@@@SDFBakerMgr ObjUV
+if(inx == 0 )
+{
+}
+else if (inx == 1 )
+{
+uv = BoxedUV(minHit.P, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return uv;
+}
+	//@@@
+
+	inx = GetSpecialID(inx);
+	if(inx == -1)
+	{
+		//uv = SimpleUVFromPos(minHit.P,minHit.N, float3(1,1,1));
+		uv = minHit.P.xz;
+	}
+return uv;
+###BLOCK
+
+###BLOCK ObjTB
+//@@@SDFBakerMgr ObjTB
+if(inx == 0 )
+{
+}
+if(inx == 1 )
+{
+BoxedTB(T,B,minHit.P, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return;
+}
+//@@@
+inx = GetSpecialID(inx);
+	if(inx == -1)
+	{
+		T = float3(1,0,0);
+		B = float3(0,0,1);
+		return;
+	}
+basis_unstable(minHit.N, T, B);
+###BLOCK
+
+###BLOCK  ObjPreRender
+int inx = minHit.obj;
+//@@@SDFBakerMgr ObjMatLib
+if(inx==0)
+{
+	float2 uv = GetObjUV(minHit);
+ uv = float2(0.1, 0.1)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(mud_ground_albedo, uv);
+	mat.ao *= SampleR(mud_ground_ao, uv);
+	mat.metallic *= SampleR(mud_ground_metallic, uv);
+	mat.roughness *= SampleR(mud_ground_roughness, uv);
+ float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(mud_ground_normal, uv, minHit.N,T,B,1);
+}
+if(inx==1)
+{
+	float2 uv = GetObjUV(minHit);
+ uv = float2(1, 1)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(Rocks_albedo, uv);
+	mat.ao *= SampleR(Rocks_ao, uv);
+	mat.metallic *= SampleR(Rocks_metallic, uv);
+	mat.roughness *= SampleR(Rocks_roughness, uv);
+ float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(Rocks_normal, uv, minHit.N,T,B,1);
+}
+//@@@
+
+
+inx = GetSpecialID(inx);
+if(inx == -1)
+{
+	//float2 uv = minHit.P.xz;
+	//		float k = length(minHit.P-eyePos);
+	//		k = saturate(k/20.0);
+	//		int mip = floor(k*10);
+	//		mat.albedo = mip/10.0;
+}
+
+//@@@SDFBakerMgr ObjImgAttach
+
+//@@@
+
+inx = GetSpecialID(inx);
+
+###BLOCK
+
+###BLOCK ObjRender
+//@@@SDFBakerMgr ObjRender
+if(mode==0)
+{
+  float3 lightDirs[1];
+  float3 dirLightColors[1];
+  lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+  dirLightColors[0] = float3(10, 10, 10);
+  result.rgb = 0.03 * mat.albedo * mat.ao;
+  for(int i=0;i<1;i++)
+  {
+      result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);
+  }
+}
+//@@@
+else if (mode == 1)
+{
+	result = PBR_IBL(envSpecTex2DArr, mat, minHit.N, -ray.dir);
+}
+else if (mode == 2)
+{
+	//object reflection IBL
+	bool isPNGEnv=false;
+	Texture2DArray tempEnv;
+	GetEnvTexArrByObj(minHit.obj, isPNGEnv, tempEnv);
+	if(isPNGEnv)
+	{
+		result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir,1,1,true,true);
+	}
+	else
+	{
+		result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir);
+	}
+}
+else if (mode == 333)
+{
+	float3 lightPos = float3(0,4,0);
+	float3 lightColor = float3(1,1,1);
+	float3 l = normalize(lightPos - minHit.P);
+	result = PBR_GGX(mat, minHit.N, -ray.dir, l, lightColor);
+}
+else if (mode == 1000)
+{
+	result = mat.albedo;
+}
+else if (mode == 1001)
+{
+	result = minHit.N;
+}
+else if (mode == 1002)
+{
+	float3 T,B;
+	GetObjTB(T, B, minHit);
+	result = T;
+}
+else
+{
+	result = float3(1,0,1);
+}
+
+int inx = GetSpecialID(minHit.obj);
+
+###BLOCK
+
+###BLOCK  ObjPostRender
+SmoothWithDither(result, suv);
+###BLOCK
+
+###BLOCK IndirectColor
+	SetCheapIndirectColor(re, seed, ray, minHit, mat);
+###BLOCK
+
+###BLOCK SDFShadow
+int inx = GetSpecialID(minHit.obj);
+if(true)
+{
+//@@@SDFBakerMgr DirShadow
+int lightType[1];
+lightType[0] = 0;
+float3 lightPos[1];
+lightPos[0] = float3(0, 3, 0);
+float3 lightDirs[1];
+lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+int shadowType[1];
+shadowType[0] =1;
+float lightspace = 1;
+float maxLength = MaxSDF;
+float tsha = 1;
+for (int i = 0; i < 1; i++)
+{
+  float maxLength = MaxSDF;
+  if(lightType[i]==0)
+  {
+      maxLength = MaxSDF;
+  }
+  if(lightType[i]==1)
+  {
+      maxLength = length(minHit.P - lightPos[i]);
+  }
+  if(lightType[i]<0)
+  {
+      tsha = 1;
+  }
+  else
+  {
+      if(shadowType[i]==0)
+      {
+          tsha = GetDirHardShadow(lightDirs[i], minHit, maxLength);
+      }
+      if(shadowType[i]==1)
+      {
+          tsha = GetDirSoftShadow(lightDirs[i], minHit, maxLength);
+      }
+  }
+  lightspace -= (1 - tsha);
+}
+lightspace /= 1;
+sha = lightspace;
+//@@@
+}
+return sha;
+###BLOCK
+
+###BLOCK ExtraSDF
+//change from https://iquilezles.org/articles/distfunctions/
+float3 opCheapBend_XY( float3 p , in float3 center, float k=10.0f)
+{
+	p -= center;
+    float c = cos(k*p.x);
+    float s = sin(k*p.x);
+    float2x2  m = {c,-s,s,c};
+    return float3(mul(m,p.xy),p.z)+center;
+}
+
+float opSmoothSubtraction( float d1, float d2, float k =1.0f) {
+    float h = clamp( 0.5 - 0.5*(d2+d1)/k, 0.0, 1.0 );
+    return lerp( d2, -d1, h ) + k*h*(1.0-h); }
+###BLOCK
+
+###BLOCK ObjSDF
+//### 
+float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
+//@@@SDFBakerMgr BeforeObjSDF
+//@@@
+//@@@SDFBakerMgr ObjSDF
+if(inx == 0 )
+{
+inx = -1;
+}
+else if (inx == 1 )
+{
+float3 center = float3(0, 1.9, 0);
+float3 bound = float3(0.5, 0.5, 0.5);
+float3 rot = float3(0, 0, 0);
+float offset = 0;
+offset = -0.08*SampleR(Rocks_height, PreGetObjUV(inx,p));
+float d = offset + SDFBox(p,center,bound, rot);
+d*=0.2;
+re = min(re,d);
+}
+//@@@
+
+if(inx == -1)
+{
+	if(IsInBBox(p,eyePos - 300,eyePos+300))
+	{
+		//float height = 0.3*sin(0.2*p.x+_Time.y);
+		float height =0;
+
+		if(traceInfo.lastTrace<0.5)// && abs(p.y)<0.4)
+		{
+			float2 uv = 0.1*p.xz;
+			//float k = length(p-eyePos);
+			//k = saturate(k/20.0);
+			//int mip = floor(k*10);
+			height += 0.2*SampleR(mud_ground_height,uv,0);
+		}
+
+		//float2 uv = p.xz;
+		//height += perlinNoise1.SampleLevel(noise_linear_repeat_sampler, uv*0.01+0.01*_Time.y, 0).x;
+		//height += 0.1*WaterHeightMap.SampleLevel(noise_linear_repeat_sampler, uv*0.1-0.01*_Time.y, 0).x;
+
+		re = 0.5*abs(p.y-height);
+	}
+}
+
+return re;
+###BLOCK
+
+###BLOCK BeforeObjSDFNormal
+
+###BLOCK
+
+###BLOCK ObjNormal
+	inx = GetSpecialID(inx);
+	//@@@SDFBakerMgr ObjNormal
+if(inx == 0 )
+{
+}
+else if (inx == 1 )
+{
+}
+	//@@@
+	return GetObjSDFNormal(inx, p, traceInfo);
+###BLOCK
+
+###BLOCK BeforeTraceScene
+
+###BLOCK
+
+###BLOCK CheckInnerBound
+//@@@SDFBakerMgr CheckInnerBound
+//@@@
+###BLOCK
+
+###BLOCK CheckInnerBound2
+//@@@SDFBakerMgr CheckInnerBound
+//@@@
+###BLOCK
+
+###BLOCK HardShadow_BeforeLoopBody
+###BLOCK
+
+###BLOCK SpecialID
+//@@@SDFBakerMgr SpecialObj
+if(inx == 0 )
+{
+inx = -1;
+}
+else if (inx == 1 )
+{
+}
+//@@@
+return inx;
+###BLOCK

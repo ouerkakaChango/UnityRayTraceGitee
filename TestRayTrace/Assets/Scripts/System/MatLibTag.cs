@@ -79,9 +79,10 @@ public class MatLibTag : MonoBehaviour
         //if(inx == 2)
         //{
         //	float2 uv = GetObjUV(minHit);
+        //  uv = s*uv+t;
         //	float3 T,B;
         //	GetObjTB(T,B, minHit);
-        //	minHit.N = SampleNormalMap(N_paper, s*uv+t, minHit.N,T,B,1.3);
+        //	minHit.N = SampleNormalMap(N_paper, uv, minHit.N,T,B,1.3);
         //}
 
         Vector2 uv_scale = new Vector2(floatParams[0], floatParams[1]);
@@ -105,6 +106,57 @@ public class MatLibTag : MonoBehaviour
         lines.Add(" float3 T,B;");
         lines.Add("	GetObjTB(T,B, minHit);");
         lines.Add("	minHit.N = SampleNormalMap("+texParams[0].plainTextures[0].name+", "+Bake(uv_scale) +"*uv+"+ Bake(uv_offset) + ", minHit.N,T,B,"+ normalIntensity + ");");
+        lines.Add("}");
+    }
+
+    public void BakePBR(ref List<string> lines)
+    {
+        //if(inx == 2)
+        //{
+        //	float2 uv = GetObjUV(minHit);
+        //  uv = s*uv+t;
+        //	float3 T,B;
+        //	GetObjTB(T,B, minHit);
+        //  mat.albedo *= SampleRGB(Albedo, uv);
+        //  mat.metallic *= SampleR(Metallic, uv);
+        //  mat.roughness *= SampleR(Rough, uv);
+        //	minHit.N = SampleNormalMap(N, uv, minHit.N,T,B,1);
+        //}
+
+        if (floatParams.Count < 4)
+        {
+            Debug.LogError("need at least 4 floatParam for uv_ST");
+            return;
+        }
+
+        float normalIntensity = 1;
+        if (floatParams.Count >= 5)
+        {
+            normalIntensity = floatParams[4];
+        }
+
+        if (texParams.Count < 1)
+        {
+            Debug.LogError("No tex tag for PBR MatLib!");
+            return;
+        } 
+
+        Vector2 uv_scale = new Vector2(floatParams[0], floatParams[1]);
+        Vector2 uv_offset = new Vector2(floatParams[2], floatParams[3]);
+        PBRTexture pbr = texParams[0].pbrTextures[0];
+
+        int objInx = SafeGetObjInx();
+        lines.Add("if(inx==" + objInx + ")");
+        lines.Add("{");
+        lines.Add("	float2 uv = GetObjUV(minHit);");
+        lines.Add(" uv = " + Bake(uv_scale) + "*uv+" + Bake(uv_offset) + ";");
+        lines.Add("	mat.albedo *= SampleRGB(" + pbr.name+"_albedo"+ ", uv);");
+        lines.Add("	mat.ao *= SampleR(" + pbr.name + "_ao" + ", uv);");
+        lines.Add("	mat.metallic *= SampleR(" + pbr.name + "_metallic" + ", uv);");
+        lines.Add("	mat.roughness *= SampleR(" + pbr.name + "_roughness" + ", uv);");
+        lines.Add(" float3 T,B;");
+        lines.Add("	GetObjTB(T,B, minHit);");
+        lines.Add("	minHit.N = SampleNormalMap("+ pbr.name + "_normal" + ", uv, minHit.N,T,B,"+ normalIntensity + ");");
         lines.Add("}");
     }
 

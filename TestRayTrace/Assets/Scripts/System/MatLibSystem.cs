@@ -73,6 +73,10 @@ public class MatLibSystem : BaseSystem
             {
                 tag.BakeNormalMap(ref bakedObjMatLib);
             }
+            else if (tag.matTypeName == "PBR")
+            {
+                tag.BakePBR(ref bakedObjMatLib);
+            }
             else if (tag.matTypeName == "Marquetry")
             {
                 tag.BakeMarquetry(ref bakedObjMatLib);

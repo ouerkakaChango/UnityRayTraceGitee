@@ -921,6 +921,7 @@ public class SDFBakerMgr : MonoBehaviour
             bakedSDFs.Add("float offset = " + offset + ";");
             bakedSDFs.Add(expression.expressionStr);
             bakedSDFs.Add("float d = offset + SDFBox(p,center,bound, rot);");
+            bakedSDFs.Add(expression.postExpressionStr);
             bakedSDFs.Add("re = min(re,d);");
         }
 

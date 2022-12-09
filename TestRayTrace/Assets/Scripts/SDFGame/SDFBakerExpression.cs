@@ -6,6 +6,8 @@ public class SDFBakerExpression : MonoBehaviour
 {
     [SerializeField,HideInInspector]
     public string expressionStr;
+    [SerializeField, HideInInspector]
+    public string postExpressionStr;
     // Start is called before the first frame update
     void Start()
     {

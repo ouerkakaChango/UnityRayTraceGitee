@@ -382,14 +382,14 @@ float3 BilinearRGB(Texture2D<float3> tex, float2 uv)
 	return lerp(x0, x1, fracPart.y);
 }
 
-float SampleR(in Texture2D tex, float2 uv)
+float SampleR(in Texture2D tex, float2 uv, int mip = 0)
 {
-	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+	return tex.SampleLevel(common_linear_repeat_sampler, uv, mip).r;
 }
 
-float SampleR(in Texture2D<float> tex, float2 uv)
+float SampleR(in Texture2D<float> tex, float2 uv, int mip = 0)
 {
-	return tex.SampleLevel(common_linear_repeat_sampler, uv, 0).r;
+	return tex.SampleLevel(common_linear_repeat_sampler, uv, mip).r;
 }
 
 float3 SampleRGB(in Texture2D tex, float2 uv)
