@@ -20,18 +20,18 @@
 #include "../../../HLSL/MatLib/Ocean.hlsl"
 
 //@@@SDFBakerMgr TexSys
-Texture2D<float> mud_ground_height;
-Texture2D<float3> mud_ground_albedo;
-Texture2D<float3> mud_ground_normal;
-Texture2D<float> mud_ground_metallic;
-Texture2D<float> mud_ground_roughness;
-Texture2D<float> mud_ground_ao;
-Texture2D<float> Rocks_height;
 Texture2D<float3> Rocks_albedo;
 Texture2D<float3> Rocks_normal;
 Texture2D<float> Rocks_metallic;
 Texture2D<float> Rocks_roughness;
 Texture2D<float> Rocks_ao;
+Texture2D<float> Rocks_height;
+Texture2D<float3> mud_ground_albedo;
+Texture2D<float3> mud_ground_normal;
+Texture2D<float> mud_ground_metallic;
+Texture2D<float> mud_ground_roughness;
+Texture2D<float> mud_ground_ao;
+Texture2D<float> mud_ground_height;
 //@@@
 
 //@@@SDFBakerMgr DyValSys
@@ -102,9 +102,6 @@ float2 PreGetObjUV(int inx, float3 p)
 	float2 uv = 0;
 	if(inx == 0 )
 {
-}
-else if (inx == 1 )
-{
 uv = BoxedUV(p, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return uv;
 }
@@ -118,11 +115,11 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
+uv = BoxedUV(minHit.P, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return uv;
 }
 else if (inx == 1 )
 {
-uv = BoxedUV(minHit.P, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return uv;
 }
 	//@@@
 
@@ -143,11 +140,11 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
+BoxedTB(T,B,minHit.P, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return;
 }
 if(inx == 1 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
-return;
 }
 //@@@
 inx = GetSpecialID(inx);
@@ -167,18 +164,6 @@ int inx = minHit.obj;
 if(inx==0)
 {
 	float2 uv = GetObjUV(minHit);
-uv = float2(0.1, 0.1)*uv+float2(0, 0);
-	mat.albedo *= SampleRGB(mud_ground_albedo, uv);
-	mat.ao *= SampleR(mud_ground_ao, uv);
-	mat.metallic *= SampleR(mud_ground_metallic, uv);
-	mat.roughness *= SampleR(mud_ground_roughness, uv);
-float3 T,B;
-	GetObjTB(T,B, minHit);
-	minHit.N = SampleNormalMap(mud_ground_normal, uv, minHit.N,T,B,1);
-}
-if(inx==1)
-{
-	float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
 	mat.albedo *= SampleRGB(Rocks_albedo, uv);
 	mat.ao *= SampleR(Rocks_ao, uv);
@@ -187,6 +172,18 @@ uv = float2(1, 1)*uv+float2(0, 0);
 float3 T,B;
 	GetObjTB(T,B, minHit);
 	minHit.N = SampleNormalMap(Rocks_normal, uv, minHit.N,T,B,1);
+}
+if(inx==1)
+{
+	float2 uv = GetObjUV(minHit);
+uv = float2(0.1, 0.1)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(mud_ground_albedo, uv);
+	mat.ao *= SampleR(mud_ground_ao, uv);
+	mat.metallic *= SampleR(mud_ground_metallic, uv);
+	mat.roughness *= SampleR(mud_ground_roughness, uv);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(mud_ground_normal, uv, minHit.N,T,B,1);
 }
 //@@@
 
@@ -222,12 +219,14 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 //@@@SDFBakerMgr ObjRender
 if(mode==0)
 {
-float3 lightDirs[1];
-float3 dirLightColors[1];
+float3 lightDirs[2];
+float3 dirLightColors[2];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-dirLightColors[0] = float3(10, 10, 10);
+dirLightColors[0] = float3(1, 1, 1);
+lightDirs[1] = normalize(minHit.P - float3(-3.88, 1.53, 0.17));
+dirLightColors[1] = float3(0, 2.681007, 10) * PntLightAtten(minHit.P, float3(-3.88, 1.53, 0.17));
 result.rgb = 0.03 * mat.albedo * mat.ao;
-for(int i=0;i<1;i++)
+for(int i=0;i<2;i++)
 {
 result.rgb += PBR_GGX(mat, minHit.N, -ray.dir, -lightDirs[i], dirLightColors[i]);
 }
@@ -315,13 +314,13 @@ int inx = GetSpecialID(minHit.obj);
 if(true)
 {
 //@@@SDFBakerMgr DirShadow
-int lightType[1];
+int lightType[2];
 lightType[0] = 0;
-float3 lightPos[1];
+float3 lightPos[2];
 lightPos[0] = float3(0, 3, 0);
-float3 lightDirs[1];
+float3 lightDirs[2];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-int shadowType[1];
+int shadowType[2];
 shadowType[0] =1;
 float lightspace = 1;
 float maxLength = MaxSDF;
@@ -390,10 +389,6 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-inx = -1;
-}
-else if (inx == 1 )
-{
 float3 center = float3(0, 1.9, 0);
 float3 bound = float3(0.5, 0.5, 0.5);
 float3 rot = float3(0, 0, 0);
@@ -402,6 +397,10 @@ offset = -0.08*SampleR(Rocks_height, PreGetObjUV(inx,p));
 float d = offset + SDFBox(p,center,bound, rot);
 d*=0.2;
 re = min(re,d);
+}
+else if (inx == 1 )
+{
+inx = -1;
 }
 //@@@
 
@@ -432,15 +431,23 @@ if(inx == -1)
 return re;
 }
 
+//https://iquilezles.org/articles/normalsSDF/
 float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonScale = 1.0f)
 {
 	float normalEpsilon = NormalEpsilon;
 
-	return normalize(float3(
-		GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
-		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
-		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon*eplisonScale), traceInfo) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon*eplisonScale), traceInfo)
-		));
+	//return normalize(float3(
+	//	GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
+	//	GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
+	//	GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon*eplisonScale), traceInfo) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon*eplisonScale), traceInfo)
+	//	));
+
+	float h = NormalEpsilon*eplisonScale; // replace by an appropriate value
+const float2 k = float2(1,-1);
+return normalize( k.xyy*GetObjSDF(inx, p + k.xyy*h, traceInfo) +
+k.yyx*GetObjSDF(inx, p + k.yyx*h, traceInfo) +
+k.yxy*GetObjSDF(inx, p + k.yxy*h, traceInfo) +
+k.xxx*GetObjSDF(inx, p + k.xxx*h, traceInfo) );
 }
 
 float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
@@ -913,10 +920,10 @@ int GetSpecialID(int inx)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
-inx = -1;
 }
 else if (inx == 1 )
 {
+inx = -1;
 }
 //@@@
 return inx;

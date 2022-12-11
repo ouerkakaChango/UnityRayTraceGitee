@@ -123,101 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &34355757
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 34355761}
-  - component: {fileID: 34355760}
-  - component: {fileID: 34355759}
-  - component: {fileID: 34355758}
-  m_Layer: 0
-  m_Name: Cube (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!65 &34355758
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 34355757}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &34355759
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 34355757}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &34355760
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 34355757}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &34355761
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 34355757}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.77, y: 4.72, z: 1.09}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &628349222
 GameObject:
   m_ObjectHideFlags: 0
@@ -368,7 +273,7 @@ MonoBehaviour:
   dof_minThreshold: 0.2
   dof_maxThreshold: 0.3
   dof_fixFocusDepth: 2
-  dof_dilationSize: 3
+  dof_dilationSize: 1
   MSDFShadow_filterSize: 3
 --- !u!114 &628349228
 MonoBehaviour:
@@ -539,7 +444,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 1
+  objInx: 0
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &894784446
@@ -585,7 +490,7 @@ MonoBehaviour:
   heightTextures: []
   plainTextures: []
   envTextures: []
-  texInx: 3
+  texInx: 0
   useSubTex: 0
   subTexID: 0
   edgeNum: 4
@@ -609,7 +514,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: 54c2c5b7c003dce4db6c5741cb55ce85, type: 3}
     channel: 3
   envTextures: []
-  texInx: 2
+  texInx: 1
   useSubTex: 0
   subTexID: 0
   edgeNum: 4
@@ -674,8 +579,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
-  - name: mud_ground_height
-    tex: {fileID: 2800000, guid: 851646be14524ee46beb325bbabd69b6, type: 3}
+  - name: Rocks_albedo
+    tex: {fileID: 2800000, guid: 417fc9c69177f664898fe49dad025198, type: 3}
+    channel: 1
+  - name: Rocks_normal
+    tex: {fileID: 2800000, guid: 693bee42eb179314c8d2dfb426891ab8, type: 3}
+    channel: 1
+  - name: Rocks_metallic
+    tex: {fileID: 2800000, guid: 8d560250c358e4142a3bbb4809b12110, type: 3}
+    channel: 3
+  - name: Rocks_roughness
+    tex: {fileID: 2800000, guid: ba45c23d7ac250649a12d1d54254c7b1, type: 3}
+    channel: 3
+  - name: Rocks_ao
+    tex: {fileID: 2800000, guid: 43ab0ab7e8b566f448e058e2195330c7, type: 3}
+    channel: 3
+  - name: Rocks_height
+    tex: {fileID: 2800000, guid: 54c2c5b7c003dce4db6c5741cb55ce85, type: 3}
     channel: 3
   - name: mud_ground_albedo
     tex: {fileID: 2800000, guid: 91fbe17bb045b1d418bb56e1eaff92d8, type: 3}
@@ -692,42 +612,27 @@ MonoBehaviour:
   - name: mud_ground_ao
     tex: {fileID: 2800000, guid: fc426e31456c4e44badf2fdec5629524, type: 3}
     channel: 3
-  - name: Rocks_height
-    tex: {fileID: 2800000, guid: 54c2c5b7c003dce4db6c5741cb55ce85, type: 3}
-    channel: 3
-  - name: Rocks_albedo
-    tex: {fileID: 2800000, guid: 417fc9c69177f664898fe49dad025198, type: 3}
-    channel: 1
-  - name: Rocks_normal
-    tex: {fileID: 2800000, guid: 693bee42eb179314c8d2dfb426891ab8, type: 3}
-    channel: 1
-  - name: Rocks_metallic
-    tex: {fileID: 2800000, guid: 8d560250c358e4142a3bbb4809b12110, type: 3}
-    channel: 3
-  - name: Rocks_roughness
-    tex: {fileID: 2800000, guid: ba45c23d7ac250649a12d1d54254c7b1, type: 3}
-    channel: 3
-  - name: Rocks_ao
-    tex: {fileID: 2800000, guid: 43ab0ab7e8b566f448e058e2195330c7, type: 3}
+  - name: mud_ground_height
+    tex: {fileID: 2800000, guid: 851646be14524ee46beb325bbabd69b6, type: 3}
     channel: 3
   tags:
-  - {fileID: 2137073057}
-  - {fileID: 2137073053}
-  - {fileID: 894784448}
   - {fileID: 894784447}
+  - {fileID: 894784448}
+  - {fileID: 2137073053}
+  - {fileID: 2137073057}
   bakedDeclares:
-  - Texture2D<float> mud_ground_height;
-  - Texture2D<float3> mud_ground_albedo;
-  - Texture2D<float3> mud_ground_normal;
-  - Texture2D<float> mud_ground_metallic;
-  - Texture2D<float> mud_ground_roughness;
-  - Texture2D<float> mud_ground_ao;
-  - Texture2D<float> Rocks_height;
   - Texture2D<float3> Rocks_albedo;
   - Texture2D<float3> Rocks_normal;
   - Texture2D<float> Rocks_metallic;
   - Texture2D<float> Rocks_roughness;
   - Texture2D<float> Rocks_ao;
+  - Texture2D<float> Rocks_height;
+  - Texture2D<float3> mud_ground_albedo;
+  - Texture2D<float3> mud_ground_normal;
+  - Texture2D<float> mud_ground_metallic;
+  - Texture2D<float> mud_ground_roughness;
+  - Texture2D<float> mud_ground_ao;
+  - Texture2D<float> mud_ground_height;
   bakedEnvTexSettings: []
 --- !u!114 &1178098469
 MonoBehaviour:
@@ -758,9 +663,10 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
-  - {fileID: 2137073055}
   - {fileID: 894784445}
+  - {fileID: 2137073055}
   dirLightTags:
+  - {fileID: 2034634558}
   - {fileID: 1561719850}
 --- !u!114 &1178098470
 MonoBehaviour:
@@ -775,22 +681,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tags:
-  - {fileID: 2137073054}
   - {fileID: 894784446}
+  - {fileID: 2137073054}
   bakedObjMatLib:
   - if(inx==0)
-  - '{'
-  - "\tfloat2 uv = GetObjUV(minHit);"
-  - ' uv = float2(0.1, 0.1)*uv+float2(0, 0);'
-  - "\tmat.albedo *= SampleRGB(mud_ground_albedo, uv);"
-  - "\tmat.ao *= SampleR(mud_ground_ao, uv);"
-  - "\tmat.metallic *= SampleR(mud_ground_metallic, uv);"
-  - "\tmat.roughness *= SampleR(mud_ground_roughness, uv);"
-  - ' float3 T,B;'
-  - "\tGetObjTB(T,B, minHit);"
-  - "\tminHit.N = SampleNormalMap(mud_ground_normal, uv, minHit.N,T,B,1);"
-  - '}'
-  - if(inx==1)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' uv = float2(1, 1)*uv+float2(0, 0);'
@@ -801,6 +695,18 @@ MonoBehaviour:
   - ' float3 T,B;'
   - "\tGetObjTB(T,B, minHit);"
   - "\tminHit.N = SampleNormalMap(Rocks_normal, uv, minHit.N,T,B,1);"
+  - '}'
+  - if(inx==1)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' uv = float2(0.1, 0.1)*uv+float2(0, 0);'
+  - "\tmat.albedo *= SampleRGB(mud_ground_albedo, uv);"
+  - "\tmat.ao *= SampleR(mud_ground_ao, uv);"
+  - "\tmat.metallic *= SampleR(mud_ground_metallic, uv);"
+  - "\tmat.roughness *= SampleR(mud_ground_roughness, uv);"
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - "\tminHit.N = SampleNormalMap(mud_ground_normal, uv, minHit.N,T,B,1);"
   - '}'
 --- !u!114 &1178098471
 MonoBehaviour:
@@ -930,7 +836,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 10
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1010,7 +916,118 @@ MonoBehaviour:
   shadowType: 1
   lightPass: 0
   lightType: 0
+  lightInx: 1
+--- !u!1 &2034634557
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2034634560}
+  - component: {fileID: 2034634559}
+  - component: {fileID: 2034634558}
+  m_Layer: 0
+  m_Name: Point Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2034634558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2034634557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca637f74265f5243b17be48c1fd4610, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bakeShadow: 0
+  shadowType: 1
+  lightPass: 0
+  lightType: 0
   lightInx: 0
+--- !u!108 &2034634559
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2034634557}
+  m_Enabled: 1
+  serializedVersion: 10
+  m_Type: 2
+  m_Shape: 0
+  m_Color: {r: 0, g: 0.26810074, b: 1, a: 1}
+  m_Intensity: 10
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+--- !u!4 &2034634560
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2034634557}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.88, y: 1.53, z: 0.17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2137073052
 GameObject:
   m_ObjectHideFlags: 0
@@ -1054,7 +1071,7 @@ MonoBehaviour:
   heightTextures: []
   plainTextures: []
   envTextures: []
-  texInx: 1
+  texInx: 2
   useSubTex: 0
   subTexID: 0
   edgeNum: 4
@@ -1108,7 +1125,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 0
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!4 &2137073056
@@ -1145,7 +1162,7 @@ MonoBehaviour:
     tex: {fileID: 2800000, guid: 851646be14524ee46beb325bbabd69b6, type: 3}
     channel: 3
   envTextures: []
-  texInx: 0
+  texInx: 3
   useSubTex: 0
   subTexID: 0
   edgeNum: 4

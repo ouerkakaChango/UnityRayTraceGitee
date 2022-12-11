@@ -134,17 +134,25 @@ float GetObjSDF(int inx, float3 p, in TraceInfo traceInfo)
 	###BLOCK
 }
 
+//https://iquilezles.org/articles/normalsSDF/
 float3 GetObjSDFNormal(int inx, float3 p, in TraceInfo traceInfo, float eplisonScale = 1.0f)
 {
 	float normalEpsilon = NormalEpsilon;
 	###BLOCK BeforeObjSDFNormal
 	...
 	###BLOCK
-	return normalize(float3(
-		GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
-		GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
-		GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon*eplisonScale), traceInfo) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon*eplisonScale), traceInfo)
-		));
+	//return normalize(float3(
+	//	GetObjSDF(inx, float3(p.x + NormalEpsilon*eplisonScale, p.y, p.z), traceInfo) - GetObjSDF(inx, float3(p.x - NormalEpsilon*eplisonScale, p.y, p.z), traceInfo),
+	//	GetObjSDF(inx, float3(p.x, p.y + NormalEpsilon*eplisonScale, p.z), traceInfo) - GetObjSDF(inx, float3(p.x, p.y - NormalEpsilon*eplisonScale, p.z), traceInfo),
+	//	GetObjSDF(inx, float3(p.x, p.y, p.z + NormalEpsilon*eplisonScale), traceInfo) - GetObjSDF(inx, float3(p.x, p.y, p.z - NormalEpsilon*eplisonScale), traceInfo)
+	//	));
+
+	float h = NormalEpsilon*eplisonScale; // replace by an appropriate value
+    const float2 k = float2(1,-1);
+    return normalize( k.xyy*GetObjSDF(inx, p + k.xyy*h, traceInfo) + 
+                      k.yyx*GetObjSDF(inx, p + k.yyx*h, traceInfo) + 
+                      k.yxy*GetObjSDF(inx, p + k.yxy*h, traceInfo) + 
+                      k.xxx*GetObjSDF(inx, p + k.xxx*h, traceInfo) );
 }
 
 float3 GetObjNormal(int inx, float3 p, in TraceInfo traceInfo)
