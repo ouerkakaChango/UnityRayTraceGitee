@@ -176,6 +176,7 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("ObjRender", new List<Vector2Int>());
         rangeMap.Add("DirShadow", new List<Vector2Int>());
         rangeMap.Add("ObjSDF", new List<Vector2Int>());
+        rangeMap.Add("ObjPreUV", new List<Vector2Int>());
         rangeMap.Add("ObjUV", new List<Vector2Int>());
         rangeMap.Add("ObjTB", new List<Vector2Int>());
         rangeMap.Add("SpecialObj", new List<Vector2Int>());
@@ -189,7 +190,7 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("FullLightInfo", new List<Vector2Int>());
         rangeMap.Add("RenderEmissive", new List<Vector2Int>());
 
-        int exInx = 18;
+        int exInx = 19;
         rangeMap.Add("ObjMatLib", new List<Vector2Int>());
         rangeMap.Add("ObjImgAttach", new List<Vector2Int>());
 
@@ -268,6 +269,10 @@ public class AutoCS : MonoBehaviour
             else if (key == "ObjUV" && ValidRange(range))
             {
                 helper.Replace(range, bakerMgr.bakedObjUVs);
+            }
+            else if (key == "ObjPreUV" && ValidRange(range))
+            {
+                helper.Replace(range, bakerMgr.bakedObjPreUVs);
             }
             else if (key == "ObjTB" && ValidRange(range))
             {

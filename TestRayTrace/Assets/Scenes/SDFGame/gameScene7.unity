@@ -204,8 +204,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 628349222}
-  m_LocalRotation: {x: 0.09816641, y: 0.35841975, z: -0.037578534, w: 0.9276241}
-  m_LocalPosition: {x: -0.4350682, y: 2.6034377, z: -0.6402207}
+  m_LocalRotation: {x: 0.10257833, y: 0.48067412, z: -0.056360424, w: 0.8690533}
+  m_LocalPosition: {x: -2.960991, y: 1.7121749, z: -2.0922947}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -408,7 +408,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 894784440}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.9, z: 0}
+  m_LocalPosition: {x: 0, y: 0.776, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -530,7 +530,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d5fb7499814c5540afc2e246b52b52c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  expressionStr: offset = -0.08*SampleR(Rocks_height, PreGetObjUV(inx,p));
+  expressionStr: offset = -0.08*SampleR(Rocks_height, GetObjPreUV(inx,p));
   postExpressionStr: d*=0.2;
 --- !u!1 &1178098466
 GameObject:
@@ -650,6 +650,7 @@ MonoBehaviour:
   bakedSDFs: []
   bakedObjNormals: []
   bakedObjUVs: []
+  bakedObjPreUVs: []
   bakedObjTBs: []
   bakedSpecialObjects: []
   bakedMaterials: []
@@ -666,8 +667,8 @@ MonoBehaviour:
   - {fileID: 894784445}
   - {fileID: 2137073055}
   dirLightTags:
-  - {fileID: 2034634558}
   - {fileID: 1561719850}
+  - {fileID: 2034634558}
 --- !u!114 &1178098470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -836,7 +837,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 10
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -916,7 +917,7 @@ MonoBehaviour:
   shadowType: 1
   lightPass: 0
   lightType: 0
-  lightInx: 1
+  lightInx: 0
 --- !u!1 &2034634557
 GameObject:
   m_ObjectHideFlags: 0
@@ -951,7 +952,7 @@ MonoBehaviour:
   shadowType: 1
   lightPass: 0
   lightType: 0
-  lightInx: 0
+  lightInx: 1
 --- !u!108 &2034634559
 Light:
   m_ObjectHideFlags: 0

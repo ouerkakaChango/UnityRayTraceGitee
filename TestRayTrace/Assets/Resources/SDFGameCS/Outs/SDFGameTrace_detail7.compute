@@ -71,11 +71,34 @@ else
 	//re = float3(1,1,1);
 	//re = GetEnvIrradiance_equirectangular(envBgTex, ray.dir, true);
 	//re = stars(ray.pos, ray.dir);
+
 	Ray tray = ray;
 	//warp skybox a little to fit vanish line
 	tray.dir = normalize(tray.dir+float3(0,0.015,0));
 	re = CommonBg_WaterSky(tray, seed.xy, float2(w,h), float2(0.5,0.5*(1+sin(0.1*_Time.y))));
 }
+
+float eyeDepth = 0;
+if(minHit.bHit)
+{
+	eyeDepth = length(minHit.P - ray.pos);
+}
+else
+{
+	eyeDepth = 300;
+}
+float fogK = 0.005*eyeDepth;
+fogK = exp(-fogK*fogK);
+
+float3 fogPos = ray.pos+ray.dir*eyeDepth;
+float fogHeightK = 1-exp(-5*(fogPos.y/10.));//saturate((fogPos.y - 0)/1);
+
+fogK = max(fogK,fogHeightK);
+
+float3 fogColor = 0.1;
+re = lerp(fogColor, re, fogK);
+
+SmoothWithDither(re, suv);
 
 	return re;
 }

@@ -35,9 +35,9 @@ int GetObjRenderMode(int obj)
 	###BLOCK
 }
 
-float2 PreGetObjUV(int inx, float3 p)
+float2 GetObjPreUV(int inx, float3 p)
 {
-	###BLOCK PreGetObjUV
+	###BLOCK GetObjPreUV
 	... 
 	###BLOCK
 }

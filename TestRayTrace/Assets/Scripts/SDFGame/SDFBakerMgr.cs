@@ -19,6 +19,8 @@ public class SDFBakerMgr : MonoBehaviour
     [HideInInspector]
     public List<string> bakedObjUVs = new List<string>();
     [HideInInspector]
+    public List<string> bakedObjPreUVs = new List<string>();
+    [HideInInspector]
     public List<string> bakedObjTBs = new List<string>();
     [HideInInspector]
     public List<string> bakedSpecialObjects = new List<string>();
@@ -112,6 +114,7 @@ public class SDFBakerMgr : MonoBehaviour
     {
         PreAddSDF(i, ref bakedSDFs, tag);
         PreAdd(i, ref bakedObjNormals);
+        PreAdd(i, ref bakedObjPreUVs);
         PreAdd(i, ref bakedObjUVs);
         PreAdd(i, ref bakedObjTBs,"inx",true);
         PreAdd(i, ref bakedSpecialObjects);
@@ -123,6 +126,7 @@ public class SDFBakerMgr : MonoBehaviour
     {
         PostAdd(i, ref bakedSDFs);
         PostAdd(i, ref bakedObjNormals);
+        PostAdd(i, ref bakedObjPreUVs);
         PostAdd(i, ref bakedObjUVs);
         PostAdd(i, ref bakedObjTBs);
         PostAdd(i, ref bakedSpecialObjects);
@@ -192,6 +196,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedBeforeSDF.Clear();
         bakedSDFs.Clear();
         bakedObjNormals.Clear();
+        bakedObjPreUVs.Clear();
         bakedObjUVs.Clear();
         bakedObjTBs.Clear();
 
@@ -924,6 +929,11 @@ public class SDFBakerMgr : MonoBehaviour
             bakedSDFs.Add(expression.postExpressionStr);
             bakedSDFs.Add("re = min(re,d);");
         }
+
+        //Bake ObjPreUV
+        line = "uv = BoxedUV(p, " + center_str + ", " + bound_str + ", " + rot_str + ");";
+        bakedObjPreUVs.Add(line);
+        bakedObjPreUVs.Add("return uv;");
 
         //Bake ObjUV
         //uv = BoxedUV(minHit.P, center, bound, rot);

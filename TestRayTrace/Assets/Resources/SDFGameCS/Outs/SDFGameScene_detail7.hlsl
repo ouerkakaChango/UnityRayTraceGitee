@@ -97,14 +97,24 @@ return renderMode[obj];
 //@@@
 }
 
-float2 PreGetObjUV(int inx, float3 p)
+float2 GetObjPreUV(int inx, float3 p)
 {
 	float2 uv = 0;
-	if(inx == 0 )
+	//@@@SDFBakerMgr ObjPreUV
+if(inx == 0 )
 {
-uv = BoxedUV(p, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(p, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return uv;
 }
+else if (inx == 1 )
+{
+}
+	//@@@
+	//if(inx == 0 )
+	//{
+	//	uv = BoxedUV(p, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+	//	return uv;
+	//}
 return uv;
 }
 
@@ -115,7 +125,7 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 1 )
@@ -140,7 +150,7 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 1.9, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+BoxedTB(T,B,minHit.P, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return;
 }
 if(inx == 1 )
@@ -208,7 +218,13 @@ inx = GetSpecialID(inx);
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
-SmoothWithDither(result, suv);
+//float k = 0.2;
+//float eyeDepth = length(minHit.P - ray.pos);
+//float fogK = k*eyeDepth;
+//fogK = fogK*fogK;
+//fogK = exp(-fogK);
+//float3 fogColor = 1;
+//result = lerp(fogColor, result, fogK);
 }
 
 float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
@@ -222,7 +238,7 @@ if(mode==0)
 float3 lightDirs[2];
 float3 dirLightColors[2];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-dirLightColors[0] = float3(1, 1, 1);
+dirLightColors[0] = float3(10, 10, 10);
 lightDirs[1] = normalize(minHit.P - float3(-3.88, 1.53, 0.17));
 dirLightColors[1] = float3(0, 2.681007, 10) * PntLightAtten(minHit.P, float3(-3.88, 1.53, 0.17));
 result.rgb = 0.03 * mat.albedo * mat.ao;
@@ -389,11 +405,11 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-float3 center = float3(0, 1.9, 0);
+float3 center = float3(0, 0.776, 0);
 float3 bound = float3(0.5, 0.5, 0.5);
 float3 rot = float3(0, 0, 0);
 float offset = 0;
-offset = -0.08*SampleR(Rocks_height, PreGetObjUV(inx,p));
+offset = -0.08*SampleR(Rocks_height, GetObjPreUV(inx,p));
 float d = offset + SDFBox(p,center,bound, rot);
 d*=0.2;
 re = min(re,d);

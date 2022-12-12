@@ -503,4 +503,9 @@ float PntLightAtten(float3 pos, float3 lightPos)
 	return saturate(1 / (d*d));
 	//return 1 / (1 + 0.01*d + 0.005*d*d);
 }
+
+float grey(float3 c)
+{
+	return c.r*0.3 + c.g*0.6 + c.b*0.1;
+}
 #endif
