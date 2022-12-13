@@ -204,8 +204,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 628349222}
-  m_LocalRotation: {x: 0.10257833, y: 0.48067412, z: -0.056360424, w: 0.8690533}
-  m_LocalPosition: {x: -2.960991, y: 1.7121749, z: -2.0922947}
+  m_LocalRotation: {x: 0.20675397, y: 0.16936646, z: -0.036354944, w: 0.9629362}
+  m_LocalPosition: {x: -3.6164348, y: 3.2471454, z: -4.211597}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -732,6 +732,7 @@ MonoBehaviour:
   bakedRenders: []
   bakedShadows: []
   bakedFullLightInfo: []
+  bakedFullAddLightInfo: []
   bakedRenderEmissive: []
   bakedBeforeSDF: []
   bakedCheckInnerBound: []
@@ -741,6 +742,8 @@ MonoBehaviour:
   - {fileID: 2137073055}
   dirLightTags:
   - {fileID: 1561719850}
+  addLightTags:
+  - {fileID: 2034634558}
 --- !u!114 &1178098470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1065,9 +1068,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bakeShadow: 0
   shadowType: 1
-  lightPass: 0
+  lightPass: 1
   lightType: 0
-  lightInx: 1
+  lightInx: 0
 --- !u!108 &2034634559
 Light:
   m_ObjectHideFlags: 0
@@ -1080,7 +1083,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 0, g: 0.26810074, b: 1, a: 1}
-  m_Intensity: 500
+  m_Intensity: 20
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208

@@ -31,10 +31,11 @@ public class SDFBakerMgr : MonoBehaviour
     [HideInInspector]
     public List<string> bakedRenders = new List<string>();
     [HideInInspector]
-    //---Deprecated
     public List<string> bakedShadows = new List<string>();
     [HideInInspector]
     public List<string> bakedFullLightInfo = new List<string>();
+    [HideInInspector]
+    public List<string> bakedFullAddLightInfo = new List<string>();
     [HideInInspector]
     public List<string> bakedRenderEmissive = new List<string>();
     [HideInInspector]
@@ -46,6 +47,7 @@ public class SDFBakerMgr : MonoBehaviour
 
     public SDFBakerTag[] tags;
     public SDFLightTag[] dirLightTags;
+    public SDFLightTag[] addLightTags;
 
     bool hide = false;
     // Start is called before the first frame update
@@ -139,7 +141,7 @@ public class SDFBakerMgr : MonoBehaviour
         List<SDFBakerTag> tagList = new List<SDFBakerTag>();
         for(int i=0;i<allTags.Length;i++)
         {
-            if(allTags[i].isActiveAndEnabled)
+            if(allTags[i].isActiveAndEnabled && allTags[i].gameObject.activeInHierarchy)
             {
                 tagList.Add(allTags[i]);
             }
@@ -150,13 +152,18 @@ public class SDFBakerMgr : MonoBehaviour
             Debug.LogError("Bake must have at least 1 sdf tag ,Stop");
         }
 
+        for (int i = 0; i < tags.Length; i++)
+        {
+            tags[i].objInx = i;
+        }
+
         SDFLightTag[] allLightTags = (SDFLightTag[])GameObject.FindObjectsOfType(typeof(SDFLightTag));
         List<SDFLightTag> dirLightList = new List<SDFLightTag>();
-        for(int i=0;i< allLightTags.Length;i++)
+        List<SDFLightTag> addLightList = new List<SDFLightTag>();
+        for (int i=0;i< allLightTags.Length;i++)
         {
             if(!allLightTags[i].isActiveAndEnabled || 
-                !allLightTags[i].gameObject.activeInHierarchy ||
-                allLightTags[i].lightPass!=SDFLightPass.Direct
+                !allLightTags[i].gameObject.activeInHierarchy
                 )
             {
                 continue;
@@ -164,29 +171,42 @@ public class SDFBakerMgr : MonoBehaviour
             if(IsDirectionalLight(allLightTags[i].gameObject)||
                 IsPointLight(allLightTags[i].gameObject))
             {
-                dirLightList.Add(allLightTags[i]);
+                if (allLightTags[i].lightPass == SDFLightPass.Direct)
+                {
+                    dirLightList.Add(allLightTags[i]);
+                }
+                else if(allLightTags[i].lightPass == SDFLightPass.Additional)
+                {
+                    addLightList.Add(allLightTags[i]);
+                }
+                else
+                {
+                    Debug.LogError("");
+                }
             }
             else
             {
                 allLightTags[i].lightType = SDFLightType.Emissive;
                 dirLightList.Add(allLightTags[i]);
+                addLightList.Add(allLightTags[i]);
             }
         }
         dirLightTags = dirLightList.ToArray();
         if(dirLightTags.Length==0)
         {
-            Debug.LogError("No light has add SDF Light Tag,Stop");
+            Debug.LogError("No light has SDF Light Tag,Stop");
         }
-
-        for (int i = 0; i < tags.Length; i++)
-        {
-            tags[i].objInx = i;
-        }
-
         for(int i=0;i<dirLightTags.Length;i++)
         {
             dirLightTags[i].lightInx = i;
         }
+
+        addLightTags = addLightList.ToArray();
+        for (int i = 0; i < addLightTags.Length; i++)
+        {
+            addLightTags[i].lightInx = i;
+        }
+
 
         ClearMemory();
     }
@@ -208,6 +228,7 @@ public class SDFBakerMgr : MonoBehaviour
         bakedRenders.Clear();
         bakedShadows.Clear();
         bakedFullLightInfo.Clear();
+        bakedFullAddLightInfo.Clear();
         bakedRenderEmissive.Clear();
 
         bakedSpecialObjects.Clear();
@@ -222,7 +243,8 @@ public class SDFBakerMgr : MonoBehaviour
         EndBakeRenderModes();
 
         EndBakeRenders();
-        EndBakeFullLightInfo();
+        EndBakeFullLightInfo(ref dirLightTags, ref bakedFullLightInfo);
+        EndBakeFullLightInfo(ref addLightTags, ref bakedFullAddLightInfo);
         EndBakeShadows();
 
         EndBakeRenderEmissive();
@@ -298,60 +320,64 @@ public class SDFBakerMgr : MonoBehaviour
         bakedRenders.Add("}");
     }
 
-    void EndBakeFullLightInfo()
+    static void EndBakeFullLightInfo(ref SDFLightTag[] lightTags, ref List<string> baked)
     {
-        int n = dirLightTags.Length;
+        int n = lightTags.Length;
+        if(n==0)
+        {
+            return;
+        }
         string str = "const static int lightType[" + n + "] = {";
         
         int type = -999;
         for (int i = 0; i < n; i++)
         {
-            if (IsDirectionalLight(dirLightTags[i].gameObject))
+            if (IsDirectionalLight(lightTags[i].gameObject))
             {
                 type = 0;
             }
-            else if (IsPointLight(dirLightTags[i].gameObject))
+            else if (IsPointLight(lightTags[i].gameObject))
             {
                 type = 1;
             }
             else
             {
                 //Debug.LogError("light type not handle");
-                type = 1000 + GetSelfObjInx(dirLightTags[i].gameObject); //emissive
+                type = 1000 + GetSelfObjInx(lightTags[i].gameObject); //emissive
             }
             str += type + (i==n-1 ? "":", ");
         }
         str += "};";
-        bakedFullLightInfo.Add(str);
+        baked.Add(str);
 
         str = "const static float3 lightColor[" + n + "] = {";
         for (int i = 0; i < n; i++)
         {
-            Vector3 lc = GetLightColor(dirLightTags[i].gameObject);
+            Vector3 lc = GetLightColor(lightTags[i].gameObject);
             str += Bake(lc) + (i == n - 1 ? "" : ", ");
         }
         str += "};";
-        bakedFullLightInfo.Add(str);
+        baked.Add(str);
 
         str = "const static float3 lightPos[" + n + "] = {";
         for (int i = 0; i < n; i++)
         {
-            Vector3 lp = dirLightTags[i].gameObject.transform.position;
+            Vector3 lp = lightTags[i].gameObject.transform.position;
             str += Bake(lp) + (i == n - 1 ? "" : ", ");
         }
         str += "};";
-        bakedFullLightInfo.Add(str);
+        baked.Add(str);
 
         str = "const static float3 lightDirs[" + n + "] = {";
         for (int i = 0; i < n; i++)
         {
             Vector3 lightDir = Vector3.zero;
-            if (IsDirectionalLight(dirLightTags[i].gameObject))
+            if (IsDirectionalLight(lightTags[i].gameObject))
             {
-                lightDir = GetLightDir(dirLightTags[i].gameObject);
+                lightDir = GetLightDir(lightTags[i].gameObject);
                 
             }
-            else if (IsPointLight(dirLightTags[i].gameObject))
+            else if (IsPointLight(lightTags[i].gameObject))
             {
             }
             else
@@ -362,22 +388,22 @@ public class SDFBakerMgr : MonoBehaviour
             str += (i == n - 1 ? "" : ", "); 
         }
         str += "};";
-        bakedFullLightInfo.Add(str);
+        baked.Add(str);
 
         str = "const static int shadowType[" + n + "] = {";
         for (int i = 0; i < n; i++)
         {
-            int shadowtype = (int)dirLightTags[i].shadowType;
-            if(!dirLightTags[i].bakeShadow)
+            int shadowtype = (int)lightTags[i].shadowType;
+            if(!lightTags[i].bakeShadow)
             {
                 shadowtype = -shadowtype - 1;
             }
             str += shadowtype + (i == n - 1 ? "" : ", ");
         }
         str += "};";
-        bakedFullLightInfo.Add(str);
+        baked.Add(str);
 
-        bakedFullLightInfo.Add("const static float lightspace = " + n + ";");
+        baked.Add("const static float lightspace = " + n + ";");
     }
 
     //??? Deprecated
@@ -1201,7 +1227,7 @@ public class SDFBakerMgr : MonoBehaviour
         }
     }
 
-    int GetSelfObjInx(GameObject obj)
+    static int GetSelfObjInx(GameObject obj)
     {
         var selftag = obj.GetComponent<SDFBakerTag>();
         if (selftag != null)
@@ -1217,27 +1243,27 @@ public class SDFBakerMgr : MonoBehaviour
 
     //##################################################################
 
-    string Bake(Vector2 v)
+    static string Bake(Vector2 v)
     {
         return "float2(" + v.x + ", " + v.y + ")";
     }
 
-    string Bake(Vector3 v)
+    static string Bake(Vector3 v)
     {
         return "float3(" + v.x+", "+v.y+", "+v.z+")";
     }
 
-    string Bake(Vector4 v)
+    static string Bake(Vector4 v)
     {
         return "float4(" + v.x + ", " + v.y + ", " + v.z+ ", " + v.w + ")";
     }
 
-    string BakeColor3(Color c)
+    static string BakeColor3(Color c)
     {
         return "float3(" + c.r + ", " + c.g + ", " + c.b + ")";
     }
 
-    string BakeRotEuler(Quaternion rot)
+    static string BakeRotEuler(Quaternion rot)
     {
         return Bake(rot.eulerAngles);
     }

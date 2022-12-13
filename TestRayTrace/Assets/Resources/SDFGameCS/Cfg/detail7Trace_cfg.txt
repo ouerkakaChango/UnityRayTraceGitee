@@ -28,6 +28,7 @@ if (minHit.bHit)
 	re = SceneRenderReflect(ray, minHit,mat);
 	}
 	re *= RenderSceneSDFShadow(minHit);
+	re += RenderSceneAdditionalColor(ray, minHit, mat);
 }
 else
 {

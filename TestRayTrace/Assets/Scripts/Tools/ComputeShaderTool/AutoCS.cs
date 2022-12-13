@@ -188,6 +188,7 @@ public class AutoCS : MonoBehaviour
         rangeMap.Add("TexSys_EnvTexSettings", new List<Vector2Int>());
         rangeMap.Add("ObjNormal", new List<Vector2Int>());
         rangeMap.Add("FullLightInfo", new List<Vector2Int>());
+        rangeMap.Add("FullAddLightInfo", new List<Vector2Int>());
         rangeMap.Add("RenderEmissive", new List<Vector2Int>());
 
         int exInx = 19;
@@ -261,6 +262,10 @@ public class AutoCS : MonoBehaviour
             else if (key == "FullLightInfo" && ValidRange(range))
             {
                 helper.Replace(range, bakerMgr.bakedFullLightInfo);
+            }
+            else if (key == "FullAddLightInfo" && ValidRange(range))
+            {
+                helper.Replace(range, bakerMgr.bakedFullAddLightInfo);
             }
             else if (key == "RenderEmissive" && ValidRange(range))
             {

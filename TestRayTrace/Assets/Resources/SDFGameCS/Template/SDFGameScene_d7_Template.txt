@@ -117,6 +117,16 @@ float RenderSceneSDFShadow(HitInfo minHit)
 	###BLOCK
 }
 
+float3 RenderSceneAdditionalColor(in Ray ray, in HitInfo minHit, in Material_PBR mat)
+{
+	float3 result = 0;
+	###BLOCK AdditionalColor
+	... 
+	###BLOCK
+
+	return result;
+}
+
 //###################################################################################
 #include "../../../HLSL/SDFGame/SDFCommonDef.hlsl"
 #include "../../../HLSL/Noise/NoiseCommonDef.hlsl"
