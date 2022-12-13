@@ -7,7 +7,7 @@ public class DynamicValSys : MonoBehaviour
     public List<DynamicFloat> outFloats = new List<DynamicFloat>();
     public DynamicValTag[] tags;
 
-    public List<string> bakedDeclares = new List<string>();
+    public List<List<string>> bakedDeclares = new List<List<string>>();
 
     // Start is called before the first frame update
     void Start()
@@ -51,13 +51,16 @@ public class DynamicValSys : MonoBehaviour
     void BakeCode()
     {
         bakedDeclares.Clear();
+        //!!! only 2 files
+        bakedDeclares.Add(new List<string>());
+        bakedDeclares.Add(new List<string>());
 
         for (int i = 0; i < outFloats.Count; i++)
         {
             string line = "";
             string prefix = "float";
             line = prefix + " " + outFloats[i].name + ";";
-            bakedDeclares.Add(line);
+            bakedDeclares[outFloats[i].fileInx].Add(line);
         }
     }
 

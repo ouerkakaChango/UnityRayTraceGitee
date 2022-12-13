@@ -318,7 +318,7 @@ public class AutoCS : MonoBehaviour
             {
                 if (dyValSys != null)
                 {
-                    helper.Replace(range, dyValSys.bakedDeclares);
+                    helper.Replace(range, dyValSys.bakedDeclares[fileInx]);
                 }
                 else
                 {

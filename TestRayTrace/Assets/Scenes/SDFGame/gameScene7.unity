@@ -225,7 +225,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bakerMgr: {fileID: 1178098469}
   texSys: {fileID: 1178098468}
-  dyValSys: {fileID: 0}
+  dyValSys: {fileID: 1178098472}
   systems:
   - {fileID: 1178098470}
   templates:
@@ -314,6 +314,78 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91ac8431640d49a43869e926f5c1d5b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &788759404
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 788759406}
+  - component: {fileID: 788759405}
+  m_Layer: 0
+  m_Name: Fog
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &788759405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788759404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 605a0e43f92c5eb42bae6ea7151685eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floatVals:
+  - type: 0
+    name: fogKScale
+    val: 1
+    cv:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 10
+        value: 10
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 1
+      m_PostInfinity: 1
+      m_RotationOrder: 0
+    fileInx: 0
+--- !u!4 &788759406
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788759404}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &894784440
 GameObject:
   m_ObjectHideFlags: 0
@@ -545,6 +617,7 @@ GameObject:
   - component: {fileID: 1178098468}
   - component: {fileID: 1178098470}
   - component: {fileID: 1178098471}
+  - component: {fileID: 1178098472}
   m_Layer: 0
   m_Name: System
   m_TagString: Untagged
@@ -724,6 +797,49 @@ MonoBehaviour:
   nextLevelObj: {fileID: 0}
   trace: {fileID: 628349227}
   startActions: 05000000
+--- !u!114 &1178098472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1178098466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c87f79a15225a4741817ad3b45347504, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outFloats:
+  - type: 1
+    name: fogKScale
+    val: 1
+    cv:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 10
+        value: 10
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 1
+      m_PostInfinity: 1
+      m_RotationOrder: 0
+    fileInx: 0
+  tags:
+  - {fileID: 788759405}
 --- !u!1 &1371661180
 GameObject:
   m_ObjectHideFlags: 0

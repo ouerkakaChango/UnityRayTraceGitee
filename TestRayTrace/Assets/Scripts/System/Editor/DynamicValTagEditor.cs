@@ -39,9 +39,11 @@ public class DynamicValTagEditor : Editor
             var elem = listSP.GetArrayElementAtIndex(i);
             SerializedProperty type = elem.FindPropertyRelative("type");
             SerializedProperty name = elem.FindPropertyRelative("name");
+            SerializedProperty fileInx = elem.FindPropertyRelative("fileInx");
 
             EditorGUI.BeginChangeCheck();
 
+            EditorGUILayout.PropertyField(fileInx, true);
             EditorGUILayout.PropertyField(name, true);
             EditorGUILayout.PropertyField(type, true);
             var arr = System.Enum.GetValues(typeof(DynamicType));

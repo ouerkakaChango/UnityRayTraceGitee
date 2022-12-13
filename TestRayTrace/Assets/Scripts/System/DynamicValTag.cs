@@ -15,6 +15,7 @@ public struct DynamicFloat
     public string name;
     public float val;
     public AnimationCurve cv;
+    public int fileInx;
 
     public float GetVal()
     {

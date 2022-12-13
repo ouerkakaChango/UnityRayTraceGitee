@@ -6,6 +6,9 @@ Blocks:
 
 ###BLOCK ExtraDef
 #include "../../../HLSL/MatLib/CommonBgMat.hlsl"
+//@@@SDFBakerMgr DyValSys
+float fogKScale;
+//@@@
 ###BLOCK
 
 ###BLOCK MainRender
@@ -47,7 +50,7 @@ else
 {
 	eyeDepth = 300;
 }
-float fogK = 0.005*eyeDepth;
+float fogK = 0.005*eyeDepth*fogKScale;
 fogK = exp(-fogK*fogK);
 
 float3 fogPos = ray.pos+ray.dir*eyeDepth;
