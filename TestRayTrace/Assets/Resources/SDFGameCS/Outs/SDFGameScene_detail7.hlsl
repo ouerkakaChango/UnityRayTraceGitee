@@ -240,7 +240,7 @@ float3 dirLightColors[2];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
 dirLightColors[0] = float3(10, 10, 10);
 lightDirs[1] = normalize(minHit.P - float3(-3.88, 1.53, 0.17));
-dirLightColors[1] = float3(0, 2.681007, 10) * PntLightAtten(minHit.P, float3(-3.88, 1.53, 0.17));
+dirLightColors[1] = float3(0, 134.0504, 500) * PntLightAtten(minHit.P, float3(-3.88, 1.53, 0.17));
 result.rgb = 0.03 * mat.albedo * mat.ao;
 for(int i=0;i<2;i++)
 {

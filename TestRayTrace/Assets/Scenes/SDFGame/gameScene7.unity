@@ -741,7 +741,6 @@ MonoBehaviour:
   - {fileID: 2137073055}
   dirLightTags:
   - {fileID: 1561719850}
-  - {fileID: 2034634558}
 --- !u!114 &1178098470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -810,7 +809,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outFloats:
-  - type: 1
+  - type: 0
     name: fogKScale
     val: 1
     cv:
@@ -1081,7 +1080,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 0, g: 0.26810074, b: 1, a: 1}
-  m_Intensity: 10
+  m_Intensity: 500
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
