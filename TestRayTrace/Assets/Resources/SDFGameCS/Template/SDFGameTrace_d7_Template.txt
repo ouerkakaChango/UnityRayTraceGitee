@@ -38,6 +38,8 @@ RWTexture2D<float4> IndirectResult;
 Texture2DArray envSpecTex2DArr;
 Texture2D<float4> envBgTex;
 
+bool useQuadTrace;
+
 //#########################################################################################################
 #include "SDFGameScene_(@SceneName).hlsl"
 //#########################################################################################################
@@ -62,6 +64,17 @@ float3 GetSDFGameIndirColor(in Ray ray,float3 seed, in HitInfo minHit, in Materi
 {
 float3 re = 0;
 ###BLOCK IndirectRender
+...
+###BLOCK
+	return re;
+}
+
+float4 GetQuadTraceColor(in Ray ray, out HitInfo minHit, out Material_PBR mat)
+{
+	float4 re = 0;
+	Init(mat);
+	TraceQuadScene(ray, minHit);
+###BLOCK QuadTraceRender
 ...
 ###BLOCK
 	return re;
@@ -128,17 +141,23 @@ void Render(uint3 id : SV_DispatchThreadID)
 		re += SSAA_colors[i];
 	}
 	re /= (float)SSAA_num;
-	Result[id.xy] = float4(re, 1);
+	
 
+	float eyeDepth = 0;
+	int cc = 0;
 	if(needEyeDepth)
 	{
-		float3 d = 0;
 		for (int i = 0; i < SSAA_num; i++)
 		{
-			d += SSAA_eyeDepth[i];
+		if(SSAA_eyeDepth[i]>=0)
+		{
+			eyeDepth += SSAA_eyeDepth[i];
+			cc+=1;
+			}
 		}
-		d /= (float)SSAA_num;
-		rt_EyeDepth[id.xy] = d;
+		eyeDepth /= (float)SSAA_num;
+		if(cc==0){eyeDepth = MAXFLOAT;}
+		rt_EyeDepth[id.xy] = eyeDepth;
 	}
 
 	if(useIndirectRT)
@@ -151,4 +170,67 @@ void Render(uint3 id : SV_DispatchThreadID)
 		re /= (float)SSAA_num;
 		IndirectResult[id.xy] = float4(re, 1);
 	}
+
+	if(useQuadTrace)
+	{
+	float4 SSAA_quadColor[SSAA_num];
+		[unroll(SSAA_edge)]
+	for (int j = 1; j <= SSAA_edge; j++)
+	{
+		[unroll(SSAA_edge)]
+		for (int i = 1; i <= SSAA_edge; i++)
+		{
+			Ray ray;
+			ray.pos = pixLeftDownPos + screenU * pixW * i * SSAA_unitDis + screenV * pixH * j * SSAA_unitDis;
+			if(camType == 1)
+			{
+				ray.dir = camFoward;
+			}
+			else
+			{
+				ray.dir = normalize(ray.pos - eyePos);
+			}
+			HitInfo minHit;
+			Material_PBR mat;
+			SSAA_quadColor[i - 1 + (j - 1)* SSAA_edge] = GetQuadTraceColor(ray, minHit, mat);
+			{
+				float eyeDepth = -1;
+				if(minHit.bHit)
+				{
+					eyeDepth = length(minHit.P - ray.pos);
+				}
+				SSAA_eyeDepth[i - 1 + (j - 1)* SSAA_edge] = eyeDepth;
+			}
+		}
+	}
+
+	float4 quadColor = 0;
+	for (int i = 0; i < SSAA_num; i++)
+	{
+		quadColor += SSAA_quadColor[i];
+	}
+	quadColor /= (float)SSAA_num;
+
+		float quadEyeDepth=0;
+		cc = 0;
+		for (int i = 0; i < SSAA_num; i++)
+		{
+			if(SSAA_eyeDepth[i]>=0)
+			{
+			quadEyeDepth += SSAA_eyeDepth[i];
+			cc+=1;
+			}
+		}
+		quadEyeDepth /= (float)SSAA_num;
+		if(cc == 0 )
+		{
+			quadEyeDepth = -1;
+		}
+		if(quadEyeDepth>=0 && quadEyeDepth < eyeDepth)
+		{
+			re = float3(1,0,0);
+		}
+	}
+
+	Result[id.xy] = float4(re, 1);
 }

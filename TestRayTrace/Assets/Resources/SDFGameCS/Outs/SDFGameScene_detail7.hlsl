@@ -11,6 +11,7 @@
 #include "../../../HLSL/PBR/PBR_IBL.hlsl"
 #include "../../../HLSL/PBR/PBR_GGX.hlsl"
 #include "../../../HLSL/UV/UVCommonDef.hlsl"
+#include "../../../HLSL/RayMath.hlsl"
 
 #include "../../../HLSL/Random/RandUtility.hlsl"
 #include "../../../HLSL/Noise/NoiseCommonDef.hlsl"
@@ -845,6 +846,30 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 		ray.pos += sdf * ray.dir;
 		Update(traceInfo,sdf);
 		traceInfo.traceSum = length(ray.pos - oriPos);
+	}
+}
+
+void TraceQuadScene(Ray ray, out HitInfo info)
+{
+	Init(info);
+	Plane plane;
+	plane.p = float3(0,1,1);
+	plane.n = float3(0,1,0);
+	float d = RayCastPlane(ray, plane);
+	//???
+	float3 u = float3(1,0,0);
+	float3 w = plane.n;
+	float3 v = normalize(cross(w,u));
+	if(d>=0)
+	{
+		info.N = plane.n;
+		info.P = ray.pos+d*ray.dir;
+		if(abs(dot(info.P - plane.p,u))<0.5&&
+			abs(dot(info.P - plane.p,v))<0.5)
+			{
+				info.bHit = true;
+				info.obj = 0;
+			}
 	}
 }
 

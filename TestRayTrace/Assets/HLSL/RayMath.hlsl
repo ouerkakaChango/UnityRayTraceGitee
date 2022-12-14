@@ -72,7 +72,7 @@ bool IsPointInsideTri(float3 pos, float3 p1, float3 p2, float3 p3)
 }
 
 //https://blog.csdn.net/qq_41524721/article/details/103490144
-float RayCastPlane(Ray ray, Plane plane)
+float RayCastPlane(in Ray ray,in Plane plane)
 {
 	float dd = dot(ray.dir, plane.n);
 	if (NearZero(dd))

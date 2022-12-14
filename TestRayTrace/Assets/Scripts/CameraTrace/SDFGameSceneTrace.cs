@@ -151,12 +151,14 @@ public class SDFGameSceneTrace : MonoBehaviour
     public bool dof_needBoxBlur = false;
     public bool usePostOp = false;
 
+    public bool useQuadTrace = true;
+
     RenderTexture rt;
     RenderTexture tempRT;
     RenderTexture tempRT1;
     RenderTexture uselessRT = null;
     RenderTexture rt_Shadow0 = null;
-    RenderTexture rt_EyeDepth = null;
+    public RenderTexture rt_EyeDepth = null;
     //Indirect RT
     RenderTexture directRT = null;
     RenderTexture newFrontIndirectRT = null, frontIndirectRT =null,indirectRT = null;
@@ -243,7 +245,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             CreateRT(ref tempRT, renderSize.x, renderSize.y);
             CreateRT(ref tempRT1, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
 
-            needEyeDepth = useTAA || useDOF;
+            needEyeDepth = useTAA || useDOF || useQuadTrace;
             if(needEyeDepth)
             {
                 CreateRT(ref rt_EyeDepth, renderSize.x, renderSize.y, RenderTextureFormat.RFloat);
@@ -475,6 +477,8 @@ public class SDFGameSceneTrace : MonoBehaviour
             computeShader.SetTexture(kInx, "rt_EyeDepth", uselessRT);
         }
 
+        computeShader.SetBool("useQuadTrace", useQuadTrace);
+
         computeShader.SetTexture(kInx, "envSpecTex2DArr", envSpecTex2DArr);
         computeShader.SetTexture(kInx, "envBgTex", envBgTex);
         camParam.InsertParamToComputeShader(ref computeShader);
@@ -693,7 +697,7 @@ public class SDFGameSceneTrace : MonoBehaviour
             csResourcesPath = ChopBegin(csResourcesPath, "Resources/");
             cs = (ComputeShader)Resources.Load(csResourcesPath);
             //---extra CS
-            if(useIndirectRT || useTAA || useDOF||usePostOp || useMSDFShadow)
+            if(useIndirectRT || useTAA || useDOF||usePostOp || useMSDFShadow || useQuadTrace)
             {
                 cs_BlendFinal = (ComputeShader)Resources.Load("LightingCS/BlendFinal");
             }

@@ -72,3 +72,7 @@ SmoothWithDither(re, suv);
 	}
 
 ###BLOCK
+
+###BLOCK QuadTraceRender
+
+###BLOCK
