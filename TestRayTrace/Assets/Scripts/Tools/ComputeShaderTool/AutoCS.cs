@@ -107,13 +107,17 @@ public class AutoCS : MonoBehaviour
         {
             dyValSys.Refresh();
         }
-        for (int i = 0; i < systems.Count; i++)
-        {
-            systems[i].Refresh();
-        }
+        
         if (bakerMgr!=null)
         {
             bakerMgr.Bake();
+            for (int i = 0; i < systems.Count; i++)
+            {
+                if (systems[i] != null)
+                {
+                    systems[i].Refresh();
+                }
+            }
             PreCompile();
         }
         else
@@ -194,11 +198,13 @@ public class AutoCS : MonoBehaviour
         int exInx = 19;
         rangeMap.Add("ObjMatLib", new List<Vector2Int>());
         rangeMap.Add("ObjImgAttach", new List<Vector2Int>());
+        rangeMap.Add("BakedQuads", new List<Vector2Int>());
 
         //---extra target sys
         Dictionary<string, int> targetSysDic = new Dictionary<string, int>();
         targetSysDic.Add("ObjMatLib",0);
         targetSysDic.Add("ObjImgAttach", 1);
+        targetSysDic.Add("BakedQuads", 2);
         //___
 
         var keyList = rangeMap.Keys.ToList();
@@ -366,7 +372,7 @@ public class AutoCS : MonoBehaviour
                         {
                             Debug.LogError("Error inx");
                         }
-                        else if (sysInx >= systems.Count)
+                        else if (sysInx >= systems.Count || systems[sysInx] == null)
                         {
                             Debug.Log("Warning: system not right: " + key + " .Lines will be cleaned. Check AutoCS system settings");
                             helper.Replace(range, "");

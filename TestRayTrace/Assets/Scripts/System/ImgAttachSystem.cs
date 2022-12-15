@@ -48,7 +48,7 @@ public class ImgAttachSystem : BaseSystem
         List<ImgAttachTag> tagList = new List<ImgAttachTag>();
         for (int i = 0; i < allTags.Length; i++)
         {
-            if (allTags[i].isActiveAndEnabled)
+            if (allTags[i].isActiveAndEnabled && allTags[i].gameObject.activeInHierarchy)
             {
                 tagList.Add(allTags[i]);
             }

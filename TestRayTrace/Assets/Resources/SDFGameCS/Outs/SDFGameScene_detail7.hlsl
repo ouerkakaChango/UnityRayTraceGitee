@@ -21,6 +21,7 @@
 #include "../../../HLSL/MatLib/Ocean.hlsl"
 
 //@@@SDFBakerMgr TexSys
+Texture2D<float4> Arror;
 Texture2D<float3> Rocks_albedo;
 Texture2D<float3> Rocks_normal;
 Texture2D<float> Rocks_metallic;
@@ -219,13 +220,6 @@ inx = GetSpecialID(inx);
 
 void ObjPostRender(inout float3 result, inout int mode, inout Material_PBR mat, inout Ray ray, inout HitInfo minHit)
 {
-//float k = 0.2;
-//float eyeDepth = length(minHit.P - ray.pos);
-//float fogK = k*eyeDepth;
-//fogK = fogK*fogK;
-//fogK = exp(-fogK);
-//float3 fogColor = 1;
-//result = lerp(fogColor, result, fogK);
 }
 
 float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
@@ -254,17 +248,17 @@ else if (mode == 1)
 else if (mode == 2)
 {
 	//object reflection IBL
-	bool isPNGEnv=false;
-	Texture2DArray tempEnv;
-	GetEnvTexArrByObj(minHit.obj, isPNGEnv, tempEnv);
-	if(isPNGEnv)
-	{
-		result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir,1,1,true,true);
-	}
-	else
-	{
-		result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir);
-	}
+	//bool isPNGEnv=false;
+	//Texture2DArray tempEnv;
+	//GetEnvTexArrByObj(minHit.obj, isPNGEnv, tempEnv);
+	//if(isPNGEnv)
+	//{
+	//	result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir,1,1,true,true);
+	//}
+	//else
+	//{
+	//	result = PBR_IBL(tempEnv, mat, minHit.N, -ray.dir);
+	//}
 }
 else if (mode == 333)
 {
@@ -849,27 +843,58 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 	}
 }
 
-void TraceQuadScene(Ray ray, out HitInfo info)
+float4 TraceQuadScene(Ray ray, out HitInfo info)
 {
 	Init(info);
-	Plane plane;
-	plane.p = float3(0,1,1);
-	plane.n = float3(0,1,0);
-	float d = RayCastPlane(ray, plane);
-	//???
-	float3 u = float3(1,0,0);
-	float3 w = plane.n;
-	float3 v = normalize(cross(w,u));
-	if(d>=0)
+	//@@@SDFBakerMgr BakedQuads
+const static float3 pos[1] = {float3(0, 1.094, 1.295)};
+const static float3 norm[1] = {float3(0, 1, 0)};
+const static float3 udir[1] = {float3(1, 0, 0)};
+const static float2 bound[1] = {float2(0.5, 0.5)};
+const static int quadNum = 1;
+	//@@@
+	int minD = MAXFLOAT;
+	int inx = -1;
+	for(int i=0;i<quadNum;i++)
 	{
-		info.N = plane.n;
-		info.P = ray.pos+d*ray.dir;
-		if(abs(dot(info.P - plane.p,u))<0.5&&
-			abs(dot(info.P - plane.p,v))<0.5)
-			{
-				info.bHit = true;
-				info.obj = 0;
-			}
+		static Plane plane;
+		plane.p = pos[i];
+		plane.n = norm[i];
+		static float d;
+		d = RayCastPlane(ray, plane);
+		static float3 u;
+		u = udir[i];
+		static float3 w;
+		w = plane.n;
+		static float3 v;
+		v = cross(w,u);
+		if(d>=0 && d<minD)
+		{
+			float3 hit = ray.pos+d*ray.dir;
+			if(abs(dot(hit - plane.p,u))<bound[i].x&&
+				abs(dot(hit - plane.p,v))<bound[i].y)
+				{
+					info.bHit = true;
+					info.obj = i;
+					info.N = plane.n;
+					info.P = hit;
+					inx = i;
+				}
+		}
+	}
+	if(info.bHit)
+	{
+		float2 uv = float2(
+		dot(info.P - pos[inx],udir[inx]),
+		dot(info.P - pos[inx],cross(norm[i],udir[inx]))
+		);
+		//uv /= bound[inx].x/0.5;
+		uv = 2*uv/bound[inx];
+		return float4(uv,0,1);
+	}
+	else
+	{
+		return 0;
 	}
 }
 

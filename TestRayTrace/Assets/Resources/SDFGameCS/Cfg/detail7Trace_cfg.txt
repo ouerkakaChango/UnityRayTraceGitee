@@ -62,7 +62,6 @@ fogK = max(fogK,fogHeightK);
 float3 fogColor = 0.1;
 re = lerp(fogColor, re, fogK);
 
-SmoothWithDither(re, suv);
 ###BLOCK
 
 ###BLOCK IndirectRender
@@ -70,9 +69,5 @@ SmoothWithDither(re, suv);
 	{
 	SetIndirectColor(re, seed, ray, minHit, mat);
 	}
-
-###BLOCK
-
-###BLOCK QuadTraceRender
 
 ###BLOCK

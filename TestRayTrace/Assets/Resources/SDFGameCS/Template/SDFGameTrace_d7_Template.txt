@@ -73,10 +73,7 @@ float4 GetQuadTraceColor(in Ray ray, out HitInfo minHit, out Material_PBR mat)
 {
 	float4 re = 0;
 	Init(mat);
-	TraceQuadScene(ray, minHit);
-###BLOCK QuadTraceRender
-...
-###BLOCK
+	re = TraceQuadScene(ray, minHit);
 	return re;
 }
 
@@ -228,9 +225,11 @@ void Render(uint3 id : SV_DispatchThreadID)
 		}
 		if(quadEyeDepth>=0 && quadEyeDepth < eyeDepth)
 		{
-			re = float3(1,0,0);
+			//???
+			re = quadColor.rgb;
 		}
 	}
 
+	SmoothWithDither(re, suv);
 	Result[id.xy] = float4(re, 1);
 }

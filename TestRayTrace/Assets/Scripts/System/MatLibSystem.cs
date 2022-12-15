@@ -47,7 +47,7 @@ public class MatLibSystem : BaseSystem
         List<MatLibTag> tagList = new List<MatLibTag>();
         for (int i = 0; i < allTags.Length; i++)
         {
-            if (allTags[i].isActiveAndEnabled)
+            if (allTags[i].isActiveAndEnabled && allTags[i].gameObject.activeInHierarchy)
             {
                 tagList.Add(allTags[i]);
             }
