@@ -520,6 +520,13 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 	}
 }
 
+float4 GetQuadColor(int inx, float2 uv, float2 bound)
+{
+	###BLOCK GetQuadColor
+	...
+	###BLOCK
+}
+
 float4 TraceQuadScene(Ray ray, out HitInfo info)
 {
 	Init(info);

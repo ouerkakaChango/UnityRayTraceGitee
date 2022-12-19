@@ -276,7 +276,7 @@ void Render(uint3 id : SV_DispatchThreadID)
 		if(quadEyeDepth>=0 && quadEyeDepth < eyeDepth)
 		{
 			//???
-			re = quadColor.rgb;
+			re = lerp(re, quadColor.rgb, quadColor.a);
 		}
 	}
 

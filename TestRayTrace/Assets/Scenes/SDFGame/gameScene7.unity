@@ -200,8 +200,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 432379063}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.094, z: 1.295}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 5.57, y: 0.54, z: 0.04}
+  m_LocalScale: {x: 8.985298, y: 0.39586, z: 0.39586}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 8
@@ -222,7 +222,7 @@ MonoBehaviour:
   pbrTextures: []
   heightTextures: []
   plainTextures:
-  - name: Arror
+  - name: Arrow
     tex: {fileID: 2800000, guid: 21b228ec242191240a72b909e9b92d09, type: 3}
     channel: 0
   envTextures: []
@@ -325,8 +325,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 628349222}
-  m_LocalRotation: {x: 0.25515214, y: 0.6275612, z: -0.22907495, w: 0.6989915}
-  m_LocalPosition: {x: -1.1387928, y: 1.7256244, z: 0.8600725}
+  m_LocalRotation: {x: -0.16272247, y: 0.77976966, z: -0.22633189, w: -0.5605841}
+  m_LocalPosition: {x: 9.550824, y: 3.5318375, z: 2.306559}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -778,7 +778,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outTextures:
-  - name: Arror
+  - name: Arrow
     tex: {fileID: 2800000, guid: 21b228ec242191240a72b909e9b92d09, type: 3}
     channel: 0
   - name: Rocks_albedo
@@ -824,7 +824,7 @@ MonoBehaviour:
   - {fileID: 2137073053}
   - {fileID: 2137073057}
   bakedDeclares:
-  - Texture2D<float4> Arror;
+  - Texture2D<float4> Arrow;
   - Texture2D<float3> Rocks_albedo;
   - Texture2D<float3> Rocks_normal;
   - Texture2D<float> Rocks_metallic;
@@ -988,10 +988,10 @@ MonoBehaviour:
   tags:
   - {fileID: 432379068}
   bakedQuads:
-  - const static float3 pos[1] = {float3(0, 1.094, 1.295)};
+  - const static float3 pos[1] = {float3(0, 0.54, 1.295)};
   - const static float3 norm[1] = {float3(0, 1, 0)};
   - const static float3 udir[1] = {float3(1, 0, 0)};
-  - const static float2 bound[1] = {float2(0.5, 0.5)};
+  - const static float2 bound[1] = {float2(4.492649, 0.19793)};
   - const static int quadNum = 1;
 --- !u!1 &1371661180
 GameObject:

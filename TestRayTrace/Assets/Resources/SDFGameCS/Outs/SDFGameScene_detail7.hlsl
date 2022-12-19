@@ -21,7 +21,7 @@
 #include "../../../HLSL/MatLib/Ocean.hlsl"
 
 //@@@SDFBakerMgr TexSys
-Texture2D<float4> Arror;
+Texture2D<float4> Arrow;
 Texture2D<float3> Rocks_albedo;
 Texture2D<float3> Rocks_normal;
 Texture2D<float> Rocks_metallic;
@@ -843,14 +843,25 @@ void Indir_TraceScene(Ray ray, out HitInfo info)
 	}
 }
 
+float4 GetQuadColor(int inx, float2 uv, float2 bound)
+{
+	if(inx == 0)
+	{
+		uv.x*=bound*4;
+		uv.x+= -_Time.y;
+		return SampleRGBA(Arrow,uv);
+	}
+	return 0;
+}
+
 float4 TraceQuadScene(Ray ray, out HitInfo info)
 {
 	Init(info);
 	//@@@SDFBakerMgr BakedQuads
-const static float3 pos[1] = {float3(0, 1.094, 1.295)};
+const static float3 pos[1] = {float3(5.57, 0.54, 0.04)};
 const static float3 norm[1] = {float3(0, 1, 0)};
 const static float3 udir[1] = {float3(1, 0, 0)};
-const static float2 bound[1] = {float2(0.5, 0.5)};
+const static float2 bound[1] = {float2(4.492649, 0.19793)};
 const static int quadNum = 1;
 	//@@@
 	int minD = MAXFLOAT;
@@ -888,9 +899,9 @@ const static int quadNum = 1;
 		dot(info.P - pos[inx],udir[inx]),
 		dot(info.P - pos[inx],cross(norm[i],udir[inx]))
 		);
-		//uv /= bound[inx].x/0.5;
-		uv = 2*uv/bound[inx];
-		return float4(uv,0,1);
+		uv = 0.5*uv/bound[inx];
+		uv = uv+0.5;
+		return GetQuadColor(inx,uv, bound[inx]);
 	}
 	else
 	{
