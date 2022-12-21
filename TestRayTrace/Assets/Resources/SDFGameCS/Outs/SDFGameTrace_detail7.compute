@@ -102,7 +102,7 @@ float fogHeightK = 1-exp(-5*(fogPos.y/10.));//saturate((fogPos.y - 0)/1);
 fogK = max(fogK,fogHeightK);
 
 float3 fogColor = 0.1;
-re = lerp(fogColor, re, fogK);
+//re = lerp(fogColor, re, fogK);
 
 
 	return re;

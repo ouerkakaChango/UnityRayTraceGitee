@@ -21,6 +21,7 @@
 #include "../../../HLSL/MatLib/Ocean.hlsl"
 
 //@@@SDFBakerMgr TexSys
+Texture3D<float> SDF_terrain;
 Texture2D<float4> Arrow;
 Texture2D<float3> Rocks_albedo;
 Texture2D<float3> Rocks_normal;
@@ -201,15 +202,17 @@ float3 T,B;
 
 
 inx = GetSpecialID(inx);
-if(inx == -1)
+if(inx== -1)
 {
-	//float2 uv = minHit.P.xz;
-	//		float k = length(minHit.P-eyePos);
-	//		k = saturate(k/20.0);
-	//		int mip = floor(k*10);
-	//		mat.albedo = mip/10.0;
+	float2 uv = 0.1*minHit.P.xz;
+			float tr = SampleR(perlinNoise1,uv);
+			if(tr<0.2)
+			{
+				mat.albedo = 0.1;
+				mat.roughness = 1;
+				mat.metallic = 0;
+			}
 }
-
 //@@@SDFBakerMgr ObjImgAttach
 
 //@@@
@@ -233,7 +236,7 @@ if(mode==0)
 float3 lightDirs[1];
 float3 dirLightColors[1];
 lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-dirLightColors[0] = float3(10, 10, 10);
+dirLightColors[0] = float3(8, 8, 8);
 result.rgb = 0.03 * mat.albedo * mat.ao;
 for(int i=0;i<1;i++)
 {
@@ -444,23 +447,35 @@ if(inx == -1)
 {
 	if(IsInBBox(p,eyePos - 300,eyePos+300))
 	{
-		//float height = 0.3*sin(0.2*p.x+_Time.y);
+		//float height = 3*sin(p.x);
 		float height =0;
-
-		if(traceInfo.lastTrace<0.5)// && abs(p.y)<0.4)
+		float k=0.5;
+		if(traceInfo.lastTrace<1.5)
 		{
 			float2 uv = 0.1*p.xz;
-			//float k = length(p-eyePos);
-			//k = saturate(k/20.0);
-			//int mip = floor(k*10);
-			height += 0.2*SampleR(mud_ground_height,uv,0);
+			//height += 0.2*SampleR(mud_ground_height,uv,0);
+			float tr = SampleR(perlinNoise1,uv);
+			if(tr<0.2)
+			{
+				height += clamp(0.8*SampleR(Rocks_height, uv, 0),0.01,0.3);
+				k=0.1;
+			}
+			else
+			{
+				height += 0.2*SampleR(mud_ground_height,uv,0);
+			}
 		}
 
-		//float2 uv = p.xz;
-		//height += perlinNoise1.SampleLevel(noise_linear_repeat_sampler, uv*0.01+0.01*_Time.y, 0).x;
-		//height += 0.1*WaterHeightMap.SampleLevel(noise_linear_repeat_sampler, uv*0.1-0.01*_Time.y, 0).x;
-
-		re = 0.5*abs(p.y-height);
+		//re = 0.5*abs(p.y-height);
+		//SDF_terrain
+		float mainh = 4*sin(0.01*p.x)+2*sin(0.02*p.z);
+		mainh += 2*sin(0.02*p.x)+1*sin(0.04*p.z);
+		mainh += 1*sin(0.04*p.x)+0.5*sin(0.08*p.z);
+		mainh += 0.5*sin(0.08*p.x)+0.25*sin(0.16*p.z);
+		//float mainh = 5*fbm4(float3(p.x,0,p.z));
+		re = abs(p.y - mainh);//abs(p.y);//SDFTex3D(p,0,25,0, SDF_terrain, TraceThre);
+		re = re - height;
+		re *=k;
 	}
 }
 
@@ -497,6 +512,10 @@ else if (inx == 1 )
 {
 }
 	//@@@
+	if(inx == -1)
+	{
+		//return GetObjSDFNormal(inx, p, traceInfo, 1000);
+	}
 	return GetObjSDFNormal(inx, p, traceInfo);
 }
 
