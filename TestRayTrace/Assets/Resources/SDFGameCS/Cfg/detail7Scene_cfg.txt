@@ -314,8 +314,8 @@ if(mode==0)
 {
   float3 lightDirs[1];
   float3 dirLightColors[1];
-  lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
-  dirLightColors[0] = float3(8, 8, 8);
+  lightDirs[0] = float3(0.3103797, -0.9506127, -6.146729E-08);
+  dirLightColors[0] = float3(1, 1, 1);
   result.rgb = 0.03 * mat.albedo * mat.ao;
   for(int i=0;i<1;i++)
   {
@@ -389,7 +389,7 @@ lightType[0] = 0;
 float3 lightPos[1];
 lightPos[0] = float3(0, 3, 0);
 float3 lightDirs[1];
-lightDirs[0] = float3(-0.3213938, -0.7660444, 0.5566705);
+lightDirs[0] = float3(0.3103797, -0.9506127, -6.146729E-08);
 int shadowType[1];
 shadowType[0] =1;
 float lightspace = 1;
@@ -506,7 +506,7 @@ if(inx == -1)
 			float tr = SampleR(perlinNoise1,uv);
 			if(tr<0.2)
 			{
-				height += clamp(0.8*SampleR(Rocks_height, uv, 0),0.01,0.3);
+				height += clamp(0.8*SampleR(Rocks_height, uv, 0),0.2,0.3);
 				k=0.1;
 			}
 			else

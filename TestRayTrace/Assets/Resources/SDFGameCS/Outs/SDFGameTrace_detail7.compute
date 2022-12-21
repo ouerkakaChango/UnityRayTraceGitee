@@ -97,12 +97,12 @@ float fogK = 0.005*eyeDepth*fogKScale;
 fogK = exp(-fogK*fogK);
 
 float3 fogPos = ray.pos+ray.dir*eyeDepth;
-float fogHeightK = 1-exp(-5*(fogPos.y/10.));//saturate((fogPos.y - 0)/1);
+float fogHeightK = 1-exp(-5*(fogPos.y/100.));
 
 fogK = max(fogK,fogHeightK);
 
 float3 fogColor = 0.1;
-//re = lerp(fogColor, re, fogK);
+re = lerp(fogColor, re, fogK);
 
 
 	return re;
