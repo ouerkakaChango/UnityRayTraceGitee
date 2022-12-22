@@ -88,7 +88,7 @@ float3 RenderSceneObj(Ray ray, inout HitInfo minHit, inout Material_PBR mat)
 
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, bool expensive = false);
-float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, int method = 1);
+float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, int method = 0);
 
 float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
 {

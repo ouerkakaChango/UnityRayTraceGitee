@@ -1,4 +1,4 @@
-﻿#define OBJNUM 2
+﻿#define OBJNUM 3
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -72,13 +72,21 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
+re.albedo = float3(0, 0, 0);
+re.metallic = 0;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(0.5, 0.5);
+}
+else if (obj == 1 )
+{
 re.albedo = float3(1, 1, 1);
 re.metallic = 1;
 re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(0.5, 0.5);
 }
-else if (obj == 1 )
+else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 1;
@@ -93,9 +101,10 @@ re.reflect_ST = float2(0.5, 0.5);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[2];
+int renderMode[3];
 renderMode[0] = 0;
 renderMode[1] = 0;
+renderMode[2] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -106,10 +115,15 @@ float2 GetObjPreUV(int inx, float3 p)
 	//@@@SDFBakerMgr ObjPreUV
 if(inx == 0 )
 {
-uv = BoxedUV(p, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(p, float3(-25.4, -4.3, -25.7), float3(15.5532, 4.323903, 8.874146), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 1 )
+{
+uv = BoxedUV(p, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return uv;
+}
+else if (inx == 2 )
 {
 }
 	//@@@
@@ -128,10 +142,15 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
-uv = BoxedUV(minHit.P, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+uv = BoxedUV(minHit.P, float3(-25.4, -4.3, -25.7), float3(15.5532, 4.323903, 8.874146), float3(0, 0, 0));
 return uv;
 }
 else if (inx == 1 )
+{
+uv = BoxedUV(minHit.P, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return uv;
+}
+else if (inx == 2 )
 {
 }
 	//@@@
@@ -153,10 +172,15 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
-BoxedTB(T,B,minHit.P, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+BoxedTB(T,B,minHit.P, float3(-25.4, -4.3, -25.7), float3(15.5532, 4.323903, 8.874146), float3(0, 0, 0));
 return;
 }
 if(inx == 1 )
+{
+BoxedTB(T,B,minHit.P, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
+return;
+}
+if(inx == 2 )
 {
 }
 //@@@
@@ -174,7 +198,7 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==0)
+if(inx==1)
 {
 	float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
@@ -186,7 +210,7 @@ float3 T,B;
 	GetObjTB(T,B, minHit);
 	minHit.N = SampleNormalMap(Rocks_normal, uv, minHit.N,T,B,1);
 }
-if(inx==1)
+if(inx==2)
 {
 	float2 uv = GetObjUV(minHit);
 uv = float2(0.1, 0.1)*uv+float2(0, 0);
@@ -297,7 +321,7 @@ int inx = GetSpecialID(minHit.obj);
 
 
 float HardShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, bool expensive = false);
-float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, int method = 1);
+float SoftShadow_TraceScene(Ray ray, out HitInfo info, float maxLength = MaxSDF, int method = 0);
 
 float GetDirHardShadow(float3 lightDir, in HitInfo minHit, float maxLength = MaxSDF)
 {
@@ -428,6 +452,10 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
+re = min(re, 0 + SDFBox(p, float3(-25.4, -4.3, -25.7), float3(15.5532, 4.323903, 8.874146), float3(0, 0, 0)));
+}
+else if (inx == 1 )
+{
 float3 center = float3(0, 0.776, 0);
 float3 bound = float3(0.5, 0.5, 0.5);
 float3 rot = float3(0, 0, 0);
@@ -437,7 +465,7 @@ float d = offset + SDFBox(p,center,bound, rot);
 d*=0.2;
 re = min(re,d);
 }
-else if (inx == 1 )
+else if (inx == 2 )
 {
 inx = -1;
 }
@@ -509,6 +537,9 @@ if(inx == 0 )
 {
 }
 else if (inx == 1 )
+{
+}
+else if (inx == 2 )
 {
 }
 	//@@@
@@ -1043,6 +1074,9 @@ if(inx == 0 )
 {
 }
 else if (inx == 1 )
+{
+}
+else if (inx == 2 )
 {
 inx = -1;
 }
