@@ -255,7 +255,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 432379063}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.57, y: 0.54, z: 0.04}
+  m_LocalPosition: {x: 4.73, y: 0.54, z: -0.05}
   m_LocalScale: {x: 8.985298, y: 0.39586, z: 0.39586}
   m_Children: []
   m_Father: {fileID: 0}
@@ -349,7 +349,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 0
+  objInx: 1
   needExtraCondition: 0
   extraCondition: 
 --- !u!65 &580037352
@@ -583,7 +583,7 @@ MonoBehaviour:
   dof_maxThreshold: 0.3
   dof_fixFocusDepth: 2
   dof_dilationSize: 1
-  MSDFShadow_filterSize: 3
+  MSDFShadow_filterSize: 1.5
 --- !u!114 &628349228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -623,6 +623,91 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91ac8431640d49a43869e926f5c1d5b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &708572472
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 708572474}
+  - component: {fileID: 708572473}
+  - component: {fileID: 708572475}
+  m_Layer: 0
+  m_Name: testRock2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &708572473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 708572472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aef49fc242802448b04a1cbe6415de3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat_PBR:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    metallic: 1
+    roughness: 1
+    reflective: 0
+    reflect_ST: {x: 0.5, y: 0.5}
+  SDF_offset: 0
+  normEplison: 1
+  renderMode: 0
+  shapeType: 1
+  booleanTags: []
+  specialID: -2
+  fontCharacter: 0
+  sliceTexTag: {fileID: 0}
+  hBound: 0.02
+  SDF_offset2D: 0
+  tex3DTag: {fileID: 0}
+  mergeType: 0
+  objInx: 0
+  needExtraCondition: 0
+  extraCondition: 
+--- !u!4 &708572474
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 708572472}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &708572475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 708572472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d88b1d40d58f36d4fbcbf28d4a127f67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matTypeName: PBR
+  floatParams:
+  - 1
+  - 1
+  - 0
+  - 0
+  texParams:
+  - {fileID: 894784447}
 --- !u!1 &788759404
 GameObject:
   m_ObjectHideFlags: 0
@@ -825,7 +910,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 1
-  objInx: 1
+  objInx: 2
   needExtraCondition: 0
   extraCondition: 
 --- !u!114 &894784446
@@ -1048,7 +1133,7 @@ MonoBehaviour:
   bakedSpecialObjects: []
   bakedMaterials: []
   bakedRenderModes:
-  - int renderMode[3];
+  - int renderMode[4];
   bakedRenders: []
   bakedShadows: []
   bakedFullLightInfo: []
@@ -1058,6 +1143,7 @@ MonoBehaviour:
   bakedCheckInnerBound: []
   bakedObjEnvTex: []
   tags:
+  - {fileID: 708572473}
   - {fileID: 580037351}
   - {fileID: 894784445}
   - {fileID: 2137073055}
@@ -1078,10 +1164,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tags:
+  - {fileID: 708572475}
   - {fileID: 894784446}
   - {fileID: 2137073054}
   bakedObjMatLib:
-  - if(inx==1)
+  - if(inx==0)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' uv = float2(1, 1)*uv+float2(0, 0);'
@@ -1094,6 +1181,18 @@ MonoBehaviour:
   - "\tminHit.N = SampleNormalMap(Rocks_normal, uv, minHit.N,T,B,1);"
   - '}'
   - if(inx==2)
+  - '{'
+  - "\tfloat2 uv = GetObjUV(minHit);"
+  - ' uv = float2(1, 1)*uv+float2(0, 0);'
+  - "\tmat.albedo *= SampleRGB(Rocks_albedo, uv);"
+  - "\tmat.ao *= SampleR(Rocks_ao, uv);"
+  - "\tmat.metallic *= SampleR(Rocks_metallic, uv);"
+  - "\tmat.roughness *= SampleR(Rocks_roughness, uv);"
+  - ' float3 T,B;'
+  - "\tGetObjTB(T,B, minHit);"
+  - "\tminHit.N = SampleNormalMap(Rocks_normal, uv, minHit.N,T,B,1);"
+  - '}'
+  - if(inx==3)
   - '{'
   - "\tfloat2 uv = GetObjUV(minHit);"
   - ' uv = float2(0.1, 0.1)*uv+float2(0, 0);'
@@ -1178,7 +1277,7 @@ MonoBehaviour:
   tags:
   - {fileID: 432379068}
   bakedQuads:
-  - const static float3 pos[1] = {float3(5.57, 0.54, 0.04)};
+  - const static float3 pos[1] = {float3(4.73, 0.54, -0.05)};
   - const static float3 norm[1] = {float3(0, 1, 0)};
   - const static float3 udir[1] = {float3(1, 0, 0)};
   - const static float2 bound[1] = {float2(4.492649, 0.19793)};
@@ -1585,7 +1684,7 @@ MonoBehaviour:
   SDF_offset2D: 0
   tex3DTag: {fileID: 0}
   mergeType: 0
-  objInx: 2
+  objInx: 3
   needExtraCondition: 0
   extraCondition: 
 --- !u!4 &2137073056

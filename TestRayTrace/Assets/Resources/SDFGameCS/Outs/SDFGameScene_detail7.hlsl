@@ -1,4 +1,4 @@
-﻿#define OBJNUM 3
+﻿#define OBJNUM 4
 
 #define MaxSDF 100000
 #define MaxTraceDis 100
@@ -72,13 +72,21 @@ Material_PBR GetObjMaterial_PBR(int obj)
 //@@@SDFBakerMgr ObjMaterial
 if(obj == 0 )
 {
+re.albedo = float3(1, 1, 1);
+re.metallic = 1;
+re.roughness = 1;
+re.reflective = 0;
+re.reflect_ST = float2(0.5, 0.5);
+}
+else if (obj == 1 )
+{
 re.albedo = float3(0, 0, 0);
 re.metallic = 0;
 re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(0.5, 0.5);
 }
-else if (obj == 1 )
+else if (obj == 2 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 1;
@@ -86,7 +94,7 @@ re.roughness = 1;
 re.reflective = 0;
 re.reflect_ST = float2(0.5, 0.5);
 }
-else if (obj == 2 )
+else if (obj == 3 )
 {
 re.albedo = float3(1, 1, 1);
 re.metallic = 1;
@@ -101,10 +109,11 @@ re.reflect_ST = float2(0.5, 0.5);
 int GetObjRenderMode(int obj)
 {
 //@@@SDFBakerMgr ObjRenderMode
-int renderMode[3];
+int renderMode[4];
 renderMode[0] = 0;
 renderMode[1] = 0;
 renderMode[2] = 0;
+renderMode[3] = 0;
 return renderMode[obj];
 //@@@
 }
@@ -115,15 +124,18 @@ float2 GetObjPreUV(int inx, float3 p)
 	//@@@SDFBakerMgr ObjPreUV
 if(inx == 0 )
 {
+}
+else if (inx == 1 )
+{
 uv = BoxedUV(p, float3(-25.4, -4.3, -25.7), float3(15.5532, 4.323903, 8.874146), float3(0, 0, 0));
 return uv;
 }
-else if (inx == 1 )
+else if (inx == 2 )
 {
 uv = BoxedUV(p, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return uv;
 }
-else if (inx == 2 )
+else if (inx == 3 )
 {
 }
 	//@@@
@@ -142,15 +154,18 @@ float2 GetObjUV(in HitInfo minHit)
 	//@@@SDFBakerMgr ObjUV
 if(inx == 0 )
 {
+}
+else if (inx == 1 )
+{
 uv = BoxedUV(minHit.P, float3(-25.4, -4.3, -25.7), float3(15.5532, 4.323903, 8.874146), float3(0, 0, 0));
 return uv;
 }
-else if (inx == 1 )
+else if (inx == 2 )
 {
 uv = BoxedUV(minHit.P, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return uv;
 }
-else if (inx == 2 )
+else if (inx == 3 )
 {
 }
 	//@@@
@@ -160,6 +175,12 @@ else if (inx == 2 )
 	{
 		//uv = SimpleUVFromPos(minHit.P,minHit.N, float3(1,1,1));
 		uv = minHit.P.xz;
+	}
+
+	if(inx == -2)
+	{
+		uv = SimpleUVFromPos(minHit.P,minHit.N, 0.1*float3(1,1,1));
+		//uv = minHit.P.xz;
 	}
 return uv;
 }
@@ -172,15 +193,18 @@ void GetObjTB(inout float3 T, inout float3 B, in HitInfo minHit)
 //@@@SDFBakerMgr ObjTB
 if(inx == 0 )
 {
+}
+if(inx == 1 )
+{
 BoxedTB(T,B,minHit.P, float3(-25.4, -4.3, -25.7), float3(15.5532, 4.323903, 8.874146), float3(0, 0, 0));
 return;
 }
-if(inx == 1 )
+if(inx == 2 )
 {
 BoxedTB(T,B,minHit.P, float3(0, 0.776, 0), float3(0.5, 0.5, 0.5), float3(0, 0, 0));
 return;
 }
-if(inx == 2 )
+if(inx == 3 )
 {
 }
 //@@@
@@ -198,7 +222,7 @@ void ObjPreRender(inout int mode, inout Material_PBR mat, inout Ray ray, inout H
 {
 int inx = minHit.obj;
 //@@@SDFBakerMgr ObjMatLib
-if(inx==1)
+if(inx==0)
 {
 	float2 uv = GetObjUV(minHit);
 uv = float2(1, 1)*uv+float2(0, 0);
@@ -211,6 +235,18 @@ float3 T,B;
 	minHit.N = SampleNormalMap(Rocks_normal, uv, minHit.N,T,B,1);
 }
 if(inx==2)
+{
+	float2 uv = GetObjUV(minHit);
+uv = float2(1, 1)*uv+float2(0, 0);
+	mat.albedo *= SampleRGB(Rocks_albedo, uv);
+	mat.ao *= SampleR(Rocks_ao, uv);
+	mat.metallic *= SampleR(Rocks_metallic, uv);
+	mat.roughness *= SampleR(Rocks_roughness, uv);
+float3 T,B;
+	GetObjTB(T,B, minHit);
+	minHit.N = SampleNormalMap(Rocks_normal, uv, minHit.N,T,B,1);
+}
+if(inx==3)
 {
 	float2 uv = GetObjUV(minHit);
 uv = float2(0.1, 0.1)*uv+float2(0, 0);
@@ -236,6 +272,16 @@ if(inx== -1)
 				mat.roughness = 1;
 				mat.metallic = 0;
 			}
+
+			//if(SampleR(perlinNoise1,0.01*minHit.P.xz)<0.5 && length(minHit.P.xz)<10)
+			//{
+			//	mat.albedo = float3(1,0,0);
+			//}
+}
+
+if(inx == -2)
+{
+	mat.roughness = max(0.9,mat.roughness);
 }
 //@@@SDFBakerMgr ObjImgAttach
 
@@ -452,9 +498,13 @@ float re = MaxTraceDis + 1; //Make sure default is an invalid SDF
 //@@@SDFBakerMgr ObjSDF
 if(inx == 0 )
 {
-re = min(re, 0 + SDFBox(p, float3(-25.4, -4.3, -25.7), float3(15.5532, 4.323903, 8.874146), float3(0, 0, 0)));
+inx = -2;
 }
 else if (inx == 1 )
+{
+re = min(re, 0 + SDFBox(p, float3(-25.4, -4.3, -25.7), float3(15.5532, 4.323903, 8.874146), float3(0, 0, 0)));
+}
+else if (inx == 2 )
 {
 float3 center = float3(0, 0.776, 0);
 float3 bound = float3(0.5, 0.5, 0.5);
@@ -465,7 +515,7 @@ float d = offset + SDFBox(p,center,bound, rot);
 d*=0.2;
 re = min(re,d);
 }
-else if (inx == 2 )
+else if (inx == 3 )
 {
 inx = -1;
 }
@@ -486,7 +536,7 @@ if(inx == -1)
 			if(tr<0.2)
 			{
 				height += clamp(0.8*SampleR(Rocks_height, uv, 0),0.2,0.3);
-				k=0.1;
+				//k=0.1;
 			}
 			else
 			{
@@ -505,6 +555,41 @@ if(inx == -1)
 		re = re - height;
 		re *=k;
 	}
+}
+
+else if(inx == -2)
+{
+	if( IsInBBox(p,-20,20) && abs(p.y)<10)
+	{
+		float mainh = 4*sin(0.01*p.x)+2*sin(0.02*p.z);
+		mainh += 2*sin(0.02*p.x)+1*sin(0.04*p.z);
+		mainh += 1*sin(0.04*p.x)+0.5*sin(0.08*p.z);
+		mainh += 0.5*sin(0.08*p.x)+0.25*sin(0.16*p.z);
+		float3 center = GetGridCenter_MidMode(p,float3(3,10,3),0);
+		if(SampleR(perlinNoise1,0.01*center.xz)<0.5)
+		{
+			center.xz += 0.3*(2*Ocean_hash21(center.x+center.z)-1);
+			center.y = mainh;
+			float3 q = p - center;
+			q*=float3(0.8,lerp(0.5,1,hash_f3(center.z)),lerp(0.9,1,hash_f3(center.x)));
+			re = SDFSphere(q,0,hash_f3(center.x)*(1.2+0.2*fbm4(p)));
+
+			center = GetGridCenter_DownMode(float3(p.x,mainh,p.z),float3(3,10,3),float3(0.4*(2*hash_f3(center.z)-1),0,0));
+			center.xz += 0.2*(2*Ocean_hash21(center.x+center.z)-1);
+			center.y = mainh;
+			q = p - center;
+			q*=float3(1,0.5,1);
+			float d2 = SDFSphere(q,0,hash_f3(center.x)*(0.4+0.2*fbm4(p)));
+			re = smin(re,d2);
+
+			re -=0.002;
+			re*=0.5;
+		}
+	}
+}
+else if(inx == -3)
+{
+	//if(SampleR(perlinNoise1,0.01*minHit.P.xz)<0.5 && length(minHit.P.xz)<10)
 }
 
 return re;
@@ -540,6 +625,9 @@ else if (inx == 1 )
 {
 }
 else if (inx == 2 )
+{
+}
+else if (inx == 3 )
 {
 }
 	//@@@
@@ -908,7 +996,7 @@ float4 TraceQuadScene(Ray ray, out HitInfo info)
 {
 	Init(info);
 	//@@@SDFBakerMgr BakedQuads
-const static float3 pos[1] = {float3(5.57, 0.54, 0.04)};
+const static float3 pos[1] = {float3(4.73, 0.54, -0.05)};
 const static float3 norm[1] = {float3(0, 1, 0)};
 const static float3 udir[1] = {float3(1, 0, 0)};
 const static float2 bound[1] = {float2(4.492649, 0.19793)};
@@ -1072,11 +1160,15 @@ int GetSpecialID(int inx)
 //@@@SDFBakerMgr SpecialObj
 if(inx == 0 )
 {
+inx = -2;
 }
 else if (inx == 1 )
 {
 }
 else if (inx == 2 )
+{
+}
+else if (inx == 3 )
 {
 inx = -1;
 }
